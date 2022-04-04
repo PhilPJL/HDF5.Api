@@ -1,6 +1,5 @@
 ﻿using HDF.PInvoke;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -17,18 +16,15 @@ namespace HDF5Test
         static void CreateFile()
         {
             const long invalidHandle = -1L;
-            var fileId = invalidHandle;
             var rawRecordTypeId = invalidHandle;
-            var spaceId = invalidHandle;
-            var dataSetId = invalidHandle;
-            var groupId = invalidHandle;
-            var propListId = invalidHandle;
 
             try
             {
+                Console.WriteLine($"H5 version={H5Global.GetLibraryVersion()}");
+
                 // Create file
-                fileId = H5F.create(@"test1.h5", H5F.ACC_TRUNC);
-                Console.WriteLine($"Opened file: {fileId}");
+                using var fileId = H5File.Create(@"test1.h5", H5F.ACC_TRUNC);
+                Console.WriteLine($"Created file: {fileId}");
 
                 // setup compound type
                 int size = Marshal.SizeOf<RawRecord>();
@@ -52,31 +48,25 @@ namespace HDF5Test
 
                 // create a dataspace - single dimension 1 x unlimited
                 var dims = new ulong[] { (ulong)records.Length };
-                spaceId = H5S.create_simple(1, dims, new ulong[] { H5S.UNLIMITED });
+                var maxdims = new ulong[] { H5S.UNLIMITED };
+
+                using var spaceId = H5Space.CreateSimple(1, dims, maxdims);
                 Console.WriteLine($"Created space: {spaceId}");
 
                 // create a group
-                groupId = H5G.create(fileId, "Data");
+                using var groupId = H5Group.Create(fileId, "Data");
                 Console.WriteLine($"Created group: {groupId}");
 
-                // create a property list
-                propListId = H5P.create(H5P.DATASET_CREATE);
+                // create a dataset-create property list
+                using var propListId = H5PropertyList.Create(H5P.DATASET_CREATE);
                 Console.WriteLine($"Created prop: {propListId}");
                 // 1) allow chunking - doesn't work without this. From user guide: HDF5 requires the use of chunking when defining extendable datasets
-                int err1 = H5P.set_chunk(propListId, 1, dims);
-                if (err1 < 0)
-                {
-                    Console.WriteLine($"Error H5P.set_chunk={err1}.");
-                }
+                H5PropertyList.SetChunk(propListId, 1, dims);
                 // 2) enable compression
-                err1 = H5P.set_deflate(propListId, 6);
-                if (err1 < 0)
-                {
-                    Console.WriteLine($"Error H5P.set_deflate={err1}.");
-                }
+                H5PropertyList.EnableCompression(propListId, 6);
 
                 // create the dataset RawRecords 
-                dataSetId = H5D.create(groupId, "RawRecords", rawRecordTypeId, spaceId, H5P.DEFAULT, propListId);
+                using var dataSetId = H5DataSet.Create(groupId, "RawRecords", rawRecordTypeId, spaceId, propListId);
                 Console.WriteLine($"Created data set: {dataSetId}");
 
                 for (int i = 0; i < 1; i++)
@@ -97,7 +87,6 @@ namespace HDF5Test
             }
             finally
             {
-                // close file
                 int result;
 
                 if (rawRecordTypeId > -1)
@@ -112,72 +101,6 @@ namespace HDF5Test
                         Console.WriteLine($"Error H5T.close={result}.");
                     }
                 }
-
-                if (dataSetId > -1)
-                {
-                    // close data set
-                    result = H5D.close(dataSetId);
-
-                    Console.WriteLine($"Closed data set: {dataSetId}");
-
-                    if (result < 0)
-                    {
-                        Console.WriteLine($"Error H5D.close={result}.");
-                    }
-                }
-
-                if (groupId > -1)
-                {
-                    // close data set
-                    result = H5G.close(groupId);
-
-                    Console.WriteLine($"Closed group: {groupId}");
-
-                    if (result < 0)
-                    {
-                        Console.WriteLine($"Error H5G.close={result}.");
-                    }
-                }
-
-                if (spaceId > -1)
-                {
-                    // close space
-                    result = H5S.close(spaceId);
-
-                    Console.WriteLine($"Closed space: {spaceId}");
-
-                    if (result < 0)
-                    {
-                        Console.WriteLine($"Error H5S.close={result}.");
-                    }
-                }
-
-                if (propListId > -1)
-                {
-                    // close space
-                    result = H5P.close(propListId);
-
-                    Console.WriteLine($"Closed prop: {propListId}");
-
-                    if (result < 0)
-                    {
-                        Console.WriteLine($"Error H5S.close={result}.");
-                    }
-                }
-
-                Debug.WriteLine($"Closing file {fileId}.  Open object count: {H5F.get_obj_count(fileId, H5F.OBJ_ALL).ToInt32()}");
-
-                if (fileId > -1)
-                {
-                    result = H5F.close(fileId);
-
-                    Console.WriteLine($"Closed file: {fileId}");
-
-                    if (result < 0)
-                    {
-                        Console.WriteLine($"Error H5F.close={result}.");
-                    }
-                }
             }
         }
 
@@ -185,13 +108,13 @@ namespace HDF5Test
         {
             var now = DateTime.UtcNow;
 
-            return Enumerable.Range(0, 10000)
+            return Enumerable.Range(0, 100000)
                 .Select(i => new RawRecord
                 {
                     Id = i,
-                    ProfileDeviation = 5.5 + i/1000f,
+                    ProfileDeviation = 5.5 + i / 1000f,
                     Timestamp = now.AddMilliseconds(i).ToOADate(),
-                    Thickness = 0.2 + i/1000f
+                    Thickness = 0.2 + i / 1000f
 
                 })
                 .ToArray();
