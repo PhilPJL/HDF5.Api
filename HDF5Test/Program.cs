@@ -1,5 +1,6 @@
 ﻿using HDF.PInvoke;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Handle = System.Int64;
@@ -26,7 +27,7 @@ namespace HDF5Test
             Console.WriteLine($"H5 version={H5Global.GetLibraryVersion()}");
 
             // Create file
-            using var fileId = H5File.Create(@"test1.h5", H5F.ACC_TRUNC);
+            using var fileId = H5File.Create(@"test2.h5", H5F.ACC_TRUNC);
             Console.WriteLine($"Created file: {fileId}");
 
             // setup compound type
@@ -46,6 +47,11 @@ namespace HDF5Test
             H5Type.Insert(rawRecordTypeId, "Interval Id", Marshal.OffsetOf<RawRecord>("IntervalId"), H5T.NATIVE_INT64);
             H5Type.Insert(rawRecordTypeId, "Pulse offset", Marshal.OffsetOf<RawRecord>("PulseOffset"), H5T.NATIVE_DOUBLE);
             H5Type.Insert(rawRecordTypeId, "Reference offset", Marshal.OffsetOf<RawRecord>("ReferenceOffset"), H5T.NATIVE_INT64);
+
+            using var byteArrayId1 = H5Type.CreateByteArrayType(32768);
+            H5Type.Insert(rawRecordTypeId, "Array1", Marshal.OffsetOf<RawRecord>("Array1"), byteArrayId1);
+            using var byteArrayId2 = H5Type.CreateByteArrayType(16384);
+            H5Type.Insert(rawRecordTypeId, "Array2", Marshal.OffsetOf<RawRecord>("Array2"), byteArrayId2);
 
             int chunkSize = 100;
 
@@ -72,6 +78,8 @@ namespace HDF5Test
             using var dataSetId = H5DataSet.Create(groupId, "RawRecords", rawRecordTypeId, memorySpaceId, propListId);
             Console.WriteLine($"Created data set: {dataSetId}");
 
+            Stopwatch s = new Stopwatch();
+            s.Start();
 
             for (int i = 0; i < 100; i++)
             {
@@ -95,6 +103,8 @@ namespace HDF5Test
                 }
             }
 
+            s.Stop();
+            Console.WriteLine($"Time elapsed: {s.Elapsed}");
         }
 
         static RawRecord[] GetTestData(int n, int chunk)
@@ -115,8 +125,32 @@ namespace HDF5Test
 
     //CTSWaveformAndProfileDatabaseSpectra
     [StructLayout(LayoutKind.Sequential)]
-    struct RawRecord
+    unsafe struct RawRecord
     {
+        public RawRecord()
+        {
+            Id = 0;
+            MeasurementId = 0;
+            Timestamp = 0;
+            Thickness = 0;
+            ProfileDeviation = 0;
+            ProfileHeight = 0;
+            ZPosition = 0;
+            IntervalId = 0;
+            PulseOffset = 0;
+            ReferenceOffset = 0;
+
+            for (int i = 0; i < 32768; i++)
+            {
+                Array1[i] = 123;
+            }
+
+            for (int i = 0; i < 16384; i++)
+            {
+                Array2[i] = 234;
+            }
+        }
+
         public long Id;
         public int MeasurementId;
         public double Timestamp;
@@ -127,5 +161,7 @@ namespace HDF5Test
         public long IntervalId;
         public double PulseOffset;
         public long ReferenceOffset;
+        public fixed byte Array1[32768];
+        public fixed byte Array2[16384];
     }
 }

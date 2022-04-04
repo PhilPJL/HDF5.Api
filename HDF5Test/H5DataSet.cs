@@ -36,6 +36,9 @@ namespace HDF5Test
         public static void Write(H5DataSetHandle dataSetId, H5TypeHandle typeId, H5SpaceHandle memorySpaceId, H5SpaceHandle fileSpaceId, IntPtr buffer)
         {
             H5Handle.AssertHandle(dataSetId);
+            H5Handle.AssertHandle(typeId);
+            H5Handle.AssertHandle(memorySpaceId);
+            H5Handle.AssertHandle(fileSpaceId);
             int err = H5D.write(dataSetId, typeId, memorySpaceId, fileSpaceId, H5P.DEFAULT, buffer);
             H5Handle.AssertError(err);
         }

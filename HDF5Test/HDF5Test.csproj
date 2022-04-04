@@ -4,6 +4,7 @@
 		<LangVersion>latest</LangVersion>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net472</TargetFramework>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
