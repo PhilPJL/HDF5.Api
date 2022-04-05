@@ -38,7 +38,7 @@ namespace HDF5Test
         }
     }
 
-    public class H5FileHandle : H5LocationHandle
+    public class H5FileHandle : H5Handle, IH5Location
     {
         public H5FileHandle(Handle handle) : base(handle)
         {
@@ -55,7 +55,7 @@ namespace HDF5Test
         }
     }
 
-    public class H5GroupHandle : H5LocationHandle
+    public class H5GroupHandle : H5Handle, IH5Location
     {
         public H5GroupHandle(Handle handle) : base(handle)
         {
@@ -72,14 +72,12 @@ namespace HDF5Test
         }
     }
 
-    public abstract class H5LocationHandle : H5Handle
+    public interface IH5Location
     {
-        protected H5LocationHandle(Handle handle) : base(handle)
-        {
-        }
+        public Handle Handle { get; }
     }
 
-    public class H5DataSetHandle : H5Handle
+    public class H5DataSetHandle : H5Handle, IH5Location
     {
         public H5DataSetHandle(Handle handle) : base(handle)
         {
@@ -120,6 +118,7 @@ namespace HDF5Test
 
         protected H5Handle(Handle handle)
         {
+            AssertHandle(handle);
             Handle = handle;
         }
 

@@ -4,43 +4,59 @@ using Handle = System.Int64;
 
 namespace HDF5Test
 {
-    public static class H5DataSet
+    public class H5DataSet : H5DataSetHandle
     {
-        public static H5DataSetHandle Create(H5LocationHandle location, string name,
-            Handle rawRecordTypeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+        private H5DataSet(Handle handle) : base(handle)
         {
-            H5Handle.AssertHandle(location);
-            H5Handle.AssertHandle(rawRecordTypeId);
-            H5Handle.AssertHandle(spaceId);
-            H5Handle.AssertHandle(propertyListId);
-            Handle h = H5D.create(location, name, rawRecordTypeId, spaceId, H5P.DEFAULT, propertyListId);
-            H5Handle.AssertHandle(h);
-            return new H5DataSetHandle(h);
         }
 
-        public static H5SpaceHandle GetFileSpace(H5DataSetHandle dataSetId)
+        public void Write(H5TypeHandle typeId, H5SpaceHandle memorySpaceId, H5SpaceHandle fileSpaceId, IntPtr buffer)
         {
-            H5Handle.AssertHandle(dataSetId);
+            Write(this, typeId, memorySpaceId, fileSpaceId, buffer);
+        }
+
+        public H5Space GetFileSpace()
+        {
+            return GetFileSpace(this);
+        }
+
+        #region Static C level API wrappers
+        public static H5DataSet Create(IH5Location location, string name,
+            Handle rawRecordTypeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+        {
+            AssertHandle(location.Handle);
+            AssertHandle(rawRecordTypeId);
+            AssertHandle(spaceId);
+            AssertHandle(propertyListId);
+            Handle h = H5D.create(location.Handle, name, rawRecordTypeId, spaceId, H5P.DEFAULT, propertyListId);
+            AssertHandle(h);
+            return new H5DataSet(h);
+        }
+
+        public static H5Space GetFileSpace(H5DataSetHandle dataSetId)
+        {
+            AssertHandle(dataSetId);
             Handle h = H5D.get_space(dataSetId);
-            H5Handle.AssertHandle(h);
-            return new H5SpaceHandle(h);
+            AssertHandle(h);
+            return new H5Space(h);
         }
 
         public static void SetExtent(H5DataSetHandle dataSetId, ulong[] dims)
         {
-            H5Handle.AssertHandle(dataSetId);
+            AssertHandle(dataSetId);
             int err = H5D.set_extent(dataSetId, dims);
-            H5Handle.AssertError(err);
+            AssertError(err);
         }
 
         public static void Write(H5DataSetHandle dataSetId, H5TypeHandle typeId, H5SpaceHandle memorySpaceId, H5SpaceHandle fileSpaceId, IntPtr buffer)
         {
-            H5Handle.AssertHandle(dataSetId);
-            H5Handle.AssertHandle(typeId);
-            H5Handle.AssertHandle(memorySpaceId);
-            H5Handle.AssertHandle(fileSpaceId);
+            AssertHandle(dataSetId);
+            AssertHandle(typeId);
+            AssertHandle(memorySpaceId);
+            AssertHandle(fileSpaceId);
             int err = H5D.write(dataSetId, typeId, memorySpaceId, fileSpaceId, H5P.DEFAULT, buffer);
-            H5Handle.AssertError(err);
+            AssertError(err);
         }
+        #endregion
     }
 }

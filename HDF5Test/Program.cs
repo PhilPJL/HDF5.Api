@@ -78,8 +78,8 @@ namespace HDF5Test
             Console.WriteLine($"Created group: {groupId}");
 
             // create a dataset named 'RawRecords' in group 'Data' with our record type and chunk size
-            using var dataSetId = H5DataSet.Create(groupId, "RawRecords", rawRecordTypeId, memorySpaceId, propListId);
-            Console.WriteLine($"Created data set: {dataSetId}");
+            using var dataSet = H5DataSet.Create(groupId, "RawRecords", rawRecordTypeId, memorySpaceId, propListId);
+            Console.WriteLine($"Created data set: {dataSet}");
 
             Stopwatch s = new Stopwatch();
             s.Start();
@@ -102,16 +102,16 @@ namespace HDF5Test
 
                     // extend the dataset to accept this chunk
                     extent[0] = (ulong)(currentPosition + records.Length);
-                    H5DataSet.SetExtent(dataSetId, extent);
+                    H5DataSet.SetExtent(dataSet, extent);
 
                     // move the hyperslab window
-                    using var fileSpaceId = H5DataSet.GetFileSpace(dataSetId);
-                    H5Space.SelectHyperslab(fileSpaceId, currentPosition, records.Length);
+                    using var fileSpace = H5DataSet.GetFileSpace(dataSet);
+                    fileSpace.SelectHyperslab(currentPosition, records.Length);
 
                     // match the space to length of records retrieved
                     // if using standard length chunks (say 100) then only need to change this for the final write
                     using var recordSpace = H5Space.CreateSimple(1, new ulong[] { (ulong)records.Length }, maxdims);
-                    H5DataSet.Write(dataSetId, rawRecordTypeId, recordSpace, fileSpaceId, pinnedBuffer.AddrOfPinnedObject());
+                    dataSet.Write(rawRecordTypeId, recordSpace, fileSpace, pinnedBuffer.AddrOfPinnedObject());
                 }
                 finally
                 {
