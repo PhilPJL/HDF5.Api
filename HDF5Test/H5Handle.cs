@@ -41,9 +41,8 @@ namespace HDF5Test
 
     public abstract class H5Handle : Disposable
     {
-        public Handle Handle { get; protected set; }
         private Func<Handle, int> Closer { get; }
-
+        public Handle Handle { get; private set; }
         public const Handle InvalidHandle = -1;
 
         protected H5Handle(Handle handle, Func<Handle, int> closer)

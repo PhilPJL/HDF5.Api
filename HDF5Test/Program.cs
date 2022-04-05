@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Handle = System.Int64;
 
 namespace HDF5Test
 {
@@ -29,29 +28,10 @@ namespace HDF5Test
             using var fileId = H5File.Create(@"test2.h5", H5F.ACC_TRUNC);
             Console.WriteLine($"Created file: {fileId}");
 
-            // setup compound type
-            // Hhow to have variable length arrays per run?
-            int size = Marshal.SizeOf<RawRecord>();
-            Console.WriteLine($"Datatype size = {size}, {size - 32768 - 16384}");
+            const int arraySize1 = 1000;
+            const int arraySize2 = 2000;
 
-            using var rawRecordTypeId = H5Type.CreateCompoundType(size);
-            Console.WriteLine($"Created type: {rawRecordTypeId}");
-
-            rawRecordTypeId.Insert("Id", Marshal.OffsetOf<RawRecord>("Id"), H5T.NATIVE_INT64);
-            rawRecordTypeId.Insert("Measurement Id", Marshal.OffsetOf<RawRecord>("MeasurementId"), H5T.NATIVE_INT32);
-            rawRecordTypeId.Insert("Timestamp", Marshal.OffsetOf<RawRecord>("Timestamp"), H5T.NATIVE_DOUBLE);
-            rawRecordTypeId.Insert("Thickness", Marshal.OffsetOf<RawRecord>("Thickness"), H5T.NATIVE_DOUBLE);
-            rawRecordTypeId.Insert("Profile deviation", Marshal.OffsetOf<RawRecord>("ProfileDeviation"), H5T.NATIVE_DOUBLE);
-            rawRecordTypeId.Insert("Profile height", Marshal.OffsetOf<RawRecord>("ProfileHeight"), H5T.NATIVE_DOUBLE);
-            rawRecordTypeId.Insert("Z position", Marshal.OffsetOf<RawRecord>("ZPosition"), H5T.NATIVE_DOUBLE);
-            rawRecordTypeId.Insert("Interval Id", Marshal.OffsetOf<RawRecord>("IntervalId"), H5T.NATIVE_INT64);
-            rawRecordTypeId.Insert("Pulse offset", Marshal.OffsetOf<RawRecord>("PulseOffset"), H5T.NATIVE_DOUBLE);
-            rawRecordTypeId.Insert("Reference offset", Marshal.OffsetOf<RawRecord>("ReferenceOffset"), H5T.NATIVE_INT64);
-
-            using var byteArrayId1 = H5Type.CreateByteArrayType(32768);
-            rawRecordTypeId.Insert("Array1", Marshal.OffsetOf<RawRecord>("Array1"), byteArrayId1);
-            using var byteArrayId2 = H5Type.CreateByteArrayType(16384);
-            rawRecordTypeId.Insert("Array2", Marshal.OffsetOf<RawRecord>("Array2"), byteArrayId2);
+            using var rawRecordType = CreateRawRecordType(arraySize1, arraySize2);
 
             int chunkSize = 100;
 
@@ -78,45 +58,62 @@ namespace HDF5Test
             Console.WriteLine($"Created group: {groupId}");
 
             // create a dataset named 'RawRecords' in group 'Data' with our record type and chunk size
-            using var dataSet = groupId.CreateDataSet("RawRecords", rawRecordTypeId, memorySpace, properyList);
+            using var dataSet = groupId.CreateDataSet("RawRecords", rawRecordType, memorySpace, properyList);
             Console.WriteLine($"Created data set: {dataSet}");
 
             Stopwatch s = new Stopwatch();
             s.Start();
 
-            var extent = new ulong[] { 0 };
-            var rand = new Random(Environment.TickCount);
+            var extent = new ulong[] { 0 }; // rename?
 
-            for (int i = 0; i < 50; i++)
+            const int testDataBufferSize = 10;
+
+            // allocate pinned buffer big enough to hold test data + arrays
+            //var native = Marshal.AllocHGlobal(testDataBufferSize * (80 + arraySize1 + arraySize2));
+
+            byte[] buffer = new byte[testDataBufferSize * (80 + arraySize1 + arraySize2)];
+
+            try
             {
-                var records = GetTestData(i, rand.Next(10, 200));
 
-                Console.WriteLine(records.Length);
-
-                GCHandle pinnedBuffer = GCHandle.Alloc(records, GCHandleType.Pinned);
-
-                try
+                for (int i = 0; i < 50; i++)
                 {
-                    // record current position for the hyperslab window
-                    int currentPosition = (int)extent[0];
+                    var records = GetTestData(i, testDataBufferSize);
+                    //GCHandle pinnedBuffer = GCHandle.Alloc(records, GCHandleType.Pinned);
 
-                    // extend the dataset to accept this chunk
-                    extent[0] = (ulong)(currentPosition + records.Length);
-                    dataSet.SetExtent(extent);
+                    for (int j = 0; j < testDataBufferSize; j++)
+                    {
+                        Buffer.BlockCopy(records, 0, buffer, j * (80 + arraySize1 + arraySize2), 80);
+                    }
+                    GCHandle pinnedBuffer = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 
-                    // move the hyperslab window
-                    using var fileSpace = dataSet.GetSpace();
-                    fileSpace.SelectHyperslab(currentPosition, records.Length);
+                    try
+                    {
+                        // record current position for the hyperslab window
+                        int currentPosition = (int)extent[0];
 
-                    // match the space to length of records retrieved
-                    // if using standard length chunks (say 100) then only need to change this for the final write
-                    using var recordSpace = H5Space.CreateSimple(1, new ulong[] { (ulong)records.Length }, maxdims);
-                    dataSet.Write(rawRecordTypeId, recordSpace, fileSpace, pinnedBuffer.AddrOfPinnedObject());
+                        // extend the dataset to accept this chunk
+                        extent[0] = (ulong)(currentPosition + records.Length);
+                        dataSet.SetExtent(extent);
+
+                        // move the hyperslab window
+                        using var fileSpace = dataSet.GetSpace();
+                        fileSpace.SelectHyperslab(currentPosition, records.Length);
+
+                        // match the space to length of records retrieved
+                        // if using standard length chunks (say 100) then only need to change this for the final write
+                        using var recordSpace = H5Space.CreateSimple(1, new ulong[] { (ulong)records.Length }, maxdims);
+                        dataSet.Write(rawRecordType, recordSpace, fileSpace, pinnedBuffer.AddrOfPinnedObject());
+                    }
+                    finally
+                    {
+                        pinnedBuffer.Free();
+                    }
                 }
-                finally
-                {
-                    pinnedBuffer.Free();
-                }
+            }
+            finally
+            {
+                //Marshal.FreeHGlobal(native);
             }
 
             s.Stop();
@@ -137,11 +134,40 @@ namespace HDF5Test
                 })
                 .ToArray();
         }
+
+        static H5Type CreateRawRecordType(int arraySize1 = 32768, int arraySize2 = 16384)
+        {
+            // setup compound type
+            // Hhow to have variable length arrays per run?
+            int rawRecordSize = Marshal.SizeOf<RawRecord>();
+            Console.WriteLine($"Datatype size = {rawRecordSize}");
+
+            var rawRecordType = H5Type.CreateCompoundType(rawRecordSize + arraySize1 + arraySize2);
+            Console.WriteLine($"Created type: {rawRecordType}");
+
+            rawRecordType.Insert("Id", Marshal.OffsetOf<RawRecord>("Id"), H5T.NATIVE_INT64);
+            rawRecordType.Insert("Measurement Id", Marshal.OffsetOf<RawRecord>("MeasurementId"), H5T.NATIVE_INT32);
+            rawRecordType.Insert("Timestamp", Marshal.OffsetOf<RawRecord>("Timestamp"), H5T.NATIVE_DOUBLE);
+            rawRecordType.Insert("Thickness", Marshal.OffsetOf<RawRecord>("Thickness"), H5T.NATIVE_DOUBLE);
+            rawRecordType.Insert("Profile deviation", Marshal.OffsetOf<RawRecord>("ProfileDeviation"), H5T.NATIVE_DOUBLE);
+            rawRecordType.Insert("Profile height", Marshal.OffsetOf<RawRecord>("ProfileHeight"), H5T.NATIVE_DOUBLE);
+            rawRecordType.Insert("Z position", Marshal.OffsetOf<RawRecord>("ZPosition"), H5T.NATIVE_DOUBLE);
+            rawRecordType.Insert("Interval Id", Marshal.OffsetOf<RawRecord>("IntervalId"), H5T.NATIVE_INT64);
+            rawRecordType.Insert("Pulse offset", Marshal.OffsetOf<RawRecord>("PulseOffset"), H5T.NATIVE_DOUBLE);
+            rawRecordType.Insert("Reference offset", Marshal.OffsetOf<RawRecord>("ReferenceOffset"), H5T.NATIVE_INT64);
+
+            using var byteArrayId1 = H5Type.CreateByteArrayType(arraySize1);
+            rawRecordType.Insert("Array1", rawRecordSize, byteArrayId1);
+            using var byteArrayId2 = H5Type.CreateByteArrayType(arraySize2);
+            rawRecordType.Insert("Array2", rawRecordSize + arraySize1, byteArrayId2);
+
+            return rawRecordType;
+        }
     }
 
     //CTSWaveformAndProfileDatabaseSpectra
     [StructLayout(LayoutKind.Sequential)]
-    unsafe struct RawRecord
+    struct RawRecord
     {
         public RawRecord()
         {
@@ -156,15 +182,15 @@ namespace HDF5Test
             PulseOffset = 0;
             ReferenceOffset = 0;
 
-            for (int i = 0; i < 32768; i++)
-            {
-                Array1[i] = (byte)i;
-            }
+            //for (int i = 0; i < 32768; i++)
+            //{
+            //    Array1[i] = (byte)i;
+            //}
 
-            for (int i = 0; i < 16384; i++)
-            {
-                Array2[i] = (byte)(byte.MaxValue - (byte)i);
-            }
+            //for (int i = 0; i < 16384; i++)
+            //{
+            //    Array2[i] = (byte)(byte.MaxValue - (byte)i);
+            //}
         }
 
         public long Id;
@@ -177,7 +203,7 @@ namespace HDF5Test
         public long IntervalId;
         public double PulseOffset;
         public long ReferenceOffset;
-        public fixed byte Array1[32768];
-        public fixed byte Array2[16384];
+        //public fixed byte Array1[32768];
+        //public fixed byte Array2[16384];
     }
 }

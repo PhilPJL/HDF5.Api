@@ -40,6 +40,13 @@ namespace HDF5Test
             return new H5Type(h);
         }
 
+        public static H5Type CreateDoubleArrayType(int size)
+        {
+            Handle h = H5T.array_create(H5T.NATIVE_DOUBLE, 1, new ulong[] { (ulong)size });
+            AssertHandle(h);
+            return new H5Type(h);
+        }
+
         public static H5Type CreateVariableLengthByteArrayType()
         {
             Handle h = H5T.vlen_create(H5T.NATIVE_B8);
