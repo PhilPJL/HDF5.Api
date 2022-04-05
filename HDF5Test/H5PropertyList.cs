@@ -19,7 +19,7 @@ namespace HDF5Test
             H5Handle.AssertError(err);
         }
 
-        public static void EnableCompression(H5PropertyListHandle handle, uint level)
+        public static void EnableDeflateCompression(H5PropertyListHandle handle, uint level)
         {
             H5Handle.AssertHandle(handle);
             int err = H5P.set_deflate(handle, level);

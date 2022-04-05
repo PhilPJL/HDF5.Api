@@ -14,7 +14,6 @@ namespace HDF5Test
             try
             {
                 CreateFile();
-                //CreateFile();
             }
             catch (Exception ex)
             {
@@ -22,7 +21,7 @@ namespace HDF5Test
             }
         }
 
-        static void CreateFile()
+        unsafe static void CreateFile()
         {
             Console.WriteLine($"H5 version={H5Global.GetLibraryVersion()}");
 
@@ -31,8 +30,9 @@ namespace HDF5Test
             Console.WriteLine($"Created file: {fileId}");
 
             // setup compound type
+            // TODO: how to have variable length arrays per run
             int size = Marshal.SizeOf<RawRecord>();
-            Console.WriteLine($"Datatype size = {size}");
+            Console.WriteLine($"Datatype size = {size}, {size - 32768 - 16384}");
 
             using var rawRecordTypeId = H5Type.CreateCompoundType(size);
             Console.WriteLine($"Created type: {rawRecordTypeId}");
@@ -56,15 +56,14 @@ namespace HDF5Test
             int chunkSize = 100;
 
             // create a dataspace - single dimension 1 x unlimited
+            // this is the chunk size that the dataset extends itself by
             var dims = new ulong[] { (ulong)chunkSize };
             var maxdims = new ulong[] { H5S.UNLIMITED };
 
+            // a dataspace defining the chunk size of our data set
+            // Q: why do we need a memory space with chunk size, and a property list with the same chunk size - or do we?
             using var memorySpaceId = H5Space.CreateSimple(1, dims, maxdims);
             Console.WriteLine($"Created space: {memorySpaceId}");
-
-            // create a group
-            using var groupId = H5Group.Create(fileId, "Data");
-            Console.WriteLine($"Created group: {groupId}");
 
             // create a dataset-create property list
             using var propListId = H5PropertyList.Create(H5P.DATASET_CREATE);
@@ -72,30 +71,47 @@ namespace HDF5Test
             // 1) allow chunking - doesn't work without this. From user guide: HDF5 requires the use of chunking when defining extendable datasets
             H5PropertyList.SetChunk(propListId, 1, dims);
             // 2) enable compression
-            H5PropertyList.EnableCompression(propListId, 6);
+            H5PropertyList.EnableDeflateCompression(propListId, 6);
 
-            // create the dataset RawRecords 
+            // create a group name 'Data'
+            using var groupId = H5Group.Create(fileId, "Data");
+            Console.WriteLine($"Created group: {groupId}");
+
+            // create a dataset named 'RawRecords' in group 'Data' with our record type and chunk size
             using var dataSetId = H5DataSet.Create(groupId, "RawRecords", rawRecordTypeId, memorySpaceId, propListId);
             Console.WriteLine($"Created data set: {dataSetId}");
 
             Stopwatch s = new Stopwatch();
             s.Start();
 
-            for (int i = 0; i < 100; i++)
+            var extent = new ulong[] { 0 };
+            var rand = new Random(Environment.TickCount);
+
+            for (int i = 0; i < 50; i++)
             {
-                var records = GetTestData(i, chunkSize);
+                var records = GetTestData(i, rand.Next(10, 200));
+
+                Console.WriteLine(records.Length);
+
                 GCHandle pinnedBuffer = GCHandle.Alloc(records, GCHandleType.Pinned);
 
                 try
                 {
-                    H5DataSet.SetExtent(dataSetId, dims);
+                    // record current position for the hyperslab window
+                    int currentPosition = (int)extent[0];
 
+                    // extend the dataset to accept this chunk
+                    extent[0] = (ulong)(currentPosition + records.Length);
+                    H5DataSet.SetExtent(dataSetId, extent);
+
+                    // move the hyperslab window
                     using var fileSpaceId = H5DataSet.GetFileSpace(dataSetId);
+                    H5Space.SelectHyperslab(fileSpaceId, currentPosition, records.Length);
 
-                    H5Space.SelectHyperslab(fileSpaceId, i * chunkSize, records.Length);
-                    H5DataSet.Write(dataSetId, rawRecordTypeId, memorySpaceId, fileSpaceId, pinnedBuffer.AddrOfPinnedObject());
-
-                    dims[0] += (ulong)records.Length;
+                    // match the space to length of records retrieved
+                    // if using standard length chunks (say 100) then only need to change this for the final write
+                    using var recordSpace = H5Space.CreateSimple(1, new ulong[] { (ulong)records.Length }, maxdims);
+                    H5DataSet.Write(dataSetId, rawRecordTypeId, recordSpace, fileSpaceId, pinnedBuffer.AddrOfPinnedObject());
                 }
                 finally
                 {
@@ -104,7 +120,7 @@ namespace HDF5Test
             }
 
             s.Stop();
-            Console.WriteLine($"Time elapsed: {s.Elapsed}");
+            Console.WriteLine($"Time elapsed: {s.Elapsed}. Total rows {extent[0]}.");
         }
 
         static RawRecord[] GetTestData(int n, int chunk)
@@ -142,12 +158,12 @@ namespace HDF5Test
 
             for (int i = 0; i < 32768; i++)
             {
-                Array1[i] = 123;
+                Array1[i] = (byte)i;
             }
 
             for (int i = 0; i < 16384; i++)
             {
-                Array2[i] = 234;
+                Array2[i] = (byte)(byte.MaxValue - (byte)i);
             }
         }
 
