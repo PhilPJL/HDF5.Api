@@ -3,13 +3,27 @@ using Handle = System.Int64;
 
 namespace HDF5Test
 {
-    public static class H5File
+    public class H5File : H5FileHandle
     {
-        public static H5FileHandle Create(string name, uint flags = H5F.ACC_TRUNC)
+        private H5File(Handle handle) : base(handle)
+        {
+        }
+
+        public H5DataSet CreateDataSet(string name, Handle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+        {
+            return H5DataSet.Create(this, name, typeId, spaceId, propertyListId);
+        }
+
+        public H5Group CreateGroup(string name)
+        {
+            return H5Group.Create(this, name);
+        }
+
+        public static H5File Create(string name, uint flags = H5F.ACC_TRUNC)
         {
             Handle h = H5F.create(name, flags);
-            H5Handle.AssertHandle(h);
-            return new H5FileHandle(h);
+            AssertHandle(h);
+            return new H5File(h);
         }
     }
 }

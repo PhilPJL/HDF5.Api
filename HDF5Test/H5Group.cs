@@ -5,11 +5,16 @@ namespace HDF5Test
 {
     public class H5Group : H5GroupHandle
     {
-        internal H5Group(Handle handle) : base(handle)
+        private H5Group(Handle handle) : base(handle)
         {
         }
 
-        public static H5GroupHandle Create(IH5Location location, string name)
+        public H5DataSet CreateDataSet(string name, Handle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+        {
+            return H5DataSet.Create(this, name, typeId, spaceId, propertyListId);
+        }
+
+        public static H5Group Create(IH5Location location, string name)
         {
             AssertHandle(location.Handle);
             Handle h = H5G.create(location.Handle, name);

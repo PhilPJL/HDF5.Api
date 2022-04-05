@@ -30,28 +30,28 @@ namespace HDF5Test
             Console.WriteLine($"Created file: {fileId}");
 
             // setup compound type
-            // TODO: how to have variable length arrays per run
+            // Hhow to have variable length arrays per run?
             int size = Marshal.SizeOf<RawRecord>();
             Console.WriteLine($"Datatype size = {size}, {size - 32768 - 16384}");
 
             using var rawRecordTypeId = H5Type.CreateCompoundType(size);
             Console.WriteLine($"Created type: {rawRecordTypeId}");
 
-            H5Type.Insert(rawRecordTypeId, "Id", Marshal.OffsetOf<RawRecord>("Id"), H5T.NATIVE_INT64);
-            H5Type.Insert(rawRecordTypeId, "Measurement Id", Marshal.OffsetOf<RawRecord>("MeasurementId"), H5T.NATIVE_INT32);
-            H5Type.Insert(rawRecordTypeId, "Timestamp", Marshal.OffsetOf<RawRecord>("Timestamp"), H5T.NATIVE_DOUBLE);
-            H5Type.Insert(rawRecordTypeId, "Thickness", Marshal.OffsetOf<RawRecord>("Thickness"), H5T.NATIVE_DOUBLE);
-            H5Type.Insert(rawRecordTypeId, "Profile deviation", Marshal.OffsetOf<RawRecord>("ProfileDeviation"), H5T.NATIVE_DOUBLE);
-            H5Type.Insert(rawRecordTypeId, "Profile height", Marshal.OffsetOf<RawRecord>("ProfileHeight"), H5T.NATIVE_DOUBLE);
-            H5Type.Insert(rawRecordTypeId, "Z position", Marshal.OffsetOf<RawRecord>("ZPosition"), H5T.NATIVE_DOUBLE);
-            H5Type.Insert(rawRecordTypeId, "Interval Id", Marshal.OffsetOf<RawRecord>("IntervalId"), H5T.NATIVE_INT64);
-            H5Type.Insert(rawRecordTypeId, "Pulse offset", Marshal.OffsetOf<RawRecord>("PulseOffset"), H5T.NATIVE_DOUBLE);
-            H5Type.Insert(rawRecordTypeId, "Reference offset", Marshal.OffsetOf<RawRecord>("ReferenceOffset"), H5T.NATIVE_INT64);
+            rawRecordTypeId.Insert("Id", Marshal.OffsetOf<RawRecord>("Id"), H5T.NATIVE_INT64);
+            rawRecordTypeId.Insert("Measurement Id", Marshal.OffsetOf<RawRecord>("MeasurementId"), H5T.NATIVE_INT32);
+            rawRecordTypeId.Insert("Timestamp", Marshal.OffsetOf<RawRecord>("Timestamp"), H5T.NATIVE_DOUBLE);
+            rawRecordTypeId.Insert("Thickness", Marshal.OffsetOf<RawRecord>("Thickness"), H5T.NATIVE_DOUBLE);
+            rawRecordTypeId.Insert("Profile deviation", Marshal.OffsetOf<RawRecord>("ProfileDeviation"), H5T.NATIVE_DOUBLE);
+            rawRecordTypeId.Insert("Profile height", Marshal.OffsetOf<RawRecord>("ProfileHeight"), H5T.NATIVE_DOUBLE);
+            rawRecordTypeId.Insert("Z position", Marshal.OffsetOf<RawRecord>("ZPosition"), H5T.NATIVE_DOUBLE);
+            rawRecordTypeId.Insert("Interval Id", Marshal.OffsetOf<RawRecord>("IntervalId"), H5T.NATIVE_INT64);
+            rawRecordTypeId.Insert("Pulse offset", Marshal.OffsetOf<RawRecord>("PulseOffset"), H5T.NATIVE_DOUBLE);
+            rawRecordTypeId.Insert("Reference offset", Marshal.OffsetOf<RawRecord>("ReferenceOffset"), H5T.NATIVE_INT64);
 
             using var byteArrayId1 = H5Type.CreateByteArrayType(32768);
-            H5Type.Insert(rawRecordTypeId, "Array1", Marshal.OffsetOf<RawRecord>("Array1"), byteArrayId1);
+            rawRecordTypeId.Insert("Array1", Marshal.OffsetOf<RawRecord>("Array1"), byteArrayId1);
             using var byteArrayId2 = H5Type.CreateByteArrayType(16384);
-            H5Type.Insert(rawRecordTypeId, "Array2", Marshal.OffsetOf<RawRecord>("Array2"), byteArrayId2);
+            rawRecordTypeId.Insert("Array2", Marshal.OffsetOf<RawRecord>("Array2"), byteArrayId2);
 
             int chunkSize = 100;
 
@@ -62,23 +62,23 @@ namespace HDF5Test
 
             // a dataspace defining the chunk size of our data set
             // Q: why do we need a memory space with chunk size, and a property list with the same chunk size - or do we?
-            using var memorySpaceId = H5Space.CreateSimple(1, dims, maxdims);
-            Console.WriteLine($"Created space: {memorySpaceId}");
+            using var memorySpace = H5Space.CreateSimple(1, dims, maxdims);
+            Console.WriteLine($"Created space: {memorySpace}");
 
             // create a dataset-create property list
-            using var propListId = H5PropertyList.Create(H5P.DATASET_CREATE);
-            Console.WriteLine($"Created prop: {propListId}");
+            using var properyList = H5PropertyList.Create(H5P.DATASET_CREATE);
+            Console.WriteLine($"Created prop: {properyList}");
             // 1) allow chunking - doesn't work without this. From user guide: HDF5 requires the use of chunking when defining extendable datasets
-            H5PropertyList.SetChunk(propListId, 1, dims);
+            properyList.SetChunk(1, dims);
             // 2) enable compression
-            H5PropertyList.EnableDeflateCompression(propListId, 6);
+            properyList.EnableDeflateCompression(6);
 
             // create a group name 'Data'
-            using var groupId = H5Group.Create(fileId, "Data");
+            using var groupId = fileId.CreateGroup("Data");
             Console.WriteLine($"Created group: {groupId}");
 
             // create a dataset named 'RawRecords' in group 'Data' with our record type and chunk size
-            using var dataSet = H5DataSet.Create(groupId, "RawRecords", rawRecordTypeId, memorySpaceId, propListId);
+            using var dataSet = groupId.CreateDataSet("RawRecords", rawRecordTypeId, memorySpace, properyList);
             Console.WriteLine($"Created data set: {dataSet}");
 
             Stopwatch s = new Stopwatch();
@@ -102,10 +102,10 @@ namespace HDF5Test
 
                     // extend the dataset to accept this chunk
                     extent[0] = (ulong)(currentPosition + records.Length);
-                    H5DataSet.SetExtent(dataSet, extent);
+                    dataSet.SetExtent(extent);
 
                     // move the hyperslab window
-                    using var fileSpace = H5DataSet.GetFileSpace(dataSet);
+                    using var fileSpace = dataSet.GetSpace();
                     fileSpace.SelectHyperslab(currentPosition, records.Length);
 
                     // match the space to length of records retrieved

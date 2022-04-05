@@ -15,31 +15,31 @@ namespace HDF5Test
             Write(this, typeId, memorySpaceId, fileSpaceId, buffer);
         }
 
-        public H5Space GetFileSpace()
+        public H5Space GetSpace()
         {
-            return GetFileSpace(this);
+            return H5Space.GetDataSetSpace(this);
         }
 
-        #region Static C level API wrappers
+        public void SetExtent(ulong[] dims)
+        {
+            SetExtent(this, dims);
+        }
+
+        #region Factory methods
         public static H5DataSet Create(IH5Location location, string name,
-            Handle rawRecordTypeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+            Handle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
         {
             AssertHandle(location.Handle);
-            AssertHandle(rawRecordTypeId);
+            AssertHandle(typeId);
             AssertHandle(spaceId);
             AssertHandle(propertyListId);
-            Handle h = H5D.create(location.Handle, name, rawRecordTypeId, spaceId, H5P.DEFAULT, propertyListId);
+            Handle h = H5D.create(location.Handle, name, typeId, spaceId, H5P.DEFAULT, propertyListId);
             AssertHandle(h);
             return new H5DataSet(h);
         }
+        #endregion
 
-        public static H5Space GetFileSpace(H5DataSetHandle dataSetId)
-        {
-            AssertHandle(dataSetId);
-            Handle h = H5D.get_space(dataSetId);
-            AssertHandle(h);
-            return new H5Space(h);
-        }
+        #region C level API wrappers
 
         public static void SetExtent(H5DataSetHandle dataSetId, ulong[] dims)
         {
