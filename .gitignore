@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 /HDF5Test/ConnectionStrings.config
+/HDF5Test/Configuration.config
