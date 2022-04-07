@@ -5,15 +5,14 @@ namespace HDF5Test
 {
     public class H5PropertyList : H5PropertyListHandle
     {
-        private H5PropertyList(Handle handle) : base(handle)
-        {
-        }
+        private H5PropertyList(Handle handle) : base(handle) { }
 
         public void SetChunk(int rank, ulong[] dims)
         {
             SetChunk(this, rank, dims);
         }
 
+        // TODO: other compression types?
         public void EnableDeflateCompression(uint level)
         {
             EnableDeflateCompression(this, level);

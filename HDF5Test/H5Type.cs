@@ -6,15 +6,13 @@ namespace HDF5Test
 {
     public class H5Type : H5TypeHandle
     {
-        private H5Type(Handle handle) : base(handle)
-        {
-        }
-        
+        private H5Type(Handle handle) : base(handle) { }
+
         public void Insert(string name, int offset, long nativeTypeId)
         {
             Insert(this, name, new IntPtr(offset), nativeTypeId);
         }
-        
+
         public void Insert(string name, IntPtr offset, long nativeTypeId)
         {
             Insert(this, name, offset, nativeTypeId);

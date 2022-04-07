@@ -5,10 +5,7 @@ namespace HDF5Test
 {
     public class H5Space : H5SpaceHandle
     {
-        private H5Space(Handle handle) : base(handle)
-        {
-
-        }
+        private H5Space(Handle handle) : base(handle) { }
 
         public void SelectHyperslab(int offset, int count)
         {

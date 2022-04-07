@@ -6,9 +6,7 @@ namespace HDF5Test
 {
     public class H5DataSet : H5DataSetHandle
     {
-        private H5DataSet(Handle handle) : base(handle)
-        {
-        }
+        private H5DataSet(Handle handle) : base(handle) { }
 
         public void Write(H5TypeHandle typeId, H5SpaceHandle memorySpaceId, H5SpaceHandle fileSpaceId, IntPtr buffer)
         {
@@ -27,7 +25,7 @@ namespace HDF5Test
 
         #region Factory methods
         public static H5DataSet Create(IH5Location location, string name,
-            Handle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+            H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
         {
             AssertHandle(location.Handle);
             AssertHandle(typeId);

@@ -12,7 +12,7 @@ namespace HDF5Test
             uint revision = 0;
             int err = H5.get_libversion(ref major, ref minor, ref revision);
             H5Handle.AssertError(err);
-            return new Version((int)major, (int)minor, (int)revision);
+            return new Version((int)major, (int)minor, 0, (int)revision);
         }
     }
 }

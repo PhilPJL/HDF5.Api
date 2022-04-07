@@ -98,12 +98,13 @@ namespace HDF5Test
                 for (int i = 0; i < 50; i++)
                 {
                     var records = GetTestData(i, testDataBufferSize);
-                    //GCHandle pinnedBuffer = GCHandle.Alloc(records, GCHandleType.Pinned);
+                    //GCHandle pinnedBufferR = GCHandle.Alloc(records, GCHandleType.Pinned);
 
-                    for (int j = 0; j < testDataBufferSize; j++)
-                    {
-                        Buffer.BlockCopy(records, 0, buffer, j * (80 + arraySize1 + arraySize2), 80);
-                    }
+                    //for (int j = 0; j < testDataBufferSize; j++)
+                    //{
+                    //    Buffer.BlockCopy(pinnedBufferR.AddrOfPinnedObject, 0, buffer, j * (80 + arraySize1 + arraySize2), 80);
+                    //}
+
                     GCHandle pinnedBuffer = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 
                     try
@@ -127,6 +128,7 @@ namespace HDF5Test
                     finally
                     {
                         pinnedBuffer.Free();
+                        //pinnedBufferR.Free();
                     }
                 }
             }
@@ -154,7 +156,7 @@ namespace HDF5Test
                 .ToArray();
         }
 
-        static H5Type CreateRawRecordType(int arraySize1 = 32768, int arraySize2 = 16384)
+        static H5Type CreateRawRecordType(int arraySize1, int arraySize2)
         {
             // setup compound type
             // Hhow to have variable length arrays per run?
