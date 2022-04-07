@@ -1,7 +1,4 @@
-﻿using HDF.PInvoke;
-using Handle = System.Int64;
-
-namespace HDF5Test
+﻿namespace HDF5Api
 {
     public class H5PropertyList : H5PropertyListHandle
     {
@@ -21,7 +18,7 @@ namespace HDF5Test
         #region Factory methods
         public static H5PropertyList Create(long classId)
         {
-            Handle h = H5P.create(classId);
+            var h = H5P.create(classId);
             AssertHandle(h);
             return new H5PropertyList(h);
         }
@@ -30,16 +27,16 @@ namespace HDF5Test
         #region C API wrappers
         public static void SetChunk(H5PropertyListHandle handle, int rank, ulong[] dims)
         {
-            H5Handle.AssertHandle(handle);
-            int err = H5P.set_chunk(handle, rank, dims);
-            H5Handle.AssertError(err);
+            AssertHandle(handle);
+            var err = H5P.set_chunk(handle, rank, dims);
+            AssertError(err);
         }
 
         public static void EnableDeflateCompression(H5PropertyListHandle handle, uint level)
         {
-            H5Handle.AssertHandle(handle);
-            int err = H5P.set_deflate(handle, level);
-            H5Handle.AssertError(err);
+            AssertHandle(handle);
+            var err = H5P.set_deflate(handle, level);
+            AssertError(err);
         }
         #endregion
     }

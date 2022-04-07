@@ -1,7 +1,4 @@
-﻿using HDF.PInvoke;
-using Handle = System.Int64;
-
-namespace HDF5Test
+﻿namespace HDF5Api
 {
     public class H5File : H5FileHandle
     {
@@ -30,7 +27,7 @@ namespace HDF5Test
         public static H5File Create(string name, uint flags = H5F.ACC_TRUNC)
         {
             // TODO: open/create etc
-            Handle h = H5F.create(name, flags);
+            var h = H5F.create(name, flags);
             AssertHandle(h);
             return new H5File(h);
         }

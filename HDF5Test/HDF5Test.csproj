@@ -12,11 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HDF.PInvoke.1.10" Version="1.10.612" />
-		<PackageReference Include="System.Memory" Version="4.5.4" />
-	</ItemGroup>
-
-	<ItemGroup>
+	  <ProjectReference Include="..\HDF5Api\HDF5Api.csproj" />
 	  <ProjectReference Include="..\PulseData\PulseData.csproj" />
 	</ItemGroup>
 

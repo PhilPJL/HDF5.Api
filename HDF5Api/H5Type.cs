@@ -1,8 +1,6 @@
-﻿using HDF.PInvoke;
-using System;
-using Handle = System.Int64;
+﻿using System;
 
-namespace HDF5Test
+namespace HDF5Api
 {
     public class H5Type : H5TypeHandle
     {
@@ -26,28 +24,28 @@ namespace HDF5Test
         #region Factory methods
         public static H5Type CreateCompoundType(int size)
         {
-            Handle h = H5T.create(H5T.class_t.COMPOUND, new IntPtr(size));
+            var h = H5T.create(H5T.class_t.COMPOUND, new IntPtr(size));
             AssertHandle(h);
             return new H5Type(h);
         }
 
         public static H5Type CreateByteArrayType(int size)
         {
-            Handle h = H5T.array_create(H5T.NATIVE_B8, 1, new ulong[] { (ulong)size });
+            var h = H5T.array_create(H5T.NATIVE_B8, 1, new ulong[] { (ulong)size });
             AssertHandle(h);
             return new H5Type(h);
         }
 
         public static H5Type CreateDoubleArrayType(int size)
         {
-            Handle h = H5T.array_create(H5T.NATIVE_DOUBLE, 1, new ulong[] { (ulong)size });
+            var h = H5T.array_create(H5T.NATIVE_DOUBLE, 1, new ulong[] { (ulong)size });
             AssertHandle(h);
             return new H5Type(h);
         }
 
         public static H5Type CreateVariableLengthByteArrayType()
         {
-            Handle h = H5T.vlen_create(H5T.NATIVE_B8);
+            var h = H5T.vlen_create(H5T.NATIVE_B8);
             AssertHandle(h);
             return new H5Type(h);
         }
@@ -57,7 +55,7 @@ namespace HDF5Test
         public static void Insert(H5TypeHandle typeId, string name, IntPtr offset, long nativeTypeId)
         {
             AssertHandle(typeId);
-            int err = H5T.insert(typeId, name, offset, nativeTypeId);
+            var err = H5T.insert(typeId, name, offset, nativeTypeId);
             AssertError(err);
         }
 
@@ -65,7 +63,7 @@ namespace HDF5Test
         {
             AssertHandle(typeId);
             AssertHandle(dataTypeId);
-            int err = H5T.insert(typeId, name, offset, dataTypeId);
+            var err = H5T.insert(typeId, name, offset, dataTypeId);
             AssertError(err);
         }
         #endregion

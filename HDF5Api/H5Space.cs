@@ -1,7 +1,4 @@
-﻿using HDF.PInvoke;
-using Handle = System.Int64;
-
-namespace HDF5Test
+﻿namespace HDF5Api
 {
     public class H5Space : H5SpaceHandle
     {
@@ -15,7 +12,7 @@ namespace HDF5Test
         #region Factory methods
         public static H5Space CreateSimple(int rank, ulong[] dims, ulong[] maxdims)
         {
-            Handle h = H5S.create_simple(rank, dims, maxdims);
+            var h = H5S.create_simple(rank, dims, maxdims);
             AssertHandle(h);
             return new H5Space(h);
         }
@@ -24,14 +21,14 @@ namespace HDF5Test
         #region C API wrappers
         public static void SelectHyperslab(H5SpaceHandle spaceId, int offset, int count)
         {
-            int err = H5S.select_hyperslab(spaceId, H5S.seloper_t.SET, new ulong[] { (ulong)offset }, null, new ulong[] { (ulong)count }, null);
+            var err = H5S.select_hyperslab(spaceId, H5S.seloper_t.SET, new ulong[] { (ulong)offset }, null, new ulong[] { (ulong)count }, null);
             AssertError(err);
         }
 
         public static H5Space GetDataSetSpace(H5DataSetHandle dataSetId)
         {
             AssertHandle(dataSetId);
-            Handle h = H5D.get_space(dataSetId);
+            var h = H5D.get_space(dataSetId);
             AssertHandle(h);
             return new H5Space(h);
         }

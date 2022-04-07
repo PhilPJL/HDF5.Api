@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HDF5Test
+namespace HDF5Api
 {
     public abstract class Disposable : IDisposable
     {

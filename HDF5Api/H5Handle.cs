@@ -1,8 +1,8 @@
-﻿using HDF.PInvoke;
+﻿global using Handle = System.Int64;
+global using HDF.PInvoke;
 using System;
-using Handle = System.Int64;
 
-namespace HDF5Test
+namespace HDF5Api
 {
     public interface IH5Location
     {
@@ -91,7 +91,7 @@ namespace HDF5Test
         {
             if (disposing && Handle > 0)
             {
-                int err = CloseHandle(Handle);
+                var err = CloseHandle(Handle);
                 Handle = InvalidHandle;
                 AssertError(err);
             }

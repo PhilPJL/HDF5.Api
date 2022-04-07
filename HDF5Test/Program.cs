@@ -1,4 +1,5 @@
 ﻿using HDF.PInvoke;
+using HDF5Api;
 using PulseData;
 using System;
 using System.Diagnostics;
@@ -141,7 +142,7 @@ namespace HDF5Test
             Console.WriteLine($"Time elapsed: {s.Elapsed}. Total rows {extent[0]}.");
         }
 
-        static RawRecord[] GetTestData(int n, int chunk)
+        private static RawRecord[] GetTestData(int n, int chunk)
         {
             var now = DateTime.UtcNow;
 
@@ -156,10 +157,9 @@ namespace HDF5Test
                 .ToArray();
         }
 
-        static H5Type CreateRawRecordType(int arraySize1, int arraySize2)
+        private static H5Type CreateRawRecordType(int arraySize1, int arraySize2)
         {
             // setup compound type
-            // Hhow to have variable length arrays per run?
             int rawRecordSize = Marshal.SizeOf<RawRecord>();
             Console.WriteLine($"Datatype size = {rawRecordSize}");
 

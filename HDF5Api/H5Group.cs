@@ -1,7 +1,4 @@
-﻿using HDF.PInvoke;
-using Handle = System.Int64;
-
-namespace HDF5Test
+﻿namespace HDF5Api
 {
     public class H5Group : H5GroupHandle
     {
@@ -19,7 +16,7 @@ namespace HDF5Test
         public static H5Group Create(IH5Location location, string name)
         {
             AssertHandle(location.Handle);
-            Handle h = H5G.create(location.Handle, name);
+            var h = H5G.create(location.Handle, name);
             AssertHandle(h);
             return new H5Group(h);
         }

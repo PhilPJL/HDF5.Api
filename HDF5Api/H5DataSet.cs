@@ -1,8 +1,6 @@
-﻿using HDF.PInvoke;
-using System;
-using Handle = System.Int64;
+﻿using System;
 
-namespace HDF5Test
+namespace HDF5Api
 {
     public class H5DataSet : H5DataSetHandle
     {
@@ -31,7 +29,7 @@ namespace HDF5Test
             AssertHandle(typeId);
             AssertHandle(spaceId);
             AssertHandle(propertyListId);
-            Handle h = H5D.create(location.Handle, name, typeId, spaceId, H5P.DEFAULT, propertyListId);
+            var h = H5D.create(location.Handle, name, typeId, spaceId, H5P.DEFAULT, propertyListId);
             AssertHandle(h);
             return new H5DataSet(h);
         }
@@ -42,7 +40,7 @@ namespace HDF5Test
         public static void SetExtent(H5DataSetHandle dataSetId, ulong[] dims)
         {
             AssertHandle(dataSetId);
-            int err = H5D.set_extent(dataSetId, dims);
+            var err = H5D.set_extent(dataSetId, dims);
             AssertError(err);
         }
 
@@ -52,7 +50,7 @@ namespace HDF5Test
             AssertHandle(typeId);
             AssertHandle(memorySpaceId);
             AssertHandle(fileSpaceId);
-            int err = H5D.write(dataSetId, typeId, memorySpaceId, fileSpaceId, H5P.DEFAULT, buffer);
+            var err = H5D.write(dataSetId, typeId, memorySpaceId, fileSpaceId, H5P.DEFAULT, buffer);
             AssertError(err);
         }
         #endregion

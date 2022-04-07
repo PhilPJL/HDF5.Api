@@ -1,7 +1,6 @@
-﻿using HDF.PInvoke;
-using System;
+﻿using System;
 
-namespace HDF5Test
+namespace HDF5Api
 {
     public static class H5Global
     {
@@ -10,7 +9,7 @@ namespace HDF5Test
             uint major = 0;
             uint minor = 0;
             uint revision = 0;
-            int err = H5.get_libversion(ref major, ref minor, ref revision);
+            var err = H5.get_libversion(ref major, ref minor, ref revision);
             H5Handle.AssertError(err);
             return new Version((int)major, (int)minor, 0, (int)revision);
         }
