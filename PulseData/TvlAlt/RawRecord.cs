@@ -16,7 +16,7 @@ namespace PulseData.TvlAlt
         public DateTime Timestamp { get; set; }
 
         [Column("THICKNESS")]
-        public long? Thickness { get; set; }
+        public double? Thickness { get; set; }
 
         [Column("PULSE_OFFSET")]
         public double? PulseOffset { get; set; }

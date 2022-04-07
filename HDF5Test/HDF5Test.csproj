@@ -12,6 +12,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="System.Interactive" Version="6.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\HDF5Api\HDF5Api.csproj" />
 	  <ProjectReference Include="..\PulseData\PulseData.csproj" />
 	</ItemGroup>
