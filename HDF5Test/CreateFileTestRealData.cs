@@ -84,25 +84,66 @@ namespace HDF5Test
             {
                 long measurementId = 12018;
 
-                context.RawRecords
-                    .Select(r => new RawRecordDB
+                // complicated query to flatten the explicit one-many but implied one-one relationships
+                // so we end up with inner joins
+                context.Waveforms.Select(w =>
+                    new
                     {
-                        Id = r.Id,
-                        MeasurementId = r.MeasurementId,
-                        Timestamp = r.Timestamp,
-                        Thickness = r.Thickness,
-                        ProfileDeviation = r.ProfileDeviation,
-                        ProfileHeight = r.ProfileHeight,
-                        ZPosition = r.ZPosition,
-                        IntervalId = r.IntervalId,
-                        PulseOffset = r.PulseOffset,
-                        ReferenceOffset = r.ReferenceOffset,
-                        Waveforms = r.Waveforms.Select(w => w.Values),
-                        Profiles = r.Profiles.Select(p => p.Values)
+                        WaveformId = w.Id,
+                        w.Type,
+                        w.Offset,
+                        w.Spacing,
+                        w.Values,
+                        w.ReferenceId,
+                        RecordId = w.RawRecord.Id,
+                        w.RawRecord.MeasurementId,
+                        w.RawRecord.Timestamp,
+                        w.RawRecord.Thickness,
+                        w.RawRecord.ProfileDeviation,
+                        w.RawRecord.ProfileHeight,
+                        w.RawRecord.ZPosition,
+                        w.RawRecord.IntervalId,
+                        w.RawRecord.PulseOffset,
+                        w.RawRecord.ReferenceOffset,
+                        w.RawRecord.Profiles
                     })
+                    .SelectMany(wf => wf.Profiles.Select(p => new RawRecordDB
+                    {
+                        Id = wf.RecordId,
+                        ProfileValues = p.Values,
+                        IntervalId = wf.IntervalId,
+                        MeasurementId = wf.MeasurementId,
+                        ProfileDeviation = wf.ProfileDeviation,
+                        ProfileHeight = wf.ProfileHeight,
+                        PulseOffset = wf.PulseOffset,
+                        ReferenceOffset = wf.ReferenceOffset,
+                        Thickness = wf.Thickness,
+                        Timestamp = wf.Timestamp,
+                        WaveformValues = wf.Values,
+                        ZPosition = wf.ZPosition
+                    }))
                     .Where(r => r.MeasurementId == measurementId)
-                    .OrderByDescending(r => r.Id)
-                    .Take(5000)
+
+
+                //context.RawRecords
+                //    .Select(r => new RawRecordDB
+                //    {
+                //        Id = r.Id,
+                //        MeasurementId = r.MeasurementId,
+                //        Timestamp = r.Timestamp,
+                //        Thickness = r.Thickness,
+                //        ProfileDeviation = r.ProfileDeviation,
+                //        ProfileHeight = r.ProfileHeight,
+                //        ZPosition = r.ZPosition,
+                //        IntervalId = r.IntervalId,
+                //        PulseOffset = r.PulseOffset,
+                //        ReferenceOffset = r.ReferenceOffset,
+                //        WaveformValues = r.Waveforms.Select(w => w.Values),
+                //        ProfileValues = r.Profiles.Select(p => p.Values)
+                //    })
+                //    .Where(r => r.MeasurementId == measurementId)
+                //    .OrderByDescending(r => r.Id)
+                    .Take(1000)
                     .Buffer(100)
                     .ForEach(rg =>
                     {
@@ -162,7 +203,8 @@ namespace HDF5Test
                 // TODO: block copy etc
                 fixed (byte* p1 = result[i].Waveform)
                 {
-                    var wf = input[i].Waveforms.Single();
+                    var wf = input[i].WaveformValues;
+                    //var wf = input[i].WaveformValues.Single();
 
                     //if (wf.Length != RawRecord.waveformBlobSize)
                     //{
@@ -181,7 +223,8 @@ namespace HDF5Test
                 fixed (byte* p1 = result[i].Profile1)
                 fixed (byte* p2 = result[i].Profile2)
                 {
-                    var pf = input[i].Profiles.Single();
+                    //var pf = input[i].ProfileValues.Single();
+                    var pf = input[i].ProfileValues;
 
                     //if (pf.Length != RawRecord.profileBlobSize)
                     //{
@@ -250,8 +293,10 @@ namespace HDF5Test
             public long? IntervalId { get; set; }
             public double? PulseOffset { get; set; }
             public double? ReferenceOffset { get; set; }
-            public IEnumerable<byte[]> Waveforms { get; set; }
-            public IEnumerable<byte[]> Profiles { get; set; }
+            public byte[] WaveformValues { get; set; }
+            public byte[] ProfileValues { get; set; }
+            //public IEnumerable<byte[]> WaveformValues { get; set; }
+            //public IEnumerable<byte[]> ProfileValues { get; set; }
         }
     }
 }

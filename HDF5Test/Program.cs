@@ -8,7 +8,7 @@ namespace HDF5Test
         {
             try
             {
-                CreateFileTest.CreateFile();
+                CreateFileTestRealData.CreateFile();
             }
             catch (Exception ex)
             {
