@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32228.343
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HDF5Test", "HDF5Test\HDF5Test.csproj", "{97293F83-F46C-49BB-9FC5-0C5435EC826B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HDF5Test", "HDF5Test\HDF5Test.csproj", "{97293F83-F46C-49BB-9FC5-0C5435EC826B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PulseData", "PulseData\PulseData.csproj", "{42126583-4B3E-4A93-84E1-ED9770A13FC1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{97293F83-F46C-49BB-9FC5-0C5435EC826B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97293F83-F46C-49BB-9FC5-0C5435EC826B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97293F83-F46C-49BB-9FC5-0C5435EC826B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42126583-4B3E-4A93-84E1-ED9770A13FC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42126583-4B3E-4A93-84E1-ED9770A13FC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42126583-4B3E-4A93-84E1-ED9770A13FC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42126583-4B3E-4A93-84E1-ED9770A13FC1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,5 @@
 ﻿using HDF.PInvoke;
+using PulseData;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -12,12 +13,30 @@ namespace HDF5Test
         {
             try
             {
+                TestDbAccess();
                 CreateFile();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
+        }
+
+        static void TestDbAccess()
+        {
+            Console.WriteLine("Testing db access");
+
+            using(var context = new TvlAltContext())
+            {
+                _ = context.IntervalRecords.Take(1).ToList();
+            }
+            using(var context = new TvlSystemContext())
+            {
+                _ = context.Measurements.Take(1).ToList();
+            }
+
+            Console.WriteLine("Db access success");
+
         }
 
         unsafe static void CreateFile()

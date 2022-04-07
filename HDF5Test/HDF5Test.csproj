@@ -3,13 +3,17 @@
 	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net472</TargetFramework>
+		<TargetFramework>net48</TargetFramework>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="HDF.PInvoke" Version="1.10.6.1" />
 		<PackageReference Include="System.Memory" Version="4.5.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\PulseData\PulseData.csproj" />
 	</ItemGroup>
 
 </Project>
