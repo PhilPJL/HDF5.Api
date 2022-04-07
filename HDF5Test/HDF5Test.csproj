@@ -20,4 +20,10 @@
 	  <ProjectReference Include="..\PulseData\PulseData.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="ConnectionStrings.config">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>
