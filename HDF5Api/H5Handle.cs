@@ -1,6 +1,7 @@
 ﻿global using Handle = System.Int64;
 global using HDF.PInvoke;
 using System;
+using System.Diagnostics;
 
 namespace HDF5Api
 {
@@ -58,6 +59,8 @@ namespace HDF5Api
 
         protected H5Handle(Handle handle, Func<Handle, int> closer)
         {
+            Debug.WriteLine($"Handle opened {handle}: {GetType().Name}");
+
             AssertHandle(handle);
             Handle = handle;
             CloseHandle = closer;
@@ -91,6 +94,8 @@ namespace HDF5Api
         {
             if (disposing && Handle > 0)
             {
+                Debug.WriteLine($"Closing handle {Handle}");
+
                 var err = CloseHandle(Handle);
                 Handle = InvalidHandle;
                 AssertError(err);

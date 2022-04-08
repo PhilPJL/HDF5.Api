@@ -5,6 +5,7 @@
 		<OutputType>Exe</OutputType>
 		<TargetFrameworks>net48;netstandard2.1</TargetFrameworks>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<PlatformTarget>AnyCPU</PlatformTarget>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -82,7 +82,7 @@ namespace HDF5Test
 
             using (var context = new TvlAltContext())
             {
-                long measurementId = 12018;
+                long measurementId = 12019;
 
                 // complicated query to flatten the explicit one-many but implied one-one relationships
                 // so we end up with inner joins
@@ -206,10 +206,10 @@ namespace HDF5Test
                     var wf = input[i].WaveformValues;
                     //var wf = input[i].WaveformValues.Single();
 
-                    //if (wf.Length != RawRecord.waveformBlobSize)
-                    //{
-                    //    Console.WriteLine($"Profile: MeasId {input[i].MeasurementId} Expected length {RawRecord.waveformBlobSize}, got {wf.Length}");
-                    //}
+                    if (wf.Length != RawRecord.waveformBlobSize)
+                    {
+                        Console.WriteLine($"Profile: MeasId {input[i].MeasurementId} Expected length {RawRecord.waveformBlobSize}, got {wf.Length}");
+                    }
 
 
                     Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(wf, 0).ToPointer(), p1, RawRecord.waveformBlobSize, wf.Length);
@@ -226,10 +226,10 @@ namespace HDF5Test
                     //var pf = input[i].ProfileValues.Single();
                     var pf = input[i].ProfileValues;
 
-                    //if (pf.Length != RawRecord.profileBlobSize)
-                    //{
-                    //    Console.WriteLine($"Profile: MeasId {input[i].MeasurementId} Expected length {RawRecord.profileBlobSize}, got {pf.Length}");
-                    //}
+                    if (pf.Length != RawRecord.profileBlobSize)
+                    {
+                        Console.WriteLine($"Profile: MeasId {input[i].MeasurementId} Expected length {RawRecord.profileBlobSize}, got {pf.Length}");
+                    }
 
                     Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(pf, 0).ToPointer(), p1, RawRecord.profileBlobSize / 2, pf.Length / 2);
                     Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(pf, pf.Length / 2).ToPointer(), p2, RawRecord.profileBlobSize / 2, pf.Length / 2);

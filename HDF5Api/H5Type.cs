@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace HDF5Api
 {
@@ -19,6 +20,18 @@ namespace HDF5Api
         public void Insert(string name, IntPtr offset, H5TypeHandle dataTypeId)
         {
             Insert(this, name, offset, dataTypeId);
+        }
+
+        public void Insert<S>(string name, long nativeTypeId) where S : struct
+        {
+            var offset = Marshal.OffsetOf<S>(name);
+            Insert(this, name, offset, nativeTypeId);
+        }
+
+        public void Insert<S>(string name, H5TypeHandle dataTypeIdd) where S : struct
+        {
+            var offset = Marshal.OffsetOf<S>(name);
+            Insert(this, name, offset, dataTypeIdd);
         }
 
         #region Factory methods
