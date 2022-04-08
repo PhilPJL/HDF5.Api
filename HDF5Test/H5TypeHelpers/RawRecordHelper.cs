@@ -24,22 +24,18 @@ namespace HDF5Test.H5TypeHelpers
 
         public static H5Type CreateH5Type()
         {
-            int size = Marshal.SizeOf<SRawRecord>();
-
-            using var type = H5Type.CreateCompoundType(size);
-
-            type.Insert<SRawRecord>(nameof(SRawRecord.Id), H5T.NATIVE_INT64);
-            type.Insert<SRawRecord>(nameof(SRawRecord.MeasurementId), H5T.NATIVE_INT32);
-            type.Insert<SRawRecord>(nameof(SRawRecord.Timestamp), H5T.NATIVE_DOUBLE);
-            type.Insert<SRawRecord>(nameof(SRawRecord.Thickness), H5T.NATIVE_DOUBLE);
-            type.Insert<SRawRecord>(nameof(SRawRecord.ProfileDeviation), H5T.NATIVE_DOUBLE);
-            type.Insert<SRawRecord>(nameof(SRawRecord.ProfileHeight), H5T.NATIVE_DOUBLE);
-            type.Insert<SRawRecord>(nameof(SRawRecord.ZPosition), H5T.NATIVE_DOUBLE);
-            type.Insert<SRawRecord>(nameof(SRawRecord.IntervalId), H5T.NATIVE_INT64);
-            type.Insert<SRawRecord>(nameof(SRawRecord.PulseOffset), H5T.NATIVE_DOUBLE);
-            type.Insert<SRawRecord>(nameof(SRawRecord.ReferenceOffset), H5T.NATIVE_DOUBLE);
-
-            return type;
+            return H5Type
+                .CreateCompoundType<SRawRecord>()
+                .Insert<SRawRecord>(nameof(SRawRecord.Id), H5T.NATIVE_INT64)
+                .Insert<SRawRecord>(nameof(SRawRecord.MeasurementId), H5T.NATIVE_INT32)
+                .Insert<SRawRecord>(nameof(SRawRecord.Timestamp), H5T.NATIVE_DOUBLE)
+                .Insert<SRawRecord>(nameof(SRawRecord.Thickness), H5T.NATIVE_DOUBLE)
+                .Insert<SRawRecord>(nameof(SRawRecord.ProfileDeviation), H5T.NATIVE_DOUBLE)
+                .Insert<SRawRecord>(nameof(SRawRecord.ProfileHeight), H5T.NATIVE_DOUBLE)
+                .Insert<SRawRecord>(nameof(SRawRecord.ZPosition), H5T.NATIVE_DOUBLE)
+                .Insert<SRawRecord>(nameof(SRawRecord.IntervalId), H5T.NATIVE_INT64)
+                .Insert<SRawRecord>(nameof(SRawRecord.PulseOffset), H5T.NATIVE_DOUBLE)
+                .Insert<SRawRecord>(nameof(SRawRecord.ReferenceOffset), H5T.NATIVE_DOUBLE);
         }
 
         public static SRawRecord Convert(RawRecord source)

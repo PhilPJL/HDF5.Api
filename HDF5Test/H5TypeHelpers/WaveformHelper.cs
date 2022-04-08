@@ -24,22 +24,17 @@ namespace HDF5Test.H5TypeHelpers
 
         public static H5Type CreateH5Type()
         {
-            int size = Marshal.SizeOf<SWaveform>();
-
-            using var type = H5Type.CreateCompoundType(size);
-
-            type.Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_INT64);
-            type.Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_INT64);
-            type.Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_UCHAR);
-            type.Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_DOUBLE);
-            type.Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_DOUBLE);
-            type.Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_INT64);
-
             using var valuesType = H5Type.CreateDoubleArrayType(WaveformBlobSize / sizeof(double));
 
-            type.Insert<SWaveform>(nameof(SWaveform.Values), valuesType);
-
-            return type;
+            return H5Type
+                .CreateCompoundType<SWaveform>()
+                .Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_INT64)
+                .Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_INT64)
+                .Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_UCHAR)
+                .Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_DOUBLE)
+                .Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_DOUBLE)
+                .Insert<SWaveform>(nameof(SWaveform.Id), H5T.NATIVE_INT64)
+                .Insert<SWaveform>(nameof(SWaveform.Values), valuesType);
         }
     }
 }

@@ -7,31 +7,36 @@ namespace HDF5Api
     {
         private H5Type(Handle handle) : base(handle) { }
 
-        public void Insert(string name, int offset, long nativeTypeId)
+        public H5Type Insert(string name, int offset, long nativeTypeId)
         {
             Insert(this, name, new IntPtr(offset), nativeTypeId);
+            return this;
         }
 
-        public void Insert(string name, IntPtr offset, long nativeTypeId)
+        public H5Type Insert(string name, IntPtr offset, long nativeTypeId)
         {
             Insert(this, name, offset, nativeTypeId);
+            return this;
         }
 
-        public void Insert(string name, IntPtr offset, H5TypeHandle dataTypeId)
+        public H5Type Insert(string name, IntPtr offset, H5TypeHandle dataTypeId)
         {
             Insert(this, name, offset, dataTypeId);
+            return this;
         }
 
-        public void Insert<S>(string name, long nativeTypeId) where S : struct
+        public H5Type Insert<S>(string name, long nativeTypeId) where S : struct
         {
             var offset = Marshal.OffsetOf<S>(name);
             Insert(this, name, offset, nativeTypeId);
+            return this;
         }
 
-        public void Insert<S>(string name, H5TypeHandle dataTypeIdd) where S : struct
+        public H5Type Insert<S>(string name, H5TypeHandle dataTypeId) where S : struct
         {
             var offset = Marshal.OffsetOf<S>(name);
-            Insert(this, name, offset, dataTypeIdd);
+            Insert(this, name, offset, dataTypeId);
+            return this;
         }
 
         #region Factory methods
@@ -40,6 +45,12 @@ namespace HDF5Api
             var h = H5T.create(H5T.class_t.COMPOUND, new IntPtr(size));
             AssertHandle(h);
             return new H5Type(h);
+        }
+
+        public static H5Type CreateCompoundType<S>() where S : struct
+        {
+            int size = Marshal.SizeOf<S>();
+            return CreateCompoundType(size);
         }
 
         public static H5Type CreateByteArrayType(int size)

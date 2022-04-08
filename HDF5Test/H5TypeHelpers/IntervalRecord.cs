@@ -19,17 +19,13 @@ namespace HDF5Test.H5TypeHelpers
 
         public static H5Type CreateH5Type()
         {
-            int size = Marshal.SizeOf<SIntervalRecord>();
-
-            using var type = H5Type.CreateCompoundType(size);
-
-            type.Insert<SIntervalRecord>(nameof(SIntervalRecord.Id), H5T.NATIVE_INT64);
-            type.Insert<SIntervalRecord>(nameof(SIntervalRecord.Timestamp), H5T.NATIVE_DOUBLE);
-            type.Insert<SIntervalRecord>(nameof(SIntervalRecord.AverageThickness), H5T.NATIVE_DOUBLE);
-            type.Insert<SIntervalRecord>(nameof(SIntervalRecord.MinimumThickness), H5T.NATIVE_DOUBLE);
-            type.Insert<SIntervalRecord>(nameof(SIntervalRecord.MaximumThickness), H5T.NATIVE_DOUBLE);
-
-            return type;
+            return H5Type
+                .CreateCompoundType<SIntervalRecord>()
+                .Insert<SIntervalRecord>(nameof(SIntervalRecord.Id), H5T.NATIVE_INT64)
+                .Insert<SIntervalRecord>(nameof(SIntervalRecord.Timestamp), H5T.NATIVE_DOUBLE)
+                .Insert<SIntervalRecord>(nameof(SIntervalRecord.AverageThickness), H5T.NATIVE_DOUBLE)
+                .Insert<SIntervalRecord>(nameof(SIntervalRecord.MinimumThickness), H5T.NATIVE_DOUBLE)
+                .Insert<SIntervalRecord>(nameof(SIntervalRecord.MaximumThickness), H5T.NATIVE_DOUBLE);
         }
 
         public static SIntervalRecord Convert(IntervalRecord source)

@@ -24,20 +24,15 @@ namespace HDF5Test.H5TypeHelpers
 
         public static H5Type CreateH5Type()
         {
-            int size = Marshal.SizeOf<SProfile>();
-
-            using var type = H5Type.CreateCompoundType(size);
-
-            type.Insert<SProfile>(nameof(SProfile.Id), H5T.NATIVE_INT64);
-            type.Insert<SProfile>(nameof(SProfile.RecordId), H5T.NATIVE_INT64);
-            type.Insert<SProfile>(nameof(SProfile.Units), H5T.NATIVE_UCHAR);
-
             using var valuesType = H5Type.CreateDoubleArrayType(profileBlobSize / sizeof(double) / 2);
 
-            type.Insert<SProfile>(nameof(SProfile.ValuesX), valuesType);
-            type.Insert<SProfile>(nameof(SProfile.ValuesZ), valuesType);
-
-            return type;
+            return H5Type
+                .CreateCompoundType<SProfile>()
+                .Insert<SProfile>(nameof(SProfile.Id), H5T.NATIVE_INT64)
+                .Insert<SProfile>(nameof(SProfile.RecordId), H5T.NATIVE_INT64)
+                .Insert<SProfile>(nameof(SProfile.Units), H5T.NATIVE_UCHAR)
+                .Insert<SProfile>(nameof(SProfile.ValuesX), valuesType)
+                .Insert<SProfile>(nameof(SProfile.ValuesZ), valuesType);
         }
 
         public static SProfile Convert(Profile source)

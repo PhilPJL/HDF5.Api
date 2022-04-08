@@ -28,20 +28,16 @@ namespace HDF5Test.H5TypeHelpers
 
         public static H5Type CreateH5Type()
         {
-            int size = Marshal.SizeOf<SMeasurementConfiguration>();
-
-            using var type = H5Type.CreateCompoundType(size);
-
-            type.Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Id), H5T.NATIVE_INT64);
-            type.Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Name), H5T.NATIVE_UCHAR);
-            type.Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Description), H5T.NATIVE_UCHAR);
-            type.Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ModuleName), H5T.NATIVE_UCHAR);
-            type.Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ScannerName), H5T.NATIVE_UCHAR);
-            type.Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ScannerConfiguration), H5T.NATIVE_UCHAR);
-            type.Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Timestamp), H5T.NATIVE_DOUBLE);
-            type.Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.SessionKey), H5T.NATIVE_UCHAR);
-
-            return type;
+            return H5Type
+                .CreateCompoundType<SMeasurementConfiguration>()
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Id), H5T.NATIVE_INT64)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Name), H5T.NATIVE_UCHAR)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Description), H5T.NATIVE_UCHAR)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ModuleName), H5T.NATIVE_UCHAR)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ScannerName), H5T.NATIVE_UCHAR)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ScannerConfiguration), H5T.NATIVE_UCHAR)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Timestamp), H5T.NATIVE_DOUBLE)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.SessionKey), H5T.NATIVE_UCHAR);
         }
 
 
