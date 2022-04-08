@@ -13,10 +13,14 @@ namespace HDF5Test.H5TypeHelpers
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public unsafe struct SProfile
         {
-            public long Id;
-            public long RecordId;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 6)]
-            public string Units;
+            public SProfile()
+            {
+            }
+
+            public long Id = 0;
+            public long RecordId = 0;
+
+            public fixed char Units[6];
 
             public fixed byte ValuesX[profileBlobSize / 2];
             public fixed byte ValuesZ[profileBlobSize / 2];
@@ -35,17 +39,25 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert<SProfile>(nameof(SProfile.ValuesZ), valuesType);
         }
 
-        public static SProfile Convert(Profile source)
+        public unsafe static SProfile Convert(Profile source)
         {
             var result = new SProfile()
             {
                 Id = source.Id,
-                Units = source.Units,
                 RecordId = source.RecordId,
             };
 
-            // TODO: values
-            throw new NotImplementedException("");
+            var pf = source.Values;
+
+            if (pf.Length > profileBlobSize)
+            {
+                throw new InvalidOperationException($"Profile: The provided data blob is length {pf.Length} which exceeds the maximum expected length {profileBlobSize}");
+            }
+
+            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(source.Units.ToCharArray(), 0).ToPointer(), result.Units, sizeof(char) * 6, source.Units.Length * 2);
+
+            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(pf, 0).ToPointer(), result.ValuesX, profileBlobSize / 2, pf.Length / 2);
+            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(pf, pf.Length / 2).ToPointer(), result.ValuesZ, profileBlobSize / 2, pf.Length / 2);
 
             return result;
         }
