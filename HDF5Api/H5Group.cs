@@ -7,7 +7,7 @@
         /// <summary>
         /// Create a DataSet for this Group
         /// </summary>
-        public H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+        public override H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
         {
             return H5DataSet.Create(this, name, typeId, spaceId, propertyListId);
         }

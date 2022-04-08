@@ -5,19 +5,19 @@
         private H5File(Handle handle) : base(handle) { }
 
         /// <summary>
-        /// Create a DataSet in this file
-        /// </summary>
-        public H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
-        {
-            return H5DataSet.Create(this, name, typeId, spaceId, propertyListId);
-        }
-
-        /// <summary>
         /// Create a Group in this file
         /// </summary>
         public H5Group CreateGroup(string name)
         {
             return H5Group.Create(this, name);
+        }
+
+        /// <summary>
+        /// Create a DataSet in this File
+        /// </summary>
+        public override H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+        {
+            return H5DataSet.Create(this, name, typeId, spaceId, propertyListId);
         }
 
         #region Factory methods

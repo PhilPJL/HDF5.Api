@@ -8,6 +8,8 @@ namespace HDF5Api
     public interface IH5Location
     {
         public Handle Handle { get; }
+
+        public H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
     }
 
     public class H5PropertyListHandle : H5Handle
@@ -20,14 +22,18 @@ namespace HDF5Api
         public H5TypeHandle(Handle handle) : base(handle, H5T.close) { }
     }
 
-    public class H5FileHandle : H5Handle, IH5Location
+    public abstract class H5FileHandle : H5Handle, IH5Location
     {
-        public H5FileHandle(Handle handle) : base(handle, H5F.close) { }
+        protected H5FileHandle(Handle handle) : base(handle, H5F.close) { }
+
+        public abstract H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
     }
 
-    public class H5GroupHandle : H5Handle, IH5Location
+    public abstract class H5GroupHandle : H5Handle, IH5Location
     {
-        public H5GroupHandle(Handle handle) : base(handle, H5G.close) { }
+        protected H5GroupHandle(Handle handle) : base(handle, H5G.close) { }
+
+        public abstract H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
     }
 
     public class H5DataSetHandle : H5Handle
