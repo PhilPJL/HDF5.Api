@@ -4,6 +4,7 @@
 		<LangVersion>latest</LangVersion>
 		<TargetFrameworks>net48;netstandard2.1</TargetFrameworks>
 		<PlatformTarget>AnyCPU</PlatformTarget>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>

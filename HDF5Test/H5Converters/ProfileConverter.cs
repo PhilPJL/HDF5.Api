@@ -22,21 +22,13 @@ namespace HDF5Test.H5TypeHelpers
             // Convert to assertions
             var pf = source.Values;
 
+            // TODO: add assertion
             if (pf.Length > ProfileBlobSize)
             {
                 throw new InvalidOperationException($"Profile: The provided data blob is length {pf.Length} which exceeds the maximum expected length {ProfileBlobSize}");
             }
 
-            var msg = $"Profile: The provided units has length {source.Units.Length} which exceeds the maximum expected length {UnitsLength}";
-
-            if (source.Units.Length > UnitsLength)
-            {
-                throw new InvalidOperationException(msg);
-            }
-
-            byte[] bytes = Ascii.GetBytes(source.Units);
-
-            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(bytes, 0).ToPointer(), result.Units, UnitsLength, bytes.Length);
+            CopyString(source.Units, result.Units, UnitsLength);
             Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(pf, 0).ToPointer(), result.ValuesX, ProfileBlobSize / 2, pf.Length / 2);
             Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(pf, pf.Length / 2).ToPointer(), result.ValuesZ, ProfileBlobSize / 2, pf.Length / 2);
 

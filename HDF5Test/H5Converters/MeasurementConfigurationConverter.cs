@@ -14,34 +14,43 @@ namespace HDF5Test.H5TypeHelpers
         private const int ScannerConfigurationLength = 8000;
         private const int SessionKeyLength = 32;
 
+        public unsafe SMeasurementConfiguration Convert(MeasurementConfiguration source)
+        {
+            var result = new SMeasurementConfiguration
+            {
+                Id = source.Id,
+                Timestamp = source.Timestamp.ToOADate()
+            };
+
+            CopyString(source.Name, result.Name, NameLength);
+            CopyString(source.Name, result.Name, DescriptionLength);
+            CopyString(source.Name, result.Name, ModuleNameLength);
+            CopyString(source.Name, result.Name, ScannerNameLength);
+            CopyString(source.Name, result.Name, ScannerConfigurationLength);
+            CopyString(source.Name, result.Name, SessionKeyLength);
+
+            return result;
+        }
+
         public H5Type CreateH5Type()
         {
+            using var nameStringType = H5Type.CreateFixedLengthStringType(NameLength);
+            using var descriptionStringType = H5Type.CreateFixedLengthStringType(DescriptionLength);
+            using var moduleNameStringType = H5Type.CreateFixedLengthStringType(ModuleNameLength);
+            using var scannerNameStringType = H5Type.CreateFixedLengthStringType(ScannerNameLength);
+            using var scannerConfigurationStringType = H5Type.CreateFixedLengthStringType(ScannerConfigurationLength);
+            using var sessionKeyStringType = H5Type.CreateFixedLengthStringType(SessionKeyLength);
+
             return H5Type
                 .CreateCompoundType<SMeasurementConfiguration>()
                 .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Id), H5T.NATIVE_INT64)
-                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Name), H5T.NATIVE_UCHAR)
-                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Description), H5T.NATIVE_UCHAR)
-                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ModuleName), H5T.NATIVE_UCHAR)
-                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ScannerName), H5T.NATIVE_UCHAR)
-                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ScannerConfiguration), H5T.NATIVE_UCHAR)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Name), nameStringType)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Description), descriptionStringType)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ModuleName), moduleNameStringType)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ScannerName), scannerNameStringType)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ScannerConfiguration), scannerConfigurationStringType)
                 .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Timestamp), H5T.NATIVE_DOUBLE)
-                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.SessionKey), H5T.NATIVE_UCHAR);
-        }
-
-        public SMeasurementConfiguration Convert(MeasurementConfiguration source)
-        {
-            return new SMeasurementConfiguration
-            {
-                Id = source.Id,
-                // TODL copy strings
-                //Name = source.Name,
-                //Description = source.Description,   
-                //ModuleName = source.ModuleName,
-                //ScannerName = source.ScannerName,
-                //ScannerConfiguration = source.ScannerConfiguration,
-                //Timestamp = source.Timestamp.ToOADate(),
-                //SessionKey = source.SessionKey
-            };
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.SessionKey), sessionKeyStringType);
         }
 
         [StructLayout(LayoutKind.Sequential)]

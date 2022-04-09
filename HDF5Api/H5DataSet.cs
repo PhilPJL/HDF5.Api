@@ -36,7 +36,6 @@ namespace HDF5Api
         #endregion
 
         #region C level API wrappers
-
         public static void SetExtent(H5DataSetHandle dataSetId, ulong[] dims)
         {
             AssertHandle(dataSetId);
