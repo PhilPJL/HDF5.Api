@@ -7,23 +7,24 @@ namespace HDF5Test.H5TypeHelpers
 {
     public static class MeasurementConfigurationHelper
     {
+        public const int nameLength = 6;
+        public const int descriptionLength = 6;
+        public const int moduleNameLength = 6;
+        public const int scannerNameLength = 6;
+        public const int scannerDescriptionLength = 6;
+        public const int sessionKeyLength = 6;
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct SMeasurementConfiguration
+        public unsafe struct SMeasurementConfiguration
         {
             public long Id;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 50)]
-            public string Name;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
-            public string Description;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
-            public string ModuleName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
-            public string ScannerName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 8000)]
-            public string ScannerConfiguration;
+            public fixed byte Name[nameLength];
+            public fixed byte Description[descriptionLength];
+            public fixed byte ModuleName[moduleNameLength];
+            public fixed byte ScannerName[scannerNameLength];
+            public fixed byte ScannerConfiguration[scannerDescriptionLength];
             public double Timestamp;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-            public string SessionKey;
+            public fixed byte SessionKey[sessionKeyLength];
         }
 
         public static H5Type CreateH5Type()
@@ -46,13 +47,13 @@ namespace HDF5Test.H5TypeHelpers
             return new SMeasurementConfiguration
             {
                 Id = source.Id,
-                Name = source.Name,
-                Description = source.Description,   
-                ModuleName = source.ModuleName,
-                ScannerName = source.ScannerName,
-                ScannerConfiguration = source.ScannerConfiguration,
-                Timestamp = source.Timestamp.ToOADate(),
-                SessionKey = source.SessionKey
+                //Name = source.Name,
+                //Description = source.Description,   
+                //ModuleName = source.ModuleName,
+                //ScannerName = source.ScannerName,
+                //ScannerConfiguration = source.ScannerConfiguration,
+                //Timestamp = source.Timestamp.ToOADate(),
+                //SessionKey = source.SessionKey
             };
         }
     }

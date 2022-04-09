@@ -73,6 +73,16 @@ namespace HDF5Api
             AssertHandle(h);
             return new H5Type(h);
         }
+
+        public static H5Type CreateFixedLengthStringType(int length)
+        {
+            var h = H5T.copy(H5T.C_S1);
+            AssertHandle(h);
+            int err = H5T.set_size(h, new IntPtr(length));
+            AssertError(err);
+            return new H5Type(h);
+        }
+
         #endregion
 
         #region C API wrappers
