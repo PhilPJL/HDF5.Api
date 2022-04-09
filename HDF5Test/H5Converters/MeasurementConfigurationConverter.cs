@@ -5,29 +5,16 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public static class MeasurementConfigurationHelper
+    public class MeasurementConfigurationConverter : H5TypeConverterBase, IH5TypeConverter<MeasurementConfiguration, MeasurementConfigurationConverter.SMeasurementConfiguration>
     {
-        public const int nameLength = 6;
-        public const int descriptionLength = 6;
-        public const int moduleNameLength = 6;
-        public const int scannerNameLength = 6;
-        public const int scannerDescriptionLength = 6;
-        public const int sessionKeyLength = 6;
+        private const int NameLength = 50;
+        private const int DescriptionLength = 255;
+        private const int ModuleNameLength = 255;
+        private const int ScannerNameLength = 255;
+        private const int ScannerConfigurationLength = 8000;
+        private const int SessionKeyLength = 32;
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public unsafe struct SMeasurementConfiguration
-        {
-            public long Id;
-            public fixed byte Name[nameLength];
-            public fixed byte Description[descriptionLength];
-            public fixed byte ModuleName[moduleNameLength];
-            public fixed byte ScannerName[scannerNameLength];
-            public fixed byte ScannerConfiguration[scannerDescriptionLength];
-            public double Timestamp;
-            public fixed byte SessionKey[sessionKeyLength];
-        }
-
-        public static H5Type CreateH5Type()
+        public H5Type CreateH5Type()
         {
             return H5Type
                 .CreateCompoundType<SMeasurementConfiguration>()
@@ -41,12 +28,12 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.SessionKey), H5T.NATIVE_UCHAR);
         }
 
-
-        public static SMeasurementConfiguration Convert(MeasurementConfiguration source)
+        public SMeasurementConfiguration Convert(MeasurementConfiguration source)
         {
             return new SMeasurementConfiguration
             {
                 Id = source.Id,
+                // TODL copy strings
                 //Name = source.Name,
                 //Description = source.Description,   
                 //ModuleName = source.ModuleName,
@@ -56,5 +43,20 @@ namespace HDF5Test.H5TypeHelpers
                 //SessionKey = source.SessionKey
             };
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct SMeasurementConfiguration
+        {
+            public long Id;
+            public fixed byte Name[NameLength];
+            public fixed byte Description[DescriptionLength];
+            public fixed byte ModuleName[ModuleNameLength];
+            public fixed byte ScannerName[ScannerNameLength];
+            public fixed byte ScannerConfiguration[ScannerConfigurationLength];
+            public double Timestamp;
+            public fixed byte SessionKey[SessionKeyLength];
+        }
+
+        public static IH5TypeConverter<MeasurementConfiguration, SMeasurementConfiguration> Default { get; } = new MeasurementConfigurationConverter();
     }
 }

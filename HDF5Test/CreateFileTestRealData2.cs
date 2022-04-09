@@ -27,7 +27,7 @@ namespace HDF5Test
             // TODO: async queryable/cancellable
             // TODO: overlap?
 
-            using var rawRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter<RawRecordHelper.SRawRecord>(group, "RawRecords", RawRecordHelper.CreateH5Type);
+            using var rawRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "RawRecords", RawRecordConverter.Default);
             using (new DisposableStopWatch(() => rawRecordWriter.CurrentPosition))
             {
                 context
@@ -36,11 +36,11 @@ namespace HDF5Test
                     .Buffer(20)
                     .ForEach(rg =>
                     {
-                        rawRecordWriter.Write(rg.Select(r => RawRecordHelper.Convert(r)));
+                        rawRecordWriter.Write(rg);
                     });
             }
 
-            using var intervalRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter<IntervalRecordHelper.SIntervalRecord>(group, "IntervalRecords", RawRecordHelper.CreateH5Type);
+            using var intervalRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "IntervalRecords", IntervalRecordConverter.Default);
             using (new DisposableStopWatch(() => intervalRecordWriter.CurrentPosition))
             {
                 context
@@ -49,11 +49,11 @@ namespace HDF5Test
                     .Buffer(20)
                     .ForEach(rg =>
                     {
-                        intervalRecordWriter.Write(rg.Select(r => IntervalRecordHelper.Convert(r)));
+                        intervalRecordWriter.Write(rg);
                     });
             }
 
-            using var profileRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter<ProfileHelper.SProfile>(group, "Profiles", ProfileHelper.CreateH5Type);
+            using var profileRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Profiles", ProfileConverter.Default);
             using (new DisposableStopWatch(() => profileRecordWriter.CurrentPosition))
             {
                 context
@@ -62,7 +62,7 @@ namespace HDF5Test
                     .Buffer(20)
                     .ForEach(rg =>
                     {
-                        profileRecordWriter.Write(rg.Select(r => ProfileHelper.Convert(r)));
+                        profileRecordWriter.Write(rg);
                     });
             }
 

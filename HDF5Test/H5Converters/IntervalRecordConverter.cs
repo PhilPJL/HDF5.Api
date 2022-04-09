@@ -5,19 +5,9 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public static class IntervalRecordHelper
+    public class IntervalRecordConverter : H5TypeConverterBase, IH5TypeConverter<IntervalRecord, IntervalRecordConverter.SIntervalRecord>
     {
-        [StructLayout(LayoutKind.Sequential)]
-        public struct SIntervalRecord
-        {
-            public long Id;
-            public double Timestamp;
-            public double AverageThickness;
-            public double MinimumThickness;
-            public double MaximumThickness;
-        }
-
-        public static H5Type CreateH5Type()
+        public H5Type CreateH5Type()
         {
             return H5Type
                 .CreateCompoundType<SIntervalRecord>()
@@ -28,7 +18,7 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert<SIntervalRecord>(nameof(SIntervalRecord.MaximumThickness), H5T.NATIVE_DOUBLE);
         }
 
-        public static SIntervalRecord Convert(IntervalRecord source)
+        public SIntervalRecord Convert(IntervalRecord source)
         {
             return new SIntervalRecord
             {
@@ -39,5 +29,17 @@ namespace HDF5Test.H5TypeHelpers
                 MaximumThickness = source.MaximumThickness ?? double.NaN,
             };
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SIntervalRecord
+        {
+            public long Id;
+            public double Timestamp;
+            public double AverageThickness;
+            public double MinimumThickness;
+            public double MaximumThickness;
+        }
+
+        public static IH5TypeConverter<IntervalRecord, SIntervalRecord> Default { get; } = new IntervalRecordConverter();
     }
 }

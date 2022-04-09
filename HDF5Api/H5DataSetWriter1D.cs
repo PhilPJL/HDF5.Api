@@ -2,12 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace HDF5Api
 {
-    public interface IH5DataSetWriter<in CompoundType> : IDisposable where CompoundType : struct
+    public abstract class H5TypeConverterBase
     {
-        public void Write(IEnumerable<CompoundType> recordsChunk);
+        protected static readonly ASCIIEncoding Ascii = new();
+    }
+
+    public interface IH5TypeConverter<in TInput, out TOutput> where TOutput : struct
+    {
+        public H5Type CreateH5Type();
+        public TOutput Convert(TInput source);
+    }
+
+    public interface IH5DataSetWriter<in TInput, out TOutput> : IDisposable where TOutput : struct
+    {
+        public void Write(IEnumerable<TInput> recordsChunk);
         public int CurrentPosition { get; }
     }
 
@@ -15,7 +27,7 @@ namespace HDF5Api
     {
         public static readonly ulong[] MaxDims = new ulong[] { H5S.UNLIMITED };
 
-        public static IH5DataSetWriter<CompoundType> CreateOneDimensionalDataSetWriter<CompoundType>(IH5Location location, string dataSetName, Func<H5Type> typeFactory, int chunkSize = 100) where CompoundType : struct
+        public static IH5DataSetWriter<TInput, TOutput> CreateOneDimensionalDataSetWriter<TInput, TOutput>(IH5Location location, string dataSetName, IH5TypeConverter<TInput, TOutput> converter, int chunkSize = 100) where TOutput : struct
         {
             // NOTE: we're only interested in creating a data set currently, not opening an existing one
 
@@ -32,30 +44,33 @@ namespace HDF5Api
             // TODO: investigate performance of compression and different compression types
             //properyList.EnableDeflateCompression(6);
 
-            var h5CompoundType = typeFactory();
+            var h5CompoundType = converter.CreateH5Type();
 
             // Create a dataset with our record type and chunk size.
             // TODO: get h5CompoundType from CompoundType and own h5CompoundType - get rid of typeFactory?
             var dataSet = location.CreateDataSet(dataSetName, h5CompoundType, memorySpace, properyList);
 
             // Writer owns and disposes/releases the data-set.
-            return new H5DataSetWriter1D<CompoundType>(dataSet, h5CompoundType, true);
+            return new H5DataSetWriter1D<TInput, TOutput>(dataSet, h5CompoundType, converter.Convert, true);
         }
     }
 
-    public class H5DataSetWriter1D<CompoundType> : Disposable, IH5DataSetWriter<CompoundType> where CompoundType : struct
+    public class H5DataSetWriter1D<TInput, TOutput> : Disposable, IH5DataSetWriter<TInput, TOutput> where TOutput : struct
     {
-        internal H5DataSetWriter1D(H5DataSet h5DataSet, H5Type h5Type, bool ownsDataSet = false)
+        internal H5DataSetWriter1D(H5DataSet h5DataSet, H5Type h5Type, Func<TInput, TOutput> convert, bool ownsDataSet = false)
         {
             DataSet = h5DataSet;
             Type = h5Type;
+            Convert = convert;
             OwnsDataSet = ownsDataSet;
         }
 
         private H5DataSet DataSet { get; set; }
         private H5Type Type { get; set; }
+        private Func<TInput, TOutput> Convert { get; }
         private bool OwnsDataSet { get; }
         public int CurrentPosition { get; private set; }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -73,9 +88,15 @@ namespace HDF5Api
             }
         }
 
-        public void Write(IEnumerable<CompoundType> recordsChunk)
+        private int TickCount;
+
+        public void Write(IEnumerable<TInput> recordsChunk)
         {
-            var records = recordsChunk.ToArray();
+            TickCount = TickCount == 0 ? Environment.TickCount : TickCount;
+            Console.WriteLine($"Writing {recordsChunk.Count()} {typeof(TInput).Name}, {Environment.TickCount - TickCount}");
+            TickCount = Environment.TickCount;
+
+            var records = recordsChunk.Select(Convert).ToArray();
 
             GCHandle pinnedBuffer = GCHandle.Alloc(records, GCHandleType.Pinned);
 
@@ -93,6 +114,7 @@ namespace HDF5Api
                 // Match the space to length of records retrieved.
                 using var recordSpace = H5Space.CreateSimple(1, new ulong[] { (ulong)records.Length }, H5DataSetWriter.MaxDims);
                 DataSet.Write(Type, recordSpace, fileSpace, pinnedBuffer.AddrOfPinnedObject());
+                Console.WriteLine($"Written {recordsChunk.Count()} {typeof(TInput).Name}, {Environment.TickCount - TickCount}");
             }
             finally
             {
