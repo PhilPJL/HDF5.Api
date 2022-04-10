@@ -7,17 +7,6 @@ namespace HDF5Test.H5TypeHelpers
 {
     public class IntervalRecordAdapter : H5TypeAdapter<IntervalRecord, IntervalRecordAdapter.SIntervalRecord>
     {
-        public override H5Type GetH5Type()
-        {
-            return H5Type
-                .CreateCompoundType<SIntervalRecord>()
-                .Insert<SIntervalRecord>(nameof(SIntervalRecord.Id), H5T.NATIVE_INT64)
-                .Insert<SIntervalRecord>(nameof(SIntervalRecord.Timestamp), H5T.NATIVE_DOUBLE)
-                .Insert<SIntervalRecord>(nameof(SIntervalRecord.AverageThickness), H5T.NATIVE_DOUBLE)
-                .Insert<SIntervalRecord>(nameof(SIntervalRecord.MinimumThickness), H5T.NATIVE_DOUBLE)
-                .Insert<SIntervalRecord>(nameof(SIntervalRecord.MaximumThickness), H5T.NATIVE_DOUBLE);
-        }
-
         protected override SIntervalRecord Convert(IntervalRecord source)
         {
             return new SIntervalRecord
@@ -28,6 +17,17 @@ namespace HDF5Test.H5TypeHelpers
                 MinimumThickness = source.MinimumThickness ?? double.NaN,
                 MaximumThickness = source.MaximumThickness ?? double.NaN,
             };
+        }
+
+        public override H5Type GetH5Type()
+        {
+            return H5Type
+                .CreateCompoundType<SIntervalRecord>()
+                .Insert<SIntervalRecord>(nameof(SIntervalRecord.Id), H5T.NATIVE_INT64)
+                .Insert<SIntervalRecord>(nameof(SIntervalRecord.Timestamp), H5T.NATIVE_DOUBLE)
+                .Insert<SIntervalRecord>(nameof(SIntervalRecord.AverageThickness), H5T.NATIVE_DOUBLE)
+                .Insert<SIntervalRecord>(nameof(SIntervalRecord.MinimumThickness), H5T.NATIVE_DOUBLE)
+                .Insert<SIntervalRecord>(nameof(SIntervalRecord.MaximumThickness), H5T.NATIVE_DOUBLE);
         }
 
         [StructLayout(LayoutKind.Sequential)]

@@ -100,10 +100,25 @@ namespace HDF5Test
                         .MeasurementConfigurations
                         .Where(mc => mc.Measurements.Any(m => m.Id == measurementId))
                         .Take(maxRows)
-                        .Buffer(20)
+                        .Buffer(chunkSize)
                         .ForEach(rg =>
                         {
                             measurementConfigurationWriter.WriteChunk(rg);
+                            sw.ShowRowsWritten(logTimePerChunk);
+                        });
+                }
+
+                using var installationConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "InstallationConfigurations", InstallationConfigurationAdapter.Default, compressionLevel);
+                using (var sw = new DisposableStopWatch("InstallationConfiguration", () => installationConfigurationWriter.CurrentPosition))
+                {
+                    systemContext
+                        .InstallationConfigurations
+                        .Where(ic => ic.Measurements.Any(m => m.Id == measurementId))
+                        .Take(maxRows)
+                        .Buffer(chunkSize)
+                        .ForEach(rg =>
+                        {
+                            installationConfigurationWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
                 }

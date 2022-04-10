@@ -29,8 +29,8 @@ namespace HDF5Test.H5TypeHelpers
             return H5Type
                 .CreateCompoundType<SRawRecord>()
                 .Insert<SRawRecord>(nameof(SRawRecord.Id), H5T.NATIVE_INT64)
-                .Insert<SRawRecord>(nameof(SRawRecord.MeasurementId), H5T.NATIVE_INT32)
                 .Insert<SRawRecord>(nameof(SRawRecord.Timestamp), H5T.NATIVE_DOUBLE)
+                .Insert<SRawRecord>(nameof(SRawRecord.MeasurementId), H5T.NATIVE_INT32)
                 .Insert<SRawRecord>(nameof(SRawRecord.Thickness), H5T.NATIVE_DOUBLE)
                 .Insert<SRawRecord>(nameof(SRawRecord.ProfileDeviation), H5T.NATIVE_DOUBLE)
                 .Insert<SRawRecord>(nameof(SRawRecord.ProfileHeight), H5T.NATIVE_DOUBLE)
@@ -44,8 +44,8 @@ namespace HDF5Test.H5TypeHelpers
         public struct SRawRecord
         {
             public long Id;
-            public int MeasurementId;
             public double Timestamp;
+            public int MeasurementId;
             public double Thickness;
             public double ProfileDeviation;
             public double ProfileHeight;

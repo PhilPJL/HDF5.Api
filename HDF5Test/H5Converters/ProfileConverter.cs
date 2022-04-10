@@ -29,6 +29,7 @@ namespace HDF5Test.H5TypeHelpers
             }
 
             CopyString(source.Units, result.Units, UnitsLength);
+            result.ValuesLength = pf.Length / 2;
             Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(pf, 0).ToPointer(), result.ValuesX, ProfileBlobSize / 2, pf.Length / 2);
             Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(pf, pf.Length / 2).ToPointer(), result.ValuesZ, ProfileBlobSize / 2, pf.Length / 2);
 
@@ -45,6 +46,7 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert<SProfile>(nameof(SProfile.Id), H5T.NATIVE_INT64)
                 .Insert<SProfile>(nameof(SProfile.RecordId), H5T.NATIVE_INT64)
                 .Insert<SProfile>(nameof(SProfile.Units), stringType)
+                .Insert<SProfile>(nameof(SProfile.ValuesLength), H5T.NATIVE_INT32)
                 .Insert<SProfile>(nameof(SProfile.ValuesX), valuesType)
                 .Insert<SProfile>(nameof(SProfile.ValuesZ), valuesType);
         }
@@ -56,6 +58,7 @@ namespace HDF5Test.H5TypeHelpers
             public long RecordId;
 
             public fixed byte Units[UnitsLength];
+            public int ValuesLength;
             public fixed byte ValuesX[ProfileBlobSize / 2];
             public fixed byte ValuesZ[ProfileBlobSize / 2];
         }

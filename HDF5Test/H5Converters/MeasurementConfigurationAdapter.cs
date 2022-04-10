@@ -23,11 +23,11 @@ namespace HDF5Test.H5TypeHelpers
             };
 
             CopyString(source.Name, result.Name, NameLength);
-            CopyString(source.Name, result.Name, DescriptionLength);
-            CopyString(source.Name, result.Name, ModuleNameLength);
-            CopyString(source.Name, result.Name, ScannerNameLength);
-            CopyString(source.Name, result.Name, ScannerConfigurationLength);
-            CopyString(source.Name, result.Name, SessionKeyLength);
+            CopyString(source.Description, result.Description, DescriptionLength);
+            CopyString(source.ModuleName, result.ModuleName, ModuleNameLength);
+            CopyString(source.ScannerName, result.ScannerName, ScannerNameLength);
+            CopyString(source.ScannerConfiguration, result.ScannerConfiguration, ScannerConfigurationLength);
+            CopyString(source.SessionKey, result.SessionKey, SessionKeyLength);
 
             return result;
         }
@@ -44,12 +44,12 @@ namespace HDF5Test.H5TypeHelpers
             return H5Type
                 .CreateCompoundType<SMeasurementConfiguration>()
                 .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Id), H5T.NATIVE_INT64)
+                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Timestamp), H5T.NATIVE_DOUBLE)
                 .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Name), nameStringType)
                 .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Description), descriptionStringType)
                 .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ModuleName), moduleNameStringType)
                 .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ScannerName), scannerNameStringType)
                 .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.ScannerConfiguration), scannerConfigurationStringType)
-                .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.Timestamp), H5T.NATIVE_DOUBLE)
                 .Insert<SMeasurementConfiguration>(nameof(SMeasurementConfiguration.SessionKey), sessionKeyStringType);
         }
 
@@ -57,12 +57,12 @@ namespace HDF5Test.H5TypeHelpers
         public unsafe struct SMeasurementConfiguration
         {
             public long Id;
+            public double Timestamp;
             public fixed byte Name[NameLength];
             public fixed byte Description[DescriptionLength];
             public fixed byte ModuleName[ModuleNameLength];
             public fixed byte ScannerName[ScannerNameLength];
             public fixed byte ScannerConfiguration[ScannerConfigurationLength];
-            public double Timestamp;
             public fixed byte SessionKey[SessionKeyLength];
         }
 
