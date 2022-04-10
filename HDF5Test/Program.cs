@@ -1,5 +1,4 @@
-﻿using HDF5Test.H5TypeHelpers;
-using System;
+﻿using System;
 
 namespace HDF5Test
 {
@@ -9,13 +8,7 @@ namespace HDF5Test
         {
             try
             {
-                // TODO: move to unit tests
-                //using var intervalRecordType = IntervalRecordHelper.CreateH5Type();
-                //using var measurementConfigurationType = MeasurementConfigurationHelper.CreateH5Type();
-                //using var profileType = ProfileHelper.CreateH5Type();
-                //using var rawRecordType = RawRecordHelper.CreateH5Type();
-
-                CreateFileTestRealData2.CreateFile();
+                CreateFileTest.CreateFile();
             }
             catch (Exception ex)
             {
