@@ -126,7 +126,7 @@ namespace HDF5Test
                         });
                 }
 
-                using var bladeProfileNameWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeProfileNames", BladeProfileNameAdapter.Default, compressionLevel);
+                using var bladeProfileNameWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(bladeGroup, "BladeProfileNames", BladeProfileNameAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeProfileName", () => bladeProfileNameWriter.RowsWritten))
                 {
                     systemContext
@@ -136,6 +136,20 @@ namespace HDF5Test
                         .ForEach(rg =>
                         {
                             bladeProfileNameWriter.WriteChunk(rg);
+                            sw.ShowRowsWritten(logTimePerChunk);
+                        });
+                }
+
+                using var bladeReferenceWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(bladeGroup, "BladeReferences", BladeReferenceAdapter.Default, compressionLevel);
+                using (var sw = new DisposableStopWatch("BladeReference", () => bladeReferenceWriter.RowsWritten))
+                {
+                    systemContext
+                        .BladeReferences
+                        .Take(maxRows)
+                        .Buffer(chunkSize)
+                        .ForEach(rg =>
+                        {
+                            bladeReferenceWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
                 }

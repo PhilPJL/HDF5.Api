@@ -11,6 +11,8 @@ namespace HDF5Test.H5TypeHelpers
     public sealed class WaveformAdapter : H5TypeAdapter<Waveform, WaveformAdapter.SWaveform>
     {
         private const int WaveformBlobSize = 16384;
+        private const int WaveformBlobTypeSize = sizeof(double);
+
         private const int TypeLength = 9;
 
         private WaveformAdapter() { }
@@ -24,13 +26,13 @@ namespace HDF5Test.H5TypeHelpers
                 Offset = source.Offset,
                 Spacing = source.Spacing,
                 ReferenceId = source.ReferenceId,
-                ValuesLength = source.Values.Length / sizeof(double)
+                ValuesLength = (source.Values?.Length ?? 0) / WaveformBlobTypeSize
             };
 
             unsafe
             {
                 CopyString(source.Type, result.Type, TypeLength);
-                CopyBlob(source.Values, result.Values, WaveformBlobSize, sizeof(double));
+                CopyBlob(source.Values, result.Values, WaveformBlobSize, WaveformBlobTypeSize);
             }
 
             return result;
@@ -38,7 +40,7 @@ namespace HDF5Test.H5TypeHelpers
 
         public override H5Type GetH5Type()
         {
-            using var valuesType = H5Type.CreateDoubleArrayType(WaveformBlobSize / sizeof(double));
+            using var valuesType = H5Type.CreateDoubleArrayType(WaveformBlobSize / WaveformBlobTypeSize);
             using var typeStringType = H5Type.CreateFixedLengthStringType(TypeLength);
 
             return H5Type

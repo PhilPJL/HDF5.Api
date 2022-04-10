@@ -37,22 +37,25 @@ namespace HDF5Api
             AssertBlobMaxLength(source, maxBlobSize);
             AssertBlobLengthDivisibleByTypeLength(source, blobTypeLength);
 
-            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(source, 0).ToPointer(), destination, maxBlobSize, source.Length);
+            if ((source?.Length ?? 0) > 0)
+            {
+                Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(source, 0).ToPointer(), destination, maxBlobSize, source.Length);
+            }
         }
 
         public static void AssertBlobMaxLength(byte[] values, int maxBlobSize)
         {
-            if (values.Length > maxBlobSize)
+            if ((values?.Length ?? 0) > maxBlobSize)
             {
-                throw new InvalidOperationException($"The provided data blob is length {values.Length} exceeds the maximum expected length {maxBlobSize}");
+                throw new InvalidOperationException($"The provided data blob is length {values?.Length} exceeds the maximum expected length {maxBlobSize}");
             }
         }
 
         public static void AssertBlobLengthDivisibleByTypeLength(byte[] values, int blobTypeLength)
         {
-            if (values.Length % blobTypeLength != 0)
+            if ((values?.Length ?? 0) % blobTypeLength != 0)
             {
-                throw new InvalidOperationException($"The provided data blob is length {values.Length} is not an exact multiple of contained type of length {blobTypeLength}");
+                throw new InvalidOperationException($"The provided data blob is length {values?.Length} is not an exact multiple of contained type of length {blobTypeLength}");
             }
         }
     }
@@ -91,24 +94,64 @@ namespace HDF5Api
     /// <typeparam name="TInput"></typeparam>
     public class H5TypeAdapter<TInput> : IH5TypeAdapter<TInput>
     {
+        private int TInputSize { get; set; }
+
         public H5Type GetH5Type()
         {
-            throw new NotImplementedException();
-
-            // Read properties using reflection - simple types, attributed strings(length) and attributed byte arrays(contained type)
             // Generate H5Type.
 
+            // Read properties using reflection - simple types, attributed strings(length) and attributed byte arrays(contained type)
+            // Calculate size of TInput memory block required
+            TInputSize = 28; // dummy
+
             // Complex types - for another day.
+
+            throw new NotImplementedException();
         }
 
         public void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
         {
-            throw new NotImplementedException();
+            if((inputRecords?.Count() ?? 0) == 0)
+            {
+                return;
+            }
 
-            // Allocate memory
+            // Allocate
+            using var memory = new GlobalMemory(TInputSize * inputRecords.Count());
+
             // Copy/marshal individual properties into memory
-            // Call write(new IntPtr(memory))
-            // Release memeory
+
+
+
+            write(memory);
+
+            throw new NotImplementedException();
+        }
+
+        public static H5TypeAdapter<TInput> Default { get; } = new H5TypeAdapter<TInput>();
+    }
+
+    internal class GlobalMemory : Disposable
+    {
+        public GlobalMemory(int size)
+        {
+            IntPtr = Marshal.AllocHGlobal(size);
+        }
+
+        public IntPtr IntPtr { get; private set; }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (IntPtr != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(IntPtr);
+                IntPtr = IntPtr.Zero;
+            }
+        }
+
+        public static implicit operator IntPtr(GlobalMemory memory)
+        {
+            return memory.IntPtr;
         }
     }
 }

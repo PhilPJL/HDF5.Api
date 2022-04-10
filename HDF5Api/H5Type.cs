@@ -70,6 +70,13 @@ namespace HDF5Api
             return new H5Type(h);
         }
 
+        public static H5Type CreateFloatArrayType(int size)
+        {
+            var h = H5T.array_create(H5T.NATIVE_FLOAT, 1, new ulong[] { (ulong)size });
+            AssertHandle(h);
+            return new H5Type(h);
+        }
+
         public static H5Type CreateVariableLengthByteArrayType()
         {
             var h = H5T.vlen_create(H5T.NATIVE_B8);

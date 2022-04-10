@@ -11,8 +11,9 @@ namespace HDF5Test.H5TypeHelpers
     /// </summary>
     public sealed class ProfileAdapter : H5TypeAdapter<Profile, ProfileAdapter.SProfile>
     {
-        public const int ProfileBlobSize = 32768;
-        public const int UnitsLength = 6;
+        private const int ProfileBlobSize = 32768;
+        private const int ProfileBlobTypeSize = sizeof(double);
+        private const int UnitsLength = 6;
 
         private ProfileAdapter() { }
 
@@ -22,17 +23,16 @@ namespace HDF5Test.H5TypeHelpers
             {
                 Id = source.Id,
                 RecordId = source.RecordId,
+                ValuesLength = (source.Values?.Length ?? 0) / 2
             };
 
             CopyString(source.Units, result.Units, UnitsLength);
 
-            result.ValuesLength = source.Values.Length / 2;
-
             unsafe
             {
                 var span = new Span<byte>(source.Values);
-                CopyBlob(span.Slice(0, span.Length / 2).ToArray(), result.ValuesX, ProfileBlobSize / 2, sizeof(double));
-                CopyBlob(span.Slice(span.Length / 2, span.Length / 2).ToArray(), result.ValuesZ, ProfileBlobSize / 2, sizeof(double));
+                CopyBlob(span.Slice(0, span.Length / 2).ToArray(), result.ValuesX, ProfileBlobSize / 2, ProfileBlobTypeSize);
+                CopyBlob(span.Slice(span.Length / 2, span.Length / 2).ToArray(), result.ValuesZ, ProfileBlobSize / 2, ProfileBlobTypeSize);
             }
 
             return result;
@@ -40,7 +40,7 @@ namespace HDF5Test.H5TypeHelpers
 
         public override H5Type GetH5Type()
         {
-            using var valuesType = H5Type.CreateDoubleArrayType(ProfileBlobSize / sizeof(double) / 2);
+            using var valuesType = H5Type.CreateDoubleArrayType(ProfileBlobSize / ProfileBlobTypeSize / 2);
             using var stringType = H5Type.CreateFixedLengthStringType(UnitsLength);
 
             return H5Type
