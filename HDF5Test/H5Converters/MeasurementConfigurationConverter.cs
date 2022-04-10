@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public class MeasurementConfigurationConverter : H5TypeConverterBase, IH5TypeConverter<MeasurementConfiguration, MeasurementConfigurationConverter.SMeasurementConfiguration>
+    public class MeasurementConfigurationConverter : H5TypeConverter<MeasurementConfiguration, MeasurementConfigurationConverter.SMeasurementConfiguration>
     {
         private const int NameLength = 50;
         private const int DescriptionLength = 255;
@@ -14,7 +14,7 @@ namespace HDF5Test.H5TypeHelpers
         private const int ScannerConfigurationLength = 8000;
         private const int SessionKeyLength = 32;
 
-        public unsafe SMeasurementConfiguration Convert(MeasurementConfiguration source)
+        public override unsafe SMeasurementConfiguration Convert(MeasurementConfiguration source)
         {
             var result = new SMeasurementConfiguration
             {
@@ -32,7 +32,7 @@ namespace HDF5Test.H5TypeHelpers
             return result;
         }
 
-        public H5Type CreateH5Type()
+        public override H5Type CreateH5Type()
         {
             using var nameStringType = H5Type.CreateFixedLengthStringType(NameLength);
             using var descriptionStringType = H5Type.CreateFixedLengthStringType(DescriptionLength);

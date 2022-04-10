@@ -30,7 +30,7 @@ namespace HDF5Api
             var dataSet = location.CreateDataSet(dataSetName, h5CompoundType, memorySpace, properyList);
 
             // Writer owns and disposes/releases the data-set.
-            return new H5DataSetWriter1D<TInput, TOutput>(dataSet, h5CompoundType, converter.Convert, true);
+            return new H5DataSetWriter1D<TInput, TOutput>(dataSet, h5CompoundType, converter, true);
         }
     }
 }
