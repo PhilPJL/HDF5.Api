@@ -28,6 +28,30 @@ namespace HDF5Api
 
             Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(sourceBytes, 0).ToPointer(), destination, destinationSizeInBytes, source.Length);
         }
+
+        protected static unsafe void CopyBlob(byte[] source, byte* destination, int maxBlobSize, int blobTypeLength)
+        {
+            AssertBlobMaxLength(source, maxBlobSize);
+            AssertBlobLengthDivisibleByTypeLength(source, blobTypeLength);
+
+            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(source, 0).ToPointer(), destination, maxBlobSize, source.Length);
+        }
+
+        public static void AssertBlobMaxLength(byte[] values, int maxBlobSize)
+        {
+            if (values.Length > maxBlobSize)
+            {
+                throw new InvalidOperationException($"The provided data blob is length {values.Length} exceeds the maximum expected length {maxBlobSize}");
+            }
+        }
+
+        public static void AssertBlobLengthDivisibleByTypeLength(byte[] values, int blobTypeLength)
+        {
+            if (values.Length % blobTypeLength != 0)
+            {
+                throw new InvalidOperationException($"The provided data blob is length {values.Length} is not an exact multiple of contained type of length {blobTypeLength}");
+            }
+        }
     }
 
     /// <summary>

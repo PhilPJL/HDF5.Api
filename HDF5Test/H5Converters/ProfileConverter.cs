@@ -24,19 +24,16 @@ namespace HDF5Test.H5TypeHelpers
                 RecordId = source.RecordId,
             };
 
-            // Convert to assertions
-            var pf = source.Values;
-
-            // TODO: add assertion
-            if (pf.Length > ProfileBlobSize)
-            {
-                throw new InvalidOperationException($"Profile: The provided data blob is length {pf.Length} which exceeds the maximum expected length {ProfileBlobSize}");
-            }
-
             CopyString(source.Units, result.Units, UnitsLength);
-            result.ValuesLength = pf.Length / 2;
-            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(pf, 0).ToPointer(), result.ValuesX, ProfileBlobSize / 2, pf.Length / 2);
-            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(pf, pf.Length / 2).ToPointer(), result.ValuesZ, ProfileBlobSize / 2, pf.Length / 2);
+
+            result.ValuesLength = source.Values.Length / 2;
+
+            unsafe
+            {
+                var span = new Span<byte>(source.Values);
+                CopyBlob(span.Slice(0, span.Length / 2).ToArray(), result.ValuesX, ProfileBlobSize / 2, sizeof(double));
+                CopyBlob(span.Slice(span.Length / 2, span.Length / 2).ToArray(), result.ValuesZ, ProfileBlobSize / 2, sizeof(double));
+            }
 
             return result;
         }

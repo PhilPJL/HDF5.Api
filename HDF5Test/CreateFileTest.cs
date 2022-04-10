@@ -10,7 +10,6 @@ namespace HDF5Test
 {
     internal static class CreateFileTest
     {
-        // Working demo of creating chunked dataset with compound type.
         internal unsafe static void CreateFile()
         {
             Console.WriteLine($"H5 version={H5Global.GetLibraryVersion()}");

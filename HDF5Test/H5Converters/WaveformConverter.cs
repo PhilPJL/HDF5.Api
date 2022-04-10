@@ -1,7 +1,6 @@
 ﻿using HDF.PInvoke;
 using HDF5Api;
 using PulseData.TvlAlt;
-using System;
 using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
@@ -16,7 +15,7 @@ namespace HDF5Test.H5TypeHelpers
 
         private WaveformAdapter() { }
 
-        protected override unsafe SWaveform Convert(Waveform source)
+        protected override SWaveform Convert(Waveform source)
         {
             var result = new SWaveform
             {
@@ -28,18 +27,11 @@ namespace HDF5Test.H5TypeHelpers
                 ValuesLength = source.Values.Length / sizeof(double)
             };
 
-            // Convert to assertions
-            var pf = source.Values;
-
-            // TODO: add assertion
-            // TODO: check is multiple of sizeof(double)
-            if (pf.Length > WaveformBlobSize)
+            unsafe
             {
-                throw new InvalidOperationException($"Waveform: The provided data blob is length {pf.Length} which exceeds the maximum expected length {WaveformBlobSize}");
+                CopyString(source.Type, result.Type, TypeLength);
+                CopyBlob(source.Values, result.Values, WaveformBlobSize, sizeof(double));
             }
-
-            CopyString(source.Type, result.Type, TypeLength);
-            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(pf, 0).ToPointer(), result.Values, WaveformBlobSize, pf.Length);
 
             return result;
         }

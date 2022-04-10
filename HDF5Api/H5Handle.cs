@@ -12,6 +12,7 @@ namespace HDF5Api
     /// Not entirely happy with this abstraction.  
     /// Could have H5Location base class deriving from Handle but that would mean removing all the Handle types
     /// and having File/Location/Handle, DataSet/Location/Handle etc.
+    /// In which case could have IHandle, IH5FileHandle etc.
     /// </remarks>
     public interface IH5Location
     {
