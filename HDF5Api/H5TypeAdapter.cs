@@ -29,6 +29,9 @@ namespace HDF5Api
             Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(sourceBytes, 0).ToPointer(), destination, destinationSizeInBytes, source.Length);
         }
 
+        /// <summary>
+        /// Helper method to copy fixed/max length byte array.
+        /// </summary>
         protected static unsafe void CopyBlob(byte[] source, byte* destination, int maxBlobSize, int blobTypeLength)
         {
             AssertBlobMaxLength(source, maxBlobSize);
@@ -55,7 +58,7 @@ namespace HDF5Api
     }
 
     /// <summary>
-    /// Base class for implementing an adaptor/converter to format an instance of C# type into a blittable struct for use in an HDF5 dataset
+    /// Base class for implementing a custom adaptor/converter to format an instance of C# type into a blittable struct for use in an HDF5 dataset
     /// </summary>
     /// <typeparam name="TInput"></typeparam>
     /// <typeparam name="TOutput"></typeparam>
@@ -79,6 +82,33 @@ namespace HDF5Api
             {
                 pinnedBuffer.Free();
             }
+        }
+    }
+
+    /// <summary>
+    /// TODO: implement a generic type adaptor that works from attributed properties in the target type
+    /// </summary>
+    /// <typeparam name="TInput"></typeparam>
+    public class H5TypeAdapter<TInput> : IH5TypeAdapter<TInput>
+    {
+        public H5Type GetH5Type()
+        {
+            throw new NotImplementedException();
+
+            // Read properties using reflection - simple types, attributed strings(length) and attributed byte arrays(contained type)
+            // Generate H5Type.
+
+            // Complex types - for another day.
+        }
+
+        public void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
+        {
+            throw new NotImplementedException();
+
+            // Allocate memory
+            // Copy/marshal individual properties into memory
+            // Call write(new IntPtr(memory))
+            // Release memeory
         }
     }
 }
