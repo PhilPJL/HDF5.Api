@@ -17,7 +17,7 @@ namespace HDF5Test.H5TypeHelpers
 
         private BladeReferenceAdapter() { }
 
-        protected override unsafe SBladeReference Convert(BladeReference source)
+        protected override SBladeReference Convert(BladeReference source)
         {
             var result = new SBladeReference
             {
@@ -30,8 +30,11 @@ namespace HDF5Test.H5TypeHelpers
                 BladeWaveformLength = (source.BladeWaveform?.Length ?? 0) / BladeWaveformBlobTypeSize
             };
 
-            CopyBlob(source.MirrorWaveform, result.MirrorWaveform, MirrorWaveformBlobLength, MirrorWaveformBlobTypeSize);
-            CopyBlob(source.BladeWaveform, result.BladeWaveform, BladeWaveformBlobLength, BladeWaveformBlobTypeSize);
+            unsafe
+            {
+                CopyBlob(source.MirrorWaveform, result.MirrorWaveform, MirrorWaveformBlobLength, MirrorWaveformBlobTypeSize);
+                CopyBlob(source.BladeWaveform, result.BladeWaveform, BladeWaveformBlobLength, BladeWaveformBlobTypeSize);
+            }
 
             return result;
         }

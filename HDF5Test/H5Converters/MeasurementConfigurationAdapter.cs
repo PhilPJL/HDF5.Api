@@ -19,7 +19,7 @@ namespace HDF5Test.H5TypeHelpers
 
         private MeasurementConfigurationAdapter() { }
 
-        protected override unsafe SMeasurementConfiguration Convert(MeasurementConfiguration source)
+        protected override SMeasurementConfiguration Convert(MeasurementConfiguration source)
         {
             var result = new SMeasurementConfiguration
             {
@@ -27,12 +27,15 @@ namespace HDF5Test.H5TypeHelpers
                 Timestamp = source.Timestamp.ToOADate()
             };
 
-            CopyString(source.Name, result.Name, NameLength);
-            CopyString(source.Description, result.Description, DescriptionLength);
-            CopyString(source.ModuleName, result.ModuleName, ModuleNameLength);
-            CopyString(source.ScannerName, result.ScannerName, ScannerNameLength);
-            CopyString(source.ScannerConfiguration, result.ScannerConfiguration, ScannerConfigurationLength);
-            CopyString(source.SessionKey, result.SessionKey, SessionKeyLength);
+            unsafe
+            {
+                CopyString(source.Name, result.Name, NameLength);
+                CopyString(source.Description, result.Description, DescriptionLength);
+                CopyString(source.ModuleName, result.ModuleName, ModuleNameLength);
+                CopyString(source.ScannerName, result.ScannerName, ScannerNameLength);
+                CopyString(source.ScannerConfiguration, result.ScannerConfiguration, ScannerConfigurationLength);
+                CopyString(source.SessionKey, result.SessionKey, SessionKeyLength);
+            }
 
             return result;
         }

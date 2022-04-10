@@ -17,7 +17,7 @@ namespace HDF5Test.H5TypeHelpers
 
         private InstallationConfigurationAdapter() { }
 
-        protected override unsafe SInstallationConfiguration Convert(InstallationConfiguration source)
+        protected override SInstallationConfiguration Convert(InstallationConfiguration source)
         {
             var result = new SInstallationConfiguration
             {
@@ -25,10 +25,13 @@ namespace HDF5Test.H5TypeHelpers
                 Timestamp = source.Timestamp.ToOADate()
             };
 
-            CopyString(source.Configuration, result.Configuration, ConfigurationLength);
-            CopyString(source.Identity, result.Identity, IdentityLength);
-            CopyString(source.SessionKey, result.SessionKey, SessionKeyLength);
-            CopyString(source.Comment, result.Comment, CommentLength);
+            unsafe
+            {
+                CopyString(source.Configuration, result.Configuration, ConfigurationLength);
+                CopyString(source.Identity, result.Identity, IdentityLength);
+                CopyString(source.SessionKey, result.SessionKey, SessionKeyLength);
+                CopyString(source.Comment, result.Comment, CommentLength);
+            }
 
             return result;
         }

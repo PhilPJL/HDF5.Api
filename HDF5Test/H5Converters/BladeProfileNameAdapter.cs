@@ -15,7 +15,7 @@ namespace HDF5Test.H5TypeHelpers
 
         private BladeProfileNameAdapter() { }
 
-        protected override unsafe SBladeProfileName Convert(BladeProfileName source)
+        protected override SBladeProfileName Convert(BladeProfileName source)
         {
             var result = new SBladeProfileName
             {
@@ -28,8 +28,11 @@ namespace HDF5Test.H5TypeHelpers
                 Scaling3 = source.Scaling3
             };
 
-            CopyString(source.Name, result.Name, NameLength);
-            CopyString(source.Description, result.Description, DescriptionLength);
+            unsafe
+            {
+                CopyString(source.Name, result.Name, NameLength);
+                CopyString(source.Description, result.Description, DescriptionLength);
+            }
 
             return result;
         }
