@@ -1,8 +1,19 @@
 ﻿namespace HDF5Api
 {
+    /// <summary>
+    /// Wrapper for H5G (Group) API.
+    /// </summary>
     public class H5Group : H5GroupHandle
     {
         private H5Group(Handle handle) : base(handle) { }
+
+        /// <summary>
+        /// Create a sub-Group of this group
+        /// </summary>
+        public override H5Group CreateGroup(string name)
+        {
+            return Create(this, name);
+        }
 
         /// <summary>
         /// Create a DataSet for this Group

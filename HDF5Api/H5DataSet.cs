@@ -2,6 +2,9 @@
 
 namespace HDF5Api
 {
+    /// <summary>
+    /// Wrapper for H5D (Data-set) API.
+    /// </summary>
     public class H5DataSet : H5DataSetHandle
     {
         private H5DataSet(Handle handle) : base(handle) { }

@@ -6,10 +6,15 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public class WaveformAdapter : H5TypeAdapter<Waveform, WaveformAdapter.SWaveform>
+    /// <summary>
+    /// A type converter for <see cref="Waveform"/>.
+    /// </summary>
+    public sealed class WaveformAdapter : H5TypeAdapter<Waveform, WaveformAdapter.SWaveform>
     {
         private const int WaveformBlobSize = 16384;
         private const int TypeLength = 9;
+
+        private WaveformAdapter() { }
 
         protected override unsafe SWaveform Convert(Waveform source)
         {
@@ -56,7 +61,7 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert<SWaveform>(nameof(SWaveform.Values), valuesType);
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential)]
         public unsafe struct SWaveform
         {
             public long Id;

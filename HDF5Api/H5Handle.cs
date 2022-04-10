@@ -5,11 +5,20 @@ using System.Diagnostics;
 
 namespace HDF5Api
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// Not entirely happy with this abstraction.  
+    /// Could have H5Location base class deriving from Handle but that would mean removing all the Handle types
+    /// and having File/Location/Handle, DataSet/Location/Handle etc.
+    /// </remarks>
     public interface IH5Location
     {
         public Handle Handle { get; }
 
         public H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
+        public H5Group CreateGroup(string name);
     }
 
     public class H5PropertyListHandle : H5Handle
@@ -27,6 +36,7 @@ namespace HDF5Api
         protected H5FileHandle(Handle handle) : base(handle, H5F.close) { }
 
         public abstract H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
+        public abstract H5Group CreateGroup(string name);
     }
 
     public abstract class H5GroupHandle : H5Handle, IH5Location
@@ -34,6 +44,7 @@ namespace HDF5Api
         protected H5GroupHandle(Handle handle) : base(handle, H5G.close) { }
 
         public abstract H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
+        public abstract H5Group CreateGroup(string name);
     }
 
     public class H5DataSetHandle : H5Handle
@@ -46,6 +57,12 @@ namespace HDF5Api
         public H5SpaceHandle(Handle handle) : base(handle, H5S.close) { }
     }
 
+    /// <summary>
+    /// Base class for H5 handles.
+    /// </summary>
+    /// <remarks>
+    /// Used to properly dispose H5 handles by calling the appropriate H5'X'.Close() method.
+    /// </remarks>
     public abstract class H5Handle : Disposable
     {
         /// <summary>

@@ -10,9 +10,13 @@ namespace HDF5Api
     {
         protected static readonly ASCIIEncoding Ascii = new();
 
-        // Move to unsafe helper class?
+        /// <summary>
+        /// Helper method to copy fixed/max length string
+        /// </summary>
         protected static unsafe void CopyString(string source, byte* destination, int destinationSizeInBytes)
         {
+            // TODO: Move to 'unsafe' helper class?
+            // probably useful outside of H5TypeAdapter
             byte[] sourceBytes = Ascii.GetBytes(source);
 
             var msg = $"Profile: The provided string '{source}' has length {source.Length} which exceeds the maximum destination length of {destinationSizeInBytes}.";
@@ -26,6 +30,11 @@ namespace HDF5Api
         }
     }
 
+    /// <summary>
+    /// Base class for implementing an adaptor/converter to format an instance of C# type into a blittable struct for use in an HDF5 dataset
+    /// </summary>
+    /// <typeparam name="TInput"></typeparam>
+    /// <typeparam name="TOutput"></typeparam>
     public abstract class H5TypeAdapter<TInput, TOutput> : H5TypeAdapterBase, IH5TypeAdapter<TInput>
     {
         protected abstract TOutput Convert(TInput source);

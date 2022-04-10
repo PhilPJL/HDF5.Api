@@ -5,12 +5,17 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public class InstallationConfigurationAdapter : H5TypeAdapter<InstallationConfiguration, InstallationConfigurationAdapter.SInstallationConfiguration>
+    /// <summary>
+    /// A type converter for <see cref="InstallationConfiguration"/>.
+    /// </summary>
+    public sealed class InstallationConfigurationAdapter : H5TypeAdapter<InstallationConfiguration, InstallationConfigurationAdapter.SInstallationConfiguration>
     {
         private const int ConfigurationLength = 12000;
         private const int IdentityLength = 1000;
         private const int SessionKeyLength = 32;
         private const int CommentLength = 2000;
+
+        private InstallationConfigurationAdapter() { }
 
         protected override unsafe SInstallationConfiguration Convert(InstallationConfiguration source)
         {

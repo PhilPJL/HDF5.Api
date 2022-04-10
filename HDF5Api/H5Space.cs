@@ -1,5 +1,8 @@
 ﻿namespace HDF5Api
 {
+    /// <summary>
+    /// Wrapper for H5S (Space) API.
+    /// </summary>
     public class H5Space : H5SpaceHandle
     {
         private H5Space(Handle handle) : base(handle) { }
@@ -32,7 +35,6 @@
             AssertHandle(h);
             return new H5Space(h);
         }
-
         #endregion
     }
 }

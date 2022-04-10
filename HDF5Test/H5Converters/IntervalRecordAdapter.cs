@@ -5,8 +5,13 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public class IntervalRecordAdapter : H5TypeAdapter<IntervalRecord, IntervalRecordAdapter.SIntervalRecord>
+    /// <summary>
+    /// A type converter for <see cref="IntervalRecord"/>.
+    /// </summary>
+    public sealed class IntervalRecordAdapter : H5TypeAdapter<IntervalRecord, IntervalRecordAdapter.SIntervalRecord>
     {
+        private IntervalRecordAdapter() { }
+
         protected override SIntervalRecord Convert(IntervalRecord source)
         {
             return new SIntervalRecord

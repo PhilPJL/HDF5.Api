@@ -6,10 +6,15 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public class ProfileAdapter : H5TypeAdapter<Profile, ProfileAdapter.SProfile>
+    /// <summary>
+    /// A type converter for <see cref="Profile"/>.
+    /// </summary>
+    public sealed class ProfileAdapter : H5TypeAdapter<Profile, ProfileAdapter.SProfile>
     {
         public const int ProfileBlobSize = 32768;
         public const int UnitsLength = 6;
+
+        private ProfileAdapter() { }
 
         protected override unsafe SProfile Convert(Profile source)
         {
@@ -51,7 +56,7 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert<SProfile>(nameof(SProfile.ValuesZ), valuesType);
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        [StructLayout(LayoutKind.Sequential)]
         public unsafe struct SProfile
         {
             public long Id;

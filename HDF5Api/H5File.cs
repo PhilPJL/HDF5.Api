@@ -1,5 +1,8 @@
 ﻿namespace HDF5Api
 {
+    /// <summary>
+    /// Wrapper for H5F (File) API.
+    /// </summary>
     public class H5File : H5FileHandle
     {
         private H5File(Handle handle) : base(handle) { }
@@ -7,7 +10,7 @@
         /// <summary>
         /// Create a Group in this file
         /// </summary>
-        public H5Group CreateGroup(string name)
+        public override H5Group CreateGroup(string name)
         {
             return H5Group.Create(this, name);
         }

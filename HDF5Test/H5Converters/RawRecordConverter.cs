@@ -5,8 +5,13 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public class RawRecordAdapter : H5TypeAdapter<RawRecord, RawRecordAdapter.SRawRecord>
+    /// <summary>
+    /// A type converter for <see cref="RawRecord"/>.
+    /// </summary>
+    public sealed class RawRecordAdapter : H5TypeAdapter<RawRecord, RawRecordAdapter.SRawRecord>
     {
+        private RawRecordAdapter() { }
+
         protected override SRawRecord Convert(RawRecord source)
         {
             return new SRawRecord

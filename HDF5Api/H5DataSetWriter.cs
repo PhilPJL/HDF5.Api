@@ -1,5 +1,8 @@
 ﻿namespace HDF5Api
 {
+    /// <summary>
+    /// Factory class for creating data-set writers.
+    /// </summary>
     public static class H5DataSetWriter
     {
         public static readonly ulong[] MaxDims = new ulong[] { H5S.UNLIMITED };
@@ -25,7 +28,6 @@
             var h5CompoundType = converter.GetH5Type();
 
             // Create a dataset with our record type and chunk size.
-            // TODO: get h5CompoundType from CompoundType and own h5CompoundType - get rid of typeFactory?
             var dataSet = location.CreateDataSet(dataSetName, h5CompoundType, memorySpace, properyList);
 
             // Writer owns and disposes/releases the data-set.

@@ -1,5 +1,8 @@
 ﻿namespace HDF5Api
 {
+    /// <summary>
+    /// Wrapper for H5P (Property list) API.
+    /// </summary>
     public class H5PropertyList : H5PropertyListHandle
     {
         private H5PropertyList(Handle handle) : base(handle) { }

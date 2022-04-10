@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Api
 {
+    /// <summary>
+    /// Wrapper for H5T (Type) API.
+    /// </summary>
     public class H5Type : H5TypeHandle
     {
         private H5Type(Handle handle) : base(handle) { }

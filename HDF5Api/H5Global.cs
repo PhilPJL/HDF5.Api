@@ -2,6 +2,9 @@
 
 namespace HDF5Api
 {
+    /// <summary>
+    /// Wrapper for H5 (Global) API.
+    /// </summary>
     public static class H5Global
     {
         public static Version GetLibraryVersion()

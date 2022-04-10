@@ -25,6 +25,7 @@ namespace HDF5Test
             // Create file and group
             using var file = H5File.Create(@"test-data.h5", H5F.ACC_TRUNC);
             using var group = file.CreateGroup($"Measurement:{measurementId}");
+            using var bladeGroup = group.CreateGroup($"BladeReference");
 
             Console.WriteLine($"Writing to file test-data.h5, group Measurement:{measurementId}.  Max rows {maxRows}.  Compression level {compressionLevel}.");
             Console.WriteLine();
@@ -37,7 +38,7 @@ namespace HDF5Test
             using (new DisposableStopWatch("Overall time", () => 0))
             {
                 using var rawRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "RawRecords", RawRecordAdapter.Default, compressionLevel);
-                using (var sw = new DisposableStopWatch("RawRecord", () => rawRecordWriter.CurrentPosition))
+                using (var sw = new DisposableStopWatch("RawRecord", () => rawRecordWriter.RowsWritten))
                 {
                     altContext
                         .RawRecords
@@ -52,7 +53,7 @@ namespace HDF5Test
                 }
 
                 using var intervalRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "IntervalRecords", IntervalRecordAdapter.Default, compressionLevel);
-                using (var sw = new DisposableStopWatch("IntervalRecord", () => intervalRecordWriter.CurrentPosition))
+                using (var sw = new DisposableStopWatch("IntervalRecord", () => intervalRecordWriter.RowsWritten))
                 {
                     altContext
                         .IntervalRecords
@@ -67,7 +68,7 @@ namespace HDF5Test
                 }
 
                 using var waveformWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Waveforms", WaveformAdapter.Default, compressionLevel);
-                using (var sw = new DisposableStopWatch("Waveform", () => waveformWriter.CurrentPosition))
+                using (var sw = new DisposableStopWatch("Waveform", () => waveformWriter.RowsWritten))
                 {
                     altContext
                         .Waveforms
@@ -82,7 +83,7 @@ namespace HDF5Test
                 }
 
                 using var profileRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Profiles", ProfileAdapter.Default, compressionLevel);
-                using (var sw = new DisposableStopWatch("Profile", () => profileRecordWriter.CurrentPosition))
+                using (var sw = new DisposableStopWatch("Profile", () => profileRecordWriter.RowsWritten))
                 {
                     altContext
                         .Profiles
@@ -97,7 +98,7 @@ namespace HDF5Test
                 }
 
                 using var measurementConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "MeasurementConfigurations", MeasurementConfigurationAdapter.Default, compressionLevel);
-                using (var sw = new DisposableStopWatch("MeasurementConfiguration", () => measurementConfigurationWriter.CurrentPosition))
+                using (var sw = new DisposableStopWatch("MeasurementConfiguration", () => measurementConfigurationWriter.RowsWritten))
                 {
                     systemContext
                         .MeasurementConfigurations
@@ -112,7 +113,7 @@ namespace HDF5Test
                 }
 
                 using var installationConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "InstallationConfigurations", InstallationConfigurationAdapter.Default, compressionLevel);
-                using (var sw = new DisposableStopWatch("InstallationConfiguration", () => installationConfigurationWriter.CurrentPosition))
+                using (var sw = new DisposableStopWatch("InstallationConfiguration", () => installationConfigurationWriter.RowsWritten))
                 {
                     systemContext
                         .InstallationConfigurations
@@ -122,6 +123,20 @@ namespace HDF5Test
                         .ForEach(rg =>
                         {
                             installationConfigurationWriter.WriteChunk(rg);
+                            sw.ShowRowsWritten(logTimePerChunk);
+                        });
+                }
+
+                using var bladeProfileNameWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeProfileNames", BladeProfileNameAdapter.Default, compressionLevel);
+                using (var sw = new DisposableStopWatch("BladeProfileName", () => bladeProfileNameWriter.RowsWritten))
+                {
+                    systemContext
+                        .BladeProfileNames
+                        .Take(maxRows)
+                        .Buffer(chunkSize)
+                        .ForEach(rg =>
+                        {
+                            bladeProfileNameWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
                 }
