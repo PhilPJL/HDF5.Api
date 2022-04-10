@@ -15,13 +15,18 @@ namespace HDF5Api
         /// </summary>
         protected static unsafe void CopyString(string source, byte* destination, int destinationSizeInBytes)
         {
+            if ((source ?? string.Empty) == string.Empty)
+            {
+                return;
+            }
+
             // TODO: Move to 'unsafe' helper class?
             // probably useful outside of H5TypeAdapter
             byte[] sourceBytes = Ascii.GetBytes(source);
 
-            var msg = $"Profile: The provided string '{source}' has length {source.Length} which exceeds the maximum destination length of {destinationSizeInBytes}.";
+            var msg = $"Profile: The provided string '{source}' has length {source?.Length} which exceeds the maximum destination length of {destinationSizeInBytes}.";
 
-            if (source.Length > destinationSizeInBytes)
+            if (source?.Length > destinationSizeInBytes)
             {
                 throw new InvalidOperationException(msg);
             }
@@ -39,7 +44,7 @@ namespace HDF5Api
 
             if ((source?.Length ?? 0) > 0)
             {
-                Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(source, 0).ToPointer(), destination, maxBlobSize, source.Length);
+                Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(source, 0).ToPointer(), destination, maxBlobSize, source?.Length ?? 0);
             }
         }
 
@@ -111,7 +116,7 @@ namespace HDF5Api
 
         public void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
         {
-            if((inputRecords?.Count() ?? 0) == 0)
+            if ((inputRecords?.Count() ?? 0) == 0)
             {
                 return;
             }

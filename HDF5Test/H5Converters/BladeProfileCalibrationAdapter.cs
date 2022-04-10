@@ -39,7 +39,6 @@ namespace HDF5Test.H5TypeHelpers
             return H5Type
                 .CreateCompoundType<SBladeProfileCalibration>()
                 .Insert<SBladeProfileCalibration>(nameof(SBladeProfileCalibration.Id), H5T.NATIVE_INT64)
-                .Insert<SBladeProfileCalibration>(nameof(SBladeProfileCalibration.Timestamp), H5T.NATIVE_DOUBLE)
                 .Insert<SBladeProfileCalibration>(nameof(SBladeProfileCalibration.ProfileValue), H5T.NATIVE_DOUBLE)
                 .Insert<SBladeProfileCalibration>(nameof(SBladeProfileCalibration.CorrectionValuesLength), H5T.NATIVE_INT32)
                 .Insert<SBladeProfileCalibration>(nameof(SBladeProfileCalibration.CorrectionValues), correctionValuesType);
@@ -49,7 +48,6 @@ namespace HDF5Test.H5TypeHelpers
         public unsafe struct SBladeProfileCalibration
         {
             public int Id;
-            public double Timestamp;
             public int BladeProfileCalibrationSetId;
             public double ProfileValue;
             public int CorrectionValuesLength;

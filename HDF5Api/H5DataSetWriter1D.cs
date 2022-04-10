@@ -31,6 +31,9 @@ namespace HDF5Api
         {
             if (disposing)
             {
+                // Finalize the length of the data set
+                DataSet.SetExtent(new ulong[] { (ulong)RowsWritten });
+
                 // We may own the data-set
                 if (OwnsDataSet)
                 {

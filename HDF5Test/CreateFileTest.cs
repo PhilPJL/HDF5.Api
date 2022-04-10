@@ -153,6 +153,34 @@ namespace HDF5Test
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
                 }
+
+                using var bladeProfileCalibrationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(bladeGroup, "BladeProfileCalibrations", BladeProfileCalibrationAdapter.Default, compressionLevel);
+                using (var sw = new DisposableStopWatch("BladeProfileCalibration", () => bladeProfileCalibrationWriter.RowsWritten))
+                {
+                    systemContext
+                        .BladeProfileCalibrations
+                        .Take(maxRows)
+                        .Buffer(chunkSize)
+                        .ForEach(rg =>
+                        {
+                            bladeProfileCalibrationWriter.WriteChunk(rg);
+                            sw.ShowRowsWritten(logTimePerChunk);
+                        });
+                }
+
+                using var bladeProfileCalibrationSetWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(bladeGroup, "BladeProfileCalibrationSets", BladeProfileCalibrationSetAdapter.Default, compressionLevel);
+                using (var sw = new DisposableStopWatch("BladeProfileCalibrationSet", () => bladeProfileCalibrationSetWriter.RowsWritten))
+                {
+                    systemContext
+                        .BladeProfileCalibrationSets
+                        .Take(maxRows)
+                        .Buffer(chunkSize)
+                        .ForEach(rg =>
+                        {
+                            bladeProfileCalibrationSetWriter.WriteChunk(rg);
+                            sw.ShowRowsWritten(logTimePerChunk);
+                        });
+                }
             }
         }
     }
