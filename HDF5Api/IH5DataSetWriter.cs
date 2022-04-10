@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace HDF5Api
 {
-    public interface IH5DataSetWriter<in TInput, out TOutput> : IDisposable where TOutput : struct
+    public interface IH5DataSetWriter<in TInput> : IDisposable
     {
-        public void Write(IEnumerable<TInput> recordsChunk);
+        public void WriteChunk(IEnumerable<TInput> recordsChunk);
         public int CurrentPosition { get; }
     }
 }

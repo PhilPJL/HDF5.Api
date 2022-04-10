@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace HDF5Api
 {
-    public class H5DataSetWriter1D<TInput, TOutput> : Disposable, IH5DataSetWriter<TInput, TOutput> where TOutput : struct
+    public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput> 
     {
-        internal H5DataSetWriter1D(H5DataSet h5DataSet, H5Type h5Type, IH5TypeConverter<TInput, TOutput> converter, bool ownsDataSet = false)
+        internal H5DataSetWriter1D(H5DataSet h5DataSet, H5Type h5Type, IH5TypeAdapter<TInput> converter, bool ownsDataSet = false)
         {
             DataSet = h5DataSet;
             Type = h5Type;
@@ -16,7 +16,7 @@ namespace HDF5Api
 
         private H5DataSet DataSet { get; set; }
         private H5Type Type { get; set; }
-        private IH5TypeConverter<TInput, TOutput> Converter { get; }
+        private IH5TypeAdapter<TInput> Converter { get; }
         private bool OwnsDataSet { get; }
         public int CurrentPosition { get; private set; }
 
@@ -37,7 +37,7 @@ namespace HDF5Api
             }
         }
 
-        public void Write(IEnumerable<TInput> recordsChunk)
+        public void WriteChunk(IEnumerable<TInput> recordsChunk)
         {
             int numRecords = recordsChunk.Count();
 
@@ -50,7 +50,7 @@ namespace HDF5Api
 
             // Match the space to length of records retrieved.
             using var recordSpace = H5Space.CreateSimple(1, new ulong[] { (ulong)numRecords }, H5DataSetWriter.MaxDims);
-            Converter.Write(WriteAdaptor(DataSet, Type, recordSpace, fileSpace), recordsChunk);
+            Converter.WriteChunk(WriteAdaptor(DataSet, Type, recordSpace, fileSpace), recordsChunk);
 
             CurrentPosition += numRecords;
 

@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public class WaveformConverter : H5TypeConverter<Waveform, WaveformConverter.SWaveform>
+    public class WaveformAdapter : H5TypeAdapter<Waveform, WaveformAdapter.SWaveform>
     {
         private const int WaveformBlobSize = 16384;
         private const int TypeLength = 9;
 
-        public override unsafe SWaveform Convert(Waveform source)
+        protected override unsafe SWaveform Convert(Waveform source)
         {
             var result = new SWaveform
             {
@@ -39,7 +39,7 @@ namespace HDF5Test.H5TypeHelpers
             return result;
         }
 
-        public override H5Type CreateH5Type()
+        public override H5Type GetH5Type()
         {
             using var valuesType = H5Type.CreateDoubleArrayType(WaveformBlobSize / sizeof(double));
             using var typeStringType = H5Type.CreateFixedLengthStringType(TypeLength);
@@ -71,6 +71,6 @@ namespace HDF5Test.H5TypeHelpers
             public fixed byte Values[WaveformBlobSize];
         }
 
-        public static IH5TypeConverter<Waveform, SWaveform> Default { get; } = new WaveformConverter();
+        public static IH5TypeAdapter<Waveform> Default { get; } = new WaveformAdapter();
     }
 }

@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public class IntervalRecordConverter : H5TypeConverter<IntervalRecord, IntervalRecordConverter.SIntervalRecord>
+    public class IntervalRecordAdapter : H5TypeAdapter<IntervalRecord, IntervalRecordAdapter.SIntervalRecord>
     {
-        public override H5Type CreateH5Type()
+        public override H5Type GetH5Type()
         {
             return H5Type
                 .CreateCompoundType<SIntervalRecord>()
@@ -18,7 +18,7 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert<SIntervalRecord>(nameof(SIntervalRecord.MaximumThickness), H5T.NATIVE_DOUBLE);
         }
 
-        public override SIntervalRecord Convert(IntervalRecord source)
+        protected override SIntervalRecord Convert(IntervalRecord source)
         {
             return new SIntervalRecord
             {
@@ -40,6 +40,6 @@ namespace HDF5Test.H5TypeHelpers
             public double MaximumThickness;
         }
 
-        public static IH5TypeConverter<IntervalRecord, SIntervalRecord> Default { get; } = new IntervalRecordConverter();
+        public static IH5TypeAdapter<IntervalRecord> Default { get; } = new IntervalRecordAdapter();
     }
 }

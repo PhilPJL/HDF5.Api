@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public class RawRecordConverter : H5TypeConverter<RawRecord, RawRecordConverter.SRawRecord>
+    public class RawRecordAdapter : H5TypeAdapter<RawRecord, RawRecordAdapter.SRawRecord>
     {
-        public override SRawRecord Convert(RawRecord source)
+        protected override SRawRecord Convert(RawRecord source)
         {
             return new SRawRecord
             {
@@ -24,7 +24,7 @@ namespace HDF5Test.H5TypeHelpers
             };
         }
 
-        public override H5Type CreateH5Type()
+        public override H5Type GetH5Type()
         {
             return H5Type
                 .CreateCompoundType<SRawRecord>()
@@ -55,6 +55,6 @@ namespace HDF5Test.H5TypeHelpers
             public double ReferenceOffset;
         }
 
-        public static IH5TypeConverter<RawRecord, SRawRecord> Default { get; } = new RawRecordConverter();
+        public static IH5TypeAdapter<RawRecord> Default { get; } = new RawRecordAdapter();
     }
 }

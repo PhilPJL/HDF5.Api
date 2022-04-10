@@ -6,11 +6,11 @@ using System.Text;
 
 namespace HDF5Api
 {
-    public abstract class H5TypeConverterBase
+    public abstract class H5TypeAdapterBase
     {
         protected static readonly ASCIIEncoding Ascii = new();
 
-        // Move to helper class
+        // Move to unsafe helper class?
         protected static unsafe void CopyString(string source, byte* destination, int destinationSizeInBytes)
         {
             byte[] sourceBytes = Ascii.GetBytes(source);
@@ -26,12 +26,13 @@ namespace HDF5Api
         }
     }
 
-    public abstract class H5TypeConverter<TInput, TOutput> : H5TypeConverterBase, IH5TypeConverter<TInput, TOutput> where TOutput : struct
+    public abstract class H5TypeAdapter<TInput, TOutput> : H5TypeAdapterBase, IH5TypeAdapter<TInput>
     {
-        public abstract TOutput Convert(TInput source);
-        public abstract H5Type CreateH5Type();
+        protected abstract TOutput Convert(TInput source);
 
-        public void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
+        public abstract H5Type GetH5Type();
+
+        public void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
         {
             var records = inputRecords.Select(Convert).ToArray();
 

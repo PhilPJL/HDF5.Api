@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Test.H5TypeHelpers
 {
-    public class ProfileConverter : H5TypeConverter<Profile, ProfileConverter.SProfile>
+    public class ProfileAdapter : H5TypeAdapter<Profile, ProfileAdapter.SProfile>
     {
         public const int ProfileBlobSize = 32768;
         public const int UnitsLength = 6;
 
-        public override unsafe SProfile Convert(Profile source)
+        protected override unsafe SProfile Convert(Profile source)
         {
             var result = new SProfile()
             {
@@ -35,7 +35,7 @@ namespace HDF5Test.H5TypeHelpers
             return result;
         }
 
-        public override H5Type CreateH5Type()
+        public override H5Type GetH5Type()
         {
             using var valuesType = H5Type.CreateDoubleArrayType(ProfileBlobSize / sizeof(double) / 2);
             using var stringType = H5Type.CreateFixedLengthStringType(UnitsLength);
@@ -60,6 +60,6 @@ namespace HDF5Test.H5TypeHelpers
             public fixed byte ValuesZ[ProfileBlobSize / 2];
         }
 
-        public static IH5TypeConverter<Profile, SProfile> Default { get; } = new ProfileConverter();
+        public static IH5TypeAdapter<Profile> Default { get; } = new ProfileAdapter();
     }
 }
