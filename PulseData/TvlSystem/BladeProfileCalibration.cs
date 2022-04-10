@@ -11,7 +11,7 @@ namespace PulseData.TvlSystem
         public int Id { get; set; }
 
         [Column("SET_ID")]
-        public int BladeProfileCalibrationSetId { get;set; }
+        public int BladeProfileCalibrationSetId { get; set; }
 
         [ForeignKey("BladeProfileCalibrationSetId")]
         public virtual BladeProfileCalibrationSet BladeProfileCalibrationSet { get; set; }

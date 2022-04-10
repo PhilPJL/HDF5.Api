@@ -18,7 +18,7 @@ namespace PulseData.TvlSystem
         public int MeasurementConfigurationId { get; set; }
 
         [ForeignKey("MeasurementConfigurationId")]
-        public virtual MeasurementConfiguration MeasurementConfiguration { get; set; }  
+        public virtual MeasurementConfiguration MeasurementConfiguration { get; set; }
 
         [Column("INST_CONFIG_ID")]
         public int InstallationConfigurationId { get; set; }

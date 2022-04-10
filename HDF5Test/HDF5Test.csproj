@@ -9,22 +9,22 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Include="..\.editorconfig" Link=".editorconfig" />
+		<None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="System.Interactive" Version="6.0.1" />
+		<PackageReference Include="System.Interactive" Version="6.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\HDF5Api\HDF5Api.csproj" />
-	  <ProjectReference Include="..\PulseData\PulseData.csproj" />
+		<ProjectReference Include="..\HDF5Api\HDF5Api.csproj" />
+		<ProjectReference Include="..\PulseData\PulseData.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="ConnectionStrings.config">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
+		<None Update="ConnectionStrings.config">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>

@@ -11,7 +11,7 @@ namespace HDF5Api
     /// Writes a 1D array of TInput instance to the supplied data-set.  Requires an appropriate adapter to convert TInput to a suitable form.
     /// </remarks>
     /// <typeparam name="TInput"></typeparam>
-    public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput> 
+    public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
     {
         internal H5DataSetWriter1D(H5DataSet h5DataSet, H5Type h5Type, IH5TypeAdapter<TInput> converter, bool ownsDataSet = false)
         {

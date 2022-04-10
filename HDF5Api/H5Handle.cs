@@ -1,5 +1,5 @@
-﻿global using Handle = System.Int64;
-global using HDF.PInvoke;
+﻿global using HDF.PInvoke;
+global using Handle = System.Int64;
 using System;
 using System.Diagnostics;
 

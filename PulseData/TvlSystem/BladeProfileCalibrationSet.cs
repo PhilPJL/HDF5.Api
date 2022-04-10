@@ -13,7 +13,7 @@ namespace PulseData.TvlSystem
         public int Id { get; set; }
 
         [Column("timestamp")]
-        public DateTime Timestamp { get;set; }
+        public DateTime Timestamp { get; set; }
 
         [Column("DELTA_FREQ")]
         public double DeltaFrequency { get; set; }
