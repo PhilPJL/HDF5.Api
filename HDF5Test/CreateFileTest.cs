@@ -3,8 +3,10 @@ using HDF5Api;
 using HDF5Test.H5TypeHelpers;
 using PulseData;
 using System;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
+using System.Transactions;
 
 namespace HDF5Test
 {
@@ -15,16 +17,15 @@ namespace HDF5Test
             Console.WriteLine($"H5 version={H5Global.GetLibraryVersion()}");
             Console.WriteLine();
 
-            int maxRows = 1000;
+            int maxRows = 25000;
             int chunkSize = 50;
-            long measurementId = 12019;
+            long measurementId = 287;
             bool logTimePerChunk = true;
             uint compressionLevel = 1;
 
             // Create file and group
             using var file = H5File.Create(@"test-data.h5", H5F.ACC_TRUNC);
             using var group = file.CreateGroup($"Measurement:{measurementId}");
-            using var bladeGroup = group.CreateGroup($"BladeReference");
 
             Console.WriteLine($"Writing to file test-data.h5, group Measurement:{measurementId}.  Max rows {maxRows}.  Compression level {compressionLevel}.");
             Console.WriteLine();
@@ -34,13 +35,16 @@ namespace HDF5Test
 
             // TODO: async queryable/cancellable
             // TODO: overlap?
+
             using (new DisposableStopWatch("Overall time", () => 0))
             {
                 using var rawRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "RawRecords", RawRecordAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("RawRecord", () => rawRecordWriter.RowsWritten))
                 {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     altContext
-                        .RawRecords
+                           .RawRecords
+                        .AsNoTracking()
                         .Where(r => r.MeasurementId == measurementId)
                         .Take(maxRows)
                         .Buffer(chunkSize)
@@ -49,13 +53,16 @@ namespace HDF5Test
                             rawRecordWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
+                    scope.Complete();
                 }
 
                 using var intervalRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "IntervalRecords", IntervalRecordAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("IntervalRecord", () => intervalRecordWriter.RowsWritten))
                 {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     altContext
-                        .IntervalRecords
+                           .IntervalRecords
+                        .AsNoTracking()
                         .Where(r => r.RawRecords.Any(rr => rr.MeasurementId == measurementId))
                         .Take(maxRows)
                         .Buffer(chunkSize)
@@ -64,13 +71,16 @@ namespace HDF5Test
                             intervalRecordWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
+                    scope.Complete();
                 }
 
                 using var waveformWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Waveforms", WaveformAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("Waveform", () => waveformWriter.RowsWritten))
                 {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     altContext
                         .Waveforms
+                        .AsNoTracking()
                         .Where(w => w.RawRecord.MeasurementId == measurementId)
                         .Take(maxRows)
                         .Buffer(chunkSize)
@@ -79,13 +89,16 @@ namespace HDF5Test
                             waveformWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
+                    scope.Complete();
                 }
 
                 using var profileRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Profiles", ProfileAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("Profile", () => profileRecordWriter.RowsWritten))
                 {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     altContext
                         .Profiles
+                        .AsNoTracking()
                         .Where(p => p.RawRecord.MeasurementId == measurementId)
                         .Take(maxRows)
                         .Buffer(chunkSize)
@@ -94,13 +107,16 @@ namespace HDF5Test
                             profileRecordWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
+                    scope.Complete();
                 }
 
                 using var measurementWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Measurements", MeasurementAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("Measurement", () => measurementWriter.RowsWritten))
                 {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     systemContext
                         .Measurements
+                        .AsNoTracking()
                         .Where(m => m.Id == measurementId)
                         .Take(maxRows)
                         .Buffer(chunkSize)
@@ -109,13 +125,16 @@ namespace HDF5Test
                             measurementWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
+                    scope.Complete();
                 }
 
                 using var measurementConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "MeasurementConfigurations", MeasurementConfigurationAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("MeasurementConfiguration", () => measurementConfigurationWriter.RowsWritten))
                 {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     systemContext
                         .MeasurementConfigurations
+                        .AsNoTracking()
                         .Where(mc => mc.Measurements.Any(m => m.Id == measurementId))
                         .Take(maxRows)
                         .Buffer(chunkSize)
@@ -124,13 +143,16 @@ namespace HDF5Test
                             measurementConfigurationWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
+                    scope.Complete();
                 }
 
                 using var installationConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "InstallationConfigurations", InstallationConfigurationAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("InstallationConfiguration", () => installationConfigurationWriter.RowsWritten))
                 {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     systemContext
                         .InstallationConfigurations
+                        .AsNoTracking()
                         .Where(ic => ic.Measurements.Any(m => m.Id == measurementId))
                         .Take(maxRows)
                         .Buffer(chunkSize)
@@ -139,13 +161,16 @@ namespace HDF5Test
                             installationConfigurationWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
+                    scope.Complete();
                 }
 
-                using var bladeProfileNameWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(bladeGroup, "BladeProfileNames", BladeProfileNameAdapter.Default, compressionLevel);
+                using var bladeProfileNameWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeProfileNames", BladeProfileNameAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeProfileName", () => bladeProfileNameWriter.RowsWritten))
                 {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     systemContext
                         .BladeProfileNames
+                        .AsNoTracking()
                         .Take(maxRows)
                         .Buffer(chunkSize)
                         .ForEach(rg =>
@@ -153,13 +178,16 @@ namespace HDF5Test
                             bladeProfileNameWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
+                    scope.Complete();
                 }
 
-                using var bladeReferenceWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(bladeGroup, "BladeReferences", BladeReferenceAdapter.Default, compressionLevel);
+                using var bladeReferenceWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeReferences", BladeReferenceAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeReference", () => bladeReferenceWriter.RowsWritten))
                 {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     systemContext
                         .BladeReferences
+                        .AsNoTracking()
                         .Take(maxRows)
                         .Buffer(chunkSize)
                         .ForEach(rg =>
@@ -167,13 +195,16 @@ namespace HDF5Test
                             bladeReferenceWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
+                    scope.Complete();
                 }
 
-                using var bladeProfileCalibrationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(bladeGroup, "BladeProfileCalibrations", BladeProfileCalibrationAdapter.Default, compressionLevel);
+                using var bladeProfileCalibrationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeProfileCalibrations", BladeProfileCalibrationAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeProfileCalibration", () => bladeProfileCalibrationWriter.RowsWritten))
                 {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     systemContext
                         .BladeProfileCalibrations
+                        .AsNoTracking()
                         .Take(maxRows)
                         .Buffer(chunkSize)
                         .ForEach(rg =>
@@ -181,13 +212,16 @@ namespace HDF5Test
                             bladeProfileCalibrationWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
+                    scope.Complete();
                 }
 
-                using var bladeProfileCalibrationSetWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(bladeGroup, "BladeProfileCalibrationSets", BladeProfileCalibrationSetAdapter.Default, compressionLevel);
+                using var bladeProfileCalibrationSetWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeProfileCalibrationSets", BladeProfileCalibrationSetAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeProfileCalibrationSet", () => bladeProfileCalibrationSetWriter.RowsWritten))
                 {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     systemContext
                         .BladeProfileCalibrationSets
+                        .AsNoTracking()
                         .Take(maxRows)
                         .Buffer(chunkSize)
                         .ForEach(rg =>
@@ -195,6 +229,7 @@ namespace HDF5Test
                             bladeProfileCalibrationSetWriter.WriteChunk(rg);
                             sw.ShowRowsWritten(logTimePerChunk);
                         });
+                    scope.Complete();
                 }
             }
         }

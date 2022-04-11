@@ -14,6 +14,7 @@ namespace HDF5Test.H5TypeHelpers
         private const int BladeWaveformBlobTypeSize = sizeof(double);
         private const int MirrorWaveformBlobLength = 8;
         private const int MirrorWaveformBlobTypeSize = sizeof(double);
+        private const int DescriptionLength = 500;
 
         private BladeReferenceAdapter() { }
 
@@ -34,6 +35,7 @@ namespace HDF5Test.H5TypeHelpers
             {
                 CopyBlob(source.MirrorWaveform, result.MirrorWaveform, MirrorWaveformBlobLength, MirrorWaveformBlobTypeSize);
                 CopyBlob(source.BladeWaveform, result.BladeWaveform, BladeWaveformBlobLength, BladeWaveformBlobTypeSize);
+                CopyString(source.Description, result.Description, DescriptionLength);
             }
 
             return result;
@@ -43,6 +45,7 @@ namespace HDF5Test.H5TypeHelpers
         {
             using var mirrorWaveformType = H5Type.CreateDoubleArrayType(MirrorWaveformBlobLength / MirrorWaveformBlobTypeSize);
             using var bladeWaveformType = H5Type.CreateDoubleArrayType(BladeWaveformBlobLength / BladeWaveformBlobTypeSize);
+            using var descriptionStringType = H5Type.CreateFixedLengthStringType(DescriptionLength);
 
             return H5Type
                 .CreateCompoundType<SBladeReference>()
@@ -51,6 +54,7 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert<SBladeReference>(nameof(SBladeReference.ProfileCurvature), H5T.NATIVE_DOUBLE)
                 .Insert<SBladeReference>(nameof(SBladeReference.ProfileHeight), H5T.NATIVE_DOUBLE)
                 .Insert<SBladeReference>(nameof(SBladeReference.ProfileCentre), H5T.NATIVE_DOUBLE)
+                .Insert<SBladeReference>(nameof(SBladeReference.Description), descriptionStringType)
                 .Insert<SBladeReference>(nameof(SBladeReference.BladeWaveformLength), H5T.NATIVE_INT32)
                 .Insert<SBladeReference>(nameof(SBladeReference.BladeWaveform), bladeWaveformType)
                 .Insert<SBladeReference>(nameof(SBladeReference.MirrorWaveformLength), H5T.NATIVE_INT32)
@@ -65,6 +69,7 @@ namespace HDF5Test.H5TypeHelpers
             public double ProfileCurvature;
             public double ProfileHeight;
             public double ProfileCentre;
+            public fixed byte Description[DescriptionLength];
 
             public int BladeWaveformLength;
             public fixed byte BladeWaveform[BladeWaveformBlobLength];
