@@ -181,7 +181,14 @@ namespace HDF5Test
                     scope.Complete();
                 }
 
-                using var bladeReferenceWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeReferences", BladeReferenceAdapter.Default, compressionLevel);
+                var bladeReference = systemContext.BladeReferences.AsNoTracking().FirstOrDefault();
+                int mirrorWaveformBlobLength = bladeReference?.MirrorWaveform.Length ?? 0;
+                int bladeWaveformBlobLength = bladeReference?.BladeWaveform.Length ?? 0;
+
+                Console.WriteLine($"Blade reference: blob lengths Blade={bladeWaveformBlobLength}, Mirror={mirrorWaveformBlobLength}");
+
+                using var bladeReferenceWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeReferences", 
+                    BladeReferenceVariableAdapter.Create(bladeWaveformBlobLength, sizeof(double), mirrorWaveformBlobLength, sizeof(double)), compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeReference", () => bladeReferenceWriter.RowsWritten))
                 {
                     using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
@@ -199,11 +206,11 @@ namespace HDF5Test
                 }
 
                 // Get size of blob
-                var blobLength = systemContext.BladeProfileCalibrations.AsNoTracking().FirstOrDefault()?.CorrectionValues.Length ?? 0;
-                Console.WriteLine($"Bladed profile calibrations: blob length {blobLength}");
+                var correctionValuesBlobLength = systemContext.BladeProfileCalibrations.AsNoTracking().FirstOrDefault()?.CorrectionValues.Length ?? 0;
+                Console.WriteLine($"Bladed profile calibrations: blob length {correctionValuesBlobLength}");
 
                 using var bladeProfileCalibrationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group,
-                    "BladeProfileCalibrations", BladeProfileCalibrationVariableAdapter.Create(blobLength, sizeof(double)), compressionLevel);
+                    "BladeProfileCalibrations", BladeProfileCalibrationVariableAdapter.Create(correctionValuesBlobLength, sizeof(double)), compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeProfileCalibration", () => bladeProfileCalibrationWriter.RowsWritten))
                 {
                     using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });

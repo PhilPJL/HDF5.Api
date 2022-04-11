@@ -19,18 +19,10 @@ namespace HDF5Test.H5TypeHelpers
 
         private BladeProfileCalibrationVariableAdapter(int blobLength, int blobTypeSize)
         {
+            AssertBlobLengthDivisibleByTypeLength(blobLength, blobTypeSize);
+
             CorrectionBlobSize = blobLength;
             CorrectionBlobTypeSize = blobTypeSize;
-        }
-
-        private SBladeProfileCalibration Convert(BladeProfileCalibration source)
-        {
-            return new SBladeProfileCalibration
-            {
-                Id = source.Id,
-                BladeProfileCalibrationSetId = source.BladeProfileCalibrationSetId,
-                ProfileValue = source.ProfileValue
-            };
         }
 
         public override H5Type GetH5Type()
@@ -48,6 +40,16 @@ namespace HDF5Test.H5TypeHelpers
 
         public override void WriteChunk(Action<IntPtr> write, IEnumerable<BladeProfileCalibration> inputRecords)
         {
+            static SBladeProfileCalibration Convert(BladeProfileCalibration source)
+            {
+                return new SBladeProfileCalibration
+                {
+                    Id = source.Id,
+                    BladeProfileCalibrationSetId = source.BladeProfileCalibrationSetId,
+                    ProfileValue = source.ProfileValue
+                };
+            }
+
             var records = inputRecords.Select(Convert).ToList();
             var blobs = inputRecords.Select(r => new { r.Id, r.CorrectionValues }).ToList();
 
@@ -55,7 +57,7 @@ namespace HDF5Test.H5TypeHelpers
             var invalidLengths = blobs.Where(r => r.CorrectionValues.Length != CorrectionBlobSize).ToList();
             if(invalidLengths.Any())
             {
-                throw new InvalidOperationException($"The Correction values length in BladeProfileCalibration for ids {string.Join(",", invalidLengths.Select(l => l.Id))} does not match the expected length of {CorrectionBlobSize}.");
+                throw new InvalidOperationException($"The Correction values length in BladeProfileCalibration for ids '{string.Join(",", invalidLengths.Select(l => l.Id))}' does not match the expected length of {CorrectionBlobSize}.");
             }
 
             int structSize = Marshal.SizeOf<SBladeProfileCalibration>();
@@ -79,12 +81,10 @@ namespace HDF5Test.H5TypeHelpers
 
                     // Copy SBladeProfileCalibration
                     Buffer.MemoryCopy(pinnedRecord, CurrentBufferPosition(), remainingBufferSize, structSize);
-
                     remainingBufferSize -= structSize;
 
                     // Copy correction values
                     Buffer.MemoryCopy(pinnedBlob, CurrentBufferPosition(), remainingBufferSize, CorrectionBlobSize);
-
                     remainingBufferSize -= CorrectionBlobSize;
                 }
 

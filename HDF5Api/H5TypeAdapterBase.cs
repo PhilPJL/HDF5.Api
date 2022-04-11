@@ -29,7 +29,7 @@ namespace HDF5Api
                 throw new InvalidOperationException(msg);
             }
 
-            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(sourceBytes, 0).ToPointer(), destination, destinationSizeInBytes, source.Length);
+            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(sourceBytes, 0).ToPointer(), destination, destinationSizeInBytes, source?.Length ?? 0);
         }
 
         /// <summary>
@@ -56,9 +56,15 @@ namespace HDF5Api
 
         public static void AssertBlobLengthDivisibleByTypeLength(byte[] values, int blobTypeLength)
         {
-            if ((values?.Length ?? 0) % blobTypeLength != 0)
+            var length = values?.Length ?? 0;
+            AssertBlobLengthDivisibleByTypeLength(length, blobTypeLength);
+        }
+
+        public static void AssertBlobLengthDivisibleByTypeLength(int length, int blobTypeLength)
+        {
+            if (length % blobTypeLength != 0)
             {
-                throw new InvalidOperationException($"The provided data blob is length {values?.Length} is not an exact multiple of contained type of length {blobTypeLength}");
+                throw new InvalidOperationException($"The provided data blob is length {length} is not an exact multiple of contained type of length {blobTypeLength}");
             }
         }
     }
