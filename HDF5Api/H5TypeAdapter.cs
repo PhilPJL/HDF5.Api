@@ -20,26 +20,22 @@ namespace HDF5Api
     /// <summary>
     /// Base class for implementing a custom adaptor/converter to format an instance of C# type into a blittable struct for use in an HDF5 dataset
     /// </summary>
-    /// <typeparam name="TInput"></typeparam>
-    /// <typeparam name="TOutput"></typeparam>
+    /// <remarks>
+    /// It is required to implement the <see cref="Convert(TInput)"/> method to convert <typeparamref name="TInput"/> to <typeparamref name="TOutput"/>, and
+    /// to implement the <see cref="H5TypeAdapter{TInput}.GetH5Type"/> method to provide a matching H5 type definition. 
+    /// </remarks>
     public abstract class H5TypeAdapter<TInput, TOutput> : H5TypeAdapter<TInput>
     {
         protected abstract TOutput Convert(TInput source);
 
         public override void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
         {
+            // convert input to Array of struct
             var records = inputRecords.Select(Convert).ToArray();
-
-            GCHandle pinnedBuffer = GCHandle.Alloc(records, GCHandleType.Pinned);
-
-            try
-            {
-                write(pinnedBuffer.AddrOfPinnedObject());
-            }
-            finally
-            {
-                pinnedBuffer.Free();
-            }
+            // pin
+            using var pinnedRecords = new PinnedObject(records);
+            // write to HDF5
+            write(pinnedRecords);
         }
     }
 
