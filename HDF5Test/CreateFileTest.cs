@@ -12,7 +12,7 @@ namespace HDF5Test
 {
     internal static class CreateFileTest
     {
-        internal unsafe static void CreateFile()
+        internal static void CreateFile()
         {
             Console.WriteLine($"H5 version={H5Global.GetLibraryVersion()}");
             Console.WriteLine();
