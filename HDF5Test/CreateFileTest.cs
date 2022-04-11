@@ -17,7 +17,7 @@ namespace HDF5Test
             Console.WriteLine($"H5 version={H5Global.GetLibraryVersion()}");
             Console.WriteLine();
 
-            int maxRows = 25000;
+            int maxRows = 1000;
             int chunkSize = 50;
             long measurementId = 287;
             bool logTimePerChunk = true;
@@ -43,7 +43,7 @@ namespace HDF5Test
                 {
                     using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     altContext
-                           .RawRecords
+                        .RawRecords
                         .AsNoTracking()
                         .Where(r => r.MeasurementId == measurementId)
                         .Take(maxRows)
@@ -61,7 +61,7 @@ namespace HDF5Test
                 {
                     using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
                     altContext
-                           .IntervalRecords
+                        .IntervalRecords
                         .AsNoTracking()
                         .Where(r => r.RawRecords.Any(rr => rr.MeasurementId == measurementId))
                         .Take(maxRows)
