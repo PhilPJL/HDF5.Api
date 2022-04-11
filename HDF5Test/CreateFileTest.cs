@@ -19,7 +19,7 @@ namespace HDF5Test
 
             int maxRows = 1000;
             int chunkSize = 50;
-            long measurementId = 287;
+            long measurementId = 12019;
             bool logTimePerChunk = true;
             uint compressionLevel = 1;
 

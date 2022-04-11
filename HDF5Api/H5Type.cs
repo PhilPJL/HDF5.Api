@@ -16,6 +16,12 @@ namespace HDF5Api
             return this;
         }
 
+        public H5Type Insert(string name, int offset, H5TypeHandle dataTypeId)
+        {
+            Insert(this, name, new IntPtr(offset), dataTypeId);
+            return this;
+        }
+
         public H5Type Insert(string name, IntPtr offset, long nativeTypeId)
         {
             Insert(this, name, offset, nativeTypeId);

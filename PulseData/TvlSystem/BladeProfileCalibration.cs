@@ -20,6 +20,6 @@ namespace PulseData.TvlSystem
         public double ProfileValue { get; set; }
 
         [Column("CORRECTION")]
-        public byte[] Correction { get; set; }
+        public byte[] CorrectionValues { get; set; }
     }
 }

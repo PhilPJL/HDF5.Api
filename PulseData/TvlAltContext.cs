@@ -15,6 +15,9 @@ namespace PulseData
         public TvlAltContext(string nameOrConnectionString = "TvlAlt") : base(GetConnection(nameOrConnectionString), true)
         {
             Database.SetInitializer<TvlAltContext>(null);
+
+            Configuration.LazyLoadingEnabled = false;
+            Configuration.ProxyCreationEnabled = false;
         }
 
         public DbSet<Waveform> Waveforms { get; set; }

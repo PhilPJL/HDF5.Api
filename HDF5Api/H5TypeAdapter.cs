@@ -1,68 +1,20 @@
-﻿using System;
+﻿using HDF5Api.Disposables;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace HDF5Api
 {
-    public abstract class H5TypeAdapterBase
+    /// <summary>
+    /// Base class for implementing a custom adaptor/converter to format an instance of C# type into a blittable struct for use in an HDF5 dataset
+    /// </summary>
+    /// <typeparam name="TInput"></typeparam>
+    public abstract class H5TypeAdapter<TInput> : H5TypeAdapterBase, IH5TypeAdapter<TInput>
     {
-        protected static readonly ASCIIEncoding Ascii = new();
+        public abstract H5Type GetH5Type();
 
-        /// <summary>
-        /// Helper method to copy fixed/max length string
-        /// </summary>
-        protected static unsafe void CopyString(string source, byte* destination, int destinationSizeInBytes)
-        {
-            if ((source ?? string.Empty) == string.Empty)
-            {
-                return;
-            }
-
-            // TODO: Move to 'unsafe' helper class?
-            // probably useful outside of H5TypeAdapter
-            byte[] sourceBytes = Ascii.GetBytes(source);
-
-            var msg = $"The provided string has length {source?.Length} which exceeds the maximum destination length of {destinationSizeInBytes}.";
-
-            if (source?.Length > destinationSizeInBytes)
-            {
-                throw new InvalidOperationException(msg);
-            }
-
-            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(sourceBytes, 0).ToPointer(), destination, destinationSizeInBytes, source.Length);
-        }
-
-        /// <summary>
-        /// Helper method to copy fixed/max length byte array.
-        /// </summary>
-        protected static unsafe void CopyBlob(byte[] source, byte* destination, int maxBlobSize, int blobTypeLength)
-        {
-            AssertBlobMaxLength(source, maxBlobSize);
-            AssertBlobLengthDivisibleByTypeLength(source, blobTypeLength);
-
-            if ((source?.Length ?? 0) > 0)
-            {
-                Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(source, 0).ToPointer(), destination, maxBlobSize, source?.Length ?? 0);
-            }
-        }
-
-        public static void AssertBlobMaxLength(byte[] values, int maxBlobSize)
-        {
-            if ((values?.Length ?? 0) > maxBlobSize)
-            {
-                throw new InvalidOperationException($"The provided data blob is length {values?.Length} exceeds the maximum expected length {maxBlobSize}");
-            }
-        }
-
-        public static void AssertBlobLengthDivisibleByTypeLength(byte[] values, int blobTypeLength)
-        {
-            if ((values?.Length ?? 0) % blobTypeLength != 0)
-            {
-                throw new InvalidOperationException($"The provided data blob is length {values?.Length} is not an exact multiple of contained type of length {blobTypeLength}");
-            }
-        }
+        public abstract void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords);
     }
 
     /// <summary>
@@ -70,13 +22,11 @@ namespace HDF5Api
     /// </summary>
     /// <typeparam name="TInput"></typeparam>
     /// <typeparam name="TOutput"></typeparam>
-    public abstract class H5TypeAdapter<TInput, TOutput> : H5TypeAdapterBase, IH5TypeAdapter<TInput>
+    public abstract class H5TypeAdapter<TInput, TOutput> : H5TypeAdapter<TInput>
     {
         protected abstract TOutput Convert(TInput source);
 
-        public abstract H5Type GetH5Type();
-
-        public void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
+        public override void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
         {
             var records = inputRecords.Select(Convert).ToArray();
 
@@ -97,11 +47,11 @@ namespace HDF5Api
     /// TODO: implement a generic type adaptor that works from attributed properties in the target type
     /// </summary>
     /// <typeparam name="TInput"></typeparam>
-    public class H5TypeAdapter<TInput> : IH5TypeAdapter<TInput>
+    public class H5AutoTypeAdapter<TInput> : H5TypeAdapter<TInput>
     {
         private int TInputSize { get; set; }
 
-        public H5Type GetH5Type()
+        public override H5Type GetH5Type()
         {
             // Generate H5Type.
 
@@ -114,7 +64,7 @@ namespace HDF5Api
             throw new NotImplementedException();
         }
 
-        public void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
+        public override void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
         {
             if ((inputRecords?.Count() ?? 0) == 0)
             {
@@ -133,30 +83,6 @@ namespace HDF5Api
             throw new NotImplementedException();
         }
 
-        public static H5TypeAdapter<TInput> Default { get; } = new H5TypeAdapter<TInput>();
-    }
-
-    internal class GlobalMemory : Disposable
-    {
-        public GlobalMemory(int size)
-        {
-            IntPtr = Marshal.AllocHGlobal(size);
-        }
-
-        public IntPtr IntPtr { get; private set; }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (IntPtr != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(IntPtr);
-                IntPtr = IntPtr.Zero;
-            }
-        }
-
-        public static implicit operator IntPtr(GlobalMemory memory)
-        {
-            return memory.IntPtr;
-        }
+        public static H5AutoTypeAdapter<TInput> Default { get; } = new H5AutoTypeAdapter<TInput>();
     }
 }
