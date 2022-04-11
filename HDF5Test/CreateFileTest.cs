@@ -198,7 +198,12 @@ namespace HDF5Test
                     scope.Complete();
                 }
 
-                using var bladeProfileCalibrationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeProfileCalibrations", BladeProfileCalibrationAdapter.Default, compressionLevel);
+                // Get size of blob
+                var blobLength = systemContext.BladeProfileCalibrations.AsNoTracking().FirstOrDefault()?.CorrectionValues.Length ?? 0;
+                Console.WriteLine($"Bladed profile calibrations: blob length {blobLength}");
+
+                using var bladeProfileCalibrationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group,
+                    "BladeProfileCalibrations", BladeProfileCalibrationVariableAdapter.Create(blobLength, sizeof(double)), compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeProfileCalibration", () => bladeProfileCalibrationWriter.RowsWritten))
                 {
                     using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });

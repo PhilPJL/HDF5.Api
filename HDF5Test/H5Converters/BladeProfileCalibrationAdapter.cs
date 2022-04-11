@@ -12,58 +12,6 @@ namespace HDF5Test.H5TypeHelpers
     /// <summary>
     /// A type converter for <see cref="BladeProfileCalibration"/>.
     /// </summary>
-    public sealed class BladeProfileCalibrationAdapter : H5TypeAdapter<BladeProfileCalibration, BladeProfileCalibrationAdapter.SBladeProfileCalibration>
-    {
-        private const int CorrectionBlobSize = 16384;
-        private const int CorrectionBlobTypeSize = sizeof(double);
-        private BladeProfileCalibrationAdapter() { }
-
-        protected override unsafe SBladeProfileCalibration Convert(BladeProfileCalibration source)
-        {
-            var result = new SBladeProfileCalibration
-            {
-                Id = source.Id,
-                BladeProfileCalibrationSetId = source.BladeProfileCalibrationSetId,
-                ProfileValue = source.ProfileValue,
-                CorrectionValuesLength = (source.CorrectionValues?.Length ?? 0) / CorrectionBlobTypeSize
-            };
-
-            unsafe
-            {
-                CopyBlob(source.CorrectionValues, result.CorrectionValues, CorrectionBlobSize, CorrectionBlobTypeSize);
-            }
-
-            return result;
-        }
-
-        public override H5Type GetH5Type()
-        {
-            using var correctionValuesType = H5Type.CreateDoubleArrayType(CorrectionBlobSize / CorrectionBlobTypeSize);
-
-            return H5Type
-                .CreateCompoundType<SBladeProfileCalibration>()
-                .Insert<SBladeProfileCalibration>(nameof(SBladeProfileCalibration.Id), H5T.NATIVE_INT64)
-                .Insert<SBladeProfileCalibration>(nameof(SBladeProfileCalibration.ProfileValue), H5T.NATIVE_DOUBLE)
-                .Insert<SBladeProfileCalibration>(nameof(SBladeProfileCalibration.CorrectionValuesLength), H5T.NATIVE_INT32)
-                .Insert<SBladeProfileCalibration>(nameof(SBladeProfileCalibration.CorrectionValues), correctionValuesType);
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public unsafe struct SBladeProfileCalibration
-        {
-            public int Id;
-            public int BladeProfileCalibrationSetId;
-            public double ProfileValue;
-            public int CorrectionValuesLength;
-            public fixed byte CorrectionValues[CorrectionBlobSize];
-        }
-
-        public static IH5TypeAdapter<BladeProfileCalibration> Default { get; } = new BladeProfileCalibrationAdapter();
-    }
-
-    /// <summary>
-    /// A type converter for <see cref="BladeProfileCalibration"/>.
-    /// </summary>
     public sealed class BladeProfileCalibrationVariableAdapter : H5TypeAdapter<BladeProfileCalibration>
     {
         private readonly int CorrectionBlobSize;
@@ -77,14 +25,12 @@ namespace HDF5Test.H5TypeHelpers
 
         private SBladeProfileCalibration Convert(BladeProfileCalibration source)
         {
-            var result = new SBladeProfileCalibration
+            return new SBladeProfileCalibration
             {
                 Id = source.Id,
                 BladeProfileCalibrationSetId = source.BladeProfileCalibrationSetId,
                 ProfileValue = source.ProfileValue
             };
-
-            return result;
         }
 
         public override H5Type GetH5Type()
@@ -94,7 +40,7 @@ namespace HDF5Test.H5TypeHelpers
             int blobOffset = Marshal.SizeOf<SBladeProfileCalibration>();
 
             return H5Type
-                .CreateCompoundType<SBladeProfileCalibration>()
+                .CreateCompoundType<SBladeProfileCalibration>(CorrectionBlobSize)
                 .Insert<SBladeProfileCalibration>(nameof(SBladeProfileCalibration.Id), H5T.NATIVE_INT64)
                 .Insert<SBladeProfileCalibration>(nameof(SBladeProfileCalibration.ProfileValue), H5T.NATIVE_DOUBLE)
                 .Insert("CorrectionValues", blobOffset, correctionValuesType);
@@ -103,13 +49,13 @@ namespace HDF5Test.H5TypeHelpers
         public override void WriteChunk(Action<IntPtr> write, IEnumerable<BladeProfileCalibration> inputRecords)
         {
             var records = inputRecords.Select(Convert).ToList();
-            var blobs = inputRecords.Select(ir => ir.CorrectionValues).ToList();
+            var blobs = inputRecords.Select(r => new { r.Id, r.CorrectionValues }).ToList();
 
-            // TODO: improve
             // if any record.Value.Length != CorrectionBlobSize, throw
-            if(blobs.Any(r => r.Length != CorrectionBlobSize))
+            var invalidLengths = blobs.Where(r => r.CorrectionValues.Length != CorrectionBlobSize).ToList();
+            if(invalidLengths.Any())
             {
-                throw new InvalidOperationException($"Wrong length");
+                throw new InvalidOperationException($"The Correction values length in BladeProfileCalibration for ids {string.Join(",", invalidLengths.Select(l => l.Id))} does not match the expected length of {CorrectionBlobSize}.");
             }
 
             int structSize = Marshal.SizeOf<SBladeProfileCalibration>();
@@ -124,16 +70,19 @@ namespace HDF5Test.H5TypeHelpers
                 for (int i = 0; i < records.Count; i++)
                 {
                     using var pinnedRecord = new PinnedObject(records[i]);
-                    using var pinnedBlob = new PinnedObject(blobs[i]);
+                    using var pinnedBlob = new PinnedObject(blobs[i].CorrectionValues);
+
+                    if(records[i].Id != blobs[i].Id)
+                    {
+                        throw new InvalidOperationException($"BladeProfileCalibration converter. Unexpected internal error. Ids not matching.");
+                    }
 
                     // Copy SBladeProfileCalibration
-                    // TODO: point at correct place in buffer
                     Buffer.MemoryCopy(pinnedRecord, CurrentBufferPosition(), remainingBufferSize, structSize);
 
                     remainingBufferSize -= structSize;
 
                     // Copy correction values
-                    // TODO: point at correct place in buffer
                     Buffer.MemoryCopy(pinnedBlob, CurrentBufferPosition(), remainingBufferSize, CorrectionBlobSize);
 
                     remainingBufferSize -= CorrectionBlobSize;

@@ -56,9 +56,21 @@ namespace HDF5Api
             return new H5Type(h);
         }
 
+        /// <summary>
+        /// Create a Compound type in order to hold an <typeparamref name="S"/>
+        /// </summary>
         public static H5Type CreateCompoundType<S>() where S : struct
         {
             int size = Marshal.SizeOf<S>();
+            return CreateCompoundType(size);
+        }
+
+        /// <summary>
+        /// Create a Compound type in order to hold an <typeparamref name="S"/> plus additional space as defined by <paramref name="extraSpace"/>
+        /// </summary>
+        public static H5Type CreateCompoundType<S>(int extraSpace) where S : struct
+        {
+            int size = Marshal.SizeOf<S>() + extraSpace;
             return CreateCompoundType(size);
         }
 
