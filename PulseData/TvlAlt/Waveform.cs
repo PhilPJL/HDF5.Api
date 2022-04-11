@@ -14,6 +14,7 @@ namespace PulseData.TvlAlt
         public long RecordId { get; set; }
 
         [Column("TYPE")]
+        [MaxLength(9)]
         public string Type { get; set; }
 
         [Column("T_OFFSET")]

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PulseData.TvlSystem
@@ -28,6 +29,7 @@ namespace PulseData.TvlSystem
         public byte[] Transform { get; set; }
 
         [Column("ERROR_REPORT")]
+        [MaxLength(21)]
         public string ErrorReport { get; set; }
 
         public virtual ICollection<BladeProfileName> BladeProfileNames { get; set; }

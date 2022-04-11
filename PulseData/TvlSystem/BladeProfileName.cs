@@ -8,9 +8,11 @@ namespace PulseData.TvlSystem
     {
         [Key]
         [Column("NAME")]
+        [MaxLength(50)]
         public string Name { get; set; }
 
         [Column("DESCRIPTION")]
+        [MaxLength(500)]
         public string Description { get; set; }
 
         [Column("PROFILE_CAL_ID")]

@@ -19,6 +19,7 @@ namespace PulseData.TvlSystem
         public double DeltaFrequency { get; set; }
 
         [Column("DESCRIPTION")]
+        [MaxLength(500)]
         public string Description { get; set; }
 
         public virtual ICollection<BladeProfileCalibration> BladeProfileCalibrations { get; set; }

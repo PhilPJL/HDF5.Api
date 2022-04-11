@@ -20,6 +20,7 @@ namespace PulseData.TvlAlt
         public byte[] Values { get; set; }
 
         [Column("UNITS")]
+        [MaxLength(6)]
         public string Units { get; set; }
     }
 }

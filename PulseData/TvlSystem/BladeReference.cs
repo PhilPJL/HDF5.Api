@@ -32,6 +32,12 @@ namespace PulseData.TvlSystem
         [Column("PROFILE_CENTRE")]
         public double ProfileCentre { get; set; }
 
+        /* -- present on pulsef27dev
+        [Column("DESCRIPTION")]
+        [MaxLength(500)]
+        public string Description { get; set; }
+        */
+
         public virtual ICollection<BladeProfileName> BladeProfileNames { get; set; }
     }
 }

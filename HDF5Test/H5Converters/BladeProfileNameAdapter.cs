@@ -22,6 +22,7 @@ namespace HDF5Test.H5TypeHelpers
                 ProfileCalibrationId = source.ProfilerCalibrationId ?? 0,
                 BladeReferenceId = source.BladeReferenceId ?? 0,
                 HeightCalibrationId = source.HeightCalibrationId ?? 0,
+                AlgorithmType = source.AlgorithmType,
                 Scaling0 = source.Scaling0,
                 Scaling1 = source.Scaling1,
                 Scaling2 = source.Scaling2,
@@ -49,6 +50,7 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert<SBladeProfileName>(nameof(SBladeProfileName.ProfileCalibrationId), H5T.NATIVE_INT32)
                 .Insert<SBladeProfileName>(nameof(SBladeProfileName.BladeReferenceId), H5T.NATIVE_INT32)
                 .Insert<SBladeProfileName>(nameof(SBladeProfileName.HeightCalibrationId), H5T.NATIVE_INT32)
+                .Insert<SBladeProfileName>(nameof(SBladeProfileName.AlgorithmType), H5T.NATIVE_INT32)
                 .Insert<SBladeProfileName>(nameof(SBladeProfileName.Scaling0), H5T.NATIVE_DOUBLE)
                 .Insert<SBladeProfileName>(nameof(SBladeProfileName.Scaling1), H5T.NATIVE_DOUBLE)
                 .Insert<SBladeProfileName>(nameof(SBladeProfileName.Scaling2), H5T.NATIVE_DOUBLE)
@@ -64,6 +66,7 @@ namespace HDF5Test.H5TypeHelpers
             public int ProfileCalibrationId;
             public int BladeReferenceId;
             public int HeightCalibrationId;
+            public int AlgorithmType;
 
             public double Scaling0;
             public double Scaling1;

@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net48;netstandard2.1</TargetFrameworks>
+		<TargetFrameworks>net48</TargetFrameworks>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<PlatformTarget>AnyCPU</PlatformTarget>
 	</PropertyGroup>

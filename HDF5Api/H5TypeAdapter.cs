@@ -24,7 +24,7 @@ namespace HDF5Api
             // probably useful outside of H5TypeAdapter
             byte[] sourceBytes = Ascii.GetBytes(source);
 
-            var msg = $"Profile: The provided string '{source}' has length {source?.Length} which exceeds the maximum destination length of {destinationSizeInBytes}.";
+            var msg = $"The provided string has length {source?.Length} which exceeds the maximum destination length of {destinationSizeInBytes}.";
 
             if (source?.Length > destinationSizeInBytes)
             {

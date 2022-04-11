@@ -96,6 +96,21 @@ namespace HDF5Test
                         });
                 }
 
+                using var measurementWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Measurements", MeasurementAdapter.Default, compressionLevel);
+                using (var sw = new DisposableStopWatch("Measurement", () => measurementWriter.RowsWritten))
+                {
+                    systemContext
+                        .Measurements
+                        .Where(m => m.Id == measurementId)
+                        .Take(maxRows)
+                        .Buffer(chunkSize)
+                        .ForEach(rg =>
+                        {
+                            measurementWriter.WriteChunk(rg);
+                            sw.ShowRowsWritten(logTimePerChunk);
+                        });
+                }
+
                 using var measurementConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "MeasurementConfigurations", MeasurementConfigurationAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("MeasurementConfiguration", () => measurementConfigurationWriter.RowsWritten))
                 {

@@ -12,6 +12,7 @@ namespace PulseData.TvlSystem
         public int Id { get; set; }
 
         [Column("SESSION_KEY")]
+        [MaxLength(32)]
         public string SessionKey { get; set; }
 
         [Column("MEAS_CONFIG_ID")]
@@ -27,15 +28,18 @@ namespace PulseData.TvlSystem
         public virtual InstallationConfiguration InstallationConfiguration { get; set; }
 
         [Column("COMMENT")]
+        [MaxLength(8000)]
         public string Comment { get; set; }
 
         [Column("STATUS")]
+        [MaxLength(11)]
         public string Status { get; set; }
 
         [Column("timestamp")]
         public DateTime Timestamp { get; set; }
 
         [Column("GEOMETRY")]
+        [MaxLength(12)]
         public string Geometry { get; set; }
 
         [ForeignKey("SessionKey")]

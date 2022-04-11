@@ -13,18 +13,22 @@ namespace PulseData.TvlSystem
         public int Id { get; set; }
 
         [Column("CONFIG")]
+        [MaxLength(12000)]
         public string Configuration { get; set; }
 
         [Column("IDENTITY")]
+        [MaxLength(1000)]
         public string Identity { get; set; }
 
         [Column("timestamp")]
         public DateTime Timestamp { get; set; }
 
         [Column("SESSION_KEY")]
+        [MaxLength(32)]
         public string SessionKey { get; set; }
 
         [Column("COMMENT")]
+        [MaxLength(2000)]
         public string Comment { get; set; }
 
         public virtual ICollection<Measurement> Measurements { get; set; }

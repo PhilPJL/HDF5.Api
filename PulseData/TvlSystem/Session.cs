@@ -10,9 +10,11 @@ namespace PulseData.TvlSystem
     {
         [Key]
         [Column("SESSION_KEY")]
+        [MaxLength(32)]
         public string SessionKey { get; set; }
 
         [Column("SESSION_TYPE")]
+        [MaxLength(8)]
         public string SessionType { get; set; }
 
         [Column("USER_ID")]
