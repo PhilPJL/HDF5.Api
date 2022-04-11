@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 namespace HDF5Api
 {
     /// <summary>
-    /// Base class for implementing a custom adaptor/converter to format an instance of C# type into a blittable struct for use in an HDF5 dataset
+    /// Base class for implementing a custom adaptor/converter to format an instance of a C# type into a blittable struct for use in an HDF5 dataset
     /// </summary>
     /// <typeparam name="TInput"></typeparam>
     public abstract class H5TypeAdapter<TInput> : H5TypeAdapterBase, IH5TypeAdapter<TInput>

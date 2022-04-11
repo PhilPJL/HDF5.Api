@@ -38,6 +38,8 @@ namespace HDF5Test
 
             using (new DisposableStopWatch("Overall time", () => 0))
             {
+                //////////////////////////////////////
+                // Raw records
                 using var rawRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "RawRecords", RawRecordAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("RawRecord", () => rawRecordWriter.RowsWritten))
                 {
@@ -56,6 +58,8 @@ namespace HDF5Test
                     scope.Complete();
                 }
 
+                //////////////////////////////////////
+                // Interval records
                 using var intervalRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "IntervalRecords", IntervalRecordAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("IntervalRecord", () => intervalRecordWriter.RowsWritten))
                 {
@@ -74,7 +78,19 @@ namespace HDF5Test
                     scope.Complete();
                 }
 
-                using var waveformWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Waveforms", WaveformAdapter.Default, compressionLevel);
+                //////////////////////////////////////
+                // Waveforms
+
+                // Get length of waveform blob for this measurement
+                var waveformValuesBlobLength = altContext
+                    .Waveforms
+                    .AsNoTracking()
+                    .Where(p => p.RawRecord.MeasurementId == measurementId)
+                    .FirstOrDefault()
+                    ?.Values?.Length ?? 0;
+                Console.WriteLine($"Waveform: blob length {waveformValuesBlobLength}");
+
+                using var waveformWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Waveforms", WaveformAdapter.Create(waveformValuesBlobLength, sizeof(double)), compressionLevel);
                 using (var sw = new DisposableStopWatch("Waveform", () => waveformWriter.RowsWritten))
                 {
                     using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
@@ -92,7 +108,19 @@ namespace HDF5Test
                     scope.Complete();
                 }
 
-                using var profileRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Profiles", ProfileAdapter.Default, compressionLevel);
+                //////////////////////////////////////
+                // Profiles
+
+                // Get length of profile blob for this measurement
+                var profileValuesBlobLength = altContext
+                    .Profiles
+                    .AsNoTracking()
+                    .Where(p => p.RawRecord.MeasurementId == measurementId)
+                    .FirstOrDefault()
+                    ?.Values?.Length ?? 0;
+                Console.WriteLine($"Profile: blob length {profileValuesBlobLength}");
+
+                using var profileRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Profiles", ProfileAdapter.Create(profileValuesBlobLength, sizeof(double)), compressionLevel);
                 using (var sw = new DisposableStopWatch("Profile", () => profileRecordWriter.RowsWritten))
                 {
                     using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
@@ -109,6 +137,9 @@ namespace HDF5Test
                         });
                     scope.Complete();
                 }
+
+                //////////////////////////////////////
+                // Measurements
 
                 using var measurementWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Measurements", MeasurementAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("Measurement", () => measurementWriter.RowsWritten))
@@ -128,6 +159,9 @@ namespace HDF5Test
                     scope.Complete();
                 }
 
+                //////////////////////////////////////
+                // Measurement configuration
+
                 using var measurementConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "MeasurementConfigurations", MeasurementConfigurationAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("MeasurementConfiguration", () => measurementConfigurationWriter.RowsWritten))
                 {
@@ -145,6 +179,9 @@ namespace HDF5Test
                         });
                     scope.Complete();
                 }
+
+                //////////////////////////////////////
+                // Installation configuration
 
                 using var installationConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "InstallationConfigurations", InstallationConfigurationAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("InstallationConfiguration", () => installationConfigurationWriter.RowsWritten))
@@ -164,6 +201,9 @@ namespace HDF5Test
                     scope.Complete();
                 }
 
+                //////////////////////////////////////
+                // Blade profile
+
                 using var bladeProfileNameWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeProfileNames", BladeProfileNameAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeProfileName", () => bladeProfileNameWriter.RowsWritten))
                 {
@@ -181,14 +221,17 @@ namespace HDF5Test
                     scope.Complete();
                 }
 
+                //////////////////////////////////////
+                // Blade reference
+
+                // Get sizes of mirror and blade waveform blobs
                 var bladeReference = systemContext.BladeReferences.AsNoTracking().FirstOrDefault();
                 int mirrorWaveformBlobLength = bladeReference?.MirrorWaveform.Length ?? 0;
                 int bladeWaveformBlobLength = bladeReference?.BladeWaveform.Length ?? 0;
-
                 Console.WriteLine($"Blade reference: blob lengths Blade={bladeWaveformBlobLength}, Mirror={mirrorWaveformBlobLength}");
 
-                using var bladeReferenceWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeReferences", 
-                    BladeReferenceVariableAdapter.Create(bladeWaveformBlobLength, sizeof(double), mirrorWaveformBlobLength, sizeof(double)), compressionLevel);
+                using var bladeReferenceWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeReferences",
+                    BladeReferenceAdapter.Create(bladeWaveformBlobLength, sizeof(double), mirrorWaveformBlobLength, sizeof(double)), compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeReference", () => bladeReferenceWriter.RowsWritten))
                 {
                     using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
@@ -205,12 +248,15 @@ namespace HDF5Test
                     scope.Complete();
                 }
 
-                // Get size of blob
+                //////////////////////////////////////
+                // Blade profile calibration
+
+                // Get size of correction values blob
                 var correctionValuesBlobLength = systemContext.BladeProfileCalibrations.AsNoTracking().FirstOrDefault()?.CorrectionValues.Length ?? 0;
                 Console.WriteLine($"Bladed profile calibrations: blob length {correctionValuesBlobLength}");
 
                 using var bladeProfileCalibrationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group,
-                    "BladeProfileCalibrations", BladeProfileCalibrationVariableAdapter.Create(correctionValuesBlobLength, sizeof(double)), compressionLevel);
+                    "BladeProfileCalibrations", BladeProfileCalibrationAdapter.Create(correctionValuesBlobLength, sizeof(double)), compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeProfileCalibration", () => bladeProfileCalibrationWriter.RowsWritten))
                 {
                     using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
@@ -226,6 +272,9 @@ namespace HDF5Test
                         });
                     scope.Complete();
                 }
+
+                //////////////////////////////////////
+                // Blade profile calibration set
 
                 using var bladeProfileCalibrationSetWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeProfileCalibrationSets", BladeProfileCalibrationSetAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("BladeProfileCalibrationSet", () => bladeProfileCalibrationSetWriter.RowsWritten))

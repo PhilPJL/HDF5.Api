@@ -12,7 +12,7 @@ namespace HDF5Test.H5TypeHelpers
     /// <summary>
     /// A type converter for <see cref="BladeReference"/>.
     /// </summary>
-    public sealed class BladeReferenceVariableAdapter : H5TypeAdapter<BladeReference>
+    public sealed class BladeReferenceAdapter : H5TypeAdapter<BladeReference>
     {
         private readonly int BladeWaveformBlobLength;
         private readonly int BladeWaveformBlobTypeSize;
@@ -20,7 +20,7 @@ namespace HDF5Test.H5TypeHelpers
         private readonly int MirrorWaveformBlobTypeSize;
         private const int DescriptionLength = 500;
 
-        private BladeReferenceVariableAdapter(int bladeWaveformBlobLength, int bladeWaveformBlobTypeSize, int mirrorWaveformBlobLength, int mirrorWaveformBlobTypeSize)
+        private BladeReferenceAdapter(int bladeWaveformBlobLength, int bladeWaveformBlobTypeSize, int mirrorWaveformBlobLength, int mirrorWaveformBlobTypeSize)
         {
             AssertBlobLengthDivisibleByTypeLength(bladeWaveformBlobLength, bladeWaveformBlobTypeSize);
             AssertBlobLengthDivisibleByTypeLength(mirrorWaveformBlobLength, mirrorWaveformBlobTypeSize);
@@ -146,6 +146,6 @@ namespace HDF5Test.H5TypeHelpers
         }
 
         public static IH5TypeAdapter<BladeReference> Create(int bladeWaveformBlobLength, int bladeWaveformblobTypeSize, int mirrorWaveformBlobLength, int mirrorWaveformblobTypeSize)
-            => new BladeReferenceVariableAdapter(bladeWaveformBlobLength, bladeWaveformblobTypeSize, mirrorWaveformBlobLength, mirrorWaveformblobTypeSize);
+            => new BladeReferenceAdapter(bladeWaveformBlobLength, bladeWaveformblobTypeSize, mirrorWaveformBlobLength, mirrorWaveformblobTypeSize);
     }
 }

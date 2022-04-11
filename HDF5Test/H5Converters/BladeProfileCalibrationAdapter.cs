@@ -12,12 +12,12 @@ namespace HDF5Test.H5TypeHelpers
     /// <summary>
     /// A type converter for <see cref="BladeProfileCalibration"/>.
     /// </summary>
-    public sealed class BladeProfileCalibrationVariableAdapter : H5TypeAdapter<BladeProfileCalibration>
+    public sealed class BladeProfileCalibrationAdapter : H5TypeAdapter<BladeProfileCalibration>
     {
         private readonly int CorrectionBlobSize;
         private readonly int CorrectionBlobTypeSize;
 
-        private BladeProfileCalibrationVariableAdapter(int blobLength, int blobTypeSize)
+        private BladeProfileCalibrationAdapter(int blobLength, int blobTypeSize)
         {
             AssertBlobLengthDivisibleByTypeLength(blobLength, blobTypeSize);
 
@@ -105,6 +105,7 @@ namespace HDF5Test.H5TypeHelpers
             public double ProfileValue;
         }
 
-        public static IH5TypeAdapter<BladeProfileCalibration> Create(int blobLength, int blobTypeSize) => new BladeProfileCalibrationVariableAdapter(blobLength, blobTypeSize);
+        public static IH5TypeAdapter<BladeProfileCalibration> Create(int blobLength, int blobTypeSize) => 
+            new BladeProfileCalibrationAdapter(blobLength, blobTypeSize);
     }
 }

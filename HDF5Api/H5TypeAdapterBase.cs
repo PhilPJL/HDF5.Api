@@ -18,8 +18,6 @@ namespace HDF5Api
                 return;
             }
 
-            // TODO: Move to 'unsafe' helper class?
-            // probably useful outside of H5TypeAdapter
             byte[] sourceBytes = Ascii.GetBytes(source);
 
             var msg = $"The provided string has length {source?.Length} which exceeds the maximum destination length of {destinationSizeInBytes}.";
