@@ -8,6 +8,14 @@
         private H5File(Handle handle) : base(handle) { }
 
         /// <summary>
+        /// Create an Attribute for this File
+        /// </summary>
+        public override H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+        {
+            return H5Attribute.Create(this, name, typeId, spaceId, propertyListId);
+        }
+
+        /// <summary>
         /// Create a Group in this file
         /// </summary>
         public override H5Group CreateGroup(string name)

@@ -23,6 +23,14 @@
             return H5DataSet.Create(this, name, typeId, spaceId, propertyListId);
         }
 
+        /// <summary>
+        /// Create an Attribute for this Group
+        /// </summary>
+        public override H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+        {
+            return H5Attribute.Create(this, name, typeId, spaceId, propertyListId);
+        }
+
         #region Factory methods
         public static H5Group Create(IH5Location location, string name)
         {

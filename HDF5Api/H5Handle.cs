@@ -18,8 +18,14 @@ namespace HDF5Api
     {
         public Handle Handle { get; }
 
+        public H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
         public H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
         public H5Group CreateGroup(string name);
+    }
+
+    public class H5AttributeHandle : H5Handle
+    {
+        public H5AttributeHandle(Handle handle) : base(handle, H5A.close) { }
     }
 
     public class H5PropertyListHandle : H5Handle
@@ -36,6 +42,7 @@ namespace HDF5Api
     {
         protected H5FileHandle(Handle handle) : base(handle, H5F.close) { }
 
+        public abstract H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
         public abstract H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
         public abstract H5Group CreateGroup(string name);
     }
@@ -44,6 +51,7 @@ namespace HDF5Api
     {
         protected H5GroupHandle(Handle handle) : base(handle, H5G.close) { }
 
+        public abstract H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
         public abstract H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
         public abstract H5Group CreateGroup(string name);
     }

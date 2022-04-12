@@ -30,12 +30,22 @@ namespace HDF5Test
             Console.WriteLine($"Writing to file test-data.h5, group Measurement:{measurementId}.  Max rows {maxRows}.  Compression level {compressionLevel}.");
             Console.WriteLine();
 
+            if (H5Attribute.Exists(file, "test"))
+            {
+                Console.WriteLine("attribute exists");
+            }
+
+            if (H5Attribute.Exists(group, "test"))
+            {
+                Console.WriteLine("attribute exists");
+            }
+
             using var altContext = new TvlAltContext();
             using var systemContext = new TvlSystemContext();
 
+#if false
             // TODO: async queryable/cancellable
             // TODO: overlap?
-
             using (new DisposableStopWatch("Overall time", () => 0))
             {
                 //////////////////////////////////////
@@ -158,7 +168,7 @@ namespace HDF5Test
                         });
                     scope.Complete();
                 }
-
+#endif
                 //////////////////////////////////////
                 // Measurement configuration
 
@@ -179,11 +189,11 @@ namespace HDF5Test
                         });
                     scope.Complete();
                 }
+#if false
+            //////////////////////////////////////
+            // Installation configuration
 
-                //////////////////////////////////////
-                // Installation configuration
-
-                using var installationConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "InstallationConfigurations", InstallationConfigurationAdapter.Default, compressionLevel);
+            using var installationConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "InstallationConfigurations", InstallationConfigurationAdapter.Default, compressionLevel);
                 using (var sw = new DisposableStopWatch("InstallationConfiguration", () => installationConfigurationWriter.RowsWritten))
                 {
                     using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
@@ -293,6 +303,7 @@ namespace HDF5Test
                     scope.Complete();
                 }
             }
+#endif
         }
     }
 

@@ -5,14 +5,14 @@
     /// </summary>
     public static class H5DataSetWriter
     {
-        public static readonly ulong[] MaxDims = new ulong[] { H5S.UNLIMITED };
+        internal static readonly ulong[] MaxDims1D = new ulong[] { H5S.UNLIMITED };
 
         public static IH5DataSetWriter<TInput> CreateOneDimensionalDataSetWriter<TInput>(IH5Location location, string dataSetName, IH5TypeAdapter<TInput> converter, uint compressionLevel = 1, int chunkSize = 100)
         {
             // NOTE: we're only interested in creating a data set currently, not opening an existing one
 
             // Single dimension (rank 1), unlimited length, chunk size.
-            using var memorySpace = H5Space.CreateSimple(1, new ulong[] { (ulong)chunkSize }, MaxDims);
+            using var memorySpace = H5Space.CreateSimple(1, new ulong[] { (ulong)chunkSize }, MaxDims1D);
 
             // Create a dataset-creation property list
             using var properyList = H5PropertyList.Create(H5P.DATASET_CREATE);
