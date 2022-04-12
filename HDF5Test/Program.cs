@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using HDF5Api;
 using System;
+using System.Collections.Generic;
 
 namespace HDF5Test
 {
@@ -8,8 +9,8 @@ namespace HDF5Test
     {
         public class Options
         {
-            [Option('m', Required = true, HelpText = "The measurement Id")]
-            public int MeasId { get; set; }
+            [Option('m', Required = true, HelpText = "One or more measurement Ids")]
+            public IEnumerable<int> MeasIds { get; set; }
 
             [Option('r', Required = false, HelpText = "Max rows to retrieve", Default = 100)]
             public int MaxRows { get; set; }
@@ -19,14 +20,14 @@ namespace HDF5Test
         {
             Parser.Default
                 .ParseArguments<Options>(args)
-                .WithParsed(o => Run(o.MeasId, o.MaxRows));
+                .WithParsed(o => Run(o.MeasIds, o.MaxRows));
         }
 
-        static void Run(int measurementId, int maxRows)
+        static void Run(IEnumerable<int> measurementIds, int maxRows)
         {
             try
             {
-                CreateFileTest.CreateFile(measurementId, maxRows);
+                CreateFileTest.CreateFile(measurementIds, maxRows);
 
 #if DEBUG
                 if (H5Handle.Handles.Count > 0)
