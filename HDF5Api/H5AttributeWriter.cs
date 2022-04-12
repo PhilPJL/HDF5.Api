@@ -21,9 +21,6 @@ namespace HDF5Api
             // Create a dataset with our record type and chunk size.
             var attribute = location.CreateAttribute(attributeName, h5CompoundType, memorySpace, properyList);
 
-            // Match the space to length of records retrieved.
-            using var recordSpace = H5Space.CreateSimple(1, new ulong[] { 1 }, MaxDims);
-
             converter.Write(WriteAdaptor(attribute, h5CompoundType), Enumerable.Repeat(input, 1));
 
             return attribute;

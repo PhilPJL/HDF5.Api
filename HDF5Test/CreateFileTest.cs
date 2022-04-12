@@ -33,29 +33,6 @@ namespace HDF5Test
             using var altContext = new TvlAltContext();
             using var systemContext = new TvlSystemContext();
 
-            //////////////////////////////////////
-            // Measurement configuration
-            {
-                using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
-
-                var config = systemContext
-                    .MeasurementConfigurations
-                    .AsNoTracking()
-                    .Where(mc => mc.Measurements.Any(m => m.Id == measurementId))
-                    .FirstOrDefault();
-
-                using var attribute = H5AttributeWriter.CreateAndWriteAttribute(group, "MeasurementConfiguration", config, MeasurementConfigurationAdapter.Default);
-
-                scope.Complete();
-
-                if (H5Attribute.Exists(group, "MeasurementConfiguration"))
-                {
-                    Console.WriteLine("MeasurementConfiguration attribute exists");
-                }
-            }
-#if false
-            // TODO: async queryable/cancellable
-            // TODO: overlap?
             using (new DisposableStopWatch("Overall time", () => 0))
             {
                 //////////////////////////////////////
@@ -160,66 +137,15 @@ namespace HDF5Test
 
                 //////////////////////////////////////
                 // Measurements
+                CreateMeaurementAttributes(measurementId, group, systemContext);
 
-                using var measurementWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Measurements", MeasurementAdapter.Default, compressionLevel);
-                using (var sw = new DisposableStopWatch("Measurement", () => measurementWriter.RowsWritten))
-                {
-                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
-                    systemContext
-                        .Measurements
-                        .AsNoTracking()
-                        .Where(m => m.Id == measurementId)
-                        .Take(maxRows)
-                        .Buffer(chunkSize)
-                        .ForEach(rg =>
-                        {
-                            measurementWriter.WriteChunk(rg);
-                            sw.ShowRowsWritten(logTimePerChunk);
-                        });
-                    scope.Complete();
-                }
-#endif
-            //////////////////////////////////////
-            // Measurement configuration
+                //////////////////////////////////////
+                // Measurement configuration - using attributes
+                CreateMeasurementConfigurationAttributes(measurementId, group, systemContext);
 
-            using var measurementConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "MeasurementConfigurations", MeasurementConfigurationAdapter.Default, compressionLevel);
-            using (var sw = new DisposableStopWatch("MeasurementConfiguration", () => measurementConfigurationWriter.RowsWritten))
-            {
-                using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
-                systemContext
-                    .MeasurementConfigurations
-                    .AsNoTracking()
-                    .Where(mc => mc.Measurements.Any(m => m.Id == measurementId))
-                    .Take(maxRows)
-                    .Buffer(chunkSize)
-                    .ForEach(rg =>
-                    {
-                        measurementConfigurationWriter.WriteChunk(rg);
-                        sw.ShowRowsWritten(logTimePerChunk);
-                    });
-                scope.Complete();
-            }
-#if false
-            //////////////////////////////////////
-            // Installation configuration
-
-            using var installationConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "InstallationConfigurations", InstallationConfigurationAdapter.Default, compressionLevel);
-                using (var sw = new DisposableStopWatch("InstallationConfiguration", () => installationConfigurationWriter.RowsWritten))
-                {
-                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
-                    systemContext
-                        .InstallationConfigurations
-                        .AsNoTracking()
-                        .Where(ic => ic.Measurements.Any(m => m.Id == measurementId))
-                        .Take(maxRows)
-                        .Buffer(chunkSize)
-                        .ForEach(rg =>
-                        {
-                            installationConfigurationWriter.WriteChunk(rg);
-                            sw.ShowRowsWritten(logTimePerChunk);
-                        });
-                    scope.Complete();
-                }
+                //////////////////////////////////////
+                // Installation configuration - using attributes
+                CreateInstallationConfigurationAttributes(measurementId, group, systemContext);
 
                 //////////////////////////////////////
                 // Blade profile
@@ -313,7 +239,117 @@ namespace HDF5Test
                     scope.Complete();
                 }
             }
-#endif
+        }
+        private static void CreateMeaurementAttributes(long measurementId, IH5Location location, TvlSystemContext systemContext)
+        {
+            using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+
+            var measurement = systemContext
+                .Measurements
+                .AsNoTracking()
+                .Where(m => m.Id == measurementId)
+                .FirstOrDefault();
+
+            if (measurement != null)
+            {
+                MeasurementSimpleAttributeWriter.WriteAttributes(location, measurement);
+            }
+
+            /*            using var measurementWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Measurements", MeasurementAdapter.Default, compressionLevel);
+                        using (var sw = new DisposableStopWatch("Measurement", () => measurementWriter.RowsWritten))
+                        {
+                            using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+                            systemContext
+                                .Measurements
+                                .AsNoTracking()
+                                .Where(m => m.Id == measurementId)
+                                .Take(maxRows)
+                                .Buffer(chunkSize)
+                                .ForEach(rg =>
+                                {
+                                    measurementWriter.WriteChunk(rg);
+                                    sw.ShowRowsWritten(logTimePerChunk);
+                                });
+                            scope.Complete();
+                        }*/
+        }
+
+        private static void CreateInstallationConfigurationAttributes(long measurementId, IH5Location location, TvlSystemContext systemContext)
+        {
+            using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+
+            var config = systemContext
+                        .InstallationConfigurations
+                        .AsNoTracking()
+                        .Where(ic => ic.Measurements.Any(m => m.Id == measurementId))
+                        .FirstOrDefault();
+
+            //            using var attribute = H5AttributeWriter.CreateAndWriteAttribute(group, "InstallationConfiguration", config, InstallationConfigurationAdapter.Default);
+
+            if (config != null)
+            {
+                InstallationConfigurationSimpleAttributeWriter.WriteAttributes(location, config);
+            }
+
+            scope.Complete();
+
+            /*                using var measurementConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "MeasurementConfigurations", MeasurementConfigurationAdapter.Default, compressionLevel);
+                using (var sw = new DisposableStopWatch("MeasurementConfiguration", () => measurementConfigurationWriter.RowsWritten))
+                {
+                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+                    systemContext
+                        .MeasurementConfigurations
+                        .AsNoTracking()
+                        .Where(mc => mc.Measurements.Any(m => m.Id == measurementId))
+                        .Take(maxRows)
+                        .Buffer(chunkSize)
+                        .ForEach(rg =>
+                        {
+                            measurementConfigurationWriter.WriteChunk(rg);
+                            sw.ShowRowsWritten(logTimePerChunk);
+                        });
+                    scope.Complete();
+                }*/
+        }
+
+        private static void CreateMeasurementConfigurationAttributes(long measurementId, IH5Location location, TvlSystemContext systemContext)
+        {
+            using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+
+            var config = systemContext
+                        .MeasurementConfigurations
+                        .AsNoTracking()
+                        .Where(mc => mc.Measurements.Any(m => m.Id == measurementId))
+                        .FirstOrDefault();
+
+            //            using var attribute = H5AttributeWriter.CreateAndWriteAttribute(group, "MeasurementConfiguration", config, MeasurementConfigurationAdapter.Default);
+
+            if (config != null)
+            {
+                MeasurementConfigurationSimpleAttributeWriter.WriteAttributes(location, config);
+            }
+
+            scope.Complete();
+
+
+            /*                using var installationConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "InstallationConfigurations", InstallationConfigurationAdapter.Default, compressionLevel);
+                            using (var sw = new DisposableStopWatch("InstallationConfiguration", () => installationConfigurationWriter.RowsWritten))
+                            {
+                                using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+                                systemContext
+                                    .InstallationConfigurations
+                                    .AsNoTracking()
+                                    .Where(ic => ic.Measurements.Any(m => m.Id == measurementId))
+                                    .Take(maxRows)
+                                    .Buffer(chunkSize)
+                                    .ForEach(rg =>
+                                    {
+                                        installationConfigurationWriter.WriteChunk(rg);
+                                        sw.ShowRowsWritten(logTimePerChunk);
+                                    });
+                                scope.Complete();
+                            }*/
+
         }
     }
 

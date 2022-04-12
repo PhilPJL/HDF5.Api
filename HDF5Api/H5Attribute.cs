@@ -9,9 +9,9 @@ namespace HDF5Api
     {
         private H5Attribute(Handle handle) : base(new H5AttributeHandle(handle)) { }
 
-        public void Write(H5Type h5Type, IntPtr buffer)
+        public void Write(H5TypeHandle typeId, IntPtr buffer)
         {
-            Write(this, h5Type, buffer);
+            Write(this, typeId, buffer);
         }
 
         #region Factory methods

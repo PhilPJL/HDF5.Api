@@ -23,7 +23,7 @@ namespace HDF5Api
             }
         }
 
-        public static implicit operator THandle (H5Object<THandle> h5Object)
+        public static implicit operator THandle(H5Object<THandle> h5Object)
         {
             return h5Object.Handle;
         }
@@ -42,6 +42,12 @@ namespace HDF5Api
     public class H5TypeHandle : H5Handle
     {
         public H5TypeHandle(Handle handle) : base(handle, H5T.close) { }
+        private H5TypeHandle(Handle handle, Func<Handle, int> closer) : base(handle, closer) { }
+
+        public static H5TypeHandle WrapNative(Handle handle)
+        {
+            return new H5TypeHandle(handle, NullCloser);
+        }
     }
 
     public class H5FileHandle : H5LocationHandle
@@ -81,6 +87,13 @@ namespace HDF5Api
         public static Dictionary<Handle, string> Handles { get; private set; } = new();
 #endif
 
+        // Null-op for wrapped native handles
+        protected static internal int NullCloser (Handle _)
+        {
+            Debug.WriteLine($"*not* Closing native handle {_}");
+            return 0;
+        }
+
         /// <summary>
         /// Func used to close the handle
         /// </summary>
@@ -100,7 +113,7 @@ namespace HDF5Api
 
         protected H5Handle(Handle handle, Func<Handle, int> closer)
         {
-            Debug.WriteLine($"Handle opened {handle}: {GetType().Name}");
+            Debug.WriteLine($"Opened handle {GetType().Name}: {handle}");
 
             handle.ThrowIfNotValid();
             Handle = handle;
@@ -120,7 +133,7 @@ namespace HDF5Api
         {
             if (disposing && !IsDisposed)
             {
-                Debug.WriteLine($"Closing handle {Handle}");
+                Debug.WriteLine($"Closing handle {GetType().Name}: {Handle}");
 
                 var err = CloseHandle(Handle);
 
