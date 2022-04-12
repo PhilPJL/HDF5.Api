@@ -14,7 +14,7 @@ namespace HDF5Api
     {
         public abstract H5Type GetH5Type();
 
-        public abstract void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords);
+        public abstract void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords);
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ namespace HDF5Api
     {
         protected abstract TOutput Convert(TInput source);
 
-        public override void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
+        public override void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
         {
             // convert input to Array of struct
             var records = inputRecords.Select(Convert).ToArray();
@@ -60,7 +60,7 @@ namespace HDF5Api
             throw new NotImplementedException();
         }
 
-        public override void WriteChunk(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
+        public override void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
         {
             if ((inputRecords?.Count() ?? 0) == 0)
             {

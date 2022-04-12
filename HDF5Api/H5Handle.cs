@@ -1,6 +1,7 @@
 ﻿global using HDF.PInvoke;
 global using Handle = System.Int64;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace HDF5Api
@@ -74,6 +75,12 @@ namespace HDF5Api
     /// </remarks>
     public abstract class H5Handle : Disposable
     {
+        public static int HandleCount { get; private set; }
+
+#if DEBUG
+        public static Dictionary<Handle, string> Handles { get; private set; } = new();
+#endif
+
         /// <summary>
         /// Func used to close the handle
         /// </summary>
@@ -96,6 +103,11 @@ namespace HDF5Api
             AssertHandle(handle);
             Handle = handle;
             CloseHandle = closer;
+            HandleCount++;
+
+#if DEBUG
+            Handles.Add(handle, Environment.StackTrace);
+#endif
         }
 
         public static void AssertHandle(Handle handle)
@@ -129,8 +141,14 @@ namespace HDF5Api
                 Debug.WriteLine($"Closing handle {Handle}");
 
                 var err = CloseHandle(Handle);
+
+#if DEBUG
+                Handles.Remove(Handle);
+#endif
+
                 Handle = InvalidHandle;
                 AssertError(err);
+                HandleCount--;
             }
         }
     }

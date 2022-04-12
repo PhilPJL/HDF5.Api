@@ -38,7 +38,7 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert("CorrectionValues", blobOffset, correctionValuesType);
         }
 
-        public override void WriteChunk(Action<IntPtr> write, IEnumerable<BladeProfileCalibration> inputRecords)
+        public override void Write(Action<IntPtr> write, IEnumerable<BladeProfileCalibration> inputRecords)
         {
             static SBladeProfileCalibration Convert(BladeProfileCalibration source)
             {

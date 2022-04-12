@@ -65,7 +65,7 @@ namespace HDF5Api
             using var recordSpace = H5Space.CreateSimple(1, new ulong[] { (ulong)numRecords }, H5DataSetWriter.MaxDims1D);
 
             // Configure most parameters for DataSet.WriteChunk and then pass the curried method as an Action<IntPtr> to Converter which only needs to supply the last param.
-            Converter.WriteChunk(WriteAdaptor(DataSet, Type, recordSpace, fileSpace), recordsChunk);
+            Converter.Write(WriteAdaptor(DataSet, Type, recordSpace, fileSpace), recordsChunk);
 
             RowsWritten += numRecords;
 

@@ -30,19 +30,29 @@ namespace HDF5Test
             Console.WriteLine($"Writing to file test-data.h5, group Measurement:{measurementId}.  Max rows {maxRows}.  Compression level {compressionLevel}.");
             Console.WriteLine();
 
-            if (H5Attribute.Exists(file, "test"))
-            {
-                Console.WriteLine("attribute exists");
-            }
-
-            if (H5Attribute.Exists(group, "test"))
-            {
-                Console.WriteLine("attribute exists");
-            }
-
             using var altContext = new TvlAltContext();
             using var systemContext = new TvlSystemContext();
 
+            //////////////////////////////////////
+            // Measurement configuration
+            {
+                using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+
+                var config = systemContext
+                    .MeasurementConfigurations
+                    .AsNoTracking()
+                    .Where(mc => mc.Measurements.Any(m => m.Id == measurementId))
+                    .FirstOrDefault();
+
+                using var attribute = H5AttributeWriter.CreateAndWriteAttribute(group, "MeasurementConfiguration", config, MeasurementConfigurationAdapter.Default);
+
+                scope.Complete();
+
+                if (H5Attribute.Exists(group, "MeasurementConfiguration"))
+                {
+                    Console.WriteLine("MeasurementConfiguration attribute exists");
+                }
+            }
 #if false
             // TODO: async queryable/cancellable
             // TODO: overlap?
@@ -169,26 +179,26 @@ namespace HDF5Test
                     scope.Complete();
                 }
 #endif
-                //////////////////////////////////////
-                // Measurement configuration
+            //////////////////////////////////////
+            // Measurement configuration
 
-                using var measurementConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "MeasurementConfigurations", MeasurementConfigurationAdapter.Default, compressionLevel);
-                using (var sw = new DisposableStopWatch("MeasurementConfiguration", () => measurementConfigurationWriter.RowsWritten))
-                {
-                    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
-                    systemContext
-                        .MeasurementConfigurations
-                        .AsNoTracking()
-                        .Where(mc => mc.Measurements.Any(m => m.Id == measurementId))
-                        .Take(maxRows)
-                        .Buffer(chunkSize)
-                        .ForEach(rg =>
-                        {
-                            measurementConfigurationWriter.WriteChunk(rg);
-                            sw.ShowRowsWritten(logTimePerChunk);
-                        });
-                    scope.Complete();
-                }
+            using var measurementConfigurationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "MeasurementConfigurations", MeasurementConfigurationAdapter.Default, compressionLevel);
+            using (var sw = new DisposableStopWatch("MeasurementConfiguration", () => measurementConfigurationWriter.RowsWritten))
+            {
+                using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+                systemContext
+                    .MeasurementConfigurations
+                    .AsNoTracking()
+                    .Where(mc => mc.Measurements.Any(m => m.Id == measurementId))
+                    .Take(maxRows)
+                    .Buffer(chunkSize)
+                    .ForEach(rg =>
+                    {
+                        measurementConfigurationWriter.WriteChunk(rg);
+                        sw.ShowRowsWritten(logTimePerChunk);
+                    });
+                scope.Complete();
+            }
 #if false
             //////////////////////////////////////
             // Installation configuration

@@ -53,7 +53,7 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert("MirrorWaveform", mirrorWaveformBlobOffset, mirrorWaveformType);
         }
 
-        public override void WriteChunk(Action<IntPtr> write, IEnumerable<BladeReference> inputRecords)
+        public override void Write(Action<IntPtr> write, IEnumerable<BladeReference> inputRecords)
         {
             SBladeReference Convert(BladeReference source)
             {

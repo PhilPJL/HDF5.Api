@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HDF5Api;
+using System;
 
 namespace HDF5Test
 {
@@ -9,6 +10,18 @@ namespace HDF5Test
             try
             {
                 CreateFileTest.CreateFile();
+
+                Console.WriteLine($"Unclosed handles: {H5Handle.HandleCount}.");
+
+                if(H5Handle.HandleCount > 0)
+                {
+                    foreach (var item in H5Handle.Handles)
+                    {
+                        Console.WriteLine("-----------------------------");
+                        Console.WriteLine($"{item.Key}");
+                        Console.WriteLine(item.Value);
+                    }
+                }
             }
             catch (Exception ex)
             {

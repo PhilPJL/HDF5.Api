@@ -43,7 +43,7 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert("ZValuex", zValuesOffset, valuesType);
         }
 
-        public override void WriteChunk(Action<IntPtr> write, IEnumerable<Profile> inputRecords)
+        public override void Write(Action<IntPtr> write, IEnumerable<Profile> inputRecords)
         {
             static unsafe SProfile Convert(Profile source)
             {

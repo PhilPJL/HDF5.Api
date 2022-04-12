@@ -45,7 +45,7 @@ namespace HDF5Test.H5TypeHelpers
                 .Insert("Values", valuesOffset, valuesType);
         }
 
-        public override void WriteChunk(Action<IntPtr> write, IEnumerable<Waveform> inputRecords)
+        public override void Write(Action<IntPtr> write, IEnumerable<Waveform> inputRecords)
         {
             static SWaveform Convert(Waveform source)
             {

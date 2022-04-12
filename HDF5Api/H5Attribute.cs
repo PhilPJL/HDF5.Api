@@ -9,15 +9,18 @@ namespace HDF5Api
     {
         private H5Attribute(Handle handle) : base(handle) { }
 
-        public void Write(H5SpaceHandle spaceId, IntPtr buffer)
+        public void Write(H5Type h5Type, IntPtr buffer)
         {
-            Write(this, spaceId, buffer);
+            Write(this, h5Type, buffer);
         }
 
         #region Factory methods
         public static H5Attribute Create(IH5Location location, string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
         {
             AssertHandle(location.Handle);
+            AssertHandle(typeId);
+            AssertHandle(spaceId);
+            AssertHandle(propertyListId);
             var h = H5A.create(location.Handle, name, typeId, spaceId, propertyListId);
             AssertHandle(h);
             return new H5Attribute(h);
@@ -32,9 +35,9 @@ namespace HDF5Api
             return err > 0;
         }
 
-        public static void Write(H5AttributeHandle handle, H5SpaceHandle spaceId, IntPtr buffer)
+        public static void Write(H5AttributeHandle h5AttributeId, H5TypeHandle h5TypeId, IntPtr buffer)
         {
-            int err = H5A.write(handle, spaceId, buffer);
+            int err = H5A.write(h5AttributeId, h5TypeId, buffer);
             AssertError(err);
         }
         #endregion
