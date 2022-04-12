@@ -7,7 +7,8 @@
     {
         internal static readonly ulong[] MaxDims1D = new ulong[] { H5S.UNLIMITED };
 
-        public static IH5DataSetWriter<TInput> CreateOneDimensionalDataSetWriter<TInput>(IH5Location location, string dataSetName, IH5TypeAdapter<TInput> converter, uint compressionLevel = 1, int chunkSize = 100)
+        public static IH5DataSetWriter<TInput> CreateOneDimensionalDataSetWriter<TInput>
+            (IH5Location location, string dataSetName, IH5TypeAdapter<TInput> converter, uint compressionLevel = 1, int chunkSize = 100)
         {
             // NOTE: we're only interested in creating a data set currently, not opening an existing one
 

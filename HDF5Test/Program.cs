@@ -11,9 +11,8 @@ namespace HDF5Test
             {
                 CreateFileTest.CreateFile();
 
-                Console.WriteLine($"Unclosed handles: {H5Handle.HandleCount}.");
-
-                if(H5Handle.HandleCount > 0)
+#if DEBUG
+                if(H5Handle.Handles.Count > 0)
                 {
                     foreach (var item in H5Handle.Handles)
                     {
@@ -22,6 +21,7 @@ namespace HDF5Test
                         Console.WriteLine(item.Value);
                     }
                 }
+#endif
             }
             catch (Exception ex)
             {

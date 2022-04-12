@@ -5,9 +5,9 @@ namespace HDF5Api
     /// <summary>
     /// Wrapper for H5D (Data-set) API.
     /// </summary>
-    public class H5DataSet : H5DataSetHandle
+    public class H5DataSet : H5Object<H5DataSetHandle>
     {
-        private H5DataSet(Handle handle) : base(handle) { }
+        private H5DataSet(Handle handle) : base(new H5DataSetHandle(handle)) { }
 
         public void Write(H5TypeHandle typeId, H5SpaceHandle memorySpaceId, H5SpaceHandle fileSpaceId, IntPtr buffer)
         {
@@ -25,15 +25,17 @@ namespace HDF5Api
         }
 
         #region Factory methods
-        public static H5DataSet Create(IH5Location location, string name,
-            H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+        public static H5DataSet Create(H5LocationHandle location, string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
         {
-            AssertHandle(location.Handle);
-            AssertHandle(typeId);
-            AssertHandle(spaceId);
-            AssertHandle(propertyListId);
-            var h = H5D.create(location.Handle, name, typeId, spaceId, H5P.DEFAULT, propertyListId);
-            AssertHandle(h);
+            location.ThrowIfNotValid();
+            typeId.ThrowIfNotValid();
+            spaceId.ThrowIfNotValid();
+            propertyListId.ThrowIfNotValid();
+
+            var h = H5D.create(location, name, typeId, spaceId, H5P.DEFAULT, propertyListId);
+            
+            h.ThrowIfNotValid();
+            
             return new H5DataSet(h);
         }
         #endregion
@@ -41,19 +43,23 @@ namespace HDF5Api
         #region C level API wrappers
         public static void SetExtent(H5DataSetHandle dataSetId, ulong[] dims)
         {
-            AssertHandle(dataSetId);
+            dataSetId.ThrowIfNotValid();
+
             var err = H5D.set_extent(dataSetId, dims);
-            AssertError(err);
+            
+            err.ThrowIfError();
         }
 
         public static void Write(H5DataSetHandle dataSetId, H5TypeHandle typeId, H5SpaceHandle memorySpaceId, H5SpaceHandle fileSpaceId, IntPtr buffer)
         {
-            AssertHandle(dataSetId);
-            AssertHandle(typeId);
-            AssertHandle(memorySpaceId);
-            AssertHandle(fileSpaceId);
+            dataSetId.ThrowIfNotValid();
+            typeId.ThrowIfNotValid();
+            memorySpaceId.ThrowIfNotValid();
+            fileSpaceId.ThrowIfNotValid();
+
             var err = H5D.write(dataSetId, typeId, memorySpaceId, fileSpaceId, H5P.DEFAULT, buffer);
-            AssertError(err);
+            
+            err.ThrowIfError();
         }
         #endregion
     }

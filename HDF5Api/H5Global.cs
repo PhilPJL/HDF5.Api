@@ -12,8 +12,11 @@ namespace HDF5Api
             uint major = 0;
             uint minor = 0;
             uint revision = 0;
+
             var err = H5.get_libversion(ref major, ref minor, ref revision);
-            H5Handle.AssertError(err);
+            
+            err.ThrowIfError();
+            
             return new Version((int)major, (int)minor, 0, (int)revision);
         }
     }

@@ -3,40 +3,19 @@
     /// <summary>
     /// Wrapper for H5G (Group) API.
     /// </summary>
-    public class H5Group : H5GroupHandle
+    public class H5Group : H5Location<H5GroupHandle>
     {
-        private H5Group(Handle handle) : base(handle) { }
-
-        /// <summary>
-        /// Create a sub-Group of this group
-        /// </summary>
-        public override H5Group CreateGroup(string name)
-        {
-            return Create(this, name);
-        }
-
-        /// <summary>
-        /// Create a DataSet for this Group
-        /// </summary>
-        public override H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
-        {
-            return H5DataSet.Create(this, name, typeId, spaceId, propertyListId);
-        }
-
-        /// <summary>
-        /// Create an Attribute for this Group
-        /// </summary>
-        public override H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
-        {
-            return H5Attribute.Create(this, name, typeId, spaceId, propertyListId);
-        }
+        private H5Group(Handle handle) : base(new H5GroupHandle(handle)) { }
 
         #region Factory methods
-        public static H5Group Create(IH5Location location, string name)
+        public static H5Group Create(H5LocationHandle locationId, string name)
         {
-            AssertHandle(location.Handle);
-            var h = H5G.create(location.Handle, name);
-            AssertHandle(h);
+            locationId.ThrowIfNotValid();
+
+            var h = H5G.create(locationId.Handle, name);
+            
+            h.ThrowIfNotValid();
+            
             return new H5Group(h);
         }
         #endregion

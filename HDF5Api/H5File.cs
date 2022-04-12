@@ -3,33 +3,9 @@
     /// <summary>
     /// Wrapper for H5F (File) API.
     /// </summary>
-    public class H5File : H5FileHandle
+    public class H5File : H5Location<H5FileHandle>
     {
-        private H5File(Handle handle) : base(handle) { }
-
-        /// <summary>
-        /// Create an Attribute for this File
-        /// </summary>
-        public override H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
-        {
-            return H5Attribute.Create(this, name, typeId, spaceId, propertyListId);
-        }
-
-        /// <summary>
-        /// Create a Group in this file
-        /// </summary>
-        public override H5Group CreateGroup(string name)
-        {
-            return H5Group.Create(this, name);
-        }
-
-        /// <summary>
-        /// Create a DataSet in this File
-        /// </summary>
-        public override H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
-        {
-            return H5DataSet.Create(this, name, typeId, spaceId, propertyListId);
-        }
+        private H5File(Handle handle) : base(new H5FileHandle(handle)) { }
 
         #region Factory methods
         /// <summary>
@@ -39,7 +15,9 @@
         {
             // TODO: open/create etc
             var h = H5F.create(name, flags);
-            AssertHandle(h);
+
+            h.ThrowIfNotValid();
+            
             return new H5File(h);
         }
         #endregion

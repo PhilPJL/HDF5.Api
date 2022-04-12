@@ -5,9 +5,9 @@ namespace HDF5Api
     /// <summary>
     /// Wrapper for H5G (Attribute) API.
     /// </summary>
-    public class H5Attribute : H5AttributeHandle
+    public class H5Attribute : H5Object<H5AttributeHandle>
     {
-        private H5Attribute(Handle handle) : base(handle) { }
+        private H5Attribute(Handle handle) : base(new H5AttributeHandle(handle)) { }
 
         public void Write(H5Type h5Type, IntPtr buffer)
         {
@@ -15,30 +15,36 @@ namespace HDF5Api
         }
 
         #region Factory methods
-        public static H5Attribute Create(IH5Location location, string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+        public static H5Attribute Create(H5LocationHandle locationId, string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
         {
-            AssertHandle(location.Handle);
-            AssertHandle(typeId);
-            AssertHandle(spaceId);
-            AssertHandle(propertyListId);
-            var h = H5A.create(location.Handle, name, typeId, spaceId, propertyListId);
-            AssertHandle(h);
+            locationId.ThrowIfNotValid();
+            typeId.ThrowIfNotValid();
+            spaceId.ThrowIfNotValid();
+            propertyListId.ThrowIfNotValid();
+
+            var h = H5A.create(locationId.Handle, name, typeId, spaceId, propertyListId);
+            
+            h.ThrowIfNotValid();
+            
             return new H5Attribute(h);
         }
         #endregion
 
         #region C level API wrappers
-        public static bool Exists(IH5Location location, string name)
+        public static bool Exists(H5LocationHandle locationId, string name)
         {
-            int err = H5A.exists(location.Handle, name);
-            AssertError(err);
+            int err = H5A.exists(locationId, name);
+            
+            err.ThrowIfError();
+            
             return err > 0;
         }
 
-        public static void Write(H5AttributeHandle h5AttributeId, H5TypeHandle h5TypeId, IntPtr buffer)
+        public static void Write(H5AttributeHandle attributeId, H5TypeHandle typeId, IntPtr buffer)
         {
-            int err = H5A.write(h5AttributeId, h5TypeId, buffer);
-            AssertError(err);
+            int err = H5A.write(attributeId, typeId, buffer);
+
+            err.ThrowIfError();
         }
         #endregion
     }

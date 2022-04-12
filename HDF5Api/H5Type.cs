@@ -6,9 +6,9 @@ namespace HDF5Api
     /// <summary>
     /// Wrapper for H5T (Type) API.
     /// </summary>
-    public class H5Type : H5TypeHandle
+    public class H5Type : H5Object<H5TypeHandle>
     {
-        private H5Type(Handle handle) : base(handle) { }
+        private H5Type(Handle handle) : base(new H5TypeHandle(handle)) { }
 
         public H5Type Insert(string name, int offset, long nativeTypeId)
         {
@@ -52,7 +52,7 @@ namespace HDF5Api
         public static H5Type CreateCompoundType(int size)
         {
             var h = H5T.create(H5T.class_t.COMPOUND, new IntPtr(size));
-            AssertHandle(h);
+            h.ThrowIfNotValid();
             return new H5Type(h);
         }
 
@@ -77,37 +77,37 @@ namespace HDF5Api
         public static H5Type CreateByteArrayType(int size)
         {
             var h = H5T.array_create(H5T.NATIVE_B8, 1, new ulong[] { (ulong)size });
-            AssertHandle(h);
+            h.ThrowIfNotValid();
             return new H5Type(h);
         }
 
         public static H5Type CreateDoubleArrayType(int size)
         {
             var h = H5T.array_create(H5T.NATIVE_DOUBLE, 1, new ulong[] { (ulong)size });
-            AssertHandle(h);
+            h.ThrowIfNotValid();
             return new H5Type(h);
         }
 
         public static H5Type CreateFloatArrayType(int size)
         {
             var h = H5T.array_create(H5T.NATIVE_FLOAT, 1, new ulong[] { (ulong)size });
-            AssertHandle(h);
+            h.ThrowIfNotValid();
             return new H5Type(h);
         }
 
         public static H5Type CreateVariableLengthByteArrayType()
         {
             var h = H5T.vlen_create(H5T.NATIVE_B8);
-            AssertHandle(h);
+            h.ThrowIfNotValid();
             return new H5Type(h);
         }
 
         public static H5Type CreateFixedLengthStringType(int length)
         {
             var h = H5T.copy(H5T.C_S1);
-            AssertHandle(h);
+            h.ThrowIfNotValid();
             int err = H5T.set_size(h, new IntPtr(length));
-            AssertError(err);
+            err.ThrowIfError();
             return new H5Type(h);
         }
 
@@ -116,17 +116,17 @@ namespace HDF5Api
         #region C API wrappers
         public static void Insert(H5TypeHandle typeId, string name, IntPtr offset, long nativeTypeId)
         {
-            AssertHandle(typeId);
+            typeId.ThrowIfNotValid();
             var err = H5T.insert(typeId, name, offset, nativeTypeId);
-            AssertError(err);
+            err.ThrowIfError();
         }
 
         public static void Insert(H5TypeHandle typeId, string name, IntPtr offset, H5TypeHandle dataTypeId)
         {
-            AssertHandle(typeId);
-            AssertHandle(dataTypeId);
+            typeId.ThrowIfNotValid();
+            dataTypeId.ThrowIfNotValid();
             var err = H5T.insert(typeId, name, offset, dataTypeId);
-            AssertError(err);
+            err.ThrowIfError();
         }
         #endregion
     }

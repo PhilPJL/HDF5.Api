@@ -6,22 +6,27 @@ using System.Diagnostics;
 
 namespace HDF5Api
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <remarks>
-    /// Not entirely happy with this abstraction.  
-    /// Could have H5Location base class deriving from Handle but that would mean removing all the Handle types
-    /// and having File/Location/Handle, DataSet/Location/Handle etc.
-    /// In which case could have IHandle, IH5FileHandle etc.
-    /// </remarks>
-    public interface IH5Location
+    public class H5Object<THandle> : Disposable where THandle : H5Handle
     {
-        public Handle Handle { get; }
+        public H5Object(THandle handle)
+        {
+            Handle = handle;
+        }
 
-        public H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
-        public H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
-        public H5Group CreateGroup(string name);
+        public THandle Handle { get; }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && !Handle.IsDisposed)
+            {
+                Handle.Dispose();
+            }
+        }
+
+        public static implicit operator THandle (H5Object<THandle> h5Object)
+        {
+            return h5Object.Handle;
+        }
     }
 
     public class H5AttributeHandle : H5Handle
@@ -39,22 +44,19 @@ namespace HDF5Api
         public H5TypeHandle(Handle handle) : base(handle, H5T.close) { }
     }
 
-    public abstract class H5FileHandle : H5Handle, IH5Location
+    public class H5FileHandle : H5LocationHandle
     {
-        protected H5FileHandle(Handle handle) : base(handle, H5F.close) { }
-
-        public abstract H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
-        public abstract H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
-        public abstract H5Group CreateGroup(string name);
+        public H5FileHandle(Handle handle) : base(handle, H5F.close) { }
     }
 
-    public abstract class H5GroupHandle : H5Handle, IH5Location
+    public class H5GroupHandle : H5LocationHandle
     {
-        protected H5GroupHandle(Handle handle) : base(handle, H5G.close) { }
+        public H5GroupHandle(Handle handle) : base(handle, H5G.close) { }
+    }
 
-        public abstract H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
-        public abstract H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
-        public abstract H5Group CreateGroup(string name);
+    public abstract class H5LocationHandle : H5Handle
+    {
+        protected H5LocationHandle(Handle handle, Func<Handle, int> closer) : base(handle, closer) { }
     }
 
     public class H5DataSetHandle : H5Handle
@@ -75,8 +77,6 @@ namespace HDF5Api
     /// </remarks>
     public abstract class H5Handle : Disposable
     {
-        public static int HandleCount { get; private set; }
-
 #if DEBUG
         public static Dictionary<Handle, string> Handles { get; private set; } = new();
 #endif
@@ -94,49 +94,31 @@ namespace HDF5Api
         /// <summary>
         /// The invalid handle value (there may be a value for this in P.Invoke)
         /// </summary>
-        public const Handle InvalidHandle = -1;
+        public const Handle InvalidHandleValue = -1;
+
+        internal bool IsDisposed => Handle <= 0;
 
         protected H5Handle(Handle handle, Func<Handle, int> closer)
         {
             Debug.WriteLine($"Handle opened {handle}: {GetType().Name}");
 
-            AssertHandle(handle);
+            handle.ThrowIfNotValid();
             Handle = handle;
             CloseHandle = closer;
-            HandleCount++;
 
 #if DEBUG
             Handles.Add(handle, Environment.StackTrace);
 #endif
         }
 
-        public static void AssertHandle(Handle handle)
-        {
-            // TODO: give more information, specific exception
-            if (handle <= 0)
-            {
-                throw new InvalidOperationException("Bad handle");
-            }
-        }
-
-        public static void AssertError(int err)
-        {
-            // TODO: give more information, specific exception
-            if (err < 0)
-            {
-                throw new InvalidOperationException("Error");
-            }
-        }
-
         public static implicit operator Handle(H5Handle h)
         {
-            AssertHandle(h.Handle);
             return h.Handle;
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && Handle > 0)
+            if (disposing && !IsDisposed)
             {
                 Debug.WriteLine($"Closing handle {Handle}");
 
@@ -146,9 +128,47 @@ namespace HDF5Api
                 Handles.Remove(Handle);
 #endif
 
-                Handle = InvalidHandle;
-                AssertError(err);
-                HandleCount--;
+                Handle = InvalidHandleValue;
+                err.ThrowIfError();
+            }
+        }
+    }
+
+    public static class H5ThrowExtensions
+    {
+        public static void ThrowIfNotValid<THandle>(H5Object<THandle> h5Object) where THandle : H5Handle
+        {
+            // TODO: give more information, specific exception
+            if (h5Object.Handle.Handle <= 0)
+            {
+                throw new InvalidOperationException("Bad handle");
+            }
+        }
+
+        public static void ThrowIfNotValid(this H5Handle handle)
+        {
+            // TODO: give more information, specific exception
+            if (handle.Handle <= 0)
+            {
+                throw new InvalidOperationException("Bad handle");
+            }
+        }
+
+        public static void ThrowIfNotValid(this Handle handle)
+        {
+            // TODO: give more information, specific exception
+            if (handle <= 0)
+            {
+                throw new InvalidOperationException("Bad handle");
+            }
+        }
+
+        public static void ThrowIfError(this int err)
+        {
+            // TODO: give more information, specific exception
+            if (err < 0)
+            {
+                throw new InvalidOperationException("Error");
             }
         }
     }

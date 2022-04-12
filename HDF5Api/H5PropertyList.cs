@@ -3,16 +3,15 @@
     /// <summary>
     /// Wrapper for H5P (Property list) API.
     /// </summary>
-    public class H5PropertyList : H5PropertyListHandle
+    public class H5PropertyList : H5Object<H5PropertyListHandle>
     {
-        private H5PropertyList(Handle handle) : base(handle) { }
+        private H5PropertyList(Handle handle) : base(new H5PropertyListHandle(handle)) { }
 
         public void SetChunk(int rank, ulong[] dims)
         {
             SetChunk(this, rank, dims);
         }
 
-        // TODO: other compression types?
         public void EnableDeflateCompression(uint level)
         {
             EnableDeflateCompression(this, level);
@@ -22,24 +21,30 @@
         public static H5PropertyList Create(long classId)
         {
             var h = H5P.create(classId);
-            AssertHandle(h);
+
+            h.ThrowIfNotValid();
+            
             return new H5PropertyList(h);
         }
         #endregion
 
         #region C API wrappers
-        public static void SetChunk(H5PropertyListHandle handle, int rank, ulong[] dims)
+        public static void SetChunk(H5PropertyListHandle propertyListId, int rank, ulong[] dims)
         {
-            AssertHandle(handle);
-            var err = H5P.set_chunk(handle, rank, dims);
-            AssertError(err);
+            propertyListId.ThrowIfNotValid();
+
+            var err = H5P.set_chunk(propertyListId, rank, dims);
+            
+            err.ThrowIfError();
         }
 
-        public static void EnableDeflateCompression(H5PropertyListHandle handle, uint level)
+        public static void EnableDeflateCompression(H5PropertyListHandle propertyListId, uint level)
         {
-            AssertHandle(handle);
-            var err = H5P.set_deflate(handle, level);
-            AssertError(err);
+            propertyListId.ThrowIfNotValid();
+            
+            var err = H5P.set_deflate(propertyListId, level);
+            
+            err.ThrowIfError();
         }
         #endregion
     }
