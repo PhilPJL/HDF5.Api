@@ -12,14 +12,12 @@ namespace HDF5Test
 {
     internal static class CreateFileTest
     {
-        internal static void CreateFile()
+        internal static void CreateFile(int measurementId, int maxRows)
         {
             Console.WriteLine($"H5 version={H5Global.GetLibraryVersion()}");
             Console.WriteLine();
 
-            int maxRows = 1000;
             int chunkSize = 50;
-            long measurementId = 12019;
             bool logTimePerChunk = true;
             uint compressionLevel = 1;
 

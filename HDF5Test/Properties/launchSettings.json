@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "HDF5Test": {
+      "commandName": "Project",
+      "commandLineArgs": "-m 12019 -r 100"
+    }
+  }
+}
