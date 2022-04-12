@@ -35,7 +35,7 @@ namespace HDF5Test
                 using var altContext = new TvlAltContext();
                 using var systemContext = new TvlSystemContext();
 
-                using (new DisposableStopWatch("Overall time", () => 0))
+                using (new DisposableStopWatch("Create group."))
                 {
                     //////////////////////////////////////
                     // Raw records
@@ -201,7 +201,7 @@ namespace HDF5Test
 
                     // Get size of correction values blob
                     var correctionValuesBlobLength = systemContext.BladeProfileCalibrations.AsNoTracking().FirstOrDefault()?.CorrectionValues.Length ?? 0;
-                    Console.WriteLine($"Bladed profile calibrations: blob length {correctionValuesBlobLength}");
+                    Console.WriteLine($"Blade profile calibrations: blob length {correctionValuesBlobLength}");
 
                     using var bladeProfileCalibrationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group,
                         "BladeProfileCalibrations", BladeProfileCalibrationAdapter.Create(correctionValuesBlobLength, sizeof(double)), compressionLevel);
@@ -361,7 +361,7 @@ namespace HDF5Test
     {
         readonly Stopwatch stopwatch = new();
 
-        public DisposableStopWatch(string name, Func<int> getPosition)
+        public DisposableStopWatch(string name, Func<int> getPosition = null)
         {
             stopwatch.Start();
             Name = name;
@@ -382,7 +382,15 @@ namespace HDF5Test
         protected override void Dispose(bool disposing)
         {
             stopwatch.Stop();
-            Console.WriteLine($"{Name} - Complete. Time elapsed: {stopwatch.Elapsed}. Rows written = {GetPosition()}");
+
+            if (GetPosition != null)
+            {
+                Console.WriteLine($"{Name} - Complete. Time elapsed: {stopwatch.Elapsed}. Rows written = {GetPosition()}");
+            }
+            else
+            {
+                Console.WriteLine($"{Name} - Complete. Time elapsed: {stopwatch.Elapsed}.");
+            }
             Console.WriteLine();
         }
     }
