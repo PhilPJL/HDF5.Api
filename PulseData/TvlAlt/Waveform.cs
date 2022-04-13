@@ -24,7 +24,7 @@ namespace PulseData.TvlAlt
         public double Spacing { get; set; }
 
         [Column("REFERENCE_ID")]
-        public long ReferenceId { get; set; }
+        public long? ReferenceId { get; set; }
 
         [Column("WAVEFORM")]
         public byte[] Values { get; set; }

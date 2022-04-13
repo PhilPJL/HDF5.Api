@@ -15,9 +15,10 @@ namespace PulseData
         public TvlSystemContext(string nameOrConnectionString = "TvlSystem") : base(GetConnection(nameOrConnectionString), true)
         {
             Database.SetInitializer<TvlSystemContext>(null);
-
+#if DEBUG
             Configuration.LazyLoadingEnabled = false;
             Configuration.ProxyCreationEnabled = false;
+#endif
         }
 
         public DbSet<BladeProfileName> BladeProfileNames { get; set; }

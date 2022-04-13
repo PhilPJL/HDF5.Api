@@ -55,7 +55,7 @@ namespace HDF5Test.H5TypeHelpers
                     RecordId = source.RecordId,
                     Offset = source.Offset,
                     Spacing = source.Spacing,
-                    ReferenceId = source.ReferenceId,
+                    ReferenceId = source.ReferenceId ?? 0,
                 };
 
                 unsafe

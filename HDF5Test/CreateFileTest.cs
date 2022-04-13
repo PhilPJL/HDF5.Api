@@ -81,60 +81,92 @@ namespace HDF5Test
                     // Waveforms
 
                     // Get length of waveform blob for this measurement
-                    var waveformValuesBlobLength = altContext
+                    var firstWaveform = altContext
                         .Waveforms
                         .AsNoTracking()
                         .Where(p => p.RawRecord.MeasurementId == measurementId)
-                        .FirstOrDefault()
-                        ?.Values?.Length ?? 0;
-                    Console.WriteLine($"Waveform: blob length {waveformValuesBlobLength}");
+                        .FirstOrDefault();
 
-                    using var waveformWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Waveforms", WaveformAdapter.Create(waveformValuesBlobLength, sizeof(double)), compressionLevel);
-                    using (var sw = new DisposableStopWatch("Waveform", () => waveformWriter.RowsWritten))
+                    if (firstWaveform != null)
                     {
-                        using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
-                        altContext
-                            .Waveforms
-                            .AsNoTracking()
-                            .Where(w => w.RawRecord.MeasurementId == measurementId)
-                            .Take(maxRows)
-                            .Buffer(chunkSize)
-                            .ForEach(rg =>
+                        var waveformValuesBlobLength = firstWaveform?.Values?.Length ?? 0;
+
+                        if (waveformValuesBlobLength > 0)
+                        {
+                            Console.WriteLine($"Waveform: blob length {waveformValuesBlobLength}");
+
+                            using var waveformWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Waveforms", WaveformAdapter.Create(waveformValuesBlobLength, sizeof(double)), compressionLevel);
+                            using (var sw = new DisposableStopWatch("Waveform", () => waveformWriter.RowsWritten))
                             {
-                                waveformWriter.WriteChunk(rg);
-                                sw.ShowRowsWritten(logTimePerChunk);
-                            });
-                        scope.Complete();
+                                using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+                                altContext
+                                    .Waveforms
+                                    .AsNoTracking()
+                                    .Where(w => w.RawRecord.MeasurementId == measurementId)
+                                    .Take(maxRows)
+                                    .Buffer(chunkSize)
+                                    .ForEach(rg =>
+                                    {
+                                        waveformWriter.WriteChunk(rg);
+                                        sw.ShowRowsWritten(logTimePerChunk);
+                                    });
+                                scope.Complete();
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"WARNING: No waveform values found for waveform id={firstWaveform.Id}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"WARNING: No Waveform records found for measurement id={measurementId}");
                     }
 
                     //////////////////////////////////////
                     // Profiles
 
                     // Get length of profile blob for this measurement
-                    var profileValuesBlobLength = altContext
+                    var firstProfile = altContext
                         .Profiles
                         .AsNoTracking()
                         .Where(p => p.RawRecord.MeasurementId == measurementId)
-                        .FirstOrDefault()
-                        ?.Values?.Length ?? 0;
-                    Console.WriteLine($"Profile: blob length {profileValuesBlobLength}");
+                        .FirstOrDefault();
 
-                    using var profileRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Profiles", ProfileAdapter.Create(profileValuesBlobLength, sizeof(double)), compressionLevel);
-                    using (var sw = new DisposableStopWatch("Profile", () => profileRecordWriter.RowsWritten))
+                    if (firstProfile != null)
                     {
-                        using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
-                        altContext
-                            .Profiles
-                            .AsNoTracking()
-                            .Where(p => p.RawRecord.MeasurementId == measurementId)
-                            .Take(maxRows)
-                            .Buffer(chunkSize)
-                            .ForEach(rg =>
+                        var profileValuesBlobLength = firstProfile?.Values?.Length ?? 0;
+
+                        if (profileValuesBlobLength > 0)
+                        {
+                            Console.WriteLine($"Profile: blob length {profileValuesBlobLength}");
+
+                            using var profileRecordWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Profiles", ProfileAdapter.Create(profileValuesBlobLength, sizeof(double)), compressionLevel);
+                            using (var sw = new DisposableStopWatch("Profile", () => profileRecordWriter.RowsWritten))
                             {
-                                profileRecordWriter.WriteChunk(rg);
-                                sw.ShowRowsWritten(logTimePerChunk);
-                            });
-                        scope.Complete();
+                                using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+                                altContext
+                                    .Profiles
+                                    .AsNoTracking()
+                                    .Where(p => p.RawRecord.MeasurementId == measurementId)
+                                    .Take(maxRows)
+                                    .Buffer(chunkSize)
+                                    .ForEach(rg =>
+                                    {
+                                        profileRecordWriter.WriteChunk(rg);
+                                        sw.ShowRowsWritten(logTimePerChunk);
+                                    });
+                                scope.Complete();
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"WARNING: No profile values found for profile id={firstProfile.Id}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"WARNING: No Profile records found for measurement id={measurementId}");
                     }
 
                     //////////////////////////////////////
@@ -173,54 +205,85 @@ namespace HDF5Test
                     // Blade reference
 
                     // Get sizes of mirror and blade waveform blobs
-                    var bladeReference = systemContext.BladeReferences.AsNoTracking().FirstOrDefault();
-                    int mirrorWaveformBlobLength = bladeReference?.MirrorWaveform.Length ?? 0;
-                    int bladeWaveformBlobLength = bladeReference?.BladeWaveform.Length ?? 0;
-                    Console.WriteLine($"Blade reference: blob lengths Blade={bladeWaveformBlobLength}, Mirror={mirrorWaveformBlobLength}");
+                    var firstBladeReference = systemContext.BladeReferences.AsNoTracking().FirstOrDefault();
 
-                    using var bladeReferenceWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeReferences",
-                        BladeReferenceAdapter.Create(bladeWaveformBlobLength, sizeof(double), mirrorWaveformBlobLength, sizeof(double)), compressionLevel);
-                    using (var sw = new DisposableStopWatch("BladeReference", () => bladeReferenceWriter.RowsWritten))
+                    if (firstBladeReference != null)
                     {
-                        using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
-                        systemContext
-                            .BladeReferences
-                            .AsNoTracking()
-                            .Take(maxRows)
-                            .Buffer(chunkSize)
-                            .ForEach(rg =>
+                        int mirrorWaveformBlobLength = firstBladeReference?.MirrorWaveform.Length ?? 0;
+                        int bladeWaveformBlobLength = firstBladeReference?.BladeWaveform.Length ?? 0;
+
+                        if (mirrorWaveformBlobLength > 0 && bladeWaveformBlobLength > 0)
+                        {
+                            Console.WriteLine($"Blade reference: blob lengths Blade={bladeWaveformBlobLength}, Mirror={mirrorWaveformBlobLength}");
+
+                            using var bladeReferenceWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeReferences",
+                                BladeReferenceAdapter.Create(bladeWaveformBlobLength, sizeof(double), mirrorWaveformBlobLength, sizeof(double)), compressionLevel);
+                            using (var sw = new DisposableStopWatch("BladeReference", () => bladeReferenceWriter.RowsWritten))
                             {
-                                bladeReferenceWriter.WriteChunk(rg);
-                                sw.ShowRowsWritten(logTimePerChunk);
-                            });
-                        scope.Complete();
+                                using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+                                systemContext
+                                    .BladeReferences
+                                    .AsNoTracking()
+                                    .Take(maxRows)
+                                    .Buffer(chunkSize)
+                                    .ForEach(rg =>
+                                    {
+                                        bladeReferenceWriter.WriteChunk(rg);
+                                        sw.ShowRowsWritten(logTimePerChunk);
+                                    });
+                                scope.Complete();
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"WARNING: BladeReference id={firstBladeReference.Id} has missing mirror and/or blade waveform values.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"WARNING: No BladeReference records found.");
                     }
 
                     //////////////////////////////////////
                     // Blade profile calibration
 
                     // Get size of correction values blob
-                    var correctionValuesBlobLength = systemContext.BladeProfileCalibrations.AsNoTracking().FirstOrDefault()?.CorrectionValues.Length ?? 0;
-                    Console.WriteLine($"Blade profile calibrations: blob length {correctionValuesBlobLength}");
-
-                    using var bladeProfileCalibrationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group,
-                        "BladeProfileCalibrations", BladeProfileCalibrationAdapter.Create(correctionValuesBlobLength, sizeof(double)), compressionLevel);
-                    using (var sw = new DisposableStopWatch("BladeProfileCalibration", () => bladeProfileCalibrationWriter.RowsWritten))
+                    var firstBladeProfileCalibration = systemContext.BladeProfileCalibrations.AsNoTracking().FirstOrDefault();
+                    if (firstBladeProfileCalibration != null)
                     {
-                        using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
-                        systemContext
-                            .BladeProfileCalibrations
-                            .AsNoTracking()
-                            .Take(maxRows)
-                            .Buffer(chunkSize)
-                            .ForEach(rg =>
-                            {
-                                bladeProfileCalibrationWriter.WriteChunk(rg);
-                                sw.ShowRowsWritten(logTimePerChunk);
-                            });
-                        scope.Complete();
-                    }
 
+                        var correctionValuesBlobLength = firstBladeProfileCalibration?.CorrectionValues.Length ?? 0;
+                        if (correctionValuesBlobLength > 0)
+                        {
+                            Console.WriteLine($"Blade profile calibrations: blob length {correctionValuesBlobLength}");
+
+                            using var bladeProfileCalibrationWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group,
+                                "BladeProfileCalibrations", BladeProfileCalibrationAdapter.Create(correctionValuesBlobLength, sizeof(double)), compressionLevel);
+                            using (var sw = new DisposableStopWatch("BladeProfileCalibration", () => bladeProfileCalibrationWriter.RowsWritten))
+                            {
+                                using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+                                systemContext
+                                    .BladeProfileCalibrations
+                                    .AsNoTracking()
+                                    .Take(maxRows)
+                                    .Buffer(chunkSize)
+                                    .ForEach(rg =>
+                                    {
+                                        bladeProfileCalibrationWriter.WriteChunk(rg);
+                                        sw.ShowRowsWritten(logTimePerChunk);
+                                    });
+                                scope.Complete();
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"WARNING: BladeProfileCalibration id={firstBladeProfileCalibration.Id} has missing values.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"WARNING: No BladeProfileCalibrations records found.");
+                    }
                     //////////////////////////////////////
                     // Blade profile calibration set
 

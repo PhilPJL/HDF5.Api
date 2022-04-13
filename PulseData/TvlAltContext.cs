@@ -16,8 +16,10 @@ namespace PulseData
         {
             Database.SetInitializer<TvlAltContext>(null);
 
+#if DEBUG
             Configuration.LazyLoadingEnabled = false;
             Configuration.ProxyCreationEnabled = false;
+#endif
         }
 
         public DbSet<Waveform> Waveforms { get; set; }
