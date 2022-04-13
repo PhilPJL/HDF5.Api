@@ -50,7 +50,7 @@ namespace HDF5Api
         /// <summary>
         /// Write a collection of <typeparamref name="TInput"/> to the DataSet.
         /// </summary>
-        public void WriteChunk(IEnumerable<TInput> recordsChunk)
+        public void Write(IEnumerable<TInput> recordsChunk)
         {
             int numRecords = recordsChunk.Count();
 

@@ -51,7 +51,7 @@ namespace HDF5Test
                             .Buffer(chunkSize)
                             .ForEach(rg =>
                             {
-                                rawRecordWriter.WriteChunk(rg);
+                                rawRecordWriter.Write(rg);
                                 sw.ShowRowsWritten(logTimePerChunk);
                             });
                         scope.Complete();
@@ -71,7 +71,7 @@ namespace HDF5Test
                             .Buffer(chunkSize)
                             .ForEach(rg =>
                             {
-                                intervalRecordWriter.WriteChunk(rg);
+                                intervalRecordWriter.Write(rg);
                                 sw.ShowRowsWritten(logTimePerChunk);
                             });
                         scope.Complete();
@@ -107,7 +107,7 @@ namespace HDF5Test
                                     .Buffer(chunkSize)
                                     .ForEach(rg =>
                                     {
-                                        waveformWriter.WriteChunk(rg);
+                                        waveformWriter.Write(rg);
                                         sw.ShowRowsWritten(logTimePerChunk);
                                     });
                                 scope.Complete();
@@ -153,7 +153,7 @@ namespace HDF5Test
                                     .Buffer(chunkSize)
                                     .ForEach(rg =>
                                     {
-                                        profileRecordWriter.WriteChunk(rg);
+                                        profileRecordWriter.Write(rg);
                                         sw.ShowRowsWritten(logTimePerChunk);
                                     });
                                 scope.Complete();
@@ -195,7 +195,7 @@ namespace HDF5Test
                             .Buffer(chunkSize)
                             .ForEach(rg =>
                             {
-                                bladeProfileNameWriter.WriteChunk(rg);
+                                bladeProfileNameWriter.Write(rg);
                                 sw.ShowRowsWritten(logTimePerChunk);
                             });
                         scope.Complete();
@@ -228,7 +228,7 @@ namespace HDF5Test
                                     .Buffer(chunkSize)
                                     .ForEach(rg =>
                                     {
-                                        bladeReferenceWriter.WriteChunk(rg);
+                                        bladeReferenceWriter.Write(rg);
                                         sw.ShowRowsWritten(logTimePerChunk);
                                     });
                                 scope.Complete();
@@ -251,7 +251,6 @@ namespace HDF5Test
                     var firstBladeProfileCalibration = systemContext.BladeProfileCalibrations.AsNoTracking().FirstOrDefault();
                     if (firstBladeProfileCalibration != null)
                     {
-
                         var correctionValuesBlobLength = firstBladeProfileCalibration?.CorrectionValues.Length ?? 0;
                         if (correctionValuesBlobLength > 0)
                         {
@@ -269,7 +268,7 @@ namespace HDF5Test
                                     .Buffer(chunkSize)
                                     .ForEach(rg =>
                                     {
-                                        bladeProfileCalibrationWriter.WriteChunk(rg);
+                                        bladeProfileCalibrationWriter.Write(rg);
                                         sw.ShowRowsWritten(logTimePerChunk);
                                     });
                                 scope.Complete();
@@ -288,9 +287,11 @@ namespace HDF5Test
                     // Blade profile calibration set
 
                     using var bladeProfileCalibrationSetWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "BladeProfileCalibrationSets", BladeProfileCalibrationSetAdapter.Default, compressionLevel);
+                    using var bladeProfileCalibrationAttributeWriter = H5AttributeWriter.CreateAttributeWriter(group,r => $"BladeProfileCalibrationSet:{r.Id}", BladeProfileCalibrationSetAdapter.Default);
                     using (var sw = new DisposableStopWatch("BladeProfileCalibrationSet", () => bladeProfileCalibrationSetWriter.RowsWritten))
                     {
                         using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+                        
                         systemContext
                             .BladeProfileCalibrationSets
                             .AsNoTracking()
@@ -298,9 +299,21 @@ namespace HDF5Test
                             .Buffer(chunkSize)
                             .ForEach(rg =>
                             {
-                                bladeProfileCalibrationSetWriter.WriteChunk(rg);
+                                bladeProfileCalibrationSetWriter.Write(rg);
                                 sw.ShowRowsWritten(logTimePerChunk);
                             });
+
+                        systemContext
+                            .BladeProfileCalibrationSets
+                            .AsNoTracking()
+                            .Take(maxRows)
+                            .Buffer(chunkSize)
+                            .ForEach(rg =>
+                            {
+                                bladeProfileCalibrationAttributeWriter.Write(rg);
+                                sw.ShowRowsWritten(logTimePerChunk);
+                            });
+
                         scope.Complete();
                     }
                 }
@@ -322,23 +335,23 @@ namespace HDF5Test
                 MeasurementSimpleAttributeWriter.WriteAttributes(location, measurement);
             }
 
-            /*            using var measurementWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Measurements", MeasurementAdapter.Default, compressionLevel);
-                        using (var sw = new DisposableStopWatch("Measurement", () => measurementWriter.RowsWritten))
-                        {
-                            using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
-                            systemContext
-                                .Measurements
-                                .AsNoTracking()
-                                .Where(m => m.Id == measurementId)
-                                .Take(maxRows)
-                                .Buffer(chunkSize)
-                                .ForEach(rg =>
-                                {
-                                    measurementWriter.WriteChunk(rg);
-                                    sw.ShowRowsWritten(logTimePerChunk);
-                                });
-                            scope.Complete();
-                        }*/
+                        //using var measurementWriter = H5DataSetWriter.CreateOneDimensionalDataSetWriter(group, "Measurements", MeasurementAdapter.Default, compressionLevel);
+                        //using (var sw = new DisposableStopWatch("Measurement", () => measurementWriter.RowsWritten))
+                        //{
+                        //    using var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted });
+                        //    systemContext
+                        //        .Measurements
+                        //        .AsNoTracking()
+                        //        .Where(m => m.Id == measurementId)
+                        //        .Take(maxRows)
+                        //        .Buffer(chunkSize)
+                        //        .ForEach(rg =>
+                        //        {
+                        //            measurementWriter.WriteChunk(rg);
+                        //            sw.ShowRowsWritten(logTimePerChunk);
+                        //        });
+                        //    scope.Complete();
+                        //}
         }
 
         private static void CreateInstallationConfigurationAttributes(long measurementId, IH5Location location, TvlSystemContext systemContext)
