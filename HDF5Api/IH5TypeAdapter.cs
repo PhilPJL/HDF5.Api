@@ -9,7 +9,7 @@ namespace HDF5Api
     /// <typeparam name="TInput"></typeparam>
     public interface IH5TypeAdapter<in TInput>
     {
-        public H5Type GetH5Type();
-        public void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords);
+        H5Type GetH5Type();
+        void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords);
     }
 }

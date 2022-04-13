@@ -1,13 +1,10 @@
-﻿using HDF5Api.Disposables;
-using System;
-
-namespace HDF5Api
+﻿namespace HDF5Api
 {
     public interface IH5Location
     {
-        public H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
-        public H5Group CreateGroup(string name);
-        public H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
+        H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
+        H5Group CreateGroup(string name);
+        H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
     }
 
     public abstract class H5Location<THandle> : H5Object<THandle>, IH5Location where THandle : H5LocationHandle

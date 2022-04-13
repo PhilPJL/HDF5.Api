@@ -10,7 +10,7 @@ namespace HDF5Api
     {
         private H5Type(Handle handle) : base(new H5TypeHandle(handle)) { }
 
-        public H5Type Insert(string name, int offset, long nativeTypeId)
+        public H5Type Insert(string name, int offset, Handle nativeTypeId)
         {
             Insert(this, name, new IntPtr(offset), nativeTypeId);
             return this;
@@ -22,7 +22,7 @@ namespace HDF5Api
             return this;
         }
 
-        public H5Type Insert(string name, IntPtr offset, long nativeTypeId)
+        public H5Type Insert(string name, IntPtr offset, Handle nativeTypeId)
         {
             Insert(this, name, offset, nativeTypeId);
             return this;
@@ -34,7 +34,7 @@ namespace HDF5Api
             return this;
         }
 
-        public H5Type Insert<S>(string name, long nativeTypeId) where S : struct
+        public H5Type Insert<S>(string name, Handle nativeTypeId) where S : struct
         {
             var offset = Marshal.OffsetOf<S>(name);
             Insert(this, name, offset, nativeTypeId);

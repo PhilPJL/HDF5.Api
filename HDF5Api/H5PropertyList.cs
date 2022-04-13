@@ -18,7 +18,7 @@
         }
 
         #region Factory methods
-        public static H5PropertyList Create(long classId)
+        public static H5PropertyList Create(Handle classId)
         {
             var h = H5P.create(classId);
 
