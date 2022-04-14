@@ -1,4 +1,5 @@
 ﻿using EntityFramework.Firebird;
+using EntityFramework.Functions;
 using PulseData.TvlSystem;
 using System.Data.Common;
 using System.Data.Entity;
@@ -19,6 +20,13 @@ namespace PulseData
             Configuration.LazyLoadingEnabled = false;
             Configuration.ProxyCreationEnabled = false;
 #endif
+        }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Conventions.Add(new FunctionConvention(typeof(FirebirdFunctions)));
         }
 
         public DbSet<BladeProfileName> BladeProfileNames { get; set; }

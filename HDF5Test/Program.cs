@@ -2,6 +2,7 @@
 using HDF5Api;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HDF5Test
 {
@@ -12,22 +13,24 @@ namespace HDF5Test
             [Option('m', Required = true, HelpText = "One or more measurement Ids")]
             public IEnumerable<int> MeasIds { get; set; }
 
-            [Option('r', Required = false, HelpText = "Max rows to retrieve", Default = 100)]
-            public int MaxRows { get; set; }
+            [Option('t', Required = false, HelpText = "Minutes of data to retrieve", Default = 1)]
+            public int Minutes { get; set; }
         }
 
-        static void Main(string[] args)
+        static async Task<int> Main(string[] args)
         {
-            Parser.Default
+            await Parser.Default
                 .ParseArguments<Options>(args)
-                .WithParsed(o => Run(o.MeasIds, o.MaxRows));
+                .WithParsedAsync(o => RunAsync(o.MeasIds, o.Minutes));
+
+            return 0;
         }
 
-        static void Run(IEnumerable<int> measurementIds, int maxRows)
+        static async Task RunAsync(IEnumerable<int> measurementIds, int minutes)
         {
             try
             {
-                CreateFileTest.CreateFile(measurementIds, maxRows);
+                await CreateFileTest.CreateFileAsync(measurementIds, minutes);
 
 #if DEBUG
                 if (H5Handle.Handles.Count > 0)
