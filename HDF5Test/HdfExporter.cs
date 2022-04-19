@@ -17,7 +17,7 @@ namespace HDF5Test
 
         private bool logTimePerChunk = true;
 
-        private static TransactionScope GetTransactionScope()
+        public static TransactionScope GetTransactionScope()
         {
             return new TransactionScope(TransactionScopeOption.Required,
                 new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
@@ -33,7 +33,7 @@ namespace HDF5Test
             CompressionLevel = compressionLevel;
         }
 
-        public void GetRowCounts()
+        public (int numRawRecords, int numIntervalRecords, int numWaveformRecords, int numProfileRecords) GetRowCounts()
         {
             using var altContext = new TvlAltContext();
             //using var systemContext = new TvlSystemContext();
@@ -71,9 +71,9 @@ namespace HDF5Test
                 .Where(p => p.RawRecord.Timestamp <= EndDateTime)
                 .Count();
 
-            Console.WriteLine($"RawRecords={numRawRecords}, IntervalRecords={numIntervalRecords}, WaveformRecords={numWaveformRecords}, ProfileRecords={numProfileRecords}");
-
             scope.Complete();
+
+            return (numRawRecords, numIntervalRecords, numWaveformRecords, numProfileRecords);
         }
 
         public void CreateRawRecordsDataSet(IH5Location location)

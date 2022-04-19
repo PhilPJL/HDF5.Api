@@ -30,6 +30,9 @@ namespace HDF5Test
         {
             try
             {
+                Console.WriteLine($"Version={H5Global.GetLibraryVersion()}, Is thread safe={H5Global.IsThreadSafe()}");
+                Console.WriteLine();
+
                 await CreateFileTest.CreateFileAsync(measurementIds, minutes);
 
 #if DEBUG

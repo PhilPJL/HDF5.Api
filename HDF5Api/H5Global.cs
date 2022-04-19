@@ -19,5 +19,15 @@ namespace HDF5Api
             
             return new Version((int)major, (int)minor, 0, (int)revision);
         }
+
+        public static bool IsThreadSafe()
+        {
+            uint is_ts = 0;
+            var err = H5.is_library_threadsafe(ref is_ts);
+
+            err.ThrowIfError();
+
+            return is_ts != 0;
+        }
     }
 }

@@ -120,7 +120,10 @@ namespace HDF5Api
             CloseHandle = closer;
 
 #if DEBUG
-            Handles.Add(handle, Environment.StackTrace);
+            lock (Handles)
+            {
+                Handles.Add(handle, Environment.StackTrace);
+            }
 #endif
         }
 
@@ -138,7 +141,10 @@ namespace HDF5Api
                 var err = CloseHandle(Handle);
 
 #if DEBUG
-                Handles.Remove(Handle);
+                lock (Handles)
+                {
+                    Handles.Remove(Handle);
+                }
 #endif
 
                 Handle = InvalidHandleValue;

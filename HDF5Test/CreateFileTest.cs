@@ -4,6 +4,7 @@ using PulseData;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HDF5Test
@@ -14,10 +15,7 @@ namespace HDF5Test
         {
             await Task.Yield();
 
-            Console.WriteLine($"H5 version={H5Global.GetLibraryVersion()}");
-            Console.WriteLine();
-
-            uint compressionLevel = 1;
+            uint compressionLevel = 0;
 
             // Create file and group
             using var file = H5File.Create(@"test-data.h5", H5F.ACC_TRUNC);
@@ -32,8 +30,34 @@ namespace HDF5Test
                 using var altContext = new TvlAltContext();
                 using var systemContext = new TvlSystemContext();
 
-                var endDateTime = DateTime.UtcNow;
-                var startDateTime = endDateTime - TimeSpan.FromMinutes(minutes);
+                var startDateTime = altContext.Profiles
+                    .AsNoTracking()
+                    .Select(p => new
+                    {
+                        ProfileId = p.Id,
+                        p.RawRecord
+                    })
+                    .SelectMany(pr => pr.RawRecord.Waveforms.Select(w => new
+                    {
+                        WaveformId = w.Id,
+                        pr.ProfileId,
+                        RawRecordId = pr.RawRecord.Id,
+                        pr.RawRecord.Timestamp,
+                        pr.RawRecord.MeasurementId
+                    }))
+                    .GroupBy(r => r.MeasurementId)
+                    .Select(g => new
+                    {
+                        MeasurementId = g.Key,
+                        RecordCount = g.Count(),
+                        MinTimestamp = g.Min(x => x.Timestamp),
+                        MaxTimestamp = g.Max(x => x.Timestamp)
+                    })
+                    .Where(m => m.MeasurementId == measurementId)
+                    .Select(m => m.MinTimestamp)
+                    .Single();
+
+                var endDateTime = startDateTime + TimeSpan.FromMinutes(minutes); ;
 
                 Console.WriteLine($"Start date={startDateTime}, end={endDateTime}");
 
@@ -41,21 +65,35 @@ namespace HDF5Test
                 {
                     var exporter = new HdfExporter(measurementId, startDateTime, endDateTime, 100, compressionLevel);
 
-                    exporter.GetRowCounts();
+                    //using (var scope = HdfExporter.GetTransactionScope())
+                    {
+                        var (numRawRecords, numIntervalRecords, numWaveformRecords, numProfileRecords) = exporter.GetRowCounts();
 
-                    exporter.CreateRawRecordsDataSet(group);
-                    exporter.CreateIntervalsDataSet(group);
-                    exporter.CreateWaveformsDataSet(group);
-                    exporter.CreateProfilesDataSet(group);
+                        Console.WriteLine($"RawRecords={numRawRecords}, IntervalRecords={numIntervalRecords}, WaveformRecords={numWaveformRecords}, ProfileRecords={numProfileRecords}");
 
-                    exporter.CreateMeaurementAttributes(group);
-                    exporter.CreateMeasurementConfigurationAttributes(group);
-                    exporter.CreateInstallationConfigurationAttributes(group);
+                        //exporter.CreateRawRecordsDataSet2(group);
 
-                    exporter.CreateBladeProfileNamesDataSet(group);
-                    exporter.CreateBladeReferencesDataSet(group);
-                    exporter.CreateBladeProfileCalibrationsDataSet(group);
-                    exporter.CreateBladeProfileCalibrationSetsDataSet(group);
+                        exporter.CreateRawRecordsDataSet(group);
+                        exporter.CreateWaveformsDataSet(group);
+                        exporter.CreateProfilesDataSet(group);
+                        exporter.CreateIntervalsDataSet(group);
+
+                        //var t1 = Task.Run(() => exporter.CreateRawRecordsDataSet(group));
+                        //var t2 = Task.Run(() => exporter.CreateWaveformsDataSet(group));
+                        //var t3 = Task.Run(() => exporter.CreateProfilesDataSet(group));
+                        //var t4 = Task.Run(() => exporter.CreateIntervalsDataSet(group));
+
+                        //await Task.WhenAll(t1, t2, t3, t4);
+
+                        exporter.CreateMeaurementAttributes(group);
+                        exporter.CreateMeasurementConfigurationAttributes(group);
+                        exporter.CreateInstallationConfigurationAttributes(group);
+
+                        exporter.CreateBladeProfileNamesDataSet(group);
+                        exporter.CreateBladeReferencesDataSet(group);
+                        exporter.CreateBladeProfileCalibrationsDataSet(group);
+                        exporter.CreateBladeProfileCalibrationSetsDataSet(group);
+                    }
                 }
             }
         }

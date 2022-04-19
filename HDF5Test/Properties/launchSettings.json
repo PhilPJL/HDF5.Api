@@ -2,7 +2,7 @@
   "profiles": {
     "HDF5Test": {
       "commandName": "Project",
-      "commandLineArgs": "-m 12020 -t 20"
+      "commandLineArgs": "-m 286 -t 120"
     }
   }
 }
