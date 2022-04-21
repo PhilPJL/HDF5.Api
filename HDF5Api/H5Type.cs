@@ -145,6 +145,15 @@ namespace HDF5Api
             return new H5Type(h);
         }
 
+        public static H5Type GetType(H5DataSetHandle dataSetId)
+        {
+            var h = H5D.get_type(dataSetId);
+
+            h.ThrowIfNotValid("H5D.get_type");
+
+            return new H5Type(h);
+        }
+
         #endregion
     }
 }

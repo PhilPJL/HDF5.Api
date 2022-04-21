@@ -34,7 +34,7 @@ namespace HDF5Api
                 }
 
                 var cls = type.GetClass();
-                if(cls != H5T.class_t.STRING)
+                if (cls != H5T.class_t.STRING)
                 {
                     throw new HDF5Exception($"Attribute is of class {cls} when expecting STRING.");
                 }
@@ -48,8 +48,7 @@ namespace HDF5Api
                     err.ThrowIfError();
 
                     // TODO: marshal Ansi/UTF8/.. etc as appropriate
-                    var s = Marshal.PtrToStringAnsi(buffer.IntPtr, (int)size);
-                    return s;
+                    return Marshal.PtrToStringAnsi(buffer.IntPtr, (int)size);
                 }
             }
         }
@@ -75,7 +74,7 @@ namespace HDF5Api
                 //    throw new HDF5Exception($"Attribute is of class {cls} when expecting {expectedCls}.");
                 //}
 
-                var size = (int)GetStorageSize(this);
+                var size = GetStorageSize(this);
 
                 if (size != Marshal.SizeOf<T>())
                 {
@@ -152,10 +151,10 @@ namespace HDF5Api
             return new H5Space(h);
         }
 
-        public static ulong GetStorageSize(H5AttributeHandle attributeId)
+        public static long GetStorageSize(H5AttributeHandle attributeId)
         {
             attributeId.ThrowIfNotValid();
-            return H5A.get_storage_size(attributeId.Handle);
+            return (long)H5A.get_storage_size(attributeId.Handle);
         }
 
         public static bool Exists(H5LocationHandle locationId, string name)

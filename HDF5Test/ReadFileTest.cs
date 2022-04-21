@@ -1,5 +1,6 @@
 ﻿using HDF5Api;
 using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace HDF5Test
@@ -18,10 +19,10 @@ namespace HDF5Test
                     using var titleAttribute = file.OpenAttribute("TITLE");
                     using var versionAttribute = file.OpenAttribute("VERSION");
 
-                    //Console.WriteLine(classAttribute.ReadString());
-                    //Console.WriteLine(formatVersionAttribute.ReadString());
-                    //Console.WriteLine(titleAttribute.ReadString());
-                    //Console.WriteLine(versionAttribute.ReadString());
+                    Console.WriteLine(classAttribute.ReadString());
+                    Console.WriteLine(formatVersionAttribute.ReadString());
+                    Console.WriteLine(titleAttribute.ReadString());
+                    Console.WriteLine(versionAttribute.ReadString());
                 }
 
                 foreach (var groupName in file.GetChildNames())
@@ -48,12 +49,12 @@ namespace HDF5Test
                                 Console.WriteLine("Attribute CLASS exists");
                             }
 
-                            //Console.WriteLine(classAttribute.ReadString());
-                            //Console.WriteLine(titleAttribute.ReadString());
-                            //Console.WriteLine(versionAttribute.ReadString());
-                            //Console.WriteLine(deltaFreqAttribute.ReadDouble());
-                            //Console.WriteLine(identifierAttribute.ReadString());
-                            //Console.WriteLine(originIdAttribute.ReadInt32());
+                            Console.WriteLine(classAttribute.ReadString());
+                            Console.WriteLine(titleAttribute.ReadString());
+                            Console.WriteLine(versionAttribute.ReadString());
+                            Console.WriteLine(deltaFreqAttribute.ReadDouble());
+                            Console.WriteLine(identifierAttribute.ReadString());
+                            Console.WriteLine(originIdAttribute.ReadInt32());
                         }
 
                         foreach (var dataSetName in group.GetChildNames())
@@ -73,17 +74,32 @@ namespace HDF5Test
                                 using var versionAttribute = dataSet.OpenAttribute("VERSION");
                                 using var profileValueAttribute = dataSet.OpenAttribute("profile_value");
 
-                                //Console.WriteLine(classAttribute.ReadString());
-                                //Console.WriteLine(flavorAttribute.ReadString());
-                                //Console.WriteLine(titleAttribute.ReadString());
-                                //Console.WriteLine(versionAttribute.ReadString());
-                                //Console.WriteLine(profileValueAttribute.ReadDouble());
+                                Console.WriteLine(classAttribute.ReadString());
+                                Console.WriteLine(flavorAttribute.ReadString());
+                                Console.WriteLine(titleAttribute.ReadString());
+                                Console.WriteLine(versionAttribute.ReadString());
+                                Console.WriteLine(profileValueAttribute.ReadDouble());
+
+                                foreach(var cr  in dataSet.Read<CalibrationRow>())
+                                { 
+                                    Console.WriteLine($"{cr.I}, {cr.R}");
+                                }
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 16)]
+    public struct CalibrationRow
+    {
+        [FieldOffset(0)]
+        public double R;
+
+        [FieldOffset(8)]
+        public double I;
     }
 }
 
