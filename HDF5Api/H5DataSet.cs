@@ -59,6 +59,17 @@ namespace HDF5Api
             return new H5DataSet(h);
         }
 
+        public static bool Exists(H5LocationHandle location, string name)
+        {
+            location.ThrowIfNotValid();
+
+            var err = H5L.exists(location, name);
+
+            err.ThrowIfError("H5L.exists");
+
+            return err >= 0;
+        }
+
         public static void SetExtent(H5DataSetHandle dataSetId, ulong[] dims)
         {
             dataSetId.ThrowIfNotValid();

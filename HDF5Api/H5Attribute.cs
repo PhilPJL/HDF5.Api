@@ -33,7 +33,11 @@ namespace HDF5Api
                     throw new HDF5Exception("Attribute contains an array type (not supported).");
                 }
 
-                // TODO: assert if not string type
+                var cls = type.GetClass();
+                if(cls != H5T.class_t.STRING)
+                {
+                    throw new HDF5Exception($"Attribute is of class {cls} when expecting STRING.");
+                }
 
                 var size = GetStorageSize(this);
 
@@ -62,7 +66,14 @@ namespace HDF5Api
                     throw new HDF5Exception("Attribute contains an array type (not supported).");
                 }
 
-                // TODO: assert if not matching type
+                var cls = type.GetClass();
+
+                //var expectedCls = GetH5ClassFromT<T>();
+
+                //if (cls != expectedCls)
+                //{
+                //    throw new HDF5Exception($"Attribute is of class {cls} when expecting {expectedCls}.");
+                //}
 
                 var size = (int)GetStorageSize(this);
 
@@ -145,6 +156,22 @@ namespace HDF5Api
         {
             attributeId.ThrowIfNotValid();
             return H5A.get_storage_size(attributeId.Handle);
+        }
+
+        public static bool Exists(H5LocationHandle locationId, string name)
+        {
+            locationId.ThrowIfNotValid();
+            var err = H5A.exists(locationId, name);
+            err.ThrowIfError("H5A.exists");
+            return err >= 0;
+        }
+
+        public static bool Exists(H5DataSetHandle dataSetId, string name)
+        {
+            dataSetId.ThrowIfNotValid();
+            var err = H5A.exists(dataSetId, name);
+            err.ThrowIfError("H5A.exists");
+            return err >= 0;
         }
 
         #endregion

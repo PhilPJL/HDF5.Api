@@ -14,12 +14,15 @@ namespace HDF5Api
     {
         H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
         H5Attribute OpenAttribute(string name);
+        bool AttributeExists(string name);
 
         H5Group CreateGroup(string name);
         H5Group OpenGroup(string name);
+        bool GroupExists(string name);
 
         H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
         H5DataSet OpenDataSet(string name);
+        bool DataSetExists(string name);
 
         IEnumerable<string> GetChildNames();
     }
@@ -51,6 +54,11 @@ namespace HDF5Api
             return H5Attribute.Open(Handle, name);
         }
 
+        public bool AttributeExists(string name)
+        {
+            return H5Attribute.Exists(Handle, name);
+        }
+
         /// <summary>
         /// Create a Group in this location
         /// </summary>
@@ -67,6 +75,11 @@ namespace HDF5Api
             return H5Group.Open(Handle, name);
         }
 
+        public bool GroupExists(string name)
+        {
+            return H5Group.Exists(Handle, name);
+        }
+
         /// <summary>
         /// Create a DataSet in this location
         /// </summary>
@@ -81,6 +94,11 @@ namespace HDF5Api
         public H5DataSet OpenDataSet(string name)
         {
             return H5DataSet.Open(this, name);
+        }
+
+        public bool DataSetExists(string name)
+        {
+            return H5DataSet.Exists(this, name);
         }
 
         /// <summary>
@@ -107,7 +125,7 @@ namespace HDF5Api
 
             return names;
 
-            int Callback(Handle group, IntPtr intPtrName, ref H5L.info_t info, IntPtr _)
+            int Callback(Handle location, IntPtr intPtrName, ref H5L.info_t info, IntPtr _)
             {
                 names.Add(Marshal.PtrToStringAnsi(intPtrName));
                 return 0;

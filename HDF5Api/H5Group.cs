@@ -31,6 +31,18 @@
             return new H5Group(h);
         }
 
+        public static bool Exists(H5LocationHandle locationId, string name)
+        {
+            locationId.ThrowIfNotValid();
+
+            H5G.info_t info = default;
+            int err = H5G.get_info_by_name(locationId, name, ref info);
+            err.ThrowIfError("H5G.get_info_by_name");
+
+            return err >= 0;
+        }
+
+
         #endregion
     }
 }

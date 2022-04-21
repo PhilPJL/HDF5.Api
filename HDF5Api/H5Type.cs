@@ -48,7 +48,17 @@ namespace HDF5Api
             return this;
         }
 
+        public H5T.class_t GetClass()
+        {
+            return GetClass(this);
+        }
+
         #region C API wrappers
+        public static H5T.class_t GetClass(H5TypeHandle typeId)
+        {
+            return H5T.get_class(typeId.Handle);
+        }
+
         public static H5Type CreateCompoundType(int size)
         {
             var h = H5T.create(H5T.class_t.COMPOUND, new IntPtr(size));

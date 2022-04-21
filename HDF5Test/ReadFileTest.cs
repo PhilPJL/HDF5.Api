@@ -18,15 +18,20 @@ namespace HDF5Test
                     using var titleAttribute = file.OpenAttribute("TITLE");
                     using var versionAttribute = file.OpenAttribute("VERSION");
 
-                    Console.WriteLine(classAttribute.ReadString());
-                    Console.WriteLine(formatVersionAttribute.ReadString());
-                    Console.WriteLine(titleAttribute.ReadString());
-                    Console.WriteLine(versionAttribute.ReadString());
+                    //Console.WriteLine(classAttribute.ReadString());
+                    //Console.WriteLine(formatVersionAttribute.ReadString());
+                    //Console.WriteLine(titleAttribute.ReadString());
+                    //Console.WriteLine(versionAttribute.ReadString());
                 }
 
                 foreach (var groupName in file.GetChildNames())
                 {
                     Console.WriteLine(groupName);
+
+                    if (file.GroupExists(groupName))
+                    {
+                        Console.WriteLine($"Group: {groupName} : exists");
+                    }
 
                     using (var group = file.OpenGroup(groupName))
                     {
@@ -38,17 +43,27 @@ namespace HDF5Test
                             using var identifierAttribute = group.OpenAttribute("identifier");
                             using var originIdAttribute = group.OpenAttribute("orig_id");
 
-                            Console.WriteLine(classAttribute.ReadString());
-                            Console.WriteLine(titleAttribute.ReadString());
-                            Console.WriteLine(versionAttribute.ReadString());
-                            Console.WriteLine(deltaFreqAttribute.ReadDouble());
-                            Console.WriteLine(identifierAttribute.ReadString());
-                            Console.WriteLine(originIdAttribute.ReadInt32());
+                            if (group.AttributeExists("CLASS"))
+                            {
+                                Console.WriteLine("Attribute CLASS exists");
+                            }
+
+                            //Console.WriteLine(classAttribute.ReadString());
+                            //Console.WriteLine(titleAttribute.ReadString());
+                            //Console.WriteLine(versionAttribute.ReadString());
+                            //Console.WriteLine(deltaFreqAttribute.ReadDouble());
+                            //Console.WriteLine(identifierAttribute.ReadString());
+                            //Console.WriteLine(originIdAttribute.ReadInt32());
                         }
 
                         foreach (var dataSetName in group.GetChildNames())
                         {
                             Console.WriteLine($"/{groupName}/{dataSetName}");
+
+                            if (group.DataSetExists(dataSetName))
+                            {
+                                Console.WriteLine($"DataSet: {dataSetName} : exists");
+                            }
 
                             using (var dataSet = group.OpenDataSet(dataSetName))
                             {
@@ -58,11 +73,11 @@ namespace HDF5Test
                                 using var versionAttribute = dataSet.OpenAttribute("VERSION");
                                 using var profileValueAttribute = dataSet.OpenAttribute("profile_value");
 
-                                Console.WriteLine(classAttribute.ReadString());
-                                Console.WriteLine(flavorAttribute.ReadString());
-                                Console.WriteLine(titleAttribute.ReadString());
-                                Console.WriteLine(versionAttribute.ReadString());
-                                Console.WriteLine(profileValueAttribute.ReadDouble());
+                                //Console.WriteLine(classAttribute.ReadString());
+                                //Console.WriteLine(flavorAttribute.ReadString());
+                                //Console.WriteLine(titleAttribute.ReadString());
+                                //Console.WriteLine(versionAttribute.ReadString());
+                                //Console.WriteLine(profileValueAttribute.ReadDouble());
                             }
                         }
                     }
