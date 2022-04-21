@@ -113,7 +113,7 @@ namespace HDF5Api
 
             err.ThrowIfError("H5L.exists");
 
-            return err >= 0;
+            return err > 0;
         }
 
         public static void SetExtent(H5DataSetHandle dataSetId, ulong[] dims)

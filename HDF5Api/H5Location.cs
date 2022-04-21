@@ -24,7 +24,7 @@ namespace HDF5Api
         H5DataSet OpenDataSet(string name);
         bool DataSetExists(string name);
 
-        IEnumerable<string> GetChildNames();
+        IEnumerable<(string name, bool isGroup)> GetChildNames();
     }
 
     /// <summary>
@@ -107,27 +107,33 @@ namespace HDF5Api
         /// <remarks>
         /// TODO: return type also?
         /// </remarks>
-        public IEnumerable<string> GetChildNames()
+        public IEnumerable<(string name, bool isGroup)> GetChildNames()
         {
             return GetChildNames(Handle);
         }
 
-        private static IEnumerable<string> GetChildNames(H5LocationHandle handle)
+        private static IEnumerable<(string name, bool isGroup)> GetChildNames(H5LocationHandle handle)
         {
             handle.ThrowIfNotValid();
 
             ulong idx = 0;
 
-            var names = new List<string>();
+            var names = new List<(string name, bool isGroup)>();
 
             int err = H5L.iterate(handle, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
             err.ThrowIfError("H5L.iterate");
 
             return names;
 
-            int Callback(Handle location, IntPtr intPtrName, ref H5L.info_t info, IntPtr _)
+            int Callback(Handle groupId, IntPtr intPtrName, ref H5L.info_t info, IntPtr _)
             {
-                names.Add(Marshal.PtrToStringAnsi(intPtrName));
+                var name = Marshal.PtrToStringAnsi(intPtrName);
+
+                H5O.info_t oinfo = default;
+                int err = H5O.get_info_by_name(groupId, name, ref oinfo);
+                err.ThrowIfError("H5O.get_info_by_name");
+
+                names.Add((name, oinfo.type == H5O.type_t.GROUP));
                 return 0;
             }
         }

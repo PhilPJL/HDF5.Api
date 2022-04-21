@@ -162,7 +162,7 @@ namespace HDF5Api
             locationId.ThrowIfNotValid();
             var err = H5A.exists(locationId, name);
             err.ThrowIfError("H5A.exists");
-            return err >= 0;
+            return err > 0;
         }
 
         public static bool Exists(H5DataSetHandle dataSetId, string name)
@@ -170,7 +170,7 @@ namespace HDF5Api
             dataSetId.ThrowIfNotValid();
             var err = H5A.exists(dataSetId, name);
             err.ThrowIfError("H5A.exists");
-            return err >= 0;
+            return err > 0;
         }
 
         #endregion

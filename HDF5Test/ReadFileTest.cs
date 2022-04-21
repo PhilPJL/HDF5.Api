@@ -1,5 +1,6 @@
 ﻿using HDF5Api;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ namespace HDF5Test
                     Console.WriteLine(versionAttribute.ReadString());
                 }
 
-                foreach (var groupName in file.GetChildNames())
+                foreach (var groupName in file.GetChildNames().Where(cn => cn.isGroup).Select(cn => cn.name))
                 {
                     Console.WriteLine(groupName);
 
@@ -48,6 +49,10 @@ namespace HDF5Test
                             {
                                 Console.WriteLine("Attribute CLASS exists");
                             }
+                            else
+                            {
+                                Console.WriteLine("Attribute CLASS1 not exists");
+                            }
 
                             Console.WriteLine(classAttribute.ReadString());
                             Console.WriteLine(titleAttribute.ReadString());
@@ -57,7 +62,7 @@ namespace HDF5Test
                             Console.WriteLine(originIdAttribute.ReadInt32());
                         }
 
-                        foreach (var dataSetName in group.GetChildNames())
+                        foreach (var dataSetName in group.GetChildNames().Where(cn => !cn.isGroup).Select(cn => cn.name))
                         {
                             Console.WriteLine($"/{groupName}/{dataSetName}");
 

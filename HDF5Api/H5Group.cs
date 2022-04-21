@@ -39,7 +39,7 @@
             int err = H5G.get_info_by_name(locationId, name, ref info);
             err.ThrowIfError("H5G.get_info_by_name");
 
-            return err >= 0;
+            return err > 0;
         }
 
 
