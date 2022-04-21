@@ -32,12 +32,15 @@ namespace HDF5Api
             // convert input to Array of struct
             var records = inputRecords.Select(Convert).ToArray();
             // pin
-            using var pinnedRecords = new PinnedObject(records);
-            // write to HDF5
-            write(pinnedRecords);
+            using (var pinnedRecords = new PinnedObject(records))
+            {
+                // write to HDF5
+                write(pinnedRecords);
+            }
         }
     }
 
+#if false
     /// <summary>
     /// TODO: implement a generic type adaptor that works from attributed properties in the target type
     /// </summary>
@@ -67,17 +70,17 @@ namespace HDF5Api
             }
 
             // Allocate
-            using var memory = new GlobalMemory(TInputSize * inputRecords.Count());
+            using (var memory = new GlobalMemory(TInputSize * inputRecords.Count()))
+            {
+                // TODO: Copy/marshal individual properties into memory
 
-            // Copy/marshal individual properties into memory
-
-
-
-            write(memory);
+                write(memory);
+            }
 
             throw new NotImplementedException();
         }
 
         public static H5AutoTypeAdapter<TInput> Default { get; } = new H5AutoTypeAdapter<TInput>();
     }
+#endif
 }

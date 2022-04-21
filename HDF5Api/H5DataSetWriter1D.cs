@@ -58,18 +58,22 @@ namespace HDF5Api
             DataSet.SetExtent(new ulong[] { (ulong)(RowsWritten + numRecords) });
 
             // Move the hyperslab window
-            using var fileSpace = DataSet.GetSpace();
-            fileSpace.SelectHyperslab(RowsWritten, numRecords);
+            using (var fileSpace = DataSet.GetSpace())
+            {
+                fileSpace.SelectHyperslab(RowsWritten, numRecords);
 
-            // Match the space to length of records retrieved.
-            using var recordSpace = H5Space.CreateSimple(1, new ulong[] { (ulong)numRecords }, H5DataSetWriter.MaxDims1D);
+                // Match the space to length of records retrieved.
+                using (var recordSpace = H5Space.CreateSimple(1, new ulong[] { (ulong)numRecords }, H5DataSetWriter.MaxDims1D))
+                {
+                    // Configure most parameters for DataSet.WriteChunk and then pass the curried method as an Action<IntPtr> to Converter which only needs to supply the last param.
+                    Converter.Write(WriteAdaptor(DataSet, Type, recordSpace, fileSpace), recordsChunk);
 
-            // Configure most parameters for DataSet.WriteChunk and then pass the curried method as an Action<IntPtr> to Converter which only needs to supply the last param.
-            Converter.Write(WriteAdaptor(DataSet, Type, recordSpace, fileSpace), recordsChunk);
+                    RowsWritten += numRecords;
+                }
+            }
 
-            RowsWritten += numRecords;
-
-            static Action<IntPtr> WriteAdaptor(H5DataSet dataSet, H5Type type, H5Space recordSpace, H5Space fileSpace)
+            // Curry dataSet.Write to an Action<IntPtr>
+            Action<IntPtr> WriteAdaptor(H5DataSet dataSet, H5Type type, H5Space recordSpace, H5Space fileSpace)
             {
                 return (IntPtr buffer) => dataSet.Write(type, recordSpace, fileSpace, buffer);
             }

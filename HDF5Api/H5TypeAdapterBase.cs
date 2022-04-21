@@ -6,7 +6,7 @@ namespace HDF5Api
 {
     public abstract class H5TypeAdapterBase
     {
-        internal static readonly ASCIIEncoding Ascii = new();
+        internal static readonly ASCIIEncoding Ascii = new ASCIIEncoding();
 
         /// <summary>
         /// Helper method to copy fixed/max length string

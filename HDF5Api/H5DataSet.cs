@@ -16,7 +16,7 @@ namespace HDF5Api
 
         public H5Space GetSpace()
         {
-            return H5Space.GetDataSetSpace(this);
+            return GetSpace(this);
         }
 
         public void SetExtent(ulong[] dims)
@@ -24,7 +24,16 @@ namespace HDF5Api
             SetExtent(this, dims);
         }
 
-        #region Factory methods
+        /// <summary>
+        /// Open an existing Attribute for this dataset
+        /// </summary>
+        public H5Attribute OpenAttribute(string name)
+        {
+            return H5Attribute.Open(Handle, name);
+        }
+
+        #region C level API wrappers
+
         public static H5DataSet Create(H5LocationHandle location, string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
         {
             location.ThrowIfNotValid();
@@ -33,21 +42,30 @@ namespace HDF5Api
             propertyListId.ThrowIfNotValid();
 
             var h = H5D.create(location, name, typeId, spaceId, H5P.DEFAULT, propertyListId);
-            
-            h.ThrowIfNotValid();
-            
+
+            h.ThrowIfNotValid("H5D.create");
+
             return new H5DataSet(h);
         }
-        #endregion
 
-        #region C level API wrappers
+        public static H5DataSet Open(H5LocationHandle location, string name)
+        {
+            location.ThrowIfNotValid();
+
+            var h = H5D.open(location, name);
+
+            h.ThrowIfNotValid("H5D.open");
+
+            return new H5DataSet(h);
+        }
+
         public static void SetExtent(H5DataSetHandle dataSetId, ulong[] dims)
         {
             dataSetId.ThrowIfNotValid();
 
             var err = H5D.set_extent(dataSetId, dims);
-            
-            err.ThrowIfError();
+
+            err.ThrowIfError("H5D.set_extent");
         }
 
         public static void Write(H5DataSetHandle dataSetId, H5TypeHandle typeId, H5SpaceHandle memorySpaceId, H5SpaceHandle fileSpaceId, IntPtr buffer)
@@ -58,9 +76,21 @@ namespace HDF5Api
             fileSpaceId.ThrowIfNotValid();
 
             var err = H5D.write(dataSetId, typeId, memorySpaceId, fileSpaceId, H5P.DEFAULT, buffer);
-            
-            err.ThrowIfError();
+
+            err.ThrowIfError("H5D.write");
         }
+
+        public static H5Space GetSpace(H5DataSetHandle dataSetId)
+        {
+            dataSetId.ThrowIfNotValid();
+
+            var h = H5D.get_space(dataSetId);
+
+            h.ThrowIfNotValid("H5D.get_space");
+
+            return new H5Space(h);
+        }
+
         #endregion
     }
 }

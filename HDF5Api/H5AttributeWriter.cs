@@ -17,6 +17,12 @@ namespace HDF5Api
         }
     }
 
+    /// <summary>
+    /// Implementation of a Compound Type attribute writer.
+    /// </summary>
+    /// <remarks> 
+    /// With a suitable <see cref="IH5TypeAdapter{TInput}"/> this writer can be used to writer a collection of <typeparamref name="TInput"/> to a target <see cref="IH5Location"/>
+    /// </remarks>
     public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
     {
         public int RowsWritten { get; private set; }
@@ -25,6 +31,12 @@ namespace HDF5Api
         private Func<TInput, string> GetAttributeName { get; }
         private IH5Location Location { get; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="location">Location to write to.  Could be a file or group.</param>
+        /// <param name="converter">Converter to provide <typeparamref name="TInput"/> instances.</param>
+        /// <param name="getAttributeName">Func to provide an attribute name for each attribute as it's written.</param>
         public H5AttributeWriter(IH5Location location, IH5TypeAdapter<TInput> converter, Func<TInput, string> getAttributeName)
         {
             Location = location;
@@ -36,20 +48,24 @@ namespace HDF5Api
         public void Write(IEnumerable<TInput> recordsChunk)
         {
             // Single dimension (rank 1), unlimited length, chunk size.
-            using var memorySpace = H5Space.CreateSimple(1, new ulong[] { 1 }, H5AttributeWriter.MaxDims);
+            using (var memorySpace = H5Space.CreateSimple(1, new ulong[] { 1 }, H5AttributeWriter.MaxDims))
 
             // Create an attribute-creation property list
-            using var properyList = H5PropertyList.Create(H5P.ATTRIBUTE_CREATE);
-
-            foreach (var record in recordsChunk)
+            using (var properyList = H5PropertyList.Create(H5P.ATTRIBUTE_CREATE))
             {
-                // Create the attribute with our record type and chunk size.
-                using var attribute = Location.CreateAttribute(GetAttributeName(record), Type, memorySpace, properyList);
-
-                Converter.Write(WriteAdaptor(attribute, Type), Enumerable.Repeat(record, 1));
+                foreach (var record in recordsChunk)
+                {
+                    // Create the attribute with our record type and chunk size.
+                    // Create with the name specified by the GetAttributeName function.
+                    using (var attribute = Location.CreateAttribute(GetAttributeName(record), Type, memorySpace, properyList))
+                    {
+                        Converter.Write(WriteAdaptor(attribute, Type), Enumerable.Repeat(record, 1));
+                    }
+                }
             }
 
-            static Action<IntPtr> WriteAdaptor(H5Attribute attribute, H5Type type)
+            // Curry attribute.Write to an Action<IntPtr>
+            Action<IntPtr> WriteAdaptor(H5Attribute attribute, H5Type type)
             {
                 return (IntPtr buffer) => attribute.Write(type, buffer);
             }

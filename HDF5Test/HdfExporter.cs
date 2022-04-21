@@ -84,7 +84,7 @@ namespace HDF5Test
             using var scope = GetTransactionScope();
 
             using var rawRecordWriter = H5DataSetWriter
-                .CreateOneDimensionalDataSetWriter(location, "RawRecords", RawRecordAdapter.Default, CompressionLevel, ChunkSize);
+                .CreateOneDimensionalDataSetWriter(location, "RawRecords", RawRecordAdapter.Default, ChunkSize, CompressionLevel);
 
             using (var sw = new DisposableStopWatch("RawRecord", () => rawRecordWriter.RowsWritten))
             {
@@ -113,7 +113,7 @@ namespace HDF5Test
             using var scope = GetTransactionScope();
 
             using var intervalRecordWriter = H5DataSetWriter
-                .CreateOneDimensionalDataSetWriter(location, "IntervalRecords", IntervalRecordAdapter.Default, CompressionLevel, ChunkSize);
+                .CreateOneDimensionalDataSetWriter(location, "IntervalRecords", IntervalRecordAdapter.Default, ChunkSize, CompressionLevel);
 
             using (var sw = new DisposableStopWatch("IntervalRecord", () => intervalRecordWriter.RowsWritten))
             {
@@ -152,7 +152,7 @@ namespace HDF5Test
                 Console.WriteLine($"Waveform: blob length {waveformValuesBlobLength}");
 
                 using var waveformWriter = H5DataSetWriter
-                    .CreateOneDimensionalDataSetWriter(location, "Waveforms", WaveformAdapter.Create(waveformValuesBlobLength, sizeof(double)), CompressionLevel, ChunkSize);
+                    .CreateOneDimensionalDataSetWriter(location, "Waveforms", WaveformAdapter.Create(waveformValuesBlobLength, sizeof(double)), ChunkSize, CompressionLevel);
 
                 using (var sw = new DisposableStopWatch("Waveform", () => waveformWriter.RowsWritten))
                 {
@@ -198,7 +198,7 @@ namespace HDF5Test
                 Console.WriteLine($"Profile: blob length {profileValuesBlobLength}");
 
                 using var profileRecordWriter = H5DataSetWriter
-                    .CreateOneDimensionalDataSetWriter(location, "Profiles", ProfileAdapter.Create(profileValuesBlobLength, sizeof(double)), CompressionLevel, ChunkSize);
+                    .CreateOneDimensionalDataSetWriter(location, "Profiles", ProfileAdapter.Create(profileValuesBlobLength, sizeof(double)), ChunkSize, CompressionLevel);
 
                 using (var sw = new DisposableStopWatch("Profile", () => profileRecordWriter.RowsWritten))
                 {
@@ -232,7 +232,7 @@ namespace HDF5Test
             using var scope = GetTransactionScope();
 
             using var bladeProfileNameWriter = H5DataSetWriter
-                .CreateOneDimensionalDataSetWriter(location, "BladeProfileNames", BladeProfileNameAdapter.Default, CompressionLevel, ChunkSize);
+                .CreateOneDimensionalDataSetWriter(location, "BladeProfileNames", BladeProfileNameAdapter.Default, ChunkSize, CompressionLevel);
 
             using (var sw = new DisposableStopWatch("BladeProfileName", () => bladeProfileNameWriter.RowsWritten))
             {
@@ -276,7 +276,7 @@ namespace HDF5Test
                     var adapter = BladeReferenceAdapter.Create(bladeWaveformBlobLength, sizeof(double), mirrorWaveformBlobLength, sizeof(double));
 
                     using var bladeReferenceWriter = H5DataSetWriter
-                        .CreateOneDimensionalDataSetWriter(location, "BladeReferences", adapter, CompressionLevel, ChunkSize);
+                        .CreateOneDimensionalDataSetWriter(location, "BladeReferences", adapter, ChunkSize, CompressionLevel);
 
                     using (var sw = new DisposableStopWatch("BladeReference", () => bladeReferenceWriter.RowsWritten))
                     {
@@ -325,7 +325,7 @@ namespace HDF5Test
                 var adapter = BladeProfileCalibrationAdapter.Create(correctionValuesBlobLength, sizeof(double));
 
                 using var bladeProfileCalibrationWriter = H5DataSetWriter
-                    .CreateOneDimensionalDataSetWriter(location, "BladeProfileCalibrations", adapter, CompressionLevel, ChunkSize);
+                    .CreateOneDimensionalDataSetWriter(location, "BladeProfileCalibrations", adapter, ChunkSize, CompressionLevel);
 
                 using (var sw = new DisposableStopWatch("BladeProfileCalibration", () => bladeProfileCalibrationWriter.RowsWritten))
                 {
@@ -356,7 +356,7 @@ namespace HDF5Test
             using var scope = GetTransactionScope();
 
             using var bladeProfileCalibrationSetWriter = H5DataSetWriter
-                .CreateOneDimensionalDataSetWriter(location, "BladeProfileCalibrationSets", BladeProfileCalibrationSetAdapter.Default, CompressionLevel, ChunkSize);
+                .CreateOneDimensionalDataSetWriter(location, "BladeProfileCalibrationSets", BladeProfileCalibrationSetAdapter.Default, ChunkSize, CompressionLevel);
 
             using (var sw = new DisposableStopWatch("BladeProfileCalibrationSet", () => bladeProfileCalibrationSetWriter.RowsWritten))
             {

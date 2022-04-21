@@ -18,7 +18,7 @@ namespace HDF5Test
             uint compressionLevel = 0;
 
             // Create file and group
-            using var file = H5File.Create(@"test-data.h5", H5F.ACC_TRUNC);
+            using var file = H5File.Create(@"test-data.h5");
 
             foreach (var measurementId in measurementIds)
             {

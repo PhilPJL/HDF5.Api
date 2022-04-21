@@ -3,14 +3,15 @@ using System.Runtime.InteropServices;
 
 namespace HDF5Api.Disposables
 {
-    public class GlobalMemory : Disposable
+    /// <summary>
+    /// Disposable wrapper for safe allocation of global memory
+    /// </summary>
+    /// <remarks>
+    /// TODO: investigate various SafeHandle types available in .NET
+    /// </remarks>
+    public abstract class GlobalMemoryBase : Disposable
     {
-        public GlobalMemory(int size)
-        {
-            IntPtr = Marshal.AllocHGlobal(size);
-        }
-
-        public IntPtr IntPtr { get; private set; }
+        public IntPtr IntPtr { get; protected set; }
 
         protected override void Dispose(bool disposing)
         {
@@ -21,14 +22,30 @@ namespace HDF5Api.Disposables
             }
         }
 
-        public static unsafe implicit operator void*(GlobalMemory memory)
+        public static unsafe implicit operator void*(GlobalMemoryBase memory)
         {
             return memory.IntPtr.ToPointer();
         }
 
-        public static implicit operator IntPtr(GlobalMemory memory)
+        public static implicit operator IntPtr(GlobalMemoryBase memory)
         {
             return memory.IntPtr;
+        }
+    }
+
+    public class GlobalMemory : GlobalMemoryBase
+    {
+        public GlobalMemory(int size)
+        {
+            IntPtr = Marshal.AllocHGlobal(size);
+        }
+    }
+
+    public class StringToGlobalMemoryAnsi : GlobalMemoryBase
+    {
+        public StringToGlobalMemoryAnsi(string s)
+        {
+            IntPtr = Marshal.StringToHGlobalAnsi(s);
         }
     }
 }

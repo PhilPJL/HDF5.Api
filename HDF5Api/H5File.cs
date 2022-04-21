@@ -7,19 +7,34 @@
     {
         private H5File(Handle handle) : base(new H5FileHandle(handle)) { }
 
-        #region Factory methods
-        /// <summary>
-        /// Create a file
-        /// </summary>
-        public static H5File Create(string name, uint flags = H5F.ACC_TRUNC)
-        {
-            // TODO: open/create etc
-            var h = H5F.create(name, flags);
+        #region C level API wrappers
 
-            h.ThrowIfNotValid();
-            
+        /// <summary>
+        /// Create a new file.
+        /// </summary>
+        public static H5File Create(string path)
+        {
+            var h = H5F.create(path, H5F.ACC_TRUNC);
+
+            h.ThrowIfNotValid("H5F.create");
+
             return new H5File(h);
         }
+
+        /// <summary>
+        /// Open an existing file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static H5File OpenReadOnly(string path)
+        {
+            var h = H5F.open(path, H5F.ACC_RDONLY);
+
+            h.ThrowIfNotValid("H5F.open");
+
+            return new H5File(h);
+        }
+        
         #endregion
     }
 }

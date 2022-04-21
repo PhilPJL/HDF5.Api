@@ -3,32 +3,10 @@ global using Handle = System.Int64;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace HDF5Api
 {
-    public class H5Object<THandle> : Disposable where THandle : H5Handle
-    {
-        public H5Object(THandle handle)
-        {
-            Handle = handle;
-        }
-
-        public THandle Handle { get; }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && !Handle.IsDisposed)
-            {
-                Handle.Dispose();
-            }
-        }
-
-        public static implicit operator THandle(H5Object<THandle> h5Object)
-        {
-            return h5Object.Handle;
-        }
-    }
-
     public class H5AttributeHandle : H5Handle
     {
         public H5AttributeHandle(Handle handle) : base(handle, H5A.close) { }
@@ -84,11 +62,11 @@ namespace HDF5Api
     public abstract class H5Handle : Disposable
     {
 #if DEBUG
-        public static Dictionary<Handle, string> Handles { get; private set; } = new();
+        public static Dictionary<Handle, string> Handles { get; private set; } = new Dictionary<Handle, string>();
 #endif
 
         // Null-op for wrapped native handles
-        protected static internal int NullCloser (Handle _)
+        protected static internal int NullCloser(Handle _)
         {
             Debug.WriteLine($"*not* Closing native handle {_}");
             return 0;
@@ -115,12 +93,12 @@ namespace HDF5Api
         {
             Debug.WriteLine($"Opened handle {GetType().Name}: {handle}");
 
-            handle.ThrowIfNotValid();
+            handle.ThrowIfNotValid("H5Handle-ctor");
             Handle = handle;
             CloseHandle = closer;
 
 #if DEBUG
-            lock (Handles)
+            lock (this)
             {
                 Handles.Add(handle, Environment.StackTrace);
             }
@@ -134,60 +112,21 @@ namespace HDF5Api
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && !IsDisposed)
+            if (!IsDisposed)
             {
                 Debug.WriteLine($"Closing handle {GetType().Name}: {Handle}");
 
-                var err = CloseHandle(Handle);
+                lock (this)
+                {
+                    var err = CloseHandle(Handle);
 
 #if DEBUG
-                lock (Handles)
-                {
                     Handles.Remove(Handle);
-                }
 #endif
 
-                Handle = InvalidHandleValue;
-                err.ThrowIfError();
-            }
-        }
-    }
-
-    public static class H5ThrowExtensions
-    {
-        public static void ThrowIfNotValid<THandle>(H5Object<THandle> h5Object) where THandle : H5Handle
-        {
-            // TODO: give more information, specific exception
-            if (h5Object.Handle.Handle <= 0)
-            {
-                throw new InvalidOperationException("Bad handle");
-            }
-        }
-
-        public static void ThrowIfNotValid(this H5Handle handle)
-        {
-            // TODO: give more information, specific exception
-            if (handle.Handle <= 0)
-            {
-                throw new InvalidOperationException("Bad handle");
-            }
-        }
-
-        public static void ThrowIfNotValid(this Handle handle)
-        {
-            // TODO: give more information, specific exception
-            if (handle <= 0)
-            {
-                throw new InvalidOperationException("Bad handle");
-            }
-        }
-
-        public static void ThrowIfError(this int err)
-        {
-            // TODO: give more information, specific exception
-            if (err < 0)
-            {
-                throw new InvalidOperationException("Error");
+                    Handle = InvalidHandleValue;
+                    err.ThrowIfError($"Closing handle for {GetType().Name}");
+                }
             }
         }
     }

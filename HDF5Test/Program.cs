@@ -33,7 +33,9 @@ namespace HDF5Test
                 Console.WriteLine($"Version={H5Global.GetLibraryVersion()}, Is thread safe={H5Global.IsThreadSafe()}");
                 Console.WriteLine();
 
-                await CreateFileTest.CreateFileAsync(measurementIds, minutes);
+                //await CreateFileTest.CreateFileAsync(measurementIds, minutes);
+
+                await ReadFileTest.ReadFileAsync(@"C:\Users\passp\source\repos\HDF5Test\HDF5Test\ProfileCorrection_master.h5");
 
 #if DEBUG
                 if (H5Handle.Handles.Count > 0)

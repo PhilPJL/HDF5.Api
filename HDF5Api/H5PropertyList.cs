@@ -12,39 +12,44 @@
             SetChunk(this, rank, dims);
         }
 
+        /// <summary>
+        /// Level 0 = off
+        /// Level 1 = min compression + min CPU
+        /// ..
+        /// Level 9 = max compression + max CPU and time
+        /// </summary>
+        /// <param name="level"></param>
         public void EnableDeflateCompression(uint level)
         {
             EnableDeflateCompression(this, level);
         }
 
-        #region Factory methods
+        #region C API wrappers
         public static H5PropertyList Create(Handle classId)
         {
             var h = H5P.create(classId);
 
-            h.ThrowIfNotValid();
-            
+            h.ThrowIfNotValid("H5P.create");
+
             return new H5PropertyList(h);
         }
-        #endregion
 
-        #region C API wrappers
         public static void SetChunk(H5PropertyListHandle propertyListId, int rank, ulong[] dims)
         {
             propertyListId.ThrowIfNotValid();
 
             var err = H5P.set_chunk(propertyListId, rank, dims);
-            
-            err.ThrowIfError();
+
+            err.ThrowIfError("H5P.set_chunk");
         }
 
         public static void EnableDeflateCompression(H5PropertyListHandle propertyListId, uint level)
         {
             propertyListId.ThrowIfNotValid();
-            
+
             var err = H5P.set_deflate(propertyListId, level);
-            
-            err.ThrowIfError();
+
+            err.ThrowIfError("H5P.set_deflate");
         }
         #endregion
     }
