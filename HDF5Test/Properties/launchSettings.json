@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "HDF5Test": {
-      "commandName": "Project",
-      "commandLineArgs": "-m 286 -t 120"
-    }
-  }
-}

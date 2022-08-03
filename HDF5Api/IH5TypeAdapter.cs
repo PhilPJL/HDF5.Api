@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HDF5Api
+namespace HDF5Api;
+
+/// <summary>
+///     Interface that needs to be implemented by the H5TypeAdapter used by the IH5DataWriter.
+/// </summary>
+/// <typeparam name="TInput"></typeparam>
+public interface IH5TypeAdapter<in TInput>
 {
-    /// <summary>
-    /// Interface that needs to be implemented by the H5TypeAdapter used by the IH5DataWriter.
-    /// </summary>
-    /// <typeparam name="TInput"></typeparam>
-    public interface IH5TypeAdapter<in TInput>
-    {
-        H5Type GetH5Type();
-        void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords);
-    }
+    H5Type GetH5Type();
+    void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords);
 }
