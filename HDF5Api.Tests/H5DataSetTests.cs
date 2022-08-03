@@ -1,5 +1,4 @@
 ﻿using HDF.PInvoke;
-using HDF5Api;
 
 namespace HDF5Api.Tests;
 

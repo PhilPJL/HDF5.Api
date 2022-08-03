@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using HDF5Api;
 
 namespace HDF5Api.Tests;
 

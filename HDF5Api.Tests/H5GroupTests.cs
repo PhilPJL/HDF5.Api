@@ -1,6 +1,4 @@
-﻿using HDF5Api;
-
-namespace HDF5Api.Tests;
+﻿namespace HDF5Api.Tests;
 
 [TestClass]
 public class H5GroupTests : H5LocationTests
