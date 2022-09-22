@@ -6,161 +6,106 @@ namespace HDF5Api;
 /// <summary>
 ///     Wrapper for H5T (Type) API.
 /// </summary>
-public class H5Type : H5Object<H5TypeHandle>
+public struct H5Type : IDisposable
 {
-    private H5Type(Handle handle) : base(new H5TypeHandle(handle)) { }
+    #region Handle wrappers
+    private long Handle { get; set; } = H5Handle.DefaultHandleValue;
+    private bool IsNative { get; set; }
+
+    internal H5Type(Handle handle, bool isNative = false)
+    {
+        Handle = handle;
+        IsNative = isNative;
+        if (!IsNative)
+        {
+            H5Handle.TrackHandle(handle);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (!IsNative && Handle > H5Handle.DefaultHandleValue)
+        {
+            H5TypeNativeMethods.Close(this);
+            H5Handle.UntrackHandle(Handle);
+        }
+
+        Handle = H5Handle.DefaultHandleValue;
+    }
+
+    public static implicit operator long(H5Type h5object)
+    {
+        h5object.Handle.ThrowIfInvalidHandleValue();
+        return h5object.Handle;
+    }
+    #endregion
+
+    #region Public Api
+
+    public static H5Type GetNativeType<T>() where T : unmanaged
+    {
+        long nativeHandle = default(T) switch
+        {
+            //            char => H5T.NATIVE_CHAR,
+
+            short => H5T.NATIVE_INT16,
+            ushort => H5T.NATIVE_USHORT,
+            int => H5T.NATIVE_INT32,
+            uint => H5T.NATIVE_UINT32,
+            long => H5T.NATIVE_INT64,
+            ulong => H5T.NATIVE_UINT64,
+            float => H5T.NATIVE_FLOAT,
+            double => H5T.NATIVE_DOUBLE,
+
+            // TODO: add more mappings as required
+
+            _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
+        };
+
+        return new H5Type(nativeHandle, true);
+    }
 
     public H5Type Insert(string name, int offset, Handle nativeTypeId)
     {
-        Insert(this, name, new IntPtr(offset), nativeTypeId);
+        H5TypeNativeMethods.Insert(this, name, new IntPtr(offset), nativeTypeId);
         return this;
     }
 
-    public H5Type Insert(string name, int offset, H5TypeHandle dataTypeId)
+    public H5Type Insert(string name, int offset, H5Type dataTypeId)
     {
-        Insert(this, name, new IntPtr(offset), dataTypeId);
+        H5TypeNativeMethods.Insert(this, name, new IntPtr(offset), dataTypeId);
         return this;
     }
 
     public H5Type Insert(string name, IntPtr offset, Handle nativeTypeId)
     {
-        Insert(this, name, offset, nativeTypeId);
+        H5TypeNativeMethods.Insert(this, name, offset, nativeTypeId);
         return this;
     }
 
-    public H5Type Insert(string name, IntPtr offset, H5TypeHandle dataTypeId)
+    public H5Type Insert(string name, IntPtr offset, H5Type dataTypeId)
     {
-        Insert(this, name, offset, dataTypeId);
+        H5TypeNativeMethods.Insert(this, name, offset, dataTypeId);
         return this;
     }
 
     public H5Type Insert<S>(string name, Handle nativeTypeId) where S : struct
     {
         var offset = Marshal.OffsetOf<S>(name);
-        Insert(this, name, offset, nativeTypeId);
+        H5TypeNativeMethods.Insert(this, name, offset, nativeTypeId);
         return this;
     }
 
-    public H5Type Insert<S>(string name, H5TypeHandle dataTypeId) where S : struct
+    public H5Type Insert<S>(string name, H5Type dataTypeId) where S : struct
     {
         var offset = Marshal.OffsetOf<S>(name);
-        Insert(this, name, offset, dataTypeId);
+        H5TypeNativeMethods.Insert(this, name, offset, dataTypeId);
         return this;
     }
 
     public H5T.class_t GetClass()
     {
-        return GetClass(this);
-    }
-
-    #region C API wrappers
-
-    public static H5T.class_t GetClass(H5TypeHandle typeId)
-    {
-        return H5T.get_class(typeId.Handle);
-    }
-
-    public static H5Type CreateCompoundType(int size)
-    {
-        Handle h = H5T.create(H5T.class_t.COMPOUND, new IntPtr(size));
-        h.ThrowIfNotValid("H5T.create");
-        return new H5Type(h);
-    }
-
-    /// <summary>
-    ///     Create a Compound type in order to hold an <typeparamref name="S" />
-    /// </summary>
-    public static H5Type CreateCompoundType<S>() where S : struct
-    {
-        int size = Marshal.SizeOf<S>();
-        return CreateCompoundType(size);
-    }
-
-    /// <summary>
-    ///     Create a Compound type in order to hold an <typeparamref name="S" /> plus additional space as defined by
-    ///     <paramref name="extraSpace" />
-    /// </summary>
-    public static H5Type CreateCompoundType<S>(int extraSpace) where S : struct
-    {
-        int size = Marshal.SizeOf<S>() + extraSpace;
-        return CreateCompoundType(size);
-    }
-
-    public static H5Type CreateByteArrayType(int size)
-    {
-        Handle h = H5T.array_create(H5T.NATIVE_B8, 1, new[] { (ulong)size });
-        h.ThrowIfNotValid("H5T.array_create");
-        return new H5Type(h);
-    }
-
-    public static H5Type CreateDoubleArrayType(int size)
-    {
-        Handle h = H5T.array_create(H5T.NATIVE_DOUBLE, 1, new[] { (ulong)size });
-        h.ThrowIfNotValid("H5T.array_create");
-        return new H5Type(h);
-    }
-
-    public static H5Type CreateFloatArrayType(int size)
-    {
-        Handle h = H5T.array_create(H5T.NATIVE_FLOAT, 1, new[] { (ulong)size });
-        h.ThrowIfNotValid("H5T.array_create");
-        return new H5Type(h);
-    }
-
-    public static H5Type CreateVariableLengthByteArrayType()
-    {
-        Handle h = H5T.vlen_create(H5T.NATIVE_B8);
-        h.ThrowIfNotValid("H5T.vlen_create");
-        return new H5Type(h);
-    }
-
-    public static H5Type CreateFixedLengthStringType(int length)
-    {
-        Handle h = H5T.copy(H5T.C_S1);
-        h.ThrowIfNotValid("H5T.copy");
-        int err = H5T.set_size(h, new IntPtr(length));
-        err.ThrowIfError("H5T.set_size");
-        return new H5Type(h);
-    }
-
-    public static void Insert(H5TypeHandle typeId, string name, IntPtr offset, Handle nativeTypeId)
-    {
-        typeId.ThrowIfNotValid();
-        int err = H5T.insert(typeId, name, offset, nativeTypeId);
-        err.ThrowIfError("H5T.insert");
-    }
-
-    public static void Insert(H5TypeHandle typeId, string name, IntPtr offset, H5TypeHandle dataTypeId)
-    {
-        typeId.ThrowIfNotValid();
-        dataTypeId.ThrowIfNotValid();
-        int err = H5T.insert(typeId, name, offset, dataTypeId);
-        err.ThrowIfError("H5T.insert");
-    }
-
-    public static H5Type GetType(H5AttributeHandle attributeId)
-    {
-        Handle h = H5A.get_type(attributeId);
-
-        h.ThrowIfNotValid("H5A.get_type");
-
-        return new H5Type(h);
-    }
-
-    public static H5Type GetType(H5DataSetHandle dataSetId)
-    {
-        Handle h = H5D.get_type(dataSetId);
-
-        h.ThrowIfNotValid("H5D.get_type");
-
-        return new H5Type(h);
-    }
-
-    public static bool IsVariableLengthString(H5TypeHandle typeId)
-    {
-        int err = H5T.is_variable_str(typeId);
-        err.ThrowIfError("H5T.is_variable_str");
-        return err > 0;
+        return H5TypeNativeMethods.GetClass(this);
     }
 
     #endregion

@@ -1,37 +1,87 @@
-﻿namespace HDF5Api;
+﻿using System;
+
+namespace HDF5Api;
 
 /// <summary>
 ///     Wrapper for H5G (Group) API.
 /// </summary>
-public class H5Group : H5Location<H5GroupHandle>
+public struct H5Group : IDisposable
 {
-    private H5Group(Handle handle) : base(new H5GroupHandle(handle)) { }
+    #region Handle wrappers
+    private long Handle { get; set; } = H5Handle.InvalidHandleValue;
+
+    private H5Group(Handle handle)
+    {
+        Handle = handle;
+        H5Handle.TrackHandle(handle);
+    }
+
+    public void Dispose()
+    {
+        if (Handle != H5Handle.InvalidHandleValue)
+        {
+            NativeMethods.Close(this);
+            H5Handle.UntrackHandle(Handle);
+            Handle = H5Handle.InvalidHandleValue;
+        }
+    }
+
+    public static implicit operator long(H5Group h5object)
+    {
+        h5object.Handle.ThrowIfInvalidHandleValue();
+        return h5object.Handle;
+    }
+    #endregion
+
+    internal static partial class NativeMethods
+    {
+        #region Close
+
+        //[LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gclose"), SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+        //[UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+        //private static partial int Close(long handle);
+
+        public static void Close(H5Group attribute)
+        {
+            //int err = Close(attribute.Handle);
+            int err = H5G.close(attribute.Handle);
+            // TODO: get additional error info 
+            err.ThrowIfError("H5Gclose");
+        }
+
+        #endregion
+
+        #region Create
+
+        public static H5Group Create(H5Location locationId, string name)
+        {
+            locationId.ThrowIfNotValid();
+
+            Handle h = H5G.create(locationId.Handle, name);
+
+            h.ThrowIfInvalidHandleValue("H5G.create");
+
+            return new H5Group(h);
+        }
+
+        #endregion
+    }
 
     #region C level API wrappers
 
-    public static H5Group Create(H5LocationHandle locationId, string name)
-    {
-        locationId.ThrowIfNotValid();
 
-        Handle h = H5G.create(locationId.Handle, name);
-
-        h.ThrowIfNotValid("H5G.create");
-
-        return new H5Group(h);
-    }
-
-    public static H5Group Open(H5LocationHandle locationId, string name)
+    public static H5Group Open(H5Location locationId, string name)
     {
         locationId.ThrowIfNotValid();
 
         Handle h = H5G.open(locationId.Handle, name);
 
-        h.ThrowIfNotValid("H5G.open");
+        h.ThrowIfInvalidHandleValue("H5G.open");
 
         return new H5Group(h);
     }
 
-    public static void Delete(H5LocationHandle locationId, string path)
+    public static void Delete(H5Location locationId, string path)
     {
         locationId.ThrowIfNotValid();
 
@@ -45,7 +95,7 @@ public class H5Group : H5Location<H5GroupHandle>
     /// </summary>
     /// <param name="locationId">A file or group id</param>
     /// <param name="name">A simple object name, e.g. 'group' not 'group/sub-group'.</param>
-    public static bool Exists(H5LocationHandle locationId, string name)
+    public static bool Exists(H5Location locationId, string name)
     {
         locationId.ThrowIfNotValid();
 
@@ -56,14 +106,14 @@ public class H5Group : H5Location<H5GroupHandle>
 
         // NOTE: H5L.exists can only check for a direct child of locationId
         int err = H5L.exists(locationId, name);
-        
+
         err.ThrowIfError("H5L.exists");
 
         return err > 0;
 
         static bool IsSimpleName(string name)
         {
-            return !name.Contains("\\") && !name.Contains("/");
+            return !name.Contains('\\') && !name.Contains('/');
         }
     }
 
@@ -82,7 +132,7 @@ public class H5Group : H5Location<H5GroupHandle>
     /// </remarks>
     /// <param name="locationId">A file or group id</param>
     /// <param name="path">e.g. /group/sub-group/sub-sub-group</param>
-    public static bool PathExists(H5LocationHandle locationId, string path)
+    public static bool PathExists(H5Location locationId, string path)
     {
         locationId.ThrowIfNotValid();
         var ginfo = new H5G.info_t();

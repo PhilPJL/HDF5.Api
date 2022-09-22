@@ -5,7 +5,7 @@ namespace HDF5Api;
 
 public interface IH5ObjectWithAttributes
 {
-    H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId);
+    H5Attribute CreateAttribute(string name, H5Type typeId, H5Space space, H5PropertyList propertyList);
     H5Attribute OpenAttribute(string name);
     void DeleteAttribute(string name);
     bool AttributeExists(string name);

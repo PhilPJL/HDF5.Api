@@ -1,71 +1,78 @@
-﻿namespace HDF5Api;
+﻿using System;
+
+namespace HDF5Api;
 
 /// <summary>
 ///     Wrapper for H5S (Space) API.
 /// </summary>
-public class H5Space : H5Object<H5SpaceHandle>
+public struct H5Space : IDisposable
 {
-    internal H5Space(Handle handle) : base(new H5SpaceHandle(handle)) { }
+    #region Constructor and operators
+
+    private long Handle { get; set; } = H5Handle.DefaultHandleValue;
+    private readonly bool _isNative = false;
+
+    internal H5Space(long handle, bool isNative = false)
+    {
+        handle.ThrowIfDefaultOrInvalidHandleValue();
+
+        Handle = handle;
+        _isNative = isNative;
+
+        if (!_isNative)
+        {
+            H5Handle.TrackHandle(handle);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_isNative || Handle == H5Handle.DefaultHandleValue)
+        {
+            // native or default(0) handle shouldn't be disposed
+            return;
+        }
+
+        if (Handle == H5Handle.InvalidHandleValue)
+        {
+            // already disposed
+            // TODO: throw already disposed
+        }
+
+        // close and mark as disposed
+        H5SpaceNativeMethods.Close(this);
+        H5Handle.UntrackHandle(Handle);
+        Handle = H5Handle.InvalidHandleValue;
+    }
+
+    public static implicit operator long(H5Space h5object)
+    {
+        h5object.Handle.ThrowIfInvalidHandleValue();
+        return h5object.Handle;
+    }
+
+    #endregion
+
+    #region Public Api
 
     public void SelectHyperslab(int offset, int count)
     {
-        SelectHyperslab(this, offset, count);
+        H5SpaceNativeMethods.SelectHyperslab(this, offset, count);
     }
 
     public long GetSimpleExtentNPoints()
     {
-        return GetSimpleExtentNPoints(this);
+        return H5SpaceNativeMethods.GetSimpleExtentNPoints(this);
     }
 
     public int GetSimpleExtentNDims()
     {
-        return GetSimpleExtentNDims(this);
+        return H5SpaceNativeMethods.GetSimpleExtentNDims(this);
     }
 
     public (int rank, ulong[] dims, ulong[] maxDims) GetSimpleExtentDims()
     {
-        return GetSimpleExtentDims(this);
-    }
-
-    #region C API wrappers
-
-    public static H5Space CreateSimple(int rank, ulong[] dims, ulong[] maxdims)
-    {
-        Handle h = H5S.create_simple(rank, dims, maxdims);
-        h.ThrowIfNotValid("H5S.create_simple");
-        return new H5Space(h);
-    }
-
-    public static void SelectHyperslab(H5SpaceHandle spaceId, int offset, int count)
-    {
-        int err = H5S.select_hyperslab(spaceId, H5S.seloper_t.SET, new[] { (ulong)offset }, null,
-            new[] { (ulong)count }, null);
-        err.ThrowIfError("H5S.select_hyperslab");
-    }
-
-    public static long GetSimpleExtentNPoints(H5SpaceHandle spaceId)
-    {
-        spaceId.ThrowIfNotValid();
-        return H5S.get_simple_extent_npoints(spaceId.Handle);
-    }
-
-    public static int GetSimpleExtentNDims(H5SpaceHandle spaceId)
-    {
-        spaceId.ThrowIfNotValid();
-        return H5S.get_simple_extent_ndims(spaceId.Handle);
-    }
-
-    public static (int rank, ulong[] dims, ulong[] maxDims) GetSimpleExtentDims(H5SpaceHandle spaceId)
-    {
-        var rank = GetSimpleExtentNDims(spaceId);
-        var dims = new ulong[rank];
-        var maxDims = new ulong[rank];
-
-        spaceId.ThrowIfNotValid();
-        int err = H5S.get_simple_extent_dims(spaceId.Handle, dims, maxDims);
-        err.ThrowIfError("H5S.get_simple_extent_dims");
-
-        return (rank, dims, maxDims);
+        return H5SpaceNativeMethods.GetSimpleExtentDims(this);
     }
 
     #endregion

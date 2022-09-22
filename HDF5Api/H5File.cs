@@ -6,27 +6,57 @@ namespace HDF5Api;
 /// <summary>
 ///     Wrapper for H5F (File) API.
 /// </summary>
-public class H5File : H5Location<H5FileHandle>
+public struct H5File : IDisposable
 {
-    private H5File(Handle handle) : base(new H5FileHandle(handle)) { }
+    #region Constructor and operators
+
+    private long Handle { get; set; } = H5Handle.DefaultHandleValue;
+    private readonly bool _isNative = false;
+
+    internal H5File(long handle, bool isNative = false)
+    {
+        handle.ThrowIfDefaultOrInvalidHandleValue();
+
+        Handle = handle;
+        _isNative = isNative;
+
+        if (!_isNative)
+        {
+            H5Handle.TrackHandle(handle);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_isNative || Handle == H5Handle.DefaultHandleValue)
+        {
+            // native or default(0) handle shouldn't be disposed
+            return;
+        }
+
+        if (Handle == H5Handle.InvalidHandleValue)
+        {
+            // already disposed
+            // TODO: throw already disposed
+        }
+
+        // close and mark as disposed
+        H5FileNativeMethods.Close(this);
+        H5Handle.UntrackHandle(Handle);
+        Handle = H5Handle.InvalidHandleValue;
+    }
+
+    public static implicit operator long(H5File h5object)
+    {
+        h5object.Handle.ThrowIfInvalidHandleValue();
+        return h5object.Handle;
+    }
+
+    #endregion
 
     public long GetObjectCount(H5ObjectTypes types = H5ObjectTypes.All)
     {
-        return GetObjectCount(this, types);
-    }
-
-    #region C level API wrappers
-
-    /// <summary>
-    ///     Create a new file. Truncates existing file.
-    /// </summary>
-    public static H5File Create(string path)
-    {
-        Handle h = H5F.create(path, H5F.ACC_TRUNC);
-
-        h.ThrowIfNotValid("H5F.create");
-
-        return new H5File(h);
+        return H5FileNativeMethods.GetObjectCount(this, types);
     }
 
     /// <summary>
@@ -34,7 +64,7 @@ public class H5File : H5Location<H5FileHandle>
     /// </summary>
     public static H5File OpenReadOnly(string path)
     {
-        return Open(path, true);
+        return H5FileNativeMethods.Open(path, true);
     }
 
     /// <summary>
@@ -42,30 +72,20 @@ public class H5File : H5Location<H5FileHandle>
     /// </summary>
     public static H5File OpenReadWrite(string path)
     {
-        return Open(path, false);
-    }
-
-    public static H5File Open(string path, bool readOnly)
-    {
-        Handle h = H5F.open(path, readOnly ? H5F.ACC_RDONLY:  H5F.ACC_RDWR);
-
-        h.ThrowIfNotValid("H5F.open");
-
-        return new H5File(h);
+        return H5FileNativeMethods.Open(path, false);
     }
 
     public static H5File OpenOrCreate(string path, bool readOnly)
     {
-        return File.Exists(path) ? Open(path, readOnly) : Create(path);
+        return File.Exists(path) 
+            ? H5FileNativeMethods.Open(path, readOnly) 
+            : H5FileNativeMethods.Create(path);
     }
 
-    public static long GetObjectCount(H5FileHandle fileId, H5ObjectTypes types = H5ObjectTypes.All)
+    public static H5File Create(string path)
     {
-        var ptr = H5F.get_obj_count(fileId, (uint)types);
-        return (long)ptr;
+        return H5FileNativeMethods.Create(path);
     }
-
-    #endregion
 }
 
 [Flags]

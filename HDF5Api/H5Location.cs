@@ -11,22 +11,21 @@ namespace HDF5Api;
 ///     Implements operations that can be carried out equally on files and groups.
 /// </remarks>
 /// <typeparam name="THandle"></typeparam>
-public abstract class H5Location<THandle> : H5Object<THandle>, IH5Location where THandle : H5LocationHandle
+/*public abstract class H5Location<THandle> : H5Object<THandle>, IH5Location where THandle : H5LocationHandle
 {
     protected H5Location(THandle handle) : base(handle) { }
 
     /// <summary>
     ///     Create an Attribute for this location
     /// </summary>
-    public H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId,
-        H5PropertyListHandle propertyListId)
+    public H5Attribute CreateAttribute(string name, H5Type typeId, H5Space spaceId, H5PropertyList propertyListId)
     {
         if (AttributeExists(name))
         {
             throw new Hdf5Exception($"Attribute {name} already exists");
         }
 
-        return H5Attribute.Create(Handle, name, typeId, spaceId, propertyListId);
+        return H5Attribute.NativeMethods.Create(this, name, typeId, spaceId, propertyListId);
     }
 
     /// <summary>
@@ -101,8 +100,8 @@ public abstract class H5Location<THandle> : H5Object<THandle>, IH5Location where
     /// <summary>
     ///     Create a DataSet in this location
     /// </summary>
-    public H5DataSet CreateDataSet(string name, H5TypeHandle typeId, H5SpaceHandle spaceId,
-        H5PropertyListHandle propertyListId)
+    public H5DataSet CreateDataSet(string name, H5Type typeId, H5Space space,
+        H5PropertyList propertyList)
     {
         return H5DataSet.Create(this, name, typeId, spaceId, propertyListId);
     }
@@ -154,3 +153,4 @@ public abstract class H5Location<THandle> : H5Object<THandle>, IH5Location where
         }
     }
 }
+*/

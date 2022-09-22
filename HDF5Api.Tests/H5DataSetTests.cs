@@ -11,13 +11,13 @@ public class H5DataSetTests : H5Test
     {
         int chunkSize = 1;
 
-        using var memorySpace = H5Space.CreateSimple(1, new[] { (ulong)chunkSize }, new[] { H5S.UNLIMITED });
+        using var memorySpace = H5SpaceNativeMethods.CreateSimple(1, new[] { (ulong)chunkSize }, new[] { H5S.UNLIMITED });
         
-        using var propertyList = H5PropertyList.Create(H5P.DATASET_CREATE);
+        using var propertyList = H5PropertyListNativeMethods.Create(H5P.DATASET_CREATE);
         // Enable chunking. From the user guide: "HDF5 requires the use of chunking when defining extendable datasets."
         propertyList.SetChunk(1, new[] { (ulong)chunkSize });
 
-        using var type = H5TypeHandle.WrapNative(H5T.NATIVE_INT64);
+        using var type = new H5Type(H5T.NATIVE_INT64, true);
 
         return location.CreateDataSet(dataSetName, type, memorySpace, propertyList);
     }
@@ -83,6 +83,7 @@ public class H5DataSetTests : H5Test
     }
 
     #region Attributes
+
     [TestMethod]
     public void CreateWriteReadDeleteAttributesSucceeds()
     {

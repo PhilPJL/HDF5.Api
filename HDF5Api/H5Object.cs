@@ -1,10 +1,12 @@
-﻿namespace HDF5Api;
+﻿using System;
+
+namespace HDF5Api;
 
 /// <summary>
 ///     Base class for H5 object types.
 /// </summary>
 /// <typeparam name="THandle">The handle associated with this object type.</typeparam>
-public class H5Object<THandle> : Disposable where THandle : H5Handle
+/*public class H5Object<THandle> : Disposable where THandle : IH5Object
 {
     public H5Object(THandle handle)
     {
@@ -26,3 +28,6 @@ public class H5Object<THandle> : Disposable where THandle : H5Handle
         return h5Object.Handle;
     }
 }
+*/
+
+

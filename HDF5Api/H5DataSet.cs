@@ -7,28 +7,72 @@ namespace HDF5Api;
 /// <summary>
 ///     Wrapper for H5D (Data-set) API.
 /// </summary>
-public class H5DataSet : H5Object<H5DataSetHandle>, IH5ObjectWithAttributes
+public struct H5DataSet : IDisposable
 {
-    private H5DataSet(Handle handle) : base(new H5DataSetHandle(handle)) { }
+    #region Constructor and operators
 
-    public void Write(H5TypeHandle typeId, H5SpaceHandle memorySpaceId, H5SpaceHandle fileSpaceId, IntPtr buffer)
+    private long Handle { get; set; } = H5Handle.DefaultHandleValue;
+    private readonly bool _isNative = false;
+
+    internal H5DataSet(long handle, bool isNative = false)
     {
-        Write(this, typeId, memorySpaceId, fileSpaceId, buffer);
+        handle.ThrowIfDefaultOrInvalidHandleValue();
+
+        Handle = handle;
+        _isNative = isNative;
+
+        if (!_isNative)
+        {
+            H5Handle.TrackHandle(handle);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_isNative || Handle == H5Handle.DefaultHandleValue)
+        {
+            // native or default(0) handle shouldn't be disposed
+            return;
+        }
+
+        if (Handle == H5Handle.InvalidHandleValue)
+        {
+            // already disposed
+            // TODO: throw already disposed
+        }
+
+        // close and mark as disposed
+        H5DataSetNativeMethods.Close(this);
+        H5Handle.UntrackHandle(Handle);
+        Handle = H5Handle.InvalidHandleValue;
+    }
+
+    public static implicit operator long(H5DataSet h5object)
+    {
+        h5object.Handle.ThrowIfInvalidHandleValue();
+        return h5object.Handle;
+    }
+
+    #endregion
+
+    public void Write(H5Type typeId, H5Space memorySpace, H5Space fileSpace, IntPtr buffer)
+    {
+        H5DataSetNativeMethods.Write(this, typeId, memorySpace, fileSpace, buffer);
     }
 
     public H5Space GetSpace()
     {
-        return GetSpace(this);
+        return H5DataSetNativeMethods.GetSpace(this);
     }
 
     public void SetExtent(ulong[] dims)
     {
-        SetExtent(this, dims);
+        H5DataSetNativeMethods.SetExtent(this, dims);
     }
 
     public H5Type GetH5Type()
     {
-        return H5Type.GetType(Handle);
+        return H5TypeNativeMethods.GetType(this);
     }
 
     /// <summary>
@@ -36,27 +80,27 @@ public class H5DataSet : H5Object<H5DataSetHandle>, IH5ObjectWithAttributes
     /// </summary>
     public H5Attribute OpenAttribute(string name)
     {
-        return H5Attribute.Open(Handle, name);
+        return H5AttributeNativeMethods.Open(Handle, name);
     }
 
-    public H5Attribute CreateAttribute(string name, H5TypeHandle typeId, H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
+    public H5Attribute CreateAttribute(string name, H5Type typeId, H5Space space, H5PropertyList creationPropertyList = default)
     {
-        return H5Attribute.Create(Handle, name, typeId, spaceId, propertyListId);
+        return H5AttributeNativeMethods.Create(Handle, name, typeId, space, creationPropertyList);
     }
 
     public void DeleteAttribute(string name)
     {
-        H5Attribute.Delete(Handle, name);
+        H5AttributeNativeMethods.Delete(Handle, name);
     }
 
     public bool AttributeExists(string name)
     {
-        return H5Attribute.Exists(Handle, name);
+        return H5AttributeNativeMethods.Exists(Handle, name);
     }
 
     public T ReadAttribute<T>(string name) where T : unmanaged
     {
-        return H5ObjectWithAttributeExtensions.ReadAttribute<T>(this, name);
+        return H5Attribute.Read<T>(this, name);
     }
 
     public string ReadStringAttribute(string name)
@@ -71,7 +115,7 @@ public class H5DataSet : H5Object<H5DataSetHandle>, IH5ObjectWithAttributes
 
     public IEnumerable<string> ListAttributeNames()
     {
-        return H5Attribute.ListAttributeNames(Handle);
+        return H5AttributeNativeMethods.ListAttributeNames(Handle);
     }
 
     /// <summary>
@@ -94,7 +138,7 @@ public class H5DataSet : H5Object<H5DataSetHandle>, IH5ObjectWithAttributes
             throw new Hdf5Exception($"DataSet is of class {cls} when expecting {H5T.class_t.COMPOUND}.");
         }
 
-        long size = GetStorageSize(this);
+        long size = H5DataSetNativeMethods.GetStorageSize(this);
 
         if (size != count * Marshal.SizeOf<T>())
         {
@@ -107,90 +151,10 @@ public class H5DataSet : H5Object<H5DataSetHandle>, IH5ObjectWithAttributes
             var result = new T[count];
             fixed (T* ptr = result)
             {
-                int err = H5D.read(Handle, type.Handle, space.Handle, space.Handle, 0, new IntPtr(ptr));
+                int err = H5D.read(Handle, type, space, space, 0, new IntPtr(ptr));
                 err.ThrowIfError("H5A.read");
                 return result;
             }
         }
     }
-
-    #region C level API wrappers
-
-    public static long GetStorageSize(H5DataSetHandle dataSetId)
-    {
-        dataSetId.ThrowIfNotValid();
-        return (long)H5D.get_storage_size(dataSetId.Handle);
-    }
-
-    public static H5DataSet Create(H5LocationHandle location, string name, H5TypeHandle typeId, H5SpaceHandle spaceId,
-        H5PropertyListHandle propertyListId)
-    {
-        location.ThrowIfNotValid();
-        typeId.ThrowIfNotValid();
-        spaceId.ThrowIfNotValid();
-        propertyListId.ThrowIfNotValid();
-
-        Handle h = H5D.create(location, name, typeId, spaceId, H5P.DEFAULT, propertyListId);
-
-        h.ThrowIfNotValid("H5D.create");
-
-        return new H5DataSet(h);
-    }
-
-    public static H5DataSet Open(H5LocationHandle location, string name)
-    {
-        location.ThrowIfNotValid();
-
-        Handle h = H5D.open(location, name);
-
-        h.ThrowIfNotValid("H5D.open");
-
-        return new H5DataSet(h);
-    }
-
-    public static bool Exists(H5LocationHandle location, string name)
-    {
-        location.ThrowIfNotValid();
-
-        int err = H5L.exists(location, name);
-
-        err.ThrowIfError("H5L.exists");
-
-        return err > 0;
-    }
-
-    public static void SetExtent(H5DataSetHandle dataSetId, ulong[] dims)
-    {
-        dataSetId.ThrowIfNotValid();
-
-        int err = H5D.set_extent(dataSetId, dims);
-
-        err.ThrowIfError("H5D.set_extent");
-    }
-
-    public static void Write(H5DataSetHandle dataSetId, H5TypeHandle typeId, H5SpaceHandle memorySpaceId,
-        H5SpaceHandle fileSpaceId, IntPtr buffer)
-    {
-        dataSetId.ThrowIfNotValid();
-        typeId.ThrowIfNotValid();
-        memorySpaceId.ThrowIfNotValid();
-        fileSpaceId.ThrowIfNotValid();
-
-        int err = H5D.write(dataSetId, typeId, memorySpaceId, fileSpaceId, H5P.DEFAULT, buffer);
-
-        err.ThrowIfError("H5D.write");
-    }
-
-    public static H5Space GetSpace(H5DataSetHandle dataSetId)
-    {
-        dataSetId.ThrowIfNotValid();
-
-        Handle h = H5D.get_space(dataSetId);
-
-        h.ThrowIfNotValid("H5D.get_space");
-
-        return new H5Space(h);
-    }
-
-    #endregion
 }

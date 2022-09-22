@@ -3,15 +3,15 @@ using HDF5Api.Disposables;
 
 namespace HDF5Api;
 
-public static class H5ObjectWithAttributeExtensions
+internal static class H5ObjectWithAttributeExtensions
 {
-    private static void CreateAndWriteAttribute(IH5ObjectWithAttributes owa, string name, H5TypeHandle typeId, IntPtr buffer)
+    private static void CreateAndWriteAttribute(IH5ObjectWithAttributes owa, string name, H5Type typeId, IntPtr buffer)
     {
         // Single dimension (rank 1), unlimited length, chunk size.
-        using var memorySpace = H5Space.CreateSimple(1, new ulong[] { 1 }, new ulong[] { 1 });
+        using var memorySpace = H5SpaceNativeMethods.CreateSimple(1, new ulong[] { 1 }, new ulong[] { 1 });
 
         // Create the attribute-creation property list
-        using var propertyList = H5PropertyList.Create(H5P.ATTRIBUTE_CREATE);
+        using var propertyList = H5PropertyListNativeMethods.Create(H5P.ATTRIBUTE_CREATE);
 
         // Create an attribute
         using var attribute = owa.CreateAttribute(name, typeId, memorySpace, propertyList);
@@ -20,7 +20,7 @@ public static class H5ObjectWithAttributeExtensions
 
     public static void CreateAndWriteAttribute<T>(this IH5ObjectWithAttributes owa, string name, T value) where T : unmanaged
     {
-        using var typeId = H5TypeHandle.WrapNative(H5Attribute.GetNativeType<T>());
+        using var typeId = H5Type.GetNativeType<T>();
         using var pinned = new PinnedObject(value);
         CreateAndWriteAttribute(owa, name, typeId, pinned);
     }
@@ -55,23 +55,23 @@ public static class H5ObjectWithAttributeExtensions
         CreateAndWriteAttribute(owa, name, typeId, pinned);
     }
 
-    internal static T ReadAttribute<T>(this IH5ObjectWithAttributes owa, string name) where T : unmanaged
+    internal static T ReadAttribute<T>(this long handle, string name) where T : unmanaged
     {
-        using var attribute = owa.OpenAttribute(name);
+        using var attribute = H5AttributeNativeMethods.Open(handle, name);
 
         return attribute.Read<T>();
     }
 
-    internal static string ReadStringAttribute(this IH5ObjectWithAttributes owa, string name)
+    internal static string ReadStringAttribute(this long handle, string name)
     {
-        using var attribute = owa.OpenAttribute(name);
+        using var attribute = H5AttributeNativeMethods.Open(handle, name);
 
         return attribute.ReadString();
     }
 
-    internal static DateTime ReadDateTimeAttribute(this IH5ObjectWithAttributes owa, string name)
+    internal static DateTime ReadDateTimeAttribute(this long handle, string name)
     {
-        using var attribute = owa.OpenAttribute(name);
+        using var attribute = H5AttributeNativeMethods.Open(handle, name);
 
         return attribute.ReadDateTime();
     }

@@ -1,51 +1,72 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using HDF5Api.Disposables;
+using System;
 using System.Runtime.InteropServices;
-using HDF5Api.Disposables;
 
 namespace HDF5Api;
 
 /// <summary>
-///     Wrapper for H5G (Attribute) API.
+///     Wrapper for H5A (Attribute) API.
 /// </summary>
-public class H5Attribute : H5Object<H5AttributeHandle>
+public struct H5Attribute : IDisposable
 {
-    private H5Attribute(Handle handle) : base(new H5AttributeHandle(handle)) { }
+    #region Constructor and operators
 
-    public void Write(H5TypeHandle typeId, IntPtr buffer)
-    {
-        Write(this, typeId, buffer);
-    }
+    private long Handle { get; set; } = H5Handle.DefaultHandleValue;
+    private readonly bool _isNative = false;
 
-    public H5Type GetH5Type()
+    internal H5Attribute(long handle, bool isNative = false)
     {
-        return H5Type.GetType(Handle);
-    }
+        handle.ThrowIfDefaultOrInvalidHandleValue();
 
-    public static Handle GetNativeType<T>() where T : unmanaged
-    {
-        return default(T) switch
+        Handle = handle;
+        _isNative = isNative;
+
+        if (!_isNative)
         {
-            //            char => H5T.NATIVE_CHAR,
+            H5Handle.TrackHandle(handle);
+        }
+    }
 
-            short => H5T.NATIVE_INT16,
-            ushort => H5T.NATIVE_USHORT,
-            int => H5T.NATIVE_INT32,
-            uint => H5T.NATIVE_UINT32,
-            long => H5T.NATIVE_INT64,
-            ulong => H5T.NATIVE_UINT64,
-            float => H5T.NATIVE_FLOAT,
-            double => H5T.NATIVE_DOUBLE,
-            // TODO: add more mappings as required
-            _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
-        };
+    public void Dispose()
+    {
+        if(_isNative || Handle == H5Handle.DefaultHandleValue)
+        {
+            // native or default(0) handle shouldn't be disposed
+            return;
+        }
+
+        if (Handle == H5Handle.InvalidHandleValue)
+        {
+            // already disposed
+            // TODO: throw already disposed
+        }
+
+        // close and mark as disposed
+        H5AttributeNativeMethods.Close(this);
+        H5Handle.UntrackHandle(Handle);
+        Handle = H5Handle.InvalidHandleValue;
+    }
+
+    public static implicit operator long(H5Attribute h5object)
+    {
+        h5object.Handle.ThrowIfInvalidHandleValue();
+        return h5object.Handle;
+    }
+
+    #endregion
+
+    #region Public Api
+
+    public H5Space GetSpace()
+    {
+        return H5AttributeNativeMethods.GetSpace(this);
     }
 
     public string ReadString()
     {
-        using var type = GetH5Type();
+        using var type = H5TypeNativeMethods.GetType(this);
         using var space = GetSpace();
+
         long count = space.GetSimpleExtentNPoints();
 
         if (count != 1)
@@ -59,11 +80,11 @@ public class H5Attribute : H5Object<H5AttributeHandle>
             throw new Hdf5Exception($"Attribute is of class {cls} when expecting STRING.");
         }
 
-        long size = GetStorageSize(this);
+        long size = H5AttributeNativeMethods.GetStorageSize(this);
 
         // TODO: probably simpler way to do this.
         using var buffer = new GlobalMemory((int)(size + 1));
-        int err = H5A.read(Handle, type.Handle, buffer.IntPtr);
+        int err = H5A.read(this, type, buffer.IntPtr);
         err.ThrowIfError("H5A.read");
 
         // TODO: marshal Ansi/UTF8/.. etc as appropriate
@@ -77,8 +98,9 @@ public class H5Attribute : H5Object<H5AttributeHandle>
 
     public T Read<T>() where T : unmanaged
     {
-        using var type = GetH5Type();
+        using var type = H5TypeNativeMethods.GetType(this);
         using var space = GetSpace();
+
         long count = space.GetSimpleExtentNPoints();
 
         if (count != 1)
@@ -87,15 +109,16 @@ public class H5Attribute : H5Object<H5AttributeHandle>
         }
 
         var cls = type.GetClass();
-        using var h = H5TypeHandle.WrapNative(GetNativeType<T>());
-        var expectedCls = H5Type.GetClass(h);
+
+        using var nativeType = H5Type.GetNativeType<T>();
+        var expectedCls = H5TypeNativeMethods.GetClass(nativeType);
 
         if (cls != expectedCls)
         {
             throw new Hdf5Exception($"Attribute is of class {cls} when expecting {expectedCls}.");
         }
 
-        int size = (int)GetStorageSize(this);
+        int size = (int)H5AttributeNativeMethods.GetStorageSize(this);
 
         if (size != Marshal.SizeOf<T>())
         {
@@ -106,173 +129,15 @@ public class H5Attribute : H5Object<H5AttributeHandle>
         unsafe
         {
             T result = default;
-            int err = H5A.read(Handle, type.Handle, new IntPtr(&result));
+            int err = H5A.read(this, type, new IntPtr(&result));
             err.ThrowIfError("H5A.read");
             return result;
         }
     }
 
-    public H5Space GetSpace()
+    public void Write(H5Type type, IntPtr buffer)
     {
-        return GetSpace(Handle);
-    }
-
-    #region C level API wrappers
-
-    #region Create
-    private static H5Attribute CreateImpl(H5Handle objectId, string name, H5TypeHandle typeId,
-        H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
-    {
-        objectId.ThrowIfNotValid();
-        typeId.ThrowIfNotValid();
-        spaceId.ThrowIfNotValid();
-        propertyListId.ThrowIfNotValid();
-
-        Handle h = H5A.create(objectId.Handle, name, typeId, spaceId, propertyListId);
-
-        h.ThrowIfNotValid("H5A.create");
-
-        return new H5Attribute(h);
-    }
-
-    public static H5Attribute Create(H5DataSetHandle dataSetId, string name, H5TypeHandle typeId,
-        H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
-    {
-        return CreateImpl(dataSetId, name, typeId, spaceId, propertyListId);
-    }
-
-    public static H5Attribute Create(H5LocationHandle locationId, string name, H5TypeHandle typeId,
-        H5SpaceHandle spaceId, H5PropertyListHandle propertyListId)
-    {
-        return CreateImpl(locationId, name, typeId, spaceId, propertyListId);
-    }
-    #endregion
-
-    #region Open
-    private static H5Attribute OpenAttributeImpl(H5Handle attributeParentId, string name)
-    {
-        attributeParentId.ThrowIfNotValid();
-
-        Handle h = H5A.open(attributeParentId.Handle, name);
-
-        h.ThrowIfNotValid("H5A.open");
-
-        return new H5Attribute(h);
-    }
-
-    public static H5Attribute Open(H5LocationHandle locationId, string name)
-    {
-        return OpenAttributeImpl(locationId, name);
-    }
-
-    public static H5Attribute Open(H5DataSetHandle dataSetId, string name)
-    {
-        return OpenAttributeImpl(dataSetId, name);
-    }
-    #endregion
-
-    #region Delete
-    private static void DeleteImpl(H5Handle objectId, string name)
-    {
-        int err = H5A.delete(objectId, name);
-
-        err.ThrowIfError("H5A.delete");
-    }
-
-    public static void Delete(H5LocationHandle locationId, string name)
-    {
-        DeleteImpl(locationId, name);
-    }
-
-    public static void Delete(H5DataSetHandle dataSetId, string name)
-    {
-        DeleteImpl(dataSetId, name);
-    }
-    #endregion
-
-    #region Exists
-    private static bool ExistsImpl(H5Handle objectId, string name)
-    {
-        objectId.ThrowIfNotValid();
-        int err = H5A.exists(objectId, name);
-        err.ThrowIfError("H5A.exists");
-        return err > 0;
-    }
-
-    public static bool Exists(H5LocationHandle locationId, string name)
-    {
-        return ExistsImpl(locationId, name);
-    }
-
-    public static bool Exists(H5DataSetHandle dataSetId, string name)
-    {
-        return ExistsImpl(dataSetId, name);
-    }
-    #endregion
-
-    #region List attribute names
-    private static IEnumerable<string> ListAttributeNamesImpl(H5Handle handle)
-    {
-        handle.ThrowIfNotValid();
-
-        if(handle is not H5DataSetHandle && handle is not H5GroupHandle && handle is not H5FileHandle)
-        {
-            throw new Hdf5Exception($"The supplied handle is of type {handle.GetType().Name}.  It must be H5DataSetHandle, H5GroupHandle or H5FileHandle.");
-        }
-
-        ulong idx = 0;
-
-        var names = new List<string>();
-        
-        int err = H5A.iterate(handle, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
-        err.ThrowIfError("H5A.iterate");
-
-        return names;
-
-        int Callback(Handle id, IntPtr intPtrName, ref H5A.info_t info, IntPtr _)
-        {
-            string name = Marshal.PtrToStringAnsi(intPtrName);
-
-            int err1 = H5A.get_info_by_name(handle, ".", name, ref info);
-            err1.ThrowIfError("H5A.get_info_by_name");
-
-            Debug.WriteLine($"{name}: {info.data_size}");
-
-            names.Add(name);
-            return 0;
-        }
-    }
-
-    public static IEnumerable<string> ListAttributeNames(H5LocationHandle locationId)
-    {
-        return ListAttributeNamesImpl(locationId);
-    }
-
-    public static IEnumerable<string> ListAttributeNames(H5DataSetHandle dataSetId)
-    {
-        return ListAttributeNamesImpl(dataSetId);
-    }
-    #endregion
-
-    public static void Write(H5AttributeHandle attributeId, H5TypeHandle typeId, IntPtr buffer)
-    {
-        int err = H5A.write(attributeId, typeId, buffer);
-
-        err.ThrowIfError("H5A.write");
-    }
-
-    public static H5Space GetSpace(H5AttributeHandle attributeId)
-    {
-        attributeId.ThrowIfNotValid();
-        Handle h = H5A.get_space(attributeId.Handle);
-        h.ThrowIfNotValid("H5A.get_space");
-        return new H5Space(h);
-    }
-
-    public static long GetStorageSize(H5AttributeHandle attributeId)
-    {
-        attributeId.ThrowIfNotValid();
-        return (long)H5A.get_storage_size(attributeId.Handle);
+        H5AttributeNativeMethods.Write(this, type, buffer);
     }
 
     #endregion
