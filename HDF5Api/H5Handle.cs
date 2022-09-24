@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 /*
  * File contains wrappers for all handle/H5ID types returned by the H5 PInvoke API.
@@ -9,10 +10,10 @@ using System.Collections.Generic;
 
 namespace HDF5Api;
 
-internal static class H5Handle
+public static class H5Handle
 {
 #if DEBUG
-    public static ConcurrentDictionary<long, string> Handles { get; } = new();
+    private static ConcurrentDictionary<long, string> Handles { get; } = new();
 #endif
     public static int OpenHandleCount { get; set; }
 
@@ -37,6 +38,14 @@ internal static class H5Handle
 #endif
 
         OpenHandleCount--;
+    }
+
+    public static void DumpOpenHandles()
+    {
+        foreach (var kvp in Handles)
+        {
+            Debug.WriteLine(kvp.Value);
+        }
     }
 }
 

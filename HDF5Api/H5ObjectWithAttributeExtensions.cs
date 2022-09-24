@@ -3,7 +3,7 @@ using System;
 
 namespace HDF5Api;
 
-internal static class H5ObjectWithAttributeExtensions
+public static class H5ObjectWithAttributeExtensions
 {
     private static void CreateAndWriteAttribute(IH5ObjectWithAttributes owa, string name, H5Type typeId, IntPtr buffer)
     {

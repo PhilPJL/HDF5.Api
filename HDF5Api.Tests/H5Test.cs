@@ -23,15 +23,12 @@ public abstract class H5Test
     {
         action();
 #if DEBUG
-        if (expectedHandlesOpen == 0 && !H5Handle.Handles.IsEmpty)
+        if (expectedHandlesOpen == 0 && H5Handle.OpenHandleCount != 0)
         {
-            foreach (var kvp in H5Handle.Handles)
-            {
-                Debug.WriteLine(kvp.Value);
-            }
+            H5Handle.DumpOpenHandles();
         }
 
-        Assert.AreEqual(expectedHandlesOpen, H5Handle.Handles.Count);
+        Assert.AreEqual(expectedHandlesOpen, H5Handle.OpenHandleCount);
 #else
         Assert.AreEqual(expectedHandlesOpen, H5Handle.OpenHandleCount);
 #endif

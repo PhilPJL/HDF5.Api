@@ -93,7 +93,8 @@ public class H5Attribute : H5Object<H5Attribute>
         }
     }
 
-    public void Write(H5Type type, IntPtr buffer)
+    // TODO: expose public Write<T> etc as per Read
+    internal void Write(H5Type type, IntPtr buffer)
     {
         H5AttributeNativeMethods.Write(this, type, buffer);
     }
