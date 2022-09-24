@@ -28,12 +28,14 @@ internal static partial class H5DataSetNativeMethods
         return (long)H5D.get_storage_size(dataSetId);
     }
 
-    public static H5DataSet Create(IH5Location location, string name, H5Type typeId, H5Space space, 
-        H5PropertyList linkCreationPropertyList = default, 
-        H5PropertyList dataSetCreationPropertyList = default, 
-        H5PropertyList accessCreationPropertyList = default)
+    public static H5DataSet Create<T>(H5Location<T> location, string name, H5Type type, H5Space space,
+        H5PropertyList? linkCreationPropertyList = null,
+        H5PropertyList? dataSetCreationPropertyList = null,
+        H5PropertyList? accessCreationPropertyList = null) where T : H5Object<T>
     {
-        Handle h = H5D.create(location, name, typeId, space, H5P.DEFAULT, 
+        location.Handle.AssertIsHandleType(HandleType.File, HandleType.Group);
+
+        long h = H5D.create(location, name, type, space,
             linkCreationPropertyList, dataSetCreationPropertyList, accessCreationPropertyList);
 
         h.ThrowIfInvalidHandleValue("H5D.create");
@@ -41,17 +43,21 @@ internal static partial class H5DataSetNativeMethods
         return new H5DataSet(h);
     }
 
-    public static H5DataSet Open(IH5Location location, string name)
+    public static H5DataSet Open<T>(H5Location<T> location, string name) where T : H5Object<T>
     {
-        Handle h = H5D.open(location, name);
+        location.Handle.AssertIsHandleType(HandleType.File, HandleType.Group);
+
+        long h = H5D.open(location, name);
 
         h.ThrowIfInvalidHandleValue("H5D.open");
 
         return new H5DataSet(h);
     }
 
-    public static bool Exists(IH5Location location, string name)
+    public static bool Exists<T>(H5Location<T> location, string name) where T : H5Object<T>
     {
+        location.Handle.AssertIsHandleType(HandleType.File, HandleType.Group);
+
         int err = H5L.exists(location, name);
 
         err.ThrowIfError("H5L.exists");
@@ -75,7 +81,7 @@ internal static partial class H5DataSetNativeMethods
 
     public static H5Space GetSpace(H5DataSet dataSet)
     {
-        Handle h = H5D.get_space(dataSet);
+        long h = H5D.get_space(dataSet);
 
         h.ThrowIfInvalidHandleValue("H5D.get_space");
 

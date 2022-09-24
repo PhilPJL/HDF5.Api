@@ -28,7 +28,7 @@ internal static partial class H5TypeNativeMethods
 
     public static H5Type CreateCompoundType(int size)
     {
-        Handle h = H5T.create(H5T.class_t.COMPOUND, new IntPtr(size));
+        long h = H5T.create(H5T.class_t.COMPOUND, new IntPtr(size));
         h.ThrowIfInvalidHandleValue("H5T.create");
         return new H5Type(h);
     }
@@ -54,42 +54,42 @@ internal static partial class H5TypeNativeMethods
 
     public static H5Type CreateByteArrayType(int size)
     {
-        Handle h = H5T.array_create(H5T.NATIVE_B8, 1, new[] { (ulong)size });
+        long h = H5T.array_create(H5T.NATIVE_B8, 1, new[] { (ulong)size });
         h.ThrowIfInvalidHandleValue("H5T.array_create");
         return new H5Type(h);
     }
 
     public static H5Type CreateDoubleArrayType(int size)
     {
-        Handle h = H5T.array_create(H5T.NATIVE_DOUBLE, 1, new[] { (ulong)size });
+        long h = H5T.array_create(H5T.NATIVE_DOUBLE, 1, new[] { (ulong)size });
         h.ThrowIfInvalidHandleValue("H5T.array_create");
         return new H5Type(h);
     }
 
     public static H5Type CreateFloatArrayType(int size)
     {
-        Handle h = H5T.array_create(H5T.NATIVE_FLOAT, 1, new[] { (ulong)size });
+        long h = H5T.array_create(H5T.NATIVE_FLOAT, 1, new[] { (ulong)size });
         h.ThrowIfInvalidHandleValue("H5T.array_create");
         return new H5Type(h);
     }
 
     public static H5Type CreateVariableLengthByteArrayType()
     {
-        Handle h = H5T.vlen_create(H5T.NATIVE_B8);
+        long h = H5T.vlen_create(H5T.NATIVE_B8);
         h.ThrowIfInvalidHandleValue("H5T.vlen_create");
         return new H5Type(h);
     }
 
     public static H5Type CreateFixedLengthStringType(int length)
     {
-        Handle h = H5T.copy(H5T.C_S1);
+        long h = H5T.copy(H5T.C_S1);
         h.ThrowIfInvalidHandleValue("H5T.copy");
         int err = H5T.set_size(h, new IntPtr(length));
         err.ThrowIfError("H5T.set_size");
         return new H5Type(h);
     }
 
-    public static void Insert(H5Type typeId, string name, IntPtr offset, Handle nativeTypeId)
+    public static void Insert(H5Type typeId, string name, IntPtr offset, long nativeTypeId)
     {
         int err = H5T.insert(typeId, name, offset, nativeTypeId);
         err.ThrowIfError("H5T.insert");

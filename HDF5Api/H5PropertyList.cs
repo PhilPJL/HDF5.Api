@@ -1,57 +1,13 @@
-﻿using System;
-
-namespace HDF5Api;
+﻿namespace HDF5Api;
 
 /// <summary>
 ///     Wrapper for H5P (Property list) API.
 /// </summary>
-public struct H5PropertyList : IDisposable
+public class H5PropertyList : H5Object<H5PropertyList>
 {
-    #region Constructor and operators
-
-    private long Handle { get; set; } = H5Handle.DefaultHandleValue;
-    private readonly bool _isNative = false;
-
-    internal H5PropertyList(long handle, bool isNative = false)
+    internal H5PropertyList(long handle) : base(handle, H5PropertyListNativeMethods.Close)
     {
-        handle.ThrowIfDefaultOrInvalidHandleValue();
-
-        Handle = handle;
-        _isNative = isNative;
-
-        if (!_isNative)
-        {
-            H5Handle.TrackHandle(handle);
-        }
     }
-
-    public void Dispose()
-    {
-        if (_isNative || Handle == H5Handle.DefaultHandleValue)
-        {
-            // native or default(0) handle shouldn't be disposed
-            return;
-        }
-
-        if (Handle == H5Handle.InvalidHandleValue)
-        {
-            // already disposed
-            // TODO: throw already disposed
-        }
-
-        // close and mark as disposed
-        H5PropertyListNativeMethods.Close(this);
-        H5Handle.UntrackHandle(Handle);
-        Handle = H5Handle.InvalidHandleValue;
-    }
-
-    public static implicit operator long(H5PropertyList h5Object)
-    {
-        h5Object.Handle.ThrowIfInvalidHandleValue();
-        return h5Object.Handle;
-    }
-
-    #endregion
 
     public void SetChunk(int rank, ulong[] dims)
     {

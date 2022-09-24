@@ -12,7 +12,7 @@ namespace HDF5Api;
 internal static class H5Handle
 {
 #if DEBUG
-    public static ConcurrentDictionary<Handle, string> Handles { get; } = new();
+    public static ConcurrentDictionary<long, string> Handles { get; } = new();
 #endif
     public static int OpenHandleCount { get; set; }
 

@@ -7,53 +7,11 @@ namespace HDF5Api;
 /// <summary>
 ///     Wrapper for H5D (Data-set) API.
 /// </summary>
-public struct H5DataSet : IDisposable
+public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 {
-    #region Constructor and operators
-
-    private long Handle { get; set; } = H5Handle.DefaultHandleValue;
-    private readonly bool _isNative = false;
-
-    internal H5DataSet(long handle, bool isNative = false)
+    internal H5DataSet(long handle) : base(handle, H5DataSetNativeMethods.Close)
     {
-        handle.ThrowIfDefaultOrInvalidHandleValue();
-
-        Handle = handle;
-        _isNative = isNative;
-
-        if (!_isNative)
-        {
-            H5Handle.TrackHandle(handle);
-        }
     }
-
-    public void Dispose()
-    {
-        if (_isNative || Handle == H5Handle.DefaultHandleValue)
-        {
-            // native or default(0) handle shouldn't be disposed
-            return;
-        }
-
-        if (Handle == H5Handle.InvalidHandleValue)
-        {
-            // already disposed
-            // TODO: throw already disposed
-        }
-
-        // close and mark as disposed
-        H5DataSetNativeMethods.Close(this);
-        H5Handle.UntrackHandle(Handle);
-        Handle = H5Handle.InvalidHandleValue;
-    }
-
-    public static implicit operator long(H5DataSet h5object)
-    {
-        h5object.Handle.ThrowIfInvalidHandleValue();
-        return h5object.Handle;
-    }
-
-    #endregion
 
     public void Write(H5Type typeId, H5Space memorySpace, H5Space fileSpace, IntPtr buffer)
     {
@@ -83,7 +41,7 @@ public struct H5DataSet : IDisposable
         return H5AttributeNativeMethods.Open(Handle, name);
     }
 
-    public H5Attribute CreateAttribute(string name, H5Type typeId, H5Space space, H5PropertyList creationPropertyList = default)
+    public H5Attribute CreateAttribute(string name, H5Type typeId, H5Space space, H5PropertyList? creationPropertyList = null)
     {
         return H5AttributeNativeMethods.Create(Handle, name, typeId, space, creationPropertyList);
     }
@@ -100,7 +58,7 @@ public struct H5DataSet : IDisposable
 
     public T ReadAttribute<T>(string name) where T : unmanaged
     {
-        return H5Attribute.Read<T>(this, name);
+        return H5ObjectWithAttributeExtensions.ReadAttribute<T>(this, name);
     }
 
     public string ReadStringAttribute(string name)
@@ -123,7 +81,7 @@ public struct H5DataSet : IDisposable
     /// <returns></returns>
     public H5PropertyList GetCreationPropertyList()
     {
-        return H5PropertyList.GetCreationPropertyList(this);
+        return H5PropertyListNativeMethods.GetCreationPropertyList(this);
     }
 
     public IEnumerable<T> Read<T>() where T : unmanaged

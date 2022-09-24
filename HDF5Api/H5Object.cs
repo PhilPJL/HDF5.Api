@@ -26,6 +26,11 @@ public class H5Object<T> : Disposable where T : H5Object<T>
         }
     }
 
+    public bool IsDisposed()
+    {
+        return Handle == H5Handle.InvalidHandleValue;
+    }
+
     protected override void Dispose(bool _)
     {
         if (_closeHandle == null || Handle == H5Handle.DefaultHandleValue)
@@ -48,8 +53,10 @@ public class H5Object<T> : Disposable where T : H5Object<T>
         Handle = H5Handle.InvalidHandleValue;
     }
 
-    public static implicit operator long(H5Object<T> h5object)
+    public static implicit operator long(H5Object<T>? h5object)
     {
+        if (h5object == null) { return 0; }
+
         h5object.Handle.ThrowIfInvalidHandleValue();
         return h5object.Handle;
     }

@@ -6,39 +6,13 @@ namespace HDF5Api;
 /// <summary>
 ///     Wrapper for H5T (Type) API.
 /// </summary>
-public struct H5Type : IDisposable
+public class H5Type : H5Object<H5Type>
 {
-    #region Handle wrappers
-    private long Handle { get; set; } = H5Handle.DefaultHandleValue;
-    private bool IsNative { get; set; }
-
-    internal H5Type(Handle handle, bool isNative = false)
+    internal H5Type(long handle) : base(handle, H5TypeNativeMethods.Close)
     {
-        Handle = handle;
-        IsNative = isNative;
-        if (!IsNative)
-        {
-            H5Handle.TrackHandle(handle);
-        }
     }
 
-    public void Dispose()
-    {
-        if (!IsNative && Handle > H5Handle.DefaultHandleValue)
-        {
-            H5TypeNativeMethods.Close(this);
-            H5Handle.UntrackHandle(Handle);
-        }
-
-        Handle = H5Handle.DefaultHandleValue;
-    }
-
-    public static implicit operator long(H5Type h5object)
-    {
-        h5object.Handle.ThrowIfInvalidHandleValue();
-        return h5object.Handle;
-    }
-    #endregion
+    private H5Type(long handle, Action<H5Type>? closer) : base(handle, closer) { }
 
     #region Public Api
 
@@ -62,7 +36,7 @@ public struct H5Type : IDisposable
             _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
         };
 
-        return new H5Type(nativeHandle, true);
+        return new H5Type(nativeHandle, null);
     }
 
     public H5Type Insert(string name, int offset, H5Type dataTypeId)

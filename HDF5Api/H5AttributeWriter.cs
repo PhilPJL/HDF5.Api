@@ -38,8 +38,7 @@ public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
     /// <param name="location">Location to write to.  Could be a file or group.</param>
     /// <param name="converter">Converter to provide <typeparamref name="TInput" /> instances.</param>
     /// <param name="getAttributeName">Func to provide an attribute name for each attribute as it's written.</param>
-    public H5AttributeWriter(IH5Location location, IH5TypeAdapter<TInput> converter,
-        Func<TInput, string> getAttributeName)
+    public H5AttributeWriter(IH5Location location, IH5TypeAdapter<TInput> converter, Func<TInput, string> getAttributeName)
     {
         Location = location;
         Type = converter.GetH5Type();
@@ -50,10 +49,10 @@ public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
     public void Write(IEnumerable<TInput> recordsChunk)
     {
         // Single dimension (rank 1), unlimited length, chunk size.
-        using (var memorySpace = H5Space.CreateSimple(1, new ulong[] { 1 }, H5AttributeWriter.MaxDims))
+        using (var memorySpace = H5SpaceNativeMethods.CreateSimple(1, new ulong[] { 1 }, H5AttributeWriter.MaxDims))
 
-            // Create an attribute-creation property list
-        using (var properyList = H5PropertyList.Create(H5P.ATTRIBUTE_CREATE))
+        // Create an attribute-creation property list
+        using (var properyList = H5PropertyListNativeMethods.Create(H5P.ATTRIBUTE_CREATE))
         {
             foreach (var record in recordsChunk)
             {
@@ -74,10 +73,9 @@ public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
 
     protected override void Dispose(bool disposing)
     {
-        if (disposing)
+        if (disposing && !Type.IsDisposed())
         {
-            Type?.Dispose();
-            Type = null;
+            Type.Dispose();
         }
     }
 }

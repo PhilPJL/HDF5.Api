@@ -25,7 +25,7 @@ internal static partial class H5FileNativeMethods
     /// </summary>
     public static H5File Create(string path)
     {
-        Handle h = H5F.create(path, H5F.ACC_TRUNC);
+        long h = H5F.create(path, H5F.ACC_TRUNC);
 
         h.ThrowIfInvalidHandleValue("H5F.create");
 
@@ -34,7 +34,7 @@ internal static partial class H5FileNativeMethods
 
     public static H5File Open(string path, bool readOnly)
     {
-        Handle h = H5F.open(path, readOnly ? H5F.ACC_RDONLY : H5F.ACC_RDWR);
+        long h = H5F.open(path, readOnly ? H5F.ACC_RDONLY : H5F.ACC_RDWR);
 
         h.ThrowIfInvalidHandleValue("H5F.open");
 

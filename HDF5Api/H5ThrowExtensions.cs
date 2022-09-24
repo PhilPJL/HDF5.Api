@@ -1,27 +1,26 @@
 ﻿using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace HDF5Api;
 
 public static class H5ThrowExtensions
 {
-/*    public static void ThrowIfNotValid(this H5Handle handle, [CallerMemberName] string methodName = null)
-    {
-        ThrowIfNotValid(handle.Handle, methodName ?? handle.GetType().Name);
-    }
+    /*    public static void ThrowIfNotValid(this H5Handle handle, [CallerMemberName] string methodName = null)
+        {
+            ThrowIfNotValid(handle.Handle, methodName ?? handle.GetType().Name);
+        }
 
-    public static void ThrowIfNotValid(this IH5Object handle, [CallerMemberName] string methodName = null)
-    {
-        ThrowIfNotValid(handle.Handle, methodName ?? handle.GetType().Name);
-    }
+        public static void ThrowIfNotValid(this IH5Object handle, [CallerMemberName] string methodName = null)
+        {
+            ThrowIfNotValid(handle.Handle, methodName ?? handle.GetType().Name);
+        }
 
-    public static void ThrowIfNotValid(this H5Object<H5Type> handle, [CallerMemberName] string methodName = null)
-    {
-        ThrowIfNotValid(handle.Handle, methodName ?? handle.GetType().Name);
-    }
-*/
-    public static void ThrowIfInvalidHandleValue(this long handle, [CallerMemberName] string methodName = null)
+        public static void ThrowIfNotValid(this H5Object<H5Type> handle, [CallerMemberName] string methodName = null)
+        {
+            ThrowIfNotValid(handle.Handle, methodName ?? handle.GetType().Name);
+        }
+    */
+    public static void ThrowIfInvalidHandleValue(this long handle, [CallerMemberName] string? methodName = null)
     {
         if (handle <= H5Handle.InvalidHandleValue)
         {
@@ -36,7 +35,7 @@ public static class H5ThrowExtensions
         }
     }
 
-    public static void ThrowIfDefaultOrInvalidHandleValue(this long handle, [CallerMemberName] string methodName = null)
+    public static void ThrowIfDefaultOrInvalidHandleValue(this long handle, [CallerMemberName] string? methodName = null)
     {
         if (handle <= H5Handle.DefaultHandleValue)
         {

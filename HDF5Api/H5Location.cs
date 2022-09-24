@@ -72,7 +72,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// </summary>
     public H5Group CreateGroup(string name)
     {
-        return H5Group.Create(Handle, name);
+        return H5GroupNativeMethods.Create(Handle, name);
     }
 
     /// <summary>
@@ -80,31 +80,30 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// </summary>
     public H5Group OpenGroup(string name)
     {
-        return H5Group.Open(Handle, name);
+        return H5GroupNativeMethods.Open(Handle, name);
     }
 
     public bool GroupExists(string name)
     {
-        return H5Group.Exists(Handle, name);
+        return H5GroupNativeMethods.Exists(Handle, name);
     }
 
     public bool GroupPathExists(string path)
     {
-        return H5Group.PathExists(Handle, path);
+        return H5GroupNativeMethods.PathExists(Handle, path);
     }
 
     public void DeleteGroup(string path)
     {
-        H5Group.Delete(Handle, path);
+        H5GroupNativeMethods.Delete(Handle, path);
     }
 
     /// <summary>
     ///     Create a DataSet in this location
     /// </summary>
-    public H5DataSet CreateDataSet(string name, H5Type type, H5Space space,
-        H5PropertyList propertyList)
+    public H5DataSet CreateDataSet(string name, H5Type type, H5Space space, H5PropertyList dataSetCreationPropertyList)
     {
-        return H5DataSet.Create(this, name, type, space, propertyList);
+        return H5DataSetNativeMethods.Create(this, name, type, space, null, dataSetCreationPropertyList);
     }
 
     /// <summary>
@@ -112,7 +111,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// </summary>
     public H5DataSet OpenDataSet(string name)
     {
-        return H5DataSet.Open(this, name);
+        return H5DataSetNativeMethods.Open(this, name);
     }
 
     public bool DataSetExists(string name)
@@ -139,15 +138,16 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
 
         return names;
 
-        int Callback(Handle groupId, IntPtr intPtrName, ref H5L.info_t info, IntPtr _)
+        int Callback(long groupId, IntPtr intPtrName, ref H5L.info_t info, IntPtr _)
         {
+            // TODO: nullability
             string? name = Marshal.PtrToStringAnsi(intPtrName);
 
             H5O.info_t oinfo = default;
             int err1 = H5O.get_info_by_name(groupId, name, ref oinfo);
             err1.ThrowIfError("H5O.get_info_by_name");
 
-            names.Add((name, oinfo.type == H5O.type_t.GROUP));
+            names.Add((name ?? "(unknown)", oinfo.type == H5O.type_t.GROUP));
             return 0;
         }
     }

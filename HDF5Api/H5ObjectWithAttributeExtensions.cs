@@ -1,5 +1,5 @@
-﻿using System;
-using HDF5Api.Disposables;
+﻿using HDF5Api.Disposables;
+using System;
 
 namespace HDF5Api;
 
@@ -48,7 +48,7 @@ internal static class H5ObjectWithAttributeExtensions
         string subString = value.Length > maxLength ? value[..maxLength] : value;
 
         // can't create a zero length string type so use a length of 1 minimum
-        using var typeId = H5Type.CreateFixedLengthStringType(subString.Length < 1 ? 1 : subString.Length);
+        using var typeId = H5TypeNativeMethods.CreateFixedLengthStringType(subString.Length < 1 ? 1 : subString.Length);
         byte[] sourceBytes = H5TypeAdapterBase.Ascii.GetBytes(subString);
 
         using var pinned = new PinnedObject(sourceBytes);

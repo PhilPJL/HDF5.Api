@@ -7,53 +7,11 @@ namespace HDF5Api;
 /// <summary>
 ///     Wrapper for H5A (Attribute) API.
 /// </summary>
-public struct H5Attribute : IDisposable
+public class H5Attribute : H5Object<H5Attribute>
 {
-    #region Constructor and operators
-
-    private long Handle { get; set; } = H5Handle.DefaultHandleValue;
-    private readonly bool _isNative = false;
-
-    internal H5Attribute(long handle, bool isNative = false)
+    internal H5Attribute(long handle) : base(handle, H5AttributeNativeMethods.Close)
     {
-        handle.ThrowIfDefaultOrInvalidHandleValue();
-
-        Handle = handle;
-        _isNative = isNative;
-
-        if (!_isNative)
-        {
-            H5Handle.TrackHandle(handle);
-        }
     }
-
-    public void Dispose()
-    {
-        if(_isNative || Handle == H5Handle.DefaultHandleValue)
-        {
-            // native or default(0) handle shouldn't be disposed
-            return;
-        }
-
-        if (Handle == H5Handle.InvalidHandleValue)
-        {
-            // already disposed
-            // TODO: throw already disposed
-        }
-
-        // close and mark as disposed
-        H5AttributeNativeMethods.Close(this);
-        H5Handle.UntrackHandle(Handle);
-        Handle = H5Handle.InvalidHandleValue;
-    }
-
-    public static implicit operator long(H5Attribute h5object)
-    {
-        h5object.Handle.ThrowIfInvalidHandleValue();
-        return h5object.Handle;
-    }
-
-    #endregion
 
     #region Public Api
 

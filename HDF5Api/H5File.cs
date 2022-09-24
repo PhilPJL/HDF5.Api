@@ -6,83 +6,32 @@ namespace HDF5Api;
 /// <summary>
 ///     Wrapper for H5F (File) API.
 /// </summary>
-public class H5File :  H5Location<H5File>
+public class H5File : H5Location<H5File>
 {
     public H5File(long handle) : base(handle, H5FileNativeMethods.Close)
     {
     }
 
-    /*    #region Constructor and operators
-
-   private long Handle { get; set; } = H5Handle.DefaultHandleValue;
-   private readonly bool _isNative = false;
-
-   internal H5File(long handle, bool isNative = false)
-   {
-       handle.ThrowIfDefaultOrInvalidHandleValue();
-
-       Handle = handle;
-       _isNative = isNative;
-
-       if (!_isNative)
-       {
-           H5Handle.TrackHandle(handle);
-       }
-   }
-
-   public void Dispose()
-   {
-       if (_isNative || Handle == H5Handle.DefaultHandleValue)
-       {
-           // native or default(0) handle shouldn't be disposed
-           return;
-       }
-
-       if (Handle == H5Handle.InvalidHandleValue)
-       {
-           // already disposed
-           // TODO: throw already disposed
-       }
-
-       // close and mark as disposed
-       H5FileNativeMethods.Close(this);
-       H5Handle.UntrackHandle(Handle);
-       Handle = H5Handle.InvalidHandleValue;
-   }
-
-   public static implicit operator long(H5File h5object)
-   {
-       h5object.Handle.ThrowIfInvalidHandleValue();
-       return h5object.Handle;
-   }
-
-   #endregion
-*/
     public long GetObjectCount(H5ObjectTypes types = H5ObjectTypes.All)
     {
         return H5FileNativeMethods.GetObjectCount(this, types);
     }
 
     /// <summary>
-    ///     Open an existing file read-only
+    ///     Open an existing file.  By default opens read-write.
     /// </summary>
-    public static H5File OpenReadOnly(string path)
+    public static H5File Open(string path, bool readOnly = false)
     {
-        return H5FileNativeMethods.Open(path, true);
+        return H5FileNativeMethods.Open(path, readOnly);
     }
 
     /// <summary>
-    ///     Open an existing file read-write
+    ///     Open an existing file (by default read-write) or create new.
     /// </summary>
-    public static H5File OpenReadWrite(string path)
+    public static H5File OpenOrCreate(string path, bool readOnly = false)
     {
-        return H5FileNativeMethods.Open(path, false);
-    }
-
-    public static H5File OpenOrCreate(string path, bool readOnly)
-    {
-        return File.Exists(path) 
-            ? H5FileNativeMethods.Open(path, readOnly) 
+        return File.Exists(path)
+            ? H5FileNativeMethods.Open(path, readOnly)
             : H5FileNativeMethods.Create(path);
     }
 

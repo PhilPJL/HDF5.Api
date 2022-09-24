@@ -24,7 +24,7 @@ internal static partial class H5SpaceNativeMethods
 
     public static H5Space CreateSimple(int rank, ulong[] dims, ulong[] maxdims)
     {
-        Handle h = H5S.create_simple(rank, dims, maxdims);
+        long h = H5S.create_simple(rank, dims, maxdims);
         h.ThrowIfInvalidHandleValue("H5S.create_simple");
         return new H5Space(h);
     }

@@ -13,7 +13,7 @@ public abstract class H5TypeAdapterBase
     /// </summary>
     protected static unsafe void CopyString(string source, byte* destination, int destinationSizeInBytes)
     {
-        if ((source ?? string.Empty) == string.Empty)
+        if (string.IsNullOrEmpty(source))
         {
             return;
         }
@@ -40,6 +40,12 @@ public abstract class H5TypeAdapterBase
         AssertBlobMaxLength(source, maxBlobSize);
         AssertBlobLengthDivisibleByTypeLength(source, blobTypeLength);
 
+        if (source == null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
+        // TODO: can't get rid of this nullability warning
         if ((source?.Length ?? 0) > 0)
         {
             Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(source, 0).ToPointer(), destination, maxBlobSize,

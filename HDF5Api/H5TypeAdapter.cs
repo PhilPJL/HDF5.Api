@@ -1,7 +1,7 @@
-﻿using System;
+﻿using HDF5Api.Disposables;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HDF5Api.Disposables;
 
 namespace HDF5Api;
 

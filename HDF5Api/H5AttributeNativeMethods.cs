@@ -53,7 +53,7 @@ internal static partial class H5AttributeNativeMethods
     /// <param name="accessPropertyList"></param>
     /// <returns></returns>
     public static H5Attribute Create(long owner, string name, H5Type type, H5Space space,
-        H5PropertyList creationPropertyList = default, H5PropertyList accessPropertyList = default)
+        H5PropertyList? creationPropertyList = null, H5PropertyList? accessPropertyList = null)
     {
         owner.AssertIsHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
@@ -76,7 +76,7 @@ internal static partial class H5AttributeNativeMethods
     {
         objectId.AssertIsHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        Handle h = H5A.open(objectId, name);
+        long h = H5A.open(objectId, name);
 
         h.ThrowIfInvalidHandleValue("H5A.open");
 
@@ -127,7 +127,7 @@ internal static partial class H5AttributeNativeMethods
 
         return names;
 
-        int Callback(Handle id, IntPtr intPtrName, ref H5A.info_t info, IntPtr _)
+        int Callback(long id, IntPtr intPtrName, ref H5A.info_t info, IntPtr _)
         {
             string? name = Marshal.PtrToStringAnsi(intPtrName);
 

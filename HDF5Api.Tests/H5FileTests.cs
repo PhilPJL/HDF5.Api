@@ -78,7 +78,7 @@ public class H5FileTests : H5LocationTests
             Assert.IsFalse(File.Exists(Path));
 
             // Try to open missing existing file read-only
-            Assert.ThrowsException<Hdf5Exception>(() => H5File.OpenReadOnly(Path));
+            Assert.ThrowsException<Hdf5Exception>(() => H5File.Open(Path, true));
         });
     }
 
@@ -97,7 +97,7 @@ public class H5FileTests : H5LocationTests
             Assert.IsTrue(File.Exists(Path));
 
             // Try to open missing existing file read-only
-            using var file = H5File.OpenReadOnly(Path);
+            using var file = H5File.Open(Path, true);
         });
     }
 
@@ -116,7 +116,7 @@ public class H5FileTests : H5LocationTests
             Assert.IsTrue(File.Exists(Path));
 
             // Try to open missing existing file read-only
-            using var file = H5File.OpenReadOnly(Path);
+            using var file = H5File.Open(Path, true);
 
             // Try to write to file should fail (assumes CreateGroup is valid)
             Assert.ThrowsException<Hdf5Exception>(() => file.CreateGroup("test"));
