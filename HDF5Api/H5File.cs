@@ -6,54 +6,58 @@ namespace HDF5Api;
 /// <summary>
 ///     Wrapper for H5F (File) API.
 /// </summary>
-public struct H5File : IDisposable
+public class H5File :  H5Location<H5File>
 {
-    #region Constructor and operators
-
-    private long Handle { get; set; } = H5Handle.DefaultHandleValue;
-    private readonly bool _isNative = false;
-
-    internal H5File(long handle, bool isNative = false)
+    public H5File(long handle) : base(handle, H5FileNativeMethods.Close)
     {
-        handle.ThrowIfDefaultOrInvalidHandleValue();
-
-        Handle = handle;
-        _isNative = isNative;
-
-        if (!_isNative)
-        {
-            H5Handle.TrackHandle(handle);
-        }
     }
 
-    public void Dispose()
-    {
-        if (_isNative || Handle == H5Handle.DefaultHandleValue)
-        {
-            // native or default(0) handle shouldn't be disposed
-            return;
-        }
+    /*    #region Constructor and operators
 
-        if (Handle == H5Handle.InvalidHandleValue)
-        {
-            // already disposed
-            // TODO: throw already disposed
-        }
+   private long Handle { get; set; } = H5Handle.DefaultHandleValue;
+   private readonly bool _isNative = false;
 
-        // close and mark as disposed
-        H5FileNativeMethods.Close(this);
-        H5Handle.UntrackHandle(Handle);
-        Handle = H5Handle.InvalidHandleValue;
-    }
+   internal H5File(long handle, bool isNative = false)
+   {
+       handle.ThrowIfDefaultOrInvalidHandleValue();
 
-    public static implicit operator long(H5File h5object)
-    {
-        h5object.Handle.ThrowIfInvalidHandleValue();
-        return h5object.Handle;
-    }
+       Handle = handle;
+       _isNative = isNative;
 
-    #endregion
+       if (!_isNative)
+       {
+           H5Handle.TrackHandle(handle);
+       }
+   }
 
+   public void Dispose()
+   {
+       if (_isNative || Handle == H5Handle.DefaultHandleValue)
+       {
+           // native or default(0) handle shouldn't be disposed
+           return;
+       }
+
+       if (Handle == H5Handle.InvalidHandleValue)
+       {
+           // already disposed
+           // TODO: throw already disposed
+       }
+
+       // close and mark as disposed
+       H5FileNativeMethods.Close(this);
+       H5Handle.UntrackHandle(Handle);
+       Handle = H5Handle.InvalidHandleValue;
+   }
+
+   public static implicit operator long(H5File h5object)
+   {
+       h5object.Handle.ThrowIfInvalidHandleValue();
+       return h5object.Handle;
+   }
+
+   #endregion
+*/
     public long GetObjectCount(H5ObjectTypes types = H5ObjectTypes.All)
     {
         return H5FileNativeMethods.GetObjectCount(this, types);

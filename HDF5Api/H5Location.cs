@@ -10,10 +10,11 @@ namespace HDF5Api;
 /// <remarks>
 ///     Implements operations that can be carried out equally on files and groups.
 /// </remarks>
-/// <typeparam name="THandle"></typeparam>
-/*public abstract class H5Location<THandle> : H5Object<THandle>, IH5Location where THandle : H5LocationHandle
+public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Object<T>
 {
-    protected H5Location(THandle handle) : base(handle) { }
+    internal H5Location(long handle, Action<T>? closeHandle) : base(handle, closeHandle)
+    {
+    }
 
     /// <summary>
     ///     Create an Attribute for this location
@@ -25,7 +26,7 @@ namespace HDF5Api;
             throw new Hdf5Exception($"Attribute {name} already exists");
         }
 
-        return H5Attribute.NativeMethods.Create(this, name, typeId, spaceId, propertyListId);
+        return H5AttributeNativeMethods.Create(this, name, typeId, spaceId, propertyListId);
     }
 
     /// <summary>
@@ -33,22 +34,22 @@ namespace HDF5Api;
     /// </summary>
     public H5Attribute OpenAttribute(string name)
     {
-        return H5Attribute.Open(Handle, name);
+        return H5AttributeNativeMethods.Open(this, name);
     }
 
     public void DeleteAttribute(string name)
     {
-        H5Attribute.Delete(Handle, name);
+        H5AttributeNativeMethods.Delete(this, name);
     }
 
     public bool AttributeExists(string name)
     {
-        return H5Attribute.Exists(Handle, name);
+        return H5AttributeNativeMethods.Exists(this, name);
     }
 
-    public T ReadAttribute<T>(string name) where T : unmanaged
+    public TA ReadAttribute<TA>(string name) where TA : unmanaged
     {
-        return H5ObjectWithAttributeExtensions.ReadAttribute<T>(this, name);
+        return H5ObjectWithAttributeExtensions.ReadAttribute<TA>(this, name);
     }
 
     public string ReadStringAttribute(string name)
@@ -63,7 +64,7 @@ namespace HDF5Api;
 
     public IEnumerable<string> ListAttributeNames()
     {
-        return H5Attribute.ListAttributeNames(Handle);
+        return H5AttributeNativeMethods.ListAttributeNames(this);
     }
 
     /// <summary>
@@ -100,10 +101,10 @@ namespace HDF5Api;
     /// <summary>
     ///     Create a DataSet in this location
     /// </summary>
-    public H5DataSet CreateDataSet(string name, H5Type typeId, H5Space space,
+    public H5DataSet CreateDataSet(string name, H5Type type, H5Space space,
         H5PropertyList propertyList)
     {
-        return H5DataSet.Create(this, name, typeId, spaceId, propertyListId);
+        return H5DataSet.Create(this, name, type, space, propertyList);
     }
 
     /// <summary>
@@ -116,7 +117,7 @@ namespace HDF5Api;
 
     public bool DataSetExists(string name)
     {
-        return H5DataSet.Exists(this, name);
+        return H5DataSetNativeMethods.Exists(this, name);
     }
 
     /// <summary>
@@ -124,13 +125,11 @@ namespace HDF5Api;
     /// </summary>
     public IEnumerable<(string name, bool isGroup)> GetChildNames()
     {
-        return GetChildNames(Handle);
+        return GetChildNames(this);
     }
 
-    private static IEnumerable<(string name, bool isGroup)> GetChildNames(H5LocationHandle handle)
+    private static IEnumerable<(string name, bool isGroup)> GetChildNames(H5Location<T> handle)
     {
-        handle.ThrowIfNotValid();
-
         ulong idx = 0;
 
         var names = new List<(string name, bool isGroup)>();
@@ -142,7 +141,7 @@ namespace HDF5Api;
 
         int Callback(Handle groupId, IntPtr intPtrName, ref H5L.info_t info, IntPtr _)
         {
-            string name = Marshal.PtrToStringAnsi(intPtrName);
+            string? name = Marshal.PtrToStringAnsi(intPtrName);
 
             H5O.info_t oinfo = default;
             int err1 = H5O.get_info_by_name(groupId, name, ref oinfo);
@@ -153,4 +152,3 @@ namespace HDF5Api;
         }
     }
 }
-*/

@@ -65,34 +65,15 @@ public struct H5Type : IDisposable
         return new H5Type(nativeHandle, true);
     }
 
-    public H5Type Insert(string name, int offset, Handle nativeTypeId)
-    {
-        H5TypeNativeMethods.Insert(this, name, new IntPtr(offset), nativeTypeId);
-        return this;
-    }
-
     public H5Type Insert(string name, int offset, H5Type dataTypeId)
     {
         H5TypeNativeMethods.Insert(this, name, new IntPtr(offset), dataTypeId);
         return this;
     }
 
-    public H5Type Insert(string name, IntPtr offset, Handle nativeTypeId)
-    {
-        H5TypeNativeMethods.Insert(this, name, offset, nativeTypeId);
-        return this;
-    }
-
     public H5Type Insert(string name, IntPtr offset, H5Type dataTypeId)
     {
         H5TypeNativeMethods.Insert(this, name, offset, dataTypeId);
-        return this;
-    }
-
-    public H5Type Insert<S>(string name, Handle nativeTypeId) where S : struct
-    {
-        var offset = Marshal.OffsetOf<S>(name);
-        H5TypeNativeMethods.Insert(this, name, offset, nativeTypeId);
         return this;
     }
 

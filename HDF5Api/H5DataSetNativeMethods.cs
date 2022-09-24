@@ -28,7 +28,7 @@ internal static partial class H5DataSetNativeMethods
         return (long)H5D.get_storage_size(dataSetId);
     }
 
-    public static H5DataSet Create(H5Location location, string name, H5Type typeId, H5Space space, 
+    public static H5DataSet Create(IH5Location location, string name, H5Type typeId, H5Space space, 
         H5PropertyList linkCreationPropertyList = default, 
         H5PropertyList dataSetCreationPropertyList = default, 
         H5PropertyList accessCreationPropertyList = default)
@@ -41,10 +41,8 @@ internal static partial class H5DataSetNativeMethods
         return new H5DataSet(h);
     }
 
-    public static H5DataSet Open(H5Location location, string name)
+    public static H5DataSet Open(IH5Location location, string name)
     {
-        location.ThrowIfNotValid();
-
         Handle h = H5D.open(location, name);
 
         h.ThrowIfInvalidHandleValue("H5D.open");
@@ -52,7 +50,7 @@ internal static partial class H5DataSetNativeMethods
         return new H5DataSet(h);
     }
 
-    public static bool Exists(H5Location location, string name)
+    public static bool Exists(IH5Location location, string name)
     {
         int err = H5L.exists(location, name);
 

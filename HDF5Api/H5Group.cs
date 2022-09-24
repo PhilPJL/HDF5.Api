@@ -32,40 +32,40 @@ public struct H5Group : IDisposable
         return h5object.Handle;
     }
     #endregion
+}
 
-    internal static partial class NativeMethods
+internal static partial class H5GroupNativeMethods
+{
+    #region Close
+
+    //[LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gclose"), SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    //[UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    //private static partial int Close(long handle);
+
+    public static void Close(H5Group attribute)
     {
-        #region Close
-
-        //[LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gclose"), SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-        //[UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
-        //private static partial int Close(long handle);
-
-        public static void Close(H5Group attribute)
-        {
-            //int err = Close(attribute.Handle);
-            int err = H5G.close(attribute.Handle);
-            // TODO: get additional error info 
-            err.ThrowIfError("H5Gclose");
-        }
-
-        #endregion
-
-        #region Create
-
-        public static H5Group Create(H5Location locationId, string name)
-        {
-            locationId.ThrowIfNotValid();
-
-            Handle h = H5G.create(locationId.Handle, name);
-
-            h.ThrowIfInvalidHandleValue("H5G.create");
-
-            return new H5Group(h);
-        }
-
-        #endregion
+        //int err = Close(attribute.Handle);
+        int err = H5G.close(attribute);
+        // TODO: get additional error info 
+        err.ThrowIfError("H5Gclose");
     }
+
+    #endregion
+
+    #region Create
+
+    public static H5Group Create(H5Location locationId, string name)
+    {
+        locationId.ThrowIfNotValid();
+
+        Handle h = H5G.create(locationId.Handle, name);
+
+        h.ThrowIfInvalidHandleValue("H5G.create");
+
+        return new H5Group(h);
+    }
+
+    #endregion
 
     #region C level API wrappers
 
@@ -141,4 +141,5 @@ public struct H5Group : IDisposable
     }
 
     #endregion
+
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -128,7 +129,9 @@ internal static partial class H5AttributeNativeMethods
 
         int Callback(Handle id, IntPtr intPtrName, ref H5A.info_t info, IntPtr _)
         {
-            string name = Marshal.PtrToStringAnsi(intPtrName);
+            string? name = Marshal.PtrToStringAnsi(intPtrName);
+
+            Guard.IsNotNull(name);
 
             int err1 = H5A.get_info_by_name(handle, ".", name, ref info);
             err1.ThrowIfError("H5A.get_info_by_name");
