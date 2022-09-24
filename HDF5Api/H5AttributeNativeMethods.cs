@@ -295,5 +295,4 @@ internal static partial class H5AttributeNativeMethods
     }
 
     #endregion
-
 }

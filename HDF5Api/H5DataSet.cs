@@ -91,7 +91,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         long count = space.GetSimpleExtentNPoints();
 
         var cls = type.GetClass();
-        if (cls != H5T.class_t.COMPOUND)
+        if (cls != H5Class.Compound)
         {
             throw new Hdf5Exception($"DataSet is of class {cls} when expecting {H5T.class_t.COMPOUND}.");
         }

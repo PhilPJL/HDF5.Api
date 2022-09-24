@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace HDF5Api;
 
@@ -20,10 +21,25 @@ internal static partial class H5TypeNativeMethods
 
     #endregion
 
-    public static H5T.class_t GetClass(H5Type typeId)
+    #region GetClass
+
+    /// <summary>
+    /// Returns the datatype class identifier.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-GetClass
+    /// </summary>
+    /// <param name="dtype_id">Identifier of datatype to query.</param>
+    /// <returns>Returns datatype class identifier if successful; otherwise
+    /// <code>H5T_NO_CLASS</code>.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tget_class")]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    public static partial int H5Tget_class(long type_id);
+
+    public static H5Class GetClass(H5Type typeId)
     {
-        return H5T.get_class(typeId);
+        return (H5Class)H5Tget_class(typeId);
     }
+
+    #endregion
 
     public static H5Type CreateCompoundType(int size)
     {
@@ -116,4 +132,21 @@ internal static partial class H5TypeNativeMethods
         return err > 0;
     }
 
+}
+
+public enum H5Class
+{
+    None = -1,
+    Integer = 0,
+    Float = 1,
+    Time = 2,
+    String = 3,
+    BitField = 4,
+    Opaque = 5,
+    Compound = 6,
+    Reference = 7,
+    Enum = 8,
+    VariableLength = 9,
+    Array = 10,
+    NClasses // ??
 }

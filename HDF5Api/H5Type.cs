@@ -58,7 +58,7 @@ public class H5Type : H5Object<H5Type>
         return this;
     }
 
-    public H5T.class_t GetClass()
+    public H5Class GetClass()
     {
         return H5TypeNativeMethods.GetClass(this);
     }

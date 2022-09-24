@@ -33,7 +33,7 @@ public class H5Attribute : H5Object<H5Attribute>
         }
 
         var cls = type.GetClass();
-        if (cls != H5T.class_t.STRING)
+        if (cls != H5Class.String)
         {
             throw new Hdf5Exception($"Attribute is of class {cls} when expecting STRING.");
         }
