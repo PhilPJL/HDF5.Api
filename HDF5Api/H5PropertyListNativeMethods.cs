@@ -9,12 +9,12 @@ internal static partial class H5PropertyListNativeMethods
 
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pclose")]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
-    private static partial int H5PClose(long handle);
+    private static partial int H5Pclose(long handle);
 
     public static void Close(H5PropertyList type)
     {
-        int err = H5PClose(type);
-        // TODO: get additional error info 
+        int err = H5Pclose(type);
+
         err.ThrowIfError("H5Tclose");
     }
 

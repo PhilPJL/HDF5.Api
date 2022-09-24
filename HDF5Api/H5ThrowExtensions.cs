@@ -35,18 +35,11 @@ public static class H5ThrowExtensions
         }
     }
 
-    public static void ThrowIfDefaultOrInvalidHandleValue(this long handle, [CallerMemberName] string? methodName = null)
+    public static void ThrowIfDefaultOrInvalidHandleValue(this long handle)
     {
         if (handle <= H5Handle.DefaultHandleValue)
         {
-            if (string.IsNullOrWhiteSpace(methodName))
-            {
-                throw new Hdf5Exception($"Bad handle {handle}.");
-            }
-            else
-            {
-                throw new Hdf5Exception($"Bad handle {handle} when {methodName}.");
-            }
+            throw new Hdf5Exception($"Bad handle {handle}.");
         }
     }
 
@@ -71,9 +64,11 @@ public static class H5ThrowExtensions
 
         var type = handle >> 56;
 
-        if (!types.Any(t => (int)t == type))
+        foreach (var t in types)
         {
-            throw new Hdf5Exception($"Handle type {type} is not valid at this point.");
+            if ((int)t == type) { return; }
         }
+
+        throw new Hdf5Exception($"Handle type {type} is not valid at this point.");
     }
 }

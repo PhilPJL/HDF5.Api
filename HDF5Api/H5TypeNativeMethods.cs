@@ -15,7 +15,6 @@ internal static partial class H5TypeNativeMethods
     {
         int err = H5Tclose(type);
 
-        // TODO: get additional error info 
         err.ThrowIfError("H5Tclose");
     }
 

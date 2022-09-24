@@ -384,6 +384,8 @@ public class H5FileTests : H5LocationTests
             Assert.IsTrue(File.Exists(Path));
 
             CreateDataSetSucceeds(file);
+
+            Assert.AreEqual(1, file.GetObjectCount());
         });
     }
 
@@ -401,6 +403,8 @@ public class H5FileTests : H5LocationTests
             Assert.IsTrue(File.Exists(Path));
 
             CreateAndOpenDataSetSucceeds(file);
+
+            Assert.AreEqual(1, file.GetObjectCount());
         });
     }
 

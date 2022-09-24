@@ -1,4 +1,6 @@
-﻿namespace HDF5Api.Tests;
+﻿using System.Diagnostics;
+
+namespace HDF5Api.Tests;
 
 [TestClass]
 public class H5AttributeTests : H5Test
@@ -42,6 +44,9 @@ public class H5AttributeTests : H5Test
             // Create duplicate attribute on data set on group
             datasetGroup.CreateAndWriteAttribute("name", 1);
             Assert.ThrowsException<Hdf5Exception>(() => datasetGroup.CreateAndWriteAttribute("name", 2));
+
+            // File + Group + 2 x DataSet
+            Assert.AreEqual(4, file.GetObjectCount());
         });
     }
 
@@ -72,6 +77,9 @@ public class H5AttributeTests : H5Test
 
             string s1 = group.ReadStringAttribute("string");
             Assert.AreEqual(s, s1);
+
+            // File + Group
+            Assert.AreEqual(2, file.GetObjectCount());
         });
     }
 

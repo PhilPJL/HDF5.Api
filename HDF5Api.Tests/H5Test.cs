@@ -23,7 +23,7 @@ public abstract class H5Test
     {
         action();
 #if DEBUG
-        if (expectedHandlesOpen == 0 && H5Handle.Handles.Count > 0)
+        if (expectedHandlesOpen == 0 && !H5Handle.Handles.IsEmpty)
         {
             foreach (var kvp in H5Handle.Handles)
             {

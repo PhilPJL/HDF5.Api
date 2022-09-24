@@ -9,11 +9,11 @@ internal static partial class H5DataSetNativeMethods
 
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dclose")]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
-    private static partial int H5DClose(long handle);
+    private static partial int H5Dclose(long handle);
 
     public static void Close(H5DataSet dataSet)
     {
-        int err = H5DClose(dataSet);
+        int err = H5Dclose(dataSet);
 
         // TODO: get additional error info 
         err.ThrowIfError("H5Dclose");

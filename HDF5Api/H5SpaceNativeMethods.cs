@@ -9,12 +9,12 @@ internal static partial class H5SpaceNativeMethods
 
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Sclose")]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
-    private static partial int H5SClose(long handle);
+    private static partial int H5Sclose(long handle);
 
     public static void Close(H5Space attribute)
     {
-        int err = H5SClose(attribute);
-        // TODO: get additional error info 
+        int err = H5Sclose(attribute);
+
         err.ThrowIfError("H5Sclose");
     }
 

@@ -1,18 +1,20 @@
-﻿namespace HDF5Api;
+﻿using System;
+using System.Runtime.InteropServices;
+
+namespace HDF5Api;
 
 internal static partial class H5GroupNativeMethods
 {
     #region Close
 
-    //[LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gclose"), SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    //[UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
-    //private static partial int Close(long handle);
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gclose")]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    private static partial int H5Gclose(long handle);
 
     public static void Close(H5Group attribute)
     {
-        //int err = Close(attribute.Handle);
-        int err = H5G.close(attribute);
-        // TODO: get additional error info 
+        int err = H5Gclose(attribute);
+
         err.ThrowIfError("H5Gclose");
     }
 

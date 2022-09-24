@@ -32,42 +32,6 @@ public abstract class H5TypeAdapterBase
             destinationSizeInBytes, source?.Length ?? 0);
     }
 
-    /// <summary>
-    ///     Helper method to copy fixed/max length byte array.
-    /// </summary>
-    protected static unsafe void CopyBlob(byte[] source, byte* destination, int maxBlobSize, int blobTypeLength)
-    {
-        AssertBlobMaxLength(source, maxBlobSize);
-        AssertBlobLengthDivisibleByTypeLength(source, blobTypeLength);
-
-        if (source == null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
-
-        // TODO: can't get rid of this nullability warning
-        if ((source?.Length ?? 0) > 0)
-        {
-            Buffer.MemoryCopy(Marshal.UnsafeAddrOfPinnedArrayElement(source, 0).ToPointer(), destination, maxBlobSize,
-                source?.Length ?? 0);
-        }
-    }
-
-    public static void AssertBlobMaxLength(byte[] values, int maxBlobSize)
-    {
-        if ((values?.Length ?? 0) > maxBlobSize)
-        {
-            throw new InvalidOperationException(
-                $"The provided data blob is length {values?.Length} exceeds the maximum expected length {maxBlobSize}");
-        }
-    }
-
-    public static void AssertBlobLengthDivisibleByTypeLength(byte[] values, int blobTypeLength)
-    {
-        int length = values?.Length ?? 0;
-        AssertBlobLengthDivisibleByTypeLength(length, blobTypeLength);
-    }
-
     public static void AssertBlobLengthDivisibleByTypeLength(int length, int blobTypeLength)
     {
         if (length % blobTypeLength != 0)

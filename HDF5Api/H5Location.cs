@@ -140,12 +140,13 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
 
         int Callback(long groupId, IntPtr intPtrName, ref H5L.info_t info, IntPtr _)
         {
-            // TODO: nullability
             string? name = Marshal.PtrToStringAnsi(intPtrName);
 
             H5O.info_t oinfo = default;
             int err1 = H5O.get_info_by_name(groupId, name, ref oinfo);
             err1.ThrowIfError("H5O.get_info_by_name");
+
+            // TODO: nullability - converting to "(unknown)" isn't great
 
             names.Add((name ?? "(unknown)", oinfo.type == H5O.type_t.GROUP));
             return 0;
