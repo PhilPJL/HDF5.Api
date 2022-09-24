@@ -72,7 +72,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// </summary>
     public H5Group CreateGroup(string name)
     {
-        return H5GroupNativeMethods.Create(Handle, name);
+        return H5GroupNativeMethods.Create(this, name);
     }
 
     /// <summary>
@@ -80,22 +80,22 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// </summary>
     public H5Group OpenGroup(string name)
     {
-        return H5GroupNativeMethods.Open(Handle, name);
+        return H5GroupNativeMethods.Open(this, name);
     }
 
     public bool GroupExists(string name)
     {
-        return H5GroupNativeMethods.Exists(Handle, name);
+        return H5GroupNativeMethods.Exists(this, name);
     }
 
     public bool GroupPathExists(string path)
     {
-        return H5GroupNativeMethods.PathExists(Handle, path);
+        return H5GroupNativeMethods.PathExists(this, path);
     }
 
     public void DeleteGroup(string path)
     {
-        H5GroupNativeMethods.Delete(Handle, path);
+        H5GroupNativeMethods.Delete(this, path);
     }
 
     /// <summary>

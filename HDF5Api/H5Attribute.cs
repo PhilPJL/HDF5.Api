@@ -20,9 +20,14 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AttributeNativeMethods.GetSpace(this);
     }
 
+    public H5Type GetH5Type()
+    {
+        return H5AttributeNativeMethods.GetType(this);
+    }
+
     public string ReadString()
     {
-        using var type = H5TypeNativeMethods.GetType(this);
+        using var type = GetH5Type();
         using var space = GetSpace();
 
         long count = space.GetSimpleExtentNPoints();
@@ -56,7 +61,7 @@ public class H5Attribute : H5Object<H5Attribute>
 
     public T Read<T>() where T : unmanaged
     {
-        using var type = H5TypeNativeMethods.GetType(this);
+        using var type = GetH5Type();
         using var space = GetSpace();
 
         long count = space.GetSimpleExtentNPoints();

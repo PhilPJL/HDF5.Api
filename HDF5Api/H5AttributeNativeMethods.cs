@@ -286,12 +286,35 @@ internal static partial class H5AttributeNativeMethods
     /// <param name="attr_id">Identifier of the attribute to query.</param>
     /// <returns>Returns the amount of storage size allocated for the
     /// attribute; otherwise returns 0 (zero).</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Aget_storage_size", CallingConvention = CallingConvention.Cdecl)]
-    private extern static ulong H5Aget_storage_size(long attr_id);
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aget_storage_size")]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    private static partial ulong H5Aget_storage_size(long attr_id);
     
     public static long GetStorageSize(H5Attribute attributeId)
     {
         return (long)H5Aget_storage_size(attributeId);
+    }
+
+    #endregion
+
+    #region GetType
+
+    /// <summary>
+    /// Returns the type of an attribute.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-GetType
+    /// </summary>
+    /// <param name="attr_id">Identifier of an attribute.</param>
+    /// <returns>Returns a datatype identifier if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aget_type")]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial long H5Aget_type(long attr_id);
+
+    public static H5Type GetType(H5Attribute attribute)
+    {
+        long typeHandle = H5Aget_type(attribute);
+        typeHandle.ThrowIfInvalidHandleValue("H5A.get_type");
+        return new H5Type(typeHandle);
     }
 
     #endregion

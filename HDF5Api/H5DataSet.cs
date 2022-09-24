@@ -30,7 +30,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
     public H5Type GetH5Type()
     {
-        return H5TypeNativeMethods.GetType(this);
+        return H5DataSetNativeMethods.GetType(this);
     }
 
     /// <summary>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Security;
 
 namespace HDF5Api;
 
@@ -41,9 +40,26 @@ internal static partial class H5TypeNativeMethods
 
     #endregion
 
+    #region Create
+
+    /// <summary>
+    /// Creates a new datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Create
+    /// </summary>
+    /// <param name="cls">Class of datatype to create.</param>
+    /// <param name="size">Size, in bytes, of the datatype being created</param>
+    /// <returns>Returns datatype identifier if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcreate")]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    private static partial long H5Tcreate(H5Class cls, IntPtr size);
+
+    /// <summary>
+    ///     Create a Compound type of the specified size./>
+    /// </summary>
     public static H5Type CreateCompoundType(int size)
     {
-        long h = H5T.create(H5T.class_t.COMPOUND, new IntPtr(size));
+        long h = H5Tcreate(H5Class.Compound, new IntPtr(size));
         h.ThrowIfInvalidHandleValue("H5T.create");
         return new H5Type(h);
     }
@@ -66,6 +82,8 @@ internal static partial class H5TypeNativeMethods
         int size = Marshal.SizeOf<S>() + extraSpace;
         return CreateCompoundType(size);
     }
+
+    #endregion
 
     public static H5Type CreateByteArrayType(int size)
     {
@@ -116,22 +134,12 @@ internal static partial class H5TypeNativeMethods
         err.ThrowIfError("H5T.insert");
     }
 
-    public static H5Type GetType(long handle)
-    {
-        handle.AssertIsHandleType(HandleType.DataSet, HandleType.Attribute);
-
-        long typeHandle = H5A.get_type(handle);
-        typeHandle.ThrowIfInvalidHandleValue("H5A.get_type");
-        return new H5Type(typeHandle);
-    }
-
     public static bool IsVariableLengthString(H5Type typeId)
     {
         int err = H5T.is_variable_str(typeId);
         err.ThrowIfError("H5T.is_variable_str");
         return err > 0;
     }
-
 }
 
 public enum H5Class

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace HDF5Api;
@@ -8,7 +9,7 @@ internal static partial class H5GroupNativeMethods
     #region Close
 
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gclose")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static partial int H5Gclose(long handle);
 
     public static void Close(H5Group attribute)
@@ -22,14 +23,15 @@ internal static partial class H5GroupNativeMethods
 
     #region Create
 
-    public static H5Group Create(long locationId, string name,
+    public static H5Group Create<T>(H5Location<T> location, 
+        string name,
         H5PropertyList? propListLinkCreation = null,
         H5PropertyList? propListGroupCreation = null,
-        H5PropertyList? propListGroupAccess = null)
+        H5PropertyList? propListGroupAccess = null) where T : H5Object<T>
     {
-        locationId.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertIsHandleType(HandleType.File, HandleType.Group);
 
-        long h = H5G.create(locationId, name, propListLinkCreation, propListGroupCreation, propListGroupAccess);
+        long h = H5G.create(location, name, propListLinkCreation, propListGroupCreation, propListGroupAccess);
 
         h.ThrowIfInvalidHandleValue("H5G.create");
 
@@ -38,22 +40,22 @@ internal static partial class H5GroupNativeMethods
 
     #endregion
 
-    public static H5Group Open(long locationId, string name, H5PropertyList? propListGroupAccess = null)
+    public static H5Group Open<T>(H5Location<T> location, string name, H5PropertyList? propListGroupAccess = null) where T : H5Object<T>
     {
-        locationId.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertIsHandleType(HandleType.File, HandleType.Group);
 
-        long h = H5G.open(locationId, name, propListGroupAccess);
+        long h = H5G.open(location, name, propListGroupAccess);
 
         h.ThrowIfInvalidHandleValue("H5G.open");
 
         return new H5Group(h);
     }
 
-    public static void Delete(long locationId, string path, H5PropertyList? propListLinkAccess = null)
+    public static void Delete<T>(H5Location<T> location, string path, H5PropertyList? propListLinkAccess = null) where T : H5Object<T>
     {
-        locationId.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertIsHandleType(HandleType.File, HandleType.Group);
 
-        int err = H5L.delete(locationId, path, propListLinkAccess);
+        int err = H5L.delete(location, path, propListLinkAccess);
 
         err.ThrowIfError("H5L.delete");
     }
@@ -63,9 +65,9 @@ internal static partial class H5GroupNativeMethods
     /// </summary>
     /// <param name="locationId">A file or group id</param>
     /// <param name="name">A simple object name, e.g. 'group' not 'group/sub-group'.</param>
-    public static bool Exists(long locationId, string name)
+    public static bool Exists<T>(H5Location<T> location, string name) where T : H5Object<T>
     {
-        locationId.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertIsHandleType(HandleType.File, HandleType.Group);
 
         if (!IsSimpleName(name))
         {
@@ -73,7 +75,7 @@ internal static partial class H5GroupNativeMethods
         }
 
         // NOTE: H5L.exists can only check for a direct child of locationId
-        int err = H5L.exists(locationId, name);
+        int err = H5L.exists(location, name);
 
         err.ThrowIfError("H5L.exists");
 
@@ -100,12 +102,12 @@ internal static partial class H5GroupNativeMethods
     /// </remarks>
     /// <param name="locationId">A file or group id</param>
     /// <param name="path">e.g. /group/sub-group/sub-sub-group</param>
-    public static bool PathExists(long locationId, string path)
+    public static bool PathExists<T>(H5Location<T> location, string path) where T : H5Object<T>
     {
-        locationId.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertIsHandleType(HandleType.File, HandleType.Group);
 
         var ginfo = new H5G.info_t();
-        int err = H5G.get_info_by_name(locationId, path, ref ginfo);
+        int err = H5G.get_info_by_name(location, path, ref ginfo);
         return err >= 0;
     }
 }
