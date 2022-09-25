@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace HDF5Api;
+﻿namespace HDF5Api;
 
 public static class H5ThrowExtensions
 {

@@ -1,6 +1,5 @@
 ﻿using HDF5Api.Disposables;
 using System;
-using System.Runtime.InteropServices;
 
 namespace HDF5Api;
 

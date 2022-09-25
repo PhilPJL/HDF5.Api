@@ -21,7 +21,7 @@ internal static partial class H5GroupNativeMethods
 
     #region Create
 
-    public static H5Group Create<T>(H5Location<T> location, 
+    public static H5Group Create<T>(H5Location<T> location,
         string name,
         H5PropertyList? propListLinkCreation = null,
         H5PropertyList? propListGroupCreation = null,

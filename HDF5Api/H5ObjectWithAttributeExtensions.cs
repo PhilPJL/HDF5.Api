@@ -55,16 +55,16 @@ public static class H5ObjectWithAttributeExtensions
         CreateAndWriteAttribute(owa, name, typeId, pinned);
     }
 
-    internal static TV ReadAttribute<T, TV>(this H5Object<T> h5Object, string name) 
-        where T: H5Object<T>
-        where TV : unmanaged 
+    internal static TV ReadAttribute<T, TV>(this H5Object<T> h5Object, string name)
+        where T : H5Object<T>
+        where TV : unmanaged
     {
         using var attribute = H5AttributeNativeMethods.Open(h5Object, name);
 
         return attribute.Read<TV>();
     }
 
-    internal static string ReadStringAttribute<T>(this H5Object<T> h5Object, string name) 
+    internal static string ReadStringAttribute<T>(this H5Object<T> h5Object, string name)
         where T : H5Object<T>
     {
         using var attribute = H5AttributeNativeMethods.Open(h5Object, name);
@@ -72,7 +72,7 @@ public static class H5ObjectWithAttributeExtensions
         return attribute.ReadString();
     }
 
-    internal static DateTime ReadDateTimeAttribute<T>(this H5Object<T> h5Object, string name) 
+    internal static DateTime ReadDateTimeAttribute<T>(this H5Object<T> h5Object, string name)
         where T : H5Object<T>
     {
         using var attribute = H5AttributeNativeMethods.Open(h5Object, name);
