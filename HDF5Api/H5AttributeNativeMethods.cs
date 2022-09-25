@@ -45,19 +45,19 @@ internal static partial class H5AttributeNativeMethods
     /// <summary>
     /// Creates an attribute attached to a specified object.
     /// </summary>
-    /// <param name="owner"></param>
+    /// <param name="h5Object"></param>
     /// <param name="name"></param>
     /// <param name="type"></param>
     /// <param name="space"></param>
     /// <param name="creationPropertyList"></param>
     /// <param name="accessPropertyList"></param>
     /// <returns></returns>
-    public static H5Attribute Create(long owner, string name, H5Type type, H5Space space,
-        H5PropertyList? creationPropertyList = null, H5PropertyList? accessPropertyList = null)
+    public static H5Attribute Create<T>(H5Object<T> h5Object, string name, H5Type type, H5Space space,
+        H5PropertyList? creationPropertyList = null, H5PropertyList? accessPropertyList = null) where T : H5Object<T>
     {
-        owner.AssertIsHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        var handle = H5Acreate2(owner, name, type, space, creationPropertyList, accessPropertyList);
+        var handle = H5Acreate2(h5Object, name, type, space, creationPropertyList, accessPropertyList);
 
         return new H5Attribute(handle);
     }
@@ -85,14 +85,14 @@ internal static partial class H5AttributeNativeMethods
     /// <summary>
     /// Open an attribute
     /// </summary>
-    /// <param name="objectId"></param>
+    /// <param name="h5Object"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static H5Attribute Open(long objectId, string name, H5PropertyList? attributeAccessPropertyList = default)
+    public static H5Attribute Open<T>(H5Object<T> h5Object, string name, H5PropertyList? attributeAccessPropertyList = default) where T : H5Object<T>
     {
-        objectId.AssertIsHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        long h = H5Aopen(objectId, name, attributeAccessPropertyList);
+        long h = H5Aopen(h5Object, name, attributeAccessPropertyList);
 
         h.ThrowIfInvalidHandleValue("H5A.open");
 
@@ -117,11 +117,11 @@ internal static partial class H5AttributeNativeMethods
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static partial int H5Adelete(long loc_id, string name);
 
-    public static void Delete(long objectId, string name)
+    public static void Delete<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
-        objectId.AssertIsHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        int err = H5Adelete(objectId, name);
+        int err = H5Adelete(h5Object, name);
 
         err.ThrowIfError("H5A.delete");
     }
@@ -144,11 +144,11 @@ internal static partial class H5AttributeNativeMethods
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static partial int H5Aexists(long obj_id, string attr_name);
 
-    public static bool Exists(long objectId, string name)
+    public static bool Exists<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
-        objectId.AssertIsHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        int err = H5Aexists(objectId, name);
+        int err = H5Aexists(h5Object, name);
 
         err.ThrowIfError("H5A.exists");
         return err > 0;
@@ -203,15 +203,15 @@ internal static partial class H5AttributeNativeMethods
     private static partial int H5Aiterate
         (long obj_id, H5.index_t idx_type, H5.iter_order_t order, ref long n, operator_t op, IntPtr op_data);
 
-    public static IEnumerable<string> ListAttributeNames(long handle)
+    public static IEnumerable<string> ListAttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
     {
-        handle.AssertIsHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
         ulong idx = 0;
 
         var names = new List<string>();
 
-        int err = H5A.iterate(handle, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
+        int err = H5A.iterate(h5Object, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
         err.ThrowIfError("H5A.iterate");
 
         return names;
@@ -222,7 +222,7 @@ internal static partial class H5AttributeNativeMethods
 
             Guard.IsNotNull(name);
 
-            int err1 = H5A.get_info_by_name(handle, ".", name, ref info);
+            int err1 = H5A.get_info_by_name(h5Object, ".", name, ref info);
             err1.ThrowIfError("H5A.get_info_by_name");
 
             Debug.WriteLine($"{name}: {info.data_size}");
@@ -290,9 +290,9 @@ internal static partial class H5AttributeNativeMethods
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static partial ulong H5Aget_storage_size(long attr_id);
     
-    public static long GetStorageSize(H5Attribute attributeId)
+    public static long GetStorageSize(H5Attribute attribute)
     {
-        return (long)H5Aget_storage_size(attributeId);
+        return (long)H5Aget_storage_size(attribute);
     }
 
     #endregion

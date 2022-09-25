@@ -3,11 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-/*
- * File contains wrappers for all handle/H5ID types returned by the H5 PInvoke API.
- * These allow calling the correct Close method when disposed.
- */
-
 namespace HDF5Api;
 
 public static class H5Handle

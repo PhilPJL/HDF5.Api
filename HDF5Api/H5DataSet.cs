@@ -13,9 +13,9 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     {
     }
 
-    public void Write(H5Type typeId, H5Space memorySpace, H5Space fileSpace, IntPtr buffer)
+    public void Write(H5Type type, H5Space memorySpace, H5Space fileSpace, IntPtr buffer)
     {
-        H5DataSetNativeMethods.Write(this, typeId, memorySpace, fileSpace, buffer);
+        H5DataSetNativeMethods.Write(this, type, memorySpace, fileSpace, buffer);
     }
 
     public H5Space GetSpace()
@@ -38,27 +38,27 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     /// </summary>
     public H5Attribute OpenAttribute(string name)
     {
-        return H5AttributeNativeMethods.Open(Handle, name);
+        return H5AttributeNativeMethods.Open(this, name);
     }
 
-    public H5Attribute CreateAttribute(string name, H5Type typeId, H5Space space, H5PropertyList? creationPropertyList = null)
+    public H5Attribute CreateAttribute(string name, H5Type type, H5Space space, H5PropertyList? creationPropertyList = null)
     {
-        return H5AttributeNativeMethods.Create(Handle, name, typeId, space, creationPropertyList);
+        return H5AttributeNativeMethods.Create(this, name, type, space, creationPropertyList);
     }
 
     public void DeleteAttribute(string name)
     {
-        H5AttributeNativeMethods.Delete(Handle, name);
+        H5AttributeNativeMethods.Delete(this, name);
     }
 
     public bool AttributeExists(string name)
     {
-        return H5AttributeNativeMethods.Exists(Handle, name);
+        return H5AttributeNativeMethods.Exists(this, name);
     }
 
     public T ReadAttribute<T>(string name) where T : unmanaged
     {
-        return H5ObjectWithAttributeExtensions.ReadAttribute<T>(this, name);
+        return H5ObjectWithAttributeExtensions.ReadAttribute<H5DataSet, T>(this, name);
     }
 
     public string ReadStringAttribute(string name)
@@ -73,7 +73,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
     public IEnumerable<string> ListAttributeNames()
     {
-        return H5AttributeNativeMethods.ListAttributeNames(Handle);
+        return H5AttributeNativeMethods.ListAttributeNames(this);
     }
 
     /// <summary>
@@ -109,7 +109,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
             var result = new T[count];
             fixed (T* ptr = result)
             {
-                int err = H5D.read(Handle, type, space, space, 0, new IntPtr(ptr));
+                int err = H5D.read(this, type, space, space, 0, new IntPtr(ptr));
                 err.ThrowIfError("H5A.read");
                 return result;
             }

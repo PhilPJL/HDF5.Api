@@ -10,14 +10,17 @@ public class H5Object<T> : Disposable where T : H5Object<T>
 {
     #region Constructor and operators
 
-    public long Handle { get; private set; } = H5Handle.DefaultHandleValue;
+    // TODO: do I need DefaultHandleValue when class based (not struct based)?
+
+    private long _handle = H5Handle.DefaultHandleValue;
+
     private readonly Action<T>? _closeHandle;
 
     internal H5Object(long handle, Action<T>? closeHandle)
     {
         handle.ThrowIfDefaultOrInvalidHandleValue();
 
-        Handle = handle;
+        _handle = handle;
         _closeHandle = closeHandle;
 
         if (_closeHandle != null)
@@ -28,18 +31,18 @@ public class H5Object<T> : Disposable where T : H5Object<T>
 
     public bool IsDisposed()
     {
-        return Handle == H5Handle.InvalidHandleValue;
+        return _handle == H5Handle.InvalidHandleValue;
     }
 
     protected override void Dispose(bool _)
     {
-        if (_closeHandle == null || Handle == H5Handle.DefaultHandleValue)
+        if (_closeHandle == null || _handle == H5Handle.DefaultHandleValue)
         {
             // native or default(0) handle shouldn't be disposed
             return;
         }
 
-        if (Handle == H5Handle.InvalidHandleValue)
+        if (_handle == H5Handle.InvalidHandleValue)
         {
             // already disposed
             throw new ObjectDisposedException($"{GetType().FullName}");
@@ -47,18 +50,36 @@ public class H5Object<T> : Disposable where T : H5Object<T>
 
         // close and mark as disposed
         _closeHandle((T)this);
-        H5Handle.UntrackHandle(Handle);
+        H5Handle.UntrackHandle(_handle);
 
         // disposed
-        Handle = H5Handle.InvalidHandleValue;
+        _handle = H5Handle.InvalidHandleValue;
     }
 
     public static implicit operator long(H5Object<T>? h5object)
     {
-        if (h5object == null) { return 0; }
+        if (h5object == null)
+        {
+            // To allow passing null as default value which then gets converted to 0.
+            return H5Handle.DefaultHandleValue;
+        }
 
-        h5object.Handle.ThrowIfInvalidHandleValue();
-        return h5object.Handle;
+        h5object._handle.ThrowIfInvalidHandleValue();
+        return h5object._handle;
+    }
+
+    internal void AssertHasHandleType(params HandleType[] types)
+    {
+        _handle.ThrowIfInvalidHandleValue();
+
+        var type = _handle >> 56;
+
+        foreach (var t in types)
+        {
+            if ((int)t == type) { return; }
+        }
+
+        throw new Hdf5Exception($"Handle type {type} is not valid at this point.");
     }
 
     #endregion

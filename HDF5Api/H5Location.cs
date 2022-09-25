@@ -19,14 +19,14 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// <summary>
     ///     Create an Attribute for this location
     /// </summary>
-    public H5Attribute CreateAttribute(string name, H5Type typeId, H5Space spaceId, H5PropertyList propertyListId)
+    public H5Attribute CreateAttribute(string name, H5Type type, H5Space space, H5PropertyList propertyListId)
     {
         if (AttributeExists(name))
         {
             throw new Hdf5Exception($"Attribute {name} already exists");
         }
 
-        return H5AttributeNativeMethods.Create(this, name, typeId, spaceId, propertyListId);
+        return H5AttributeNativeMethods.Create(this, name, type, space, propertyListId);
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
 
     public TA ReadAttribute<TA>(string name) where TA : unmanaged
     {
-        return H5ObjectWithAttributeExtensions.ReadAttribute<TA>(this, name);
+        return H5ObjectWithAttributeExtensions.ReadAttribute<T, TA>(this, name);
     }
 
     public string ReadStringAttribute(string name)

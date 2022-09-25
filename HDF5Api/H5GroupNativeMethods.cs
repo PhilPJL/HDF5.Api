@@ -29,7 +29,7 @@ internal static partial class H5GroupNativeMethods
         H5PropertyList? propListGroupCreation = null,
         H5PropertyList? propListGroupAccess = null) where T : H5Object<T>
     {
-        location.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
         long h = H5G.create(location, name, propListLinkCreation, propListGroupCreation, propListGroupAccess);
 
@@ -42,7 +42,7 @@ internal static partial class H5GroupNativeMethods
 
     public static H5Group Open<T>(H5Location<T> location, string name, H5PropertyList? propListGroupAccess = null) where T : H5Object<T>
     {
-        location.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
         long h = H5G.open(location, name, propListGroupAccess);
 
@@ -53,7 +53,7 @@ internal static partial class H5GroupNativeMethods
 
     public static void Delete<T>(H5Location<T> location, string path, H5PropertyList? propListLinkAccess = null) where T : H5Object<T>
     {
-        location.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
         int err = H5L.delete(location, path, propListLinkAccess);
 
@@ -67,7 +67,7 @@ internal static partial class H5GroupNativeMethods
     /// <param name="name">A simple object name, e.g. 'group' not 'group/sub-group'.</param>
     public static bool Exists<T>(H5Location<T> location, string name) where T : H5Object<T>
     {
-        location.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
         if (!IsSimpleName(name))
         {
@@ -104,7 +104,7 @@ internal static partial class H5GroupNativeMethods
     /// <param name="path">e.g. /group/sub-group/sub-sub-group</param>
     public static bool PathExists<T>(H5Location<T> location, string path) where T : H5Object<T>
     {
-        location.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
         var ginfo = new H5G.info_t();
         int err = H5G.get_info_by_name(location, path, ref ginfo);

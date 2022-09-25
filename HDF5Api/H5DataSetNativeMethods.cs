@@ -21,10 +21,8 @@ internal static partial class H5DataSetNativeMethods
 
     #endregion
 
-    public static long GetStorageSize(long dataSetId)
+    public static long GetStorageSize(H5DataSet dataSetId) 
     {
-        dataSetId.AssertIsHandleType(HandleType.DataSet);
-
         return (long)H5D.get_storage_size(dataSetId);
     }
 
@@ -33,7 +31,8 @@ internal static partial class H5DataSetNativeMethods
         H5PropertyList? dataSetCreationPropertyList = null,
         H5PropertyList? accessCreationPropertyList = null) where T : H5Object<T>
     {
-        location.AssertIsHandleType(HandleType.File, HandleType.Group);
+        // TODO: is this check necessary?
+        location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
         long h = H5D.create(location, name, type, space,
             linkCreationPropertyList, dataSetCreationPropertyList, accessCreationPropertyList);
@@ -45,7 +44,7 @@ internal static partial class H5DataSetNativeMethods
 
     public static H5DataSet Open<T>(H5Location<T> location, string name) where T : H5Object<T>
     {
-        location.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
         long h = H5D.open(location, name);
 
@@ -56,7 +55,7 @@ internal static partial class H5DataSetNativeMethods
 
     public static bool Exists<T>(H5Location<T> location, string name) where T : H5Object<T>
     {
-        location.AssertIsHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
         int err = H5L.exists(location, name);
 

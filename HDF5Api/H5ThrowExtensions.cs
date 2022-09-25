@@ -41,23 +41,4 @@ public static class H5ThrowExtensions
             }
         }
     }
-
-    internal static void AssertIsHandleType<T>(this H5Object<T> h5Object, params HandleType[] types) where T : H5Object<T>
-    {
-        AssertIsHandleType(h5Object.Handle, types);
-    }
-
-    internal static void AssertIsHandleType(this long handle, params HandleType[] types)
-    {
-        handle.ThrowIfInvalidHandleValue();
-
-        var type = handle >> 56;
-
-        foreach (var t in types)
-        {
-            if ((int)t == type) { return; }
-        }
-
-        throw new Hdf5Exception($"Handle type {type} is not valid at this point.");
-    }
 }

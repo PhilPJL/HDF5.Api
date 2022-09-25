@@ -5,7 +5,7 @@ namespace HDF5Api;
 
 public static class H5ObjectWithAttributeExtensions
 {
-    private static void CreateAndWriteAttribute(IH5ObjectWithAttributes owa, string name, H5Type typeId, IntPtr buffer)
+    private static void CreateAndWriteAttribute(IH5ObjectWithAttributes owa, string name, H5Type type, IntPtr buffer)
     {
         // Single dimension (rank 1), unlimited length, chunk size.
         using var memorySpace = H5SpaceNativeMethods.CreateSimple(1, new ulong[] { 1 }, new ulong[] { 1 });
@@ -14,8 +14,8 @@ public static class H5ObjectWithAttributeExtensions
         using var propertyList = H5PropertyListNativeMethods.Create(H5P.ATTRIBUTE_CREATE);
 
         // Create an attribute
-        using var attribute = owa.CreateAttribute(name, typeId, memorySpace, propertyList);
-        attribute.Write(typeId, buffer);
+        using var attribute = owa.CreateAttribute(name, type, memorySpace, propertyList);
+        attribute.Write(type, buffer);
     }
 
     public static void CreateAndWriteAttribute<T>(this IH5ObjectWithAttributes owa, string name, T value) where T : unmanaged
@@ -55,23 +55,27 @@ public static class H5ObjectWithAttributeExtensions
         CreateAndWriteAttribute(owa, name, typeId, pinned);
     }
 
-    internal static T ReadAttribute<T>(this long handle, string name) where T : unmanaged
+    internal static TV ReadAttribute<T, TV>(this H5Object<T> h5Object, string name) 
+        where T: H5Object<T>
+        where TV : unmanaged 
     {
-        using var attribute = H5AttributeNativeMethods.Open(handle, name);
+        using var attribute = H5AttributeNativeMethods.Open(h5Object, name);
 
-        return attribute.Read<T>();
+        return attribute.Read<TV>();
     }
 
-    internal static string ReadStringAttribute(this long handle, string name)
+    internal static string ReadStringAttribute<T>(this H5Object<T> h5Object, string name) 
+        where T : H5Object<T>
     {
-        using var attribute = H5AttributeNativeMethods.Open(handle, name);
+        using var attribute = H5AttributeNativeMethods.Open(h5Object, name);
 
         return attribute.ReadString();
     }
 
-    internal static DateTime ReadDateTimeAttribute(this long handle, string name)
+    internal static DateTime ReadDateTimeAttribute<T>(this H5Object<T> h5Object, string name) 
+        where T : H5Object<T>
     {
-        using var attribute = H5AttributeNativeMethods.Open(handle, name);
+        using var attribute = H5AttributeNativeMethods.Open(h5Object, name);
 
         return attribute.ReadDateTime();
     }
