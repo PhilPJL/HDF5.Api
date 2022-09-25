@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace HDF5Api;
 
 /// <summary>
-///     Wrapper for H5D (Data-set) API.
+///     .NET wrapper for the H5D (DataSet) API: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_d.html"/>
 /// </summary>
 public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 {

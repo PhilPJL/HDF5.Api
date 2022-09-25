@@ -2,23 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace HDF5Api;
 
+/// <summary>
+/// H5 attribute native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
+/// </summary>
 internal static partial class H5AttributeNativeMethods
 {
     #region Close
 
+    /// <summary>
+    /// Closes the specified attribute.
+    /// </summary>
+    /// <param name="attr_id">Attribute to release access to.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aclose")]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    private static partial int H5Aclose(long handle);
+    private static partial int H5Aclose(long attr_id);
 
     public static void Close(H5Attribute attribute)
     {
-        H5Aclose(attribute).ThrowIfError("H5Aclose");
+        H5Aclose(attribute).ThrowIfError(nameof(H5Aclose));
     }
 
     #endregion
@@ -27,7 +33,6 @@ internal static partial class H5AttributeNativeMethods
 
     /// <summary>
     /// Creates an attribute attached to a specified object.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Create2
     /// </summary>
     /// <param name="loc_id">Location or object identifier</param>
     /// <param name="attr_name">Attribute name</param>
@@ -57,9 +62,11 @@ internal static partial class H5AttributeNativeMethods
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        var handle = H5Acreate2(h5Object, name, type, space, creationPropertyList, accessPropertyList);
+        var h = H5Acreate2(h5Object, name, type, space, creationPropertyList, accessPropertyList);
 
-        return new H5Attribute(handle);
+        h.ThrowIfInvalidHandleValue(nameof(H5Acreate2));
+
+        return new H5Attribute(h);
     }
 
     #endregion
@@ -69,7 +76,6 @@ internal static partial class H5AttributeNativeMethods
     /// <summary>
     /// Opens an attribute for an object specified by object identifier
     /// and attribute name.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Open
     /// </summary>
     /// <param name="obj_id">Identifer for object to which attribute is
     /// attached</param>
@@ -94,7 +100,7 @@ internal static partial class H5AttributeNativeMethods
 
         long h = H5Aopen(h5Object, name, attributeAccessPropertyList);
 
-        h.ThrowIfInvalidHandleValue("H5A.open");
+        h.ThrowIfInvalidHandleValue(nameof(H5Aopen));
 
         return new H5Attribute(h);
     }
@@ -105,7 +111,6 @@ internal static partial class H5AttributeNativeMethods
 
     /// <summary>
     /// Deletes an attribute from a specified location.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Delete
     /// </summary>
     /// <param name="loc_id">Identifier of the dataset, group, or named
     /// datatype to have the attribute deleted from.</param>
@@ -123,7 +128,7 @@ internal static partial class H5AttributeNativeMethods
 
         int err = H5Adelete(h5Object, name);
 
-        err.ThrowIfError("H5A.delete");
+        err.ThrowIfError(nameof(H5Adelete));
     }
 
     #endregion
@@ -132,7 +137,6 @@ internal static partial class H5AttributeNativeMethods
 
     /// <summary>
     /// Determines whether an attribute with a given name exists on an object.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Exists
     /// </summary>
     /// <param name="obj_id">Object identifier</param>
     /// <param name="attr_name">Attribute name</param>
@@ -150,7 +154,7 @@ internal static partial class H5AttributeNativeMethods
 
         int err = H5Aexists(h5Object, name);
 
-        err.ThrowIfError("H5A.exists");
+        err.ThrowIfError(nameof(H5Aexists));
         return err > 0;
     }
 
@@ -159,7 +163,6 @@ internal static partial class H5AttributeNativeMethods
     #region List attribute names
     /// <summary>
     /// Delegate for H5Aiterate2() callbacks
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Iterate2
     /// </summary>
     /// <param name="location_id">The location identifier for the group or
     /// dataset being iterated over</param>
@@ -178,11 +181,10 @@ internal static partial class H5AttributeNativeMethods
     /// be restarted at the next attribute, as indicated by the return value
     /// of <code>n</code>.</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int operator_t(long location_id, IntPtr attr_name, ref long ainfo, IntPtr op_data);
+    private delegate int operator_t(long location_id, IntPtr attr_name, ref AttributeInfo ainfo, IntPtr op_data);
 
     /// <summary>
     /// Calls user-defined function for each attribute on an object.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Iterate2
     /// </summary>
     /// <param name="obj_id">Identifier for object to which attributes are
     /// attached; may be group, dataset, or named datatype.</param>
@@ -200,8 +202,8 @@ internal static partial class H5AttributeNativeMethods
     /// </returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aiterate2")]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    private static partial int H5Aiterate
-        (long obj_id, H5.index_t idx_type, H5.iter_order_t order, ref long n, operator_t op, IntPtr op_data);
+    private static partial int H5Aiterate2
+        (long obj_id, GroupOrAttributeIndex idx_type, H5.iter_order_t order, ref ulong n, operator_t op, IntPtr op_data);
 
     public static IEnumerable<string> ListAttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
     {
@@ -211,19 +213,19 @@ internal static partial class H5AttributeNativeMethods
 
         var names = new List<string>();
 
-        int err = H5A.iterate(h5Object, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
-        err.ThrowIfError("H5A.iterate");
+        int err = H5Aiterate2(h5Object, GroupOrAttributeIndex.Name, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
+        err.ThrowIfError(nameof(H5Aiterate2));
 
         return names;
 
-        int Callback(long id, IntPtr intPtrName, ref H5A.info_t info, IntPtr _)
+        int Callback(long id, IntPtr intPtrName, ref AttributeInfo info, IntPtr _)
         {
             string? name = Marshal.PtrToStringAnsi(intPtrName);
 
             Guard.IsNotNull(name);
 
-            int err1 = H5A.get_info_by_name(h5Object, ".", name, ref info);
-            err1.ThrowIfError("H5A.get_info_by_name");
+            int err1 = H5Aget_info_by_name(h5Object, ".", name, ref info, 0);
+            err1.ThrowIfError(nameof(H5Aget_info_by_name));
 
             Debug.WriteLine($"{name}: {info.data_size}");
 
@@ -234,11 +236,69 @@ internal static partial class H5AttributeNativeMethods
 
     #endregion
 
+    #region GetInfoByName
+    /// <summary>
+    /// Retrieves attribute information, by attribute name.
+    /// </summary>
+    /// <param name="loc_id">Location of object to which attribute is
+    /// attached</param>
+    /// <param name="obj_name">Name of object to which attribute is
+    /// attached, relative to location</param>
+    /// <param name="attr_name">Attribute name</param>
+    /// <param name="ainfo">Struct containing returned attribute
+    /// information</param>
+    /// <param name="lapl_id">Link access property list</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    /// <remarks>ASCII strings ONLY!</remarks>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aget_info_by_name", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    private static partial int H5Aget_info_by_name(long loc_id, string obj_name, string attr_name, ref AttributeInfo ainfo, long lapl_id);
+
+    /// <summary>
+    /// Information struct for attribute (for H5Aget_info/H5Aget_info_by_idx).  Equivalent to H5A.info_t.
+    /// </summary>
+    private struct AttributeInfo
+    {
+        /// <summary>
+        /// Indicate if creation order is valid
+        /// </summary>
+        public uint corder_valid;
+        /// <summary>
+        /// Creation order
+        /// </summary>
+        public uint corder;
+        /// <summary>
+        /// Character set of attribute name
+        /// </summary>
+        public CharacterSet cset;
+        /// <summary>
+        /// Size of raw data
+        /// </summary>
+        public ulong data_size;
+    };
+
+    private enum CharacterSet
+    {
+        /// <summary>
+        /// error [value = -1].
+        /// </summary>
+        Error = -1,
+        /// <summary>
+        /// US ASCII [value = 0].
+        /// </summary>
+        Ascii = 0,
+        /// <summary>
+        /// UTF-8 Unicode encoding [value = 1].
+        /// </summary>
+        Utf8 = 1,
+    }
+    #endregion
+
     #region Write
 
     /// <summary>
     /// Writes data to an attribute.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Write
     /// </summary>
     /// <param name="attr_id">Identifier of an attribute to write.</param>
     /// <param name="mem_type_id">Identifier of the attribute datatype
@@ -252,7 +312,7 @@ internal static partial class H5AttributeNativeMethods
     {
         int err = H5Awrite(attribute, type, buffer);
 
-        err.ThrowIfError("H5A.write");
+        err.ThrowIfError(nameof(H5Awrite));
     }
 
     #endregion
@@ -261,7 +321,6 @@ internal static partial class H5AttributeNativeMethods
 
     /// <summary>
     /// Gets a copy of the dataspace for an attribute.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-GetSpace
     /// </summary>
     /// <param name="attr_id">Identifier of an attribute.</param>
     /// <returns>Returns attribute dataspace identifier if successful;
@@ -272,7 +331,11 @@ internal static partial class H5AttributeNativeMethods
 
     public static H5Space GetSpace(H5Attribute attribute)
     {
-        return new H5Space(H5Aget_space(attribute));
+        var space = H5Aget_space(attribute);
+
+        space.ThrowIfError(nameof(H5Aget_space));
+
+        return new H5Space(space);
     }
 
     #endregion
@@ -281,7 +344,6 @@ internal static partial class H5AttributeNativeMethods
 
     /// <summary>
     /// Returns the amount of storage required for an attribute.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-GetStorageSize
     /// </summary>
     /// <param name="attr_id">Identifier of the attribute to query.</param>
     /// <returns>Returns the amount of storage size allocated for the
@@ -289,7 +351,7 @@ internal static partial class H5AttributeNativeMethods
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aget_storage_size")]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static partial ulong H5Aget_storage_size(long attr_id);
-    
+
     public static long GetStorageSize(H5Attribute attribute)
     {
         return (long)H5Aget_storage_size(attribute);
@@ -301,7 +363,6 @@ internal static partial class H5AttributeNativeMethods
 
     /// <summary>
     /// Returns the type of an attribute.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-GetType
     /// </summary>
     /// <param name="attr_id">Identifier of an attribute.</param>
     /// <returns>Returns a datatype identifier if successful; otherwise
@@ -313,9 +374,10 @@ internal static partial class H5AttributeNativeMethods
     public static H5Type GetType(H5Attribute attribute)
     {
         long typeHandle = H5Aget_type(attribute);
-        typeHandle.ThrowIfInvalidHandleValue("H5A.get_type");
+        typeHandle.ThrowIfInvalidHandleValue(nameof(H5Aget_type));
         return new H5Type(typeHandle);
     }
 
     #endregion
 }
+

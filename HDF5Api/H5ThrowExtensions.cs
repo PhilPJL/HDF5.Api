@@ -41,4 +41,19 @@ public static class H5ThrowExtensions
             }
         }
     }
+
+    public static void ThrowIfError(this long err, string methodName)
+    {
+        if (err < 0)
+        {
+            if (string.IsNullOrWhiteSpace(methodName))
+            {
+                throw new Hdf5Exception($"Error: {err}.");
+            }
+            else
+            {
+                throw new Hdf5Exception($"Error {err} calling: {methodName}.");
+            }
+        }
+    }
 }

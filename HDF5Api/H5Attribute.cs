@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace HDF5Api;
 
 /// <summary>
-///     Wrapper for H5A (Attribute) API.
+///     .NET wrapper for the H5A (Attribute) API: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
 /// </summary>
 public class H5Attribute : H5Object<H5Attribute>
 {
