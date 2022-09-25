@@ -8,7 +8,7 @@ internal static partial class H5SpaceNativeMethods
     #region Close
 
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Sclose")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static partial int H5Sclose(long handle);
 
     public static void Close(H5Space attribute)

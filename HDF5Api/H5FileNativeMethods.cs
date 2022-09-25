@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using System.Security;
 
 namespace HDF5Api;
 
@@ -9,7 +7,7 @@ internal static partial class H5FileNativeMethods
     #region Close
 
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fclose")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static partial int H5Fclose(long handle);
 
     public static void Close(H5File file)
@@ -36,8 +34,8 @@ internal static partial class H5FileNativeMethods
     /// <returns>Returns a file identifier if successful; otherwise returns
     /// a negative value.</returns>
     /// <remarks><paramref name="filename"/> MUST be an ASCII string.</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fcreate", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(System.Runtime.InteropServices.Marshalling.AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fcreate", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial long H5Fcreate(string filename, uint flags, long create_plist, long access_plist);
 
     /// <summary>
@@ -68,8 +66,8 @@ internal static partial class H5FileNativeMethods
     /// <returns>Returns a file identifier if successful; otherwise returns
     /// a negative value.</returns>
     /// <remarks><paramref name="filename"/> MUST be an ASCII string!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fopen", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(System.Runtime.InteropServices.Marshalling.AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fopen", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static partial long H5Fopen(string filename, uint flags, long plist);
 
     public static H5File Open(string path, bool readOnly, H5PropertyList? fileAccessPropertyList = null)
@@ -96,7 +94,7 @@ internal static partial class H5FileNativeMethods
     /// <returns>Returns the number of open objects if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fget_obj_count")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial long H5Fget_obj_count(long file_id, uint types);
 
     public static long GetObjectCount(H5File file, H5ObjectTypes types = H5ObjectTypes.All)

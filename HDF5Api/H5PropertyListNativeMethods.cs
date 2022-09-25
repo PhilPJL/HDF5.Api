@@ -8,7 +8,7 @@ internal static partial class H5PropertyListNativeMethods
     #region Close
 
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pclose")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static partial int H5Pclose(long handle);
 
     public static void Close(H5PropertyList type)

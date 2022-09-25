@@ -27,10 +27,7 @@ public abstract class H5Test
         {
             H5Handle.DumpOpenHandles();
         }
-
-        Assert.AreEqual(expectedHandlesOpen, H5Handle.OpenHandleCount);
-#else
-        Assert.AreEqual(expectedHandlesOpen, H5Handle.OpenHandleCount);
 #endif
+        Assert.AreEqual(expectedHandlesOpen, H5Handle.OpenHandleCount);
     }
 }
