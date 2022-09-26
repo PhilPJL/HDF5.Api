@@ -1,9 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using static HDF.PInvoke.H5T;
-using System.Security;
 
 namespace HDF5Api;
 
@@ -390,7 +387,6 @@ internal static partial class H5AttributeNativeMethods
 
     #region Read
 
-
     /// <summary>
     /// Reads an attribute.
     /// </summary>
@@ -402,26 +398,15 @@ internal static partial class H5AttributeNativeMethods
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread")]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    private static partial int H5Aread(long attr_id, long type_id, IntPtr buf);
-
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static partial int H5Aread(long attr_id, long type_id, Span<byte> buf);
 
-    [Obsolete("Use Span based overload")]
-    public static void Read(H5Attribute attribute, H5Type type, IntPtr buffer)
+    public static void Read<T>(H5Attribute attribute, H5Type type, Span<T> buffer) where T : unmanaged
     {
-        int err = H5Aread(attribute, type, buffer);
+        int err = H5Aread(attribute, type, MemoryMarshal.AsBytes(buffer));
 
         err.ThrowIfError(nameof(H5Aread));
     }
 
-    public static void Read(H5Attribute attribute, H5Type type, Span<byte> buffer)
-    {
-        int err = H5Aread(attribute, type, buffer);
-
-        err.ThrowIfError(nameof(H5Aread));
-    }
     #endregion
 }
 

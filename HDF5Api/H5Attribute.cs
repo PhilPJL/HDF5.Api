@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.HighPerformance.Buffers;
-using HDF5Api.Disposables;
-using System;
+﻿using System;
 using System.Text;
 
 namespace HDF5Api;
@@ -86,13 +84,9 @@ public class H5Attribute : H5Object<H5Attribute>
                 $"Attribute storage size is {size}, which does not match the expected size for type {typeof(T).Name} of {Marshal.SizeOf<T>()}.");
         }
 
-        unsafe
-        {
-            T result = default;
-            int err = H5A.read(this, type, new IntPtr(&result));
-            err.ThrowIfError("H5A.read");
-            return result;
-        }
+        Span<T> buffer = stackalloc T[1];
+        H5AttributeNativeMethods.Read(this, type, buffer);
+        return buffer[0];
     }
 
     // TODO: expose public Write<T> etc as per Read
