@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using static HDF.PInvoke.H5T;
+using System.Security;
 
 namespace HDF5Api;
 
@@ -205,7 +207,7 @@ internal static partial class H5AttributeNativeMethods
     private static partial int H5Aiterate2
         (long obj_id, GroupOrAttributeIndex idx_type, H5.iter_order_t order, ref ulong n, operator_t op, IntPtr op_data);
 
-    public static IEnumerable<string> ListAttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
+    public static IEnumerable<string> ListAttributeNames<T>(H5Object<T> h5Object, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
@@ -224,10 +226,7 @@ internal static partial class H5AttributeNativeMethods
 
             Guard.IsNotNull(name);
 
-            int err1 = H5Aget_info_by_name(h5Object, ".", name, ref info, 0);
-            err1.ThrowIfError(nameof(H5Aget_info_by_name));
-
-            Debug.WriteLine($"{name}: {info.data_size}");
+            info = GetInfoByName(h5Object, ".", name, linkAccessPropertyList);
 
             names.Add(name);
             return 0;
@@ -255,6 +254,15 @@ internal static partial class H5AttributeNativeMethods
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static partial int H5Aget_info_by_name(long loc_id, string obj_name, string attr_name, ref AttributeInfo ainfo, long lapl_id);
 
+    // TODO: make public?
+    private static AttributeInfo GetInfoByName<T>(H5Object<T> h5Object, string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
+    {
+        AttributeInfo info = default;
+        int err = H5Aget_info_by_name(h5Object, objectName, attributeName, ref info, linkAccessPropertyList);
+        err.ThrowIfError(nameof(H5Aget_info_by_name));
+        return info;
+    }
+
     /// <summary>
     /// Information struct for attribute (for H5Aget_info/H5Aget_info_by_idx).  Equivalent to H5A.info_t.
     /// </summary>
@@ -278,7 +286,7 @@ internal static partial class H5AttributeNativeMethods
         public ulong data_size;
     };
 
-    private enum CharacterSet
+    private enum CharacterSet : int
     {
         /// <summary>
         /// error [value = -1].
@@ -378,6 +386,42 @@ internal static partial class H5AttributeNativeMethods
         return new H5Type(typeHandle);
     }
 
+    #endregion
+
+    #region Read
+
+
+    /// <summary>
+    /// Reads an attribute.
+    /// </summary>
+    /// <param name="attr_id">Identifier of an attribute to read.</param>
+    /// <param name="type_id"> Identifier of the attribute datatype
+    /// (in memory).</param>
+    /// <param name="buf">Buffer for data to be read.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread")]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    private static partial int H5Aread(long attr_id, long type_id, IntPtr buf);
+
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread")]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    private static partial int H5Aread(long attr_id, long type_id, Span<byte> buf);
+
+    [Obsolete("Use Span based overload")]
+    public static void Read(H5Attribute attribute, H5Type type, IntPtr buffer)
+    {
+        int err = H5Aread(attribute, type, buffer);
+
+        err.ThrowIfError(nameof(H5Aread));
+    }
+
+    public static void Read(H5Attribute attribute, H5Type type, Span<byte> buffer)
+    {
+        int err = H5Aread(attribute, type, buffer);
+
+        err.ThrowIfError(nameof(H5Aread));
+    }
     #endregion
 }
 

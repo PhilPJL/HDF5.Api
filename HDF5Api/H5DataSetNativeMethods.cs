@@ -1,4 +1,6 @@
 ﻿using System;
+using static HDF.PInvoke.H5T;
+using System.Security;
 
 namespace HDF5Api;
 
@@ -24,7 +26,7 @@ internal static partial class H5DataSetNativeMethods
     {
         int err = H5Dclose(dataSet);
 
-        err.ThrowIfError("H5Dclose");
+        err.ThrowIfError(nameof(H5Dclose));
     }
 
     #endregion
@@ -80,7 +82,7 @@ internal static partial class H5DataSetNativeMethods
         long h = H5Dcreate2(location, name, type, space,
             linkCreationPropertyList, dataSetCreationPropertyList, accessCreationPropertyList);
 
-        h.ThrowIfInvalidHandleValue("H5Dcreate2");
+        h.ThrowIfInvalidHandleValue(nameof(H5Dcreate2));
 
         return new H5DataSet(h);
     }
@@ -109,37 +111,95 @@ internal static partial class H5DataSetNativeMethods
 
         long h = H5Dopen2(location, name, dataSetAccessPropertyList);
 
-        h.ThrowIfInvalidHandleValue("H5Dopen2");
+        h.ThrowIfInvalidHandleValue(nameof(H5Dopen2));
 
         return new H5DataSet(h);
     }
 
     #endregion
 
-    public static bool Exists<T>(H5Location<T> location, string name) where T : H5Object<T>
+    #region Exists
+
+    /// <summary>
+    /// Determine whether a link with the specified name exists in a group.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5L.html#Link-Exists
+    /// </summary>
+    /// <param name="loc_id">Identifier of the file or group to query.</param>
+    /// <param name="name">The name of the link to check.</param>
+    /// <param name="lapl_id">Link access property list identifier.</param>
+    /// <returns>Returns 1 or 0 if successful; otherwise returns a negative
+    /// value.</returns>
+    /// <remarks>ASCII strings ONLY!</remarks>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lexists", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial int H5Lexists(long loc_id, string name, long lapl_id);
+
+
+    public static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
-        int err = H5L.exists(location, name);
+        int err = H5Lexists(location, name, linkAccessPropertyList);
 
-        err.ThrowIfError("H5L.exists");
+        err.ThrowIfError(nameof(H5Lexists));
 
         return err > 0;
     }
 
-    public static void SetExtent(H5DataSet dataSetId, ulong[] dims)
+    #endregion
+
+    #region SetExtent
+
+    /// <summary>
+    /// Changes the sizes of a dataset’s dimensions.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-SetExtent
+    /// </summary>
+    /// <param name="dset_id">Dataset identifier</param>
+    /// <param name="size">Array containing the new magnitude of each
+    /// dimension of the dataset.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dset_extent")]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial int H5Dset_extent(long dset_id, ulong[] size);
+
+    public static void SetExtent(H5DataSet dataSetId, ulong[] dimensions)
     {
-        int err = H5D.set_extent(dataSetId, dims);
+        int err = H5Dset_extent(dataSetId, dimensions);
 
         err.ThrowIfError("H5D.set_extent");
     }
 
-    public static void Write(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, IntPtr buffer)
+    #endregion
+
+    #region Write
+
+    /// <summary>
+    /// Writes raw data from a buffer to a dataset.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Write
+    /// </summary>
+    /// <param name="dset_id">Identifier of the dataset to write to.</param>
+    /// <param name="mem_type_id">Identifier of the memory datatype.</param>
+    /// <param name="mem_space_id">Identifier of the memory dataspace.</param>
+    /// <param name="file_space_id">Identifier of the dataset's dataspace
+    /// in the file.</param>
+    /// <param name="plist_id">Identifier of a transfer property list for
+    /// this I/O operation.</param>
+    /// <param name="buf">Buffer with data to be written to the file.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dwrite")]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial int H5Dwrite(long dset_id, long mem_type_id, long mem_space_id, long file_space_id, long plist_id, IntPtr buf);
+
+    public static void Write(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, IntPtr buffer, H5PropertyList? transferPropertyList = null)
     {
-        int err = H5D.write(dataSet, type, memorySpace, fileSpace, default, buffer);
+        int err = H5Dwrite(dataSet, type, memorySpace, fileSpace, transferPropertyList, buffer);
 
         err.ThrowIfError("H5D.write");
     }
+
+    #endregion
 
     public static H5Space GetSpace(H5DataSet dataSet)
     {

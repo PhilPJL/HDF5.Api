@@ -14,7 +14,7 @@ internal static partial class H5FileNativeMethods
     {
         int err = H5Fclose(file);
 
-        err.ThrowIfError("H5Fclose");
+        err.ThrowIfError(nameof(H5Fclose));
     }
 
     #endregion
@@ -45,7 +45,7 @@ internal static partial class H5FileNativeMethods
     {
         long h = H5Fcreate(path, (uint)H5FileOptions.Truncate, fileCreationPropertyList, fileAccessPropertyList);
 
-        h.ThrowIfInvalidHandleValue("H5F.create");
+        h.ThrowIfInvalidHandleValue(nameof(H5Fcreate));
 
         return new H5File(h);
     }
@@ -74,7 +74,7 @@ internal static partial class H5FileNativeMethods
     {
         long h = H5Fopen(path, (uint)(readOnly ? H5FileOptions.ReadOnly : H5FileOptions.ReadWrite), fileAccessPropertyList);
 
-        h.ThrowIfInvalidHandleValue("H5F.open");
+        h.ThrowIfInvalidHandleValue(nameof(H5Fopen));
 
         return new H5File(h);
     }

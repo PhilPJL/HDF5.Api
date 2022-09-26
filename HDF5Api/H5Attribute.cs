@@ -1,5 +1,7 @@
-﻿using HDF5Api.Disposables;
+﻿using CommunityToolkit.HighPerformance.Buffers;
+using HDF5Api.Disposables;
 using System;
+using System.Text;
 
 namespace HDF5Api;
 
@@ -44,13 +46,9 @@ public class H5Attribute : H5Object<H5Attribute>
 
         long size = H5AttributeNativeMethods.GetStorageSize(this);
 
-        // TODO: probably simpler way to do this.
-        using var buffer = new GlobalMemory((int)(size + 1));
-        int err = H5A.read(this, type, buffer.IntPtr);
-        err.ThrowIfError("H5A.read");
-
-        // TODO: marshal Ansi/UTF8/.. etc as appropriate
-        return Marshal.PtrToStringAnsi(buffer.IntPtr, (int)size);
+        Span<byte> buffer = stackalloc byte[(int)size];
+        H5AttributeNativeMethods.Read(this, type, buffer);
+        return Encoding.ASCII.GetString(buffer);
     }
 
     public DateTime ReadDateTime()
