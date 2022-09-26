@@ -17,6 +17,11 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         H5DataSetNativeMethods.Write(this, type, memorySpace, fileSpace, buffer);
     }
 
+    public void Write<T>(H5Type type, H5Space memorySpace, H5Space fileSpace, Span<T> buffer) where T : unmanaged
+    {
+        H5DataSetNativeMethods.Write(this, type, memorySpace, fileSpace, buffer);
+    }
+
     public H5Space GetSpace()
     {
         return H5DataSetNativeMethods.GetSpace(this);

@@ -14,8 +14,7 @@ namespace HDF5Api;
 /// <typeparam name="TInput"></typeparam>
 public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
 {
-    internal H5DataSetWriter1D(H5DataSet h5DataSet, H5Type h5Type, IH5TypeAdapter<TInput> converter,
-        bool ownsDataSet = false)
+    internal H5DataSetWriter1D(H5DataSet h5DataSet, H5Type h5Type, IH5TypeAdapter<TInput> converter, bool ownsDataSet = false)
     {
         DataSet = h5DataSet;
         Type = h5Type;
@@ -64,6 +63,7 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
 
             // Match the space to length of records retrieved.
             using var recordSpace = H5SpaceNativeMethods.CreateSimple(1, new[] { (ulong)numRecords }, H5DataSetWriter.MaxDims1D);
+
             // Configure most parameters for DataSet.WriteChunk and then pass the curried method as an Action<IntPtr> to Converter which only needs to supply the last param.
             Converter.Write(WriteAdaptor(DataSet, Type, recordSpace, fileSpace), recordsChunk);
 

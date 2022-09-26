@@ -2,13 +2,23 @@
 
 namespace HDF5Api;
 
+/// <summary>
+/// H5 file native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_f.html"/>
+/// </summary>
 internal static partial class H5FileNativeMethods
 {
     #region Close
 
+    /// <summary>
+    /// Terminates access to an HDF5 file.
+    /// </summary>
+    /// <param name="file_id">Identifier of a file to which access is
+    /// terminated.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fclose")]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    private static partial int H5Fclose(long handle);
+    private static partial herr_t H5Fclose(hid_t file_id);
 
     public static void Close(H5File file)
     {
@@ -23,7 +33,6 @@ internal static partial class H5FileNativeMethods
 
     /// <summary>
     /// Creates an HDF5 file.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-CreateS
     /// </summary>
     /// <param name="filename">Name of the file to access.</param>
     /// <param name="flags">File access flags (H5.ACC_*).</param>
@@ -36,7 +45,7 @@ internal static partial class H5FileNativeMethods
     /// <remarks><paramref name="filename"/> MUST be an ASCII string.</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fcreate", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial long H5Fcreate(string filename, uint flags, long create_plist, long access_plist);
+    private static partial hid_t H5Fcreate(string filename, uint flags, hid_t create_plist, hid_t access_plist);
 
     /// <summary>
     ///     Create a new file.
@@ -56,7 +65,6 @@ internal static partial class H5FileNativeMethods
 
     /// <summary>
     /// Opens an existing HDF5 file.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-Open
     /// </summary>
     /// <param name="filename">Name of the file to be opened.</param>
     /// <param name="flags">File access flags. (<code>H5F_ACC_RDWR</code>
@@ -68,7 +76,7 @@ internal static partial class H5FileNativeMethods
     /// <remarks><paramref name="filename"/> MUST be an ASCII string!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fopen", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    private static partial long H5Fopen(string filename, uint flags, long plist);
+    private static partial hid_t H5Fopen(string filename, uint flags, hid_t plist);
 
     public static H5File Open(string path, bool readOnly, H5PropertyList? fileAccessPropertyList = null)
     {
@@ -85,7 +93,6 @@ internal static partial class H5FileNativeMethods
 
     /// <summary>
     /// Returns the number of open object identifiers for an open file.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-GetObjCount
     /// </summary>
     /// <param name="file_id">Identifier of a currently-open HDF5 file.
     /// </param>
@@ -95,7 +102,7 @@ internal static partial class H5FileNativeMethods
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fget_obj_count")]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial long H5Fget_obj_count(long file_id, uint types);
+    private static partial ssize_t H5Fget_obj_count(hid_t file_id, uint types);
 
     public static long GetObjectCount(H5File file, H5ObjectTypes types = H5ObjectTypes.All)
     {

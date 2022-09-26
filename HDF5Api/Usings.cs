@@ -2,3 +2,12 @@
 global using System.Runtime.CompilerServices;
 global using System.Runtime.InteropServices;
 global using System.Runtime.InteropServices.Marshalling;
+global using herr_t = System.Int32;
+global using htri_t = System.Int32;
+global using hid_t = System.Int64;
+global using size_t = System.IntPtr;
+global using ssize_t = System.IntPtr;
+global using H5O_msg_crt_idx_t = System.UInt32;
+global using hbool_t = System.UInt32;
+global using hsize_t = System.UInt64;
+global using haddr_t = System.UInt64;
