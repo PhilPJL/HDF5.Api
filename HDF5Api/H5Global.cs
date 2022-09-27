@@ -86,3 +86,8 @@ internal enum GroupOrAttributeIndex : int
     /// </summary>
     N
 };
+
+/*internal static class Constants
+{
+    public const string DLLFileName = "hdf5.dll";
+};*/
