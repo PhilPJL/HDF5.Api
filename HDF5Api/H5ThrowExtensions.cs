@@ -10,10 +10,8 @@ public static class H5ThrowExtensions
             {
                 throw new Hdf5Exception($"Bad handle {handle}.");
             }
-            else
-            {
-                throw new Hdf5Exception($"Bad handle {handle} when {methodName}.");
-            }
+
+            throw new Hdf5Exception($"Bad handle {handle} when {methodName}.");
         }
     }
 
@@ -33,10 +31,8 @@ public static class H5ThrowExtensions
             {
                 throw new Hdf5Exception($"Error: {err}.");
             }
-            else
-            {
-                throw new Hdf5Exception($"Error {err} calling: {methodName}.");
-            }
+
+            throw new Hdf5Exception($"Error {err} calling: {methodName}.");
         }
     }
 
@@ -48,10 +44,8 @@ public static class H5ThrowExtensions
             {
                 throw new Hdf5Exception($"Error: {err}.");
             }
-            else
-            {
-                throw new Hdf5Exception($"Error {err} calling: {methodName}.");
-            }
+
+            throw new Hdf5Exception($"Error {err} calling: {methodName}.");
         }
     }
 }

@@ -49,25 +49,22 @@ public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
     public void Write(IEnumerable<TInput> recordsChunk)
     {
         // Single dimension (rank 1), unlimited length, chunk size.
-        using (var memorySpace = H5SpaceNativeMethods.CreateSimple(1, new ulong[] { 1 }, H5AttributeWriter.MaxDims))
-
-        // Create an attribute-creation property list
-        using (var properyList = H5PropertyListNativeMethods.Create(H5P.ATTRIBUTE_CREATE))
+        using var memorySpace = H5SpaceNativeMethods.CreateSimple(1, new ulong[] { 1 }, H5AttributeWriter.MaxDims);
+        using var properyList = H5PropertyListNativeMethods.Create(H5P.ATTRIBUTE_CREATE);
+        
+        foreach (var record in recordsChunk)
         {
-            foreach (var record in recordsChunk)
-            {
-                // Create the attribute with our record type and chunk size.
-                // Create with the name specified by the GetAttributeName function.
-                using var attribute =
-                    Location.CreateAttribute(GetAttributeName(record), Type, memorySpace, properyList);
-                Converter.Write(WriteAdaptor(attribute, Type), Enumerable.Repeat(record, 1));
-            }
+            // Create the attribute with our record type and chunk size.
+            // Create with the name specified by the GetAttributeName function.
+            using var attribute =
+                Location.CreateAttribute(GetAttributeName(record), Type, memorySpace, properyList);
+            Converter.Write(WriteAdaptor(attribute, Type), Enumerable.Repeat(record, 1));
         }
 
         // Curry attribute.Write to an Action<IntPtr>
         Action<IntPtr> WriteAdaptor(H5Attribute attribute, H5Type type)
         {
-            return (IntPtr buffer) => attribute.Write(type, buffer);
+            return buffer => attribute.Write(type, buffer);
         }
     }
 

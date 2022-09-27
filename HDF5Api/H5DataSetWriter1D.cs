@@ -73,7 +73,7 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
         // Curry dataSet.Write to an Action<IntPtr>
         Action<IntPtr> WriteAdaptor(H5DataSet dataSet, H5Type type, H5Space recordSpace, H5Space fileSpace)
         {
-            return (IntPtr buffer) => dataSet.Write(type, recordSpace, fileSpace, buffer);
+            return buffer => dataSet.Write(type, recordSpace, fileSpace, buffer);
         }
     }
 }

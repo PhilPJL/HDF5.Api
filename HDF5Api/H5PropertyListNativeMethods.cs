@@ -1,7 +1,4 @@
-﻿using System;
-using System.Security;
-
-namespace HDF5Api;
+﻿namespace HDF5Api;
 
 internal static partial class H5PropertyListNativeMethods
 {
@@ -15,7 +12,7 @@ internal static partial class H5PropertyListNativeMethods
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pclose")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Pclose(hid_t plist);
 
     public static void Close(H5PropertyList propertyList)
@@ -36,7 +33,7 @@ internal static partial class H5PropertyListNativeMethods
     /// <returns>Returns a property list identifier (<code>plist</code>)
     /// if successful; otherwise Fail (-1).</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pcreate")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Pcreate(hid_t cls_id);
 
     public static H5PropertyList Create(long classId)
@@ -62,7 +59,7 @@ internal static partial class H5PropertyListNativeMethods
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pset_chunk")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Pset_chunk(hid_t plist_id, int ndims, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] hsize_t[] dims);
 
     public static void SetChunk(H5PropertyList propertyList, int rank, ulong[] dims)
@@ -85,7 +82,7 @@ internal static partial class H5PropertyListNativeMethods
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pset_deflate")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Pset_deflate(hid_t plist_id, uint level);
 
     public static void EnableDeflateCompression(H5PropertyList propertyList, uint level)
@@ -107,7 +104,7 @@ internal static partial class H5PropertyListNativeMethods
     /// <returns>Returns a dataset creation property list identifier if
     /// successful; otherwise returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_create_plist")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Dget_create_plist(hid_t dset_id);
 
     /// <summary>

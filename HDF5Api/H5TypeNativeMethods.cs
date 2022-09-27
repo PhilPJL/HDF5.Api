@@ -7,7 +7,7 @@ internal static partial class H5TypeNativeMethods
     #region Close
 
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tclose")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial int H5Tclose(long handle);
 
     public static void Close(H5Type type)
@@ -25,12 +25,12 @@ internal static partial class H5TypeNativeMethods
     /// Returns the datatype class identifier.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-GetClass
     /// </summary>
-    /// <param name="dtype_id">Identifier of datatype to query.</param>
+    /// <param name="type_id">Identifier of datatype to query.</param>
     /// <returns>Returns datatype class identifier if successful; otherwise
     /// <code>H5T_NO_CLASS</code>.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tget_class")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial int H5Tget_class(long type_id);
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
+    private static partial int H5Tget_class(long type_id);
 
     public static H5Class GetClass(H5Type typeId)
     {
@@ -50,7 +50,7 @@ internal static partial class H5TypeNativeMethods
     /// <returns>Returns datatype identifier if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcreate")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial long H5Tcreate(H5Class cls, IntPtr size);
 
     /// <summary>

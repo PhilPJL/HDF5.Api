@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HDF5Api;
+﻿namespace HDF5Api;
 
 /// <summary>
 /// H5 file native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_f.html"/>
@@ -17,7 +15,7 @@ internal static partial class H5FileNativeMethods
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fclose")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Fclose(hid_t file_id);
 
     public static void Close(H5File file)
@@ -44,7 +42,7 @@ internal static partial class H5FileNativeMethods
     /// a negative value.</returns>
     /// <remarks><paramref name="filename"/> MUST be an ASCII string.</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fcreate", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Fcreate(string filename, uint flags, hid_t create_plist, hid_t access_plist);
 
     /// <summary>
@@ -75,7 +73,7 @@ internal static partial class H5FileNativeMethods
     /// a negative value.</returns>
     /// <remarks><paramref name="filename"/> MUST be an ASCII string!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fopen", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Fopen(string filename, uint flags, hid_t plist);
 
     public static H5File Open(string path, bool readOnly, H5PropertyList? fileAccessPropertyList = null)
@@ -101,18 +99,18 @@ internal static partial class H5FileNativeMethods
     /// <returns>Returns the number of open objects if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fget_obj_count")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial ssize_t H5Fget_obj_count(hid_t file_id, uint types);
 
     public static long GetObjectCount(H5File file, H5ObjectTypes types = H5ObjectTypes.All)
     {
-        return H5Fget_obj_count(file, (uint)types);
+        return (long)H5Fget_obj_count(file, (uint)types);
     }
 
     #endregion
 }
 
-enum H5FileOptions : uint
+internal enum H5FileOptions : uint
 {
     // Flags for H5F.open() and H5F.create() calls
 

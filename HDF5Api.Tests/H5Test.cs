@@ -1,14 +1,8 @@
-﻿using System.Diagnostics;
-
-namespace HDF5Api.Tests;
+﻿namespace HDF5Api.Tests;
 
 [TestClass]
 public abstract class H5Test
 {
-    protected H5Test()
-    {
-    }
-
     [TestInitialize]
     public void TestInitialize()
     {
@@ -18,12 +12,13 @@ public abstract class H5Test
     /// <summary>
     ///     Verify all handles have been closed after completion of test.
     /// </summary>
-    /// <param name="action"></param>
+    /// <param name="action">The action to run.</param>
+    /// <param name="expectedHandlesOpen">The number of handles expected to be open after the action has run.</param>
     protected static void HandleCheck(Action action, int expectedHandlesOpen = 0)
     {
         action();
 #if DEBUG
-        if (expectedHandlesOpen == 0 && H5Handle.OpenHandleCount != 0)
+        if (expectedHandlesOpen == 0)
         {
             H5Handle.DumpOpenHandles();
         }

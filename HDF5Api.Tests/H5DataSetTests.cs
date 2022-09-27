@@ -5,11 +5,11 @@ namespace HDF5Api.Tests;
 [TestClass]
 public class H5DataSetTests : H5Test
 {
-    const string Path = "test.h5";
+    private const string Path = "test.h5";
 
     internal static H5DataSet CreateTestDataset(IH5Location location, string dataSetName)
     {
-        int chunkSize = 1;
+        const int chunkSize = 1;
 
         using var memorySpace = H5SpaceNativeMethods.CreateSimple(1, new[] { (ulong)chunkSize }, new[] { H5S.UNLIMITED });
 

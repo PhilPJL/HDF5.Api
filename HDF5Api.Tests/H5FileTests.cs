@@ -3,9 +3,28 @@
 [TestClass]
 public class H5FileTests : H5LocationTests
 {
-    const string Path = "test.h5";
+    private const string Path = "test.h5";
 
     #region Create file tests
+
+    [TestMethod]
+    public void OpenHandleTest()
+    {
+        H5File file = null;
+
+        HandleCheck(() =>
+        {
+            // Ensure no existing file
+            File.Delete(Path);
+            Assert.IsFalse(File.Exists(Path));
+
+            // Create new file
+            file = H5File.Create(Path);
+
+        }, 1);
+
+        file?.Dispose();
+    }
 
     [TestMethod]
     public void CreateFileSucceeds()

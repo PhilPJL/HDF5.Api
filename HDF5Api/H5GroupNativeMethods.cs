@@ -1,7 +1,4 @@
-﻿using System;
-using System.Security;
-
-namespace HDF5Api;
+﻿namespace HDF5Api;
 
 /// <summary>
 /// H5 group native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_g.html"/>
@@ -17,15 +14,9 @@ internal static partial class H5GroupNativeMethods
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gclose")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Gclose(hid_t group_id);
 
-    /// <summary>
-    /// Closes the specified group.
-    /// </summary>
-    /// <param name="group_id">Group identifier to release.</param>
-    /// <returns>Returns a non-negative value if successful; otherwise
-    /// returns a negative value.</returns>
     public static void Close(H5Group attribute)
     {
         int err = H5Gclose(attribute);
@@ -49,7 +40,7 @@ internal static partial class H5GroupNativeMethods
     /// <returns>Returns a group identifier if successful; otherwise returns
     /// a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gcreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Gcreate2(hid_t loc_id, string name, hid_t lcpl_id, hid_t gcpl_id, hid_t gapl_id);
 
     public static H5Group Create<T>(
@@ -82,7 +73,7 @@ internal static partial class H5GroupNativeMethods
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gopen2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Gopen2(hid_t loc_id, string name, hid_t gapl_id);
 
     public static H5Group Open<T>(H5Location<T> location, string name, H5PropertyList? propListGroupAccess = null) where T : H5Object<T>
@@ -111,7 +102,7 @@ internal static partial class H5GroupNativeMethods
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Ldelete", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Ldelete(hid_t loc_id, string name, hid_t lapl_id);
 
     public static void Delete<T>(H5Location<T> location, string path, H5PropertyList? propListLinkAccess = null) where T : H5Object<T>
@@ -138,14 +129,15 @@ internal static partial class H5GroupNativeMethods
     /// value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lexists", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial htri_t H5Lexists(hid_t loc_id, string name, hid_t lapl_id);
 
     /// <summary>
     ///     Test if an object exists by name in the specified location.
     /// </summary>
-    /// <param name="locationId">A file or group id</param>
+    /// <param name="location">A file or group id</param>
     /// <param name="name">A simple object name, e.g. 'group' not 'group/sub-group'.</param>
+    /// <param name="linkAccessPropertyList"></param>
     public static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group);
@@ -185,8 +177,9 @@ internal static partial class H5GroupNativeMethods
     ///         Note also that an H5 file allows a rooted path (/grp/grp) but an H5 group doesn't (grp/grp).
     ///     </para>
     /// </remarks>
-    /// <param name="locationId">A file or group id</param>
+    /// <param name="location">A file or group id</param>
     /// <param name="path">e.g. /group/sub-group/sub-sub-group</param>
+    /// <param name="linkAccessPropertyList"></param>
     public static bool PathExists<T>(H5Location<T> location, string path, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group);
@@ -208,7 +201,7 @@ internal static partial class H5GroupNativeMethods
     /// returns a negative value.</returns>
     /// <remarks>ASCII strngs ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_name", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Gget_info_by_name(hid_t loc_id, string name, ref info_t ginfo, hid_t lapl_id);
 
     private enum storage_type_t

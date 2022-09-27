@@ -48,7 +48,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
 
     public TA ReadAttribute<TA>(string name) where TA : unmanaged
     {
-        return H5ObjectWithAttributeExtensions.ReadAttribute<T, TA>(this, name);
+        return this.ReadAttribute<T, TA>(name);
     }
 
     public string ReadStringAttribute(string name)

@@ -36,14 +36,7 @@ public static class H5ObjectWithAttributeExtensions
     {
         value ??= string.Empty;
 
-        if (maxLength <= 0)
-        {
-            maxLength = value.Length;
-        }
-        else
-        {
-            maxLength = Math.Min(value.Length, maxLength);
-        }
+        maxLength = maxLength <= 0 ? value.Length : Math.Min(value.Length, maxLength);
 
         string subString = value.Length > maxLength ? value[..maxLength] : value;
 

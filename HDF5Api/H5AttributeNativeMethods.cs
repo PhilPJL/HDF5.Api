@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System;
 using System.Collections.Generic;
-using static HDF.PInvoke.H5T;
 
 namespace HDF5Api;
 
@@ -44,7 +43,7 @@ internal static partial class H5AttributeNativeMethods
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Acreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Acreate2
         (hid_t loc_id, string attr_name, hid_t type_id, hid_t space_id, hid_t acpl_id, hid_t aapl_id);
 
@@ -86,7 +85,7 @@ internal static partial class H5AttributeNativeMethods
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aopen", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Aopen(hid_t obj_id, string attr_name, hid_t aapl_id);
 
     /// <summary>
@@ -94,6 +93,7 @@ internal static partial class H5AttributeNativeMethods
     /// </summary>
     /// <param name="h5Object"></param>
     /// <param name="name"></param>
+    /// <param name="attributeAccessPropertyList"></param>
     /// <returns></returns>
     public static H5Attribute Open<T>(H5Object<T> h5Object, string name, H5PropertyList? attributeAccessPropertyList = default) where T : H5Object<T>
     {
@@ -120,7 +120,7 @@ internal static partial class H5AttributeNativeMethods
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Adelete", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Adelete(hid_t loc_id, string name);
 
     public static void Delete<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
@@ -146,7 +146,7 @@ internal static partial class H5AttributeNativeMethods
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aexists", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial htri_t H5Aexists(hid_t obj_id, string attr_name);
 
     public static bool Exists<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
@@ -203,7 +203,7 @@ internal static partial class H5AttributeNativeMethods
     /// a positive value indicating short-circuit success
     /// </returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aiterate2")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Aiterate2
         (hid_t obj_id, GroupOrAttributeIndex idx_type, CommonIterationOrders order, ref hsize_t n, operator_t op, IntPtr op_data);
 
@@ -252,7 +252,7 @@ internal static partial class H5AttributeNativeMethods
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aget_info_by_name", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Aget_info_by_name(hid_t loc_id, string obj_name, string attr_name, ref AttributeInfo ainfo, hid_t lapl_id);
 
     // TODO: make public?
@@ -285,9 +285,9 @@ internal static partial class H5AttributeNativeMethods
         /// Size of raw data
         /// </summary>
         public ulong data_size;
-    };
+    }
 
-    private enum CharacterSet : int
+    private enum CharacterSet
     {
         /// <summary>
         /// error [value = -1].
@@ -300,7 +300,7 @@ internal static partial class H5AttributeNativeMethods
         /// <summary>
         /// UTF-8 Unicode encoding [value = 1].
         /// </summary>
-        Utf8 = 1,
+        Utf8 = 1
     }
     #endregion
 
@@ -314,7 +314,7 @@ internal static partial class H5AttributeNativeMethods
     /// (in memory).</param>
     /// <param name="buf">Data to be written.</param>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Awrite")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Awrite(hid_t attr_id, hid_t mem_type_id, IntPtr buf);
 
     public static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
@@ -335,7 +335,7 @@ internal static partial class H5AttributeNativeMethods
     /// <returns>Returns attribute dataspace identifier if successful;
     /// otherwise returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aget_space")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Aget_space(hid_t attr_id);
 
     public static H5Space GetSpace(H5Attribute attribute)
@@ -358,7 +358,7 @@ internal static partial class H5AttributeNativeMethods
     /// <returns>Returns the amount of storage size allocated for the
     /// attribute; otherwise returns 0 (zero).</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aget_storage_size")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hsize_t H5Aget_storage_size(hid_t attr_id);
 
     public static long GetStorageSize(H5Attribute attribute)
@@ -377,7 +377,7 @@ internal static partial class H5AttributeNativeMethods
     /// <returns>Returns a datatype identifier if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aget_type")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     public static partial hid_t H5Aget_type(hid_t attr_id);
 
     public static H5Type GetType(H5Attribute attribute)
@@ -401,7 +401,7 @@ internal static partial class H5AttributeNativeMethods
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Aread(hid_t attr_id, hid_t type_id, Span<byte> buf);
 
     public static void Read<T>(H5Attribute attribute, H5Type type, Span<T> buffer) where T : unmanaged

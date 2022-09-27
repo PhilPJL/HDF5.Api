@@ -15,7 +15,7 @@ public static partial class H5Error
     /// <returns>Returns a non-negative value on success; otherwise returns
     /// a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eset_auto2")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     public static partial herr_t H5Eset_auto2
         (hid_t estack_id, auto_t? func, IntPtr client_data);
 

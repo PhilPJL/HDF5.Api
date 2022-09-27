@@ -1,11 +1,9 @@
-﻿using System.Diagnostics;
-
-namespace HDF5Api.Tests;
+﻿namespace HDF5Api.Tests;
 
 [TestClass]
 public class H5AttributeTests : H5Test
 {
-    const string Path = "test.h5";
+    private const string Path = "test.h5";
 
     [TestMethod]
     public void CreateDuplicateAttributeNameThrows()
@@ -72,7 +70,7 @@ public class H5AttributeTests : H5Test
 
             group.DeleteAttribute("string");
 
-            string s = "long-----------------------------------";
+            const string s = "long-----------------------------------";
             group.CreateAndWriteAttribute("string", s);
 
             string s1 = group.ReadStringAttribute("string");
@@ -135,7 +133,7 @@ public class H5AttributeTests : H5Test
 
         void CreateWriteReadDeleteDateTimeAttribute(DateTime value)
         {
-            string name = "dtDateTime";
+            const string name = "dtDateTime";
 
             location.CreateAndWriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
@@ -150,7 +148,7 @@ public class H5AttributeTests : H5Test
 
         void CreateWriteReadDeleteStringAttribute(string value, int maxLength = 0)
         {
-            string name = "dtString";
+            const string name = "dtString";
 
             location.CreateAndWriteAttribute(name, value, maxLength);
             Assert.IsTrue(location.AttributeExists(name));

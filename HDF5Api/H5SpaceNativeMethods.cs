@@ -1,13 +1,11 @@
-﻿using System;
-
-namespace HDF5Api;
+﻿namespace HDF5Api;
 
 internal static partial class H5SpaceNativeMethods
 {
     #region Close
 
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Sclose")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial int H5Sclose(long handle);
 
     public static void Close(H5Space attribute)

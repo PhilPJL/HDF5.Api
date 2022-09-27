@@ -62,7 +62,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
     public T ReadAttribute<T>(string name) where T : unmanaged
     {
-        return H5ObjectWithAttributeExtensions.ReadAttribute<H5DataSet, T>(this, name);
+        return this.ReadAttribute<H5DataSet, T>(name);
     }
 
     public string ReadStringAttribute(string name)
@@ -82,7 +82,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
     /// <summary>
     /// Get copy of property list used to create the data-set.
-    /// <returns></returns>
+    /// </summary>
     public H5PropertyList GetCreationPropertyList()
     {
         return H5PropertyListNativeMethods.GetCreationPropertyList(this);

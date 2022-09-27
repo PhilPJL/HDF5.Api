@@ -10,7 +10,7 @@ public static class H5Handle
 #if DEBUG
     private static ConcurrentDictionary<long, string> Handles { get; } = new();
 #endif
-    public static int OpenHandleCount { get; set; }
+    public static int OpenHandleCount { get; private set; }
 
     internal const long InvalidHandleValue = -1;
     internal const long DefaultHandleValue = 0;
@@ -29,7 +29,7 @@ public static class H5Handle
     internal static void UntrackHandle(long handle)
     {
 #if DEBUG
-        Handles.Remove(handle, out var _);
+        Handles.Remove(handle, out _);
 #endif
 
         OpenHandleCount--;
@@ -53,5 +53,5 @@ internal enum HandleType
     DataSet = 5,
     Attribute = 6,
 
-    PropertyList = 10,
+    PropertyList = 10
 }

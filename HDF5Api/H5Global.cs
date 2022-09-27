@@ -67,7 +67,7 @@ internal enum CommonIterationOrders : int
 /// over links in groups/attributes on objects.
 /// Equivalent to H5.index_t.
 /// </summary>
-internal enum GroupOrAttributeIndex : int
+internal enum GroupOrAttributeIndex
 {
     /// <summary>
     /// Unknown index type [value = -1].
@@ -85,7 +85,7 @@ internal enum GroupOrAttributeIndex : int
     /// Number of indices defined [value = 2].
     /// </summary>
     N
-};
+}
 
 /*internal static class Constants
 {

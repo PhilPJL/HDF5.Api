@@ -17,7 +17,7 @@ internal static partial class H5DataSetNativeMethods
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dclose")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Dclose(hid_t dset_id);
 
     public static void Close(H5DataSet dataSet)
@@ -39,7 +39,7 @@ internal static partial class H5DataSetNativeMethods
     /// for the dataset, not counting metadata; otherwise returns 0 (zero).
     /// </returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_storage_size")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hsize_t H5Dget_storage_size(hid_t dset_id);
 
     public static long GetStorageSize(H5DataSet dataSetId)
@@ -65,7 +65,7 @@ internal static partial class H5DataSetNativeMethods
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dcreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Dcreate2(hid_t loc_id, string name, hid_t type_id, hid_t space_id, hid_t lcpl_id, hid_t dcpl_id, hid_t dapl_id);
 
     public static H5DataSet Create<T>(H5Location<T> location, string name, H5Type type, H5Space space,
@@ -98,7 +98,7 @@ internal static partial class H5DataSetNativeMethods
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dopen2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Dopen2(hid_t file_id, string name, hid_t dapl_id);
 
     public static H5DataSet Open<T>(H5Location<T> location, string name, H5PropertyList? dataSetAccessPropertyList = null) where T : H5Object<T>
@@ -126,7 +126,7 @@ internal static partial class H5DataSetNativeMethods
     /// value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lexists", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial htri_t H5Lexists(hid_t loc_id, string name, hid_t lapl_id);
 
     public static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
@@ -153,7 +153,7 @@ internal static partial class H5DataSetNativeMethods
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dset_extent")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Dset_extent(hid_t dset_id, hsize_t[] size);
 
     public static void SetExtent(H5DataSet dataSetId, ulong[] dimensions)
@@ -181,12 +181,12 @@ internal static partial class H5DataSetNativeMethods
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dwrite")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Dwrite
         (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id, hid_t file_space_id, hid_t plist_id, IntPtr buf);
 
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dwrite")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Dwrite
         (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id, hid_t file_space_id, hid_t plist_id, Span<byte> buf);
 
@@ -215,7 +215,7 @@ internal static partial class H5DataSetNativeMethods
     /// <returns>Returns a dataspace identifier if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_space")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial hid_t H5Dget_space(hid_t dset_id);
 
     public static H5Space GetSpace(H5DataSet dataSet)
@@ -238,7 +238,7 @@ internal static partial class H5DataSetNativeMethods
     /// <returns>Returns a datatype identifier if successful; otherwise
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_type")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     public static partial hid_t H5Dget_type(hid_t dset_id);
 
     public static H5Type GetType(H5DataSet dataSet)

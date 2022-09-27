@@ -5,14 +5,12 @@ namespace HDF5Api;
 /// <summary>
 ///     Base class for H5 object types.
 /// </summary>
-/// <typeparam name="THandle">The handle associated with this object type.</typeparam>
+/// <typeparam name="T">The H5 type derived from this H5Object.</typeparam>
 public class H5Object<T> : Disposable where T : H5Object<T>
 {
     #region Constructor and operators
 
-    // TODO: do I need DefaultHandleValue when class based (not struct based)?
-
-    private long _handle = H5Handle.DefaultHandleValue;
+    private long _handle;
 
     private readonly Action<T>? _closeHandle;
 
@@ -74,6 +72,7 @@ public class H5Object<T> : Disposable where T : H5Object<T>
 
         var type = _handle >> 56;
 
+        // ReSharper disable once LoopCanBeConvertedToQuery
         foreach (var t in types)
         {
             if ((int)t == type) { return; }

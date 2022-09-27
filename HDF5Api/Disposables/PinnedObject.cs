@@ -7,7 +7,7 @@ namespace HDF5Api.Disposables;
 /// </summary>
 public class PinnedObject : Disposable
 {
-    public GCHandle Pinned { get; private set; }
+    private GCHandle Pinned { get; set; }
 
     public PinnedObject(object objectToPin)
     {

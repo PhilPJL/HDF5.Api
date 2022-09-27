@@ -3,7 +3,7 @@
 [TestClass]
 public class H5HandleTests : H5Test
 {
-    const string Path = "test.h5";
+    private const string Path = "test.h5";
 
     [TestMethod]
     public void DetectUnclosedHandlesSucceeds()
