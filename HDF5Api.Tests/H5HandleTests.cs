@@ -15,7 +15,7 @@ public class H5HandleTests : H5Test
             Assert.IsFalse(File.Exists(Path));
 
             // Create file without disposing
-            H5File file = null;
+            H5File? file = null;
             HandleCheck(() => file = H5File.Create(Path), 1);
             Assert.IsTrue(File.Exists(Path));
 

@@ -10,7 +10,7 @@ public class H5FileTests : H5LocationTests
     [TestMethod]
     public void OpenHandleTest()
     {
-        H5File file = null;
+        H5File? file = null;
 
         HandleCheck(() =>
         {
