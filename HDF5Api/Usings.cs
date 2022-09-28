@@ -11,3 +11,4 @@ global using H5O_msg_crt_idx_t = System.UInt32;
 global using hbool_t = System.UInt32;
 global using hsize_t = System.UInt64;
 global using haddr_t = System.UInt64;
+global using hssize_t = System.Int64;

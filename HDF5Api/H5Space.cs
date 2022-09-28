@@ -1,4 +1,6 @@
-﻿namespace HDF5Api;
+﻿using System.Collections.Generic;
+
+namespace HDF5Api;
 
 /// <summary>
 ///     Wrapper for H5S (Space) API.
@@ -26,10 +28,15 @@ public class H5Space : H5Object<H5Space>
         return H5SpaceNativeMethods.GetSimpleExtentNDims(this);
     }
 
-    public (int rank, ulong[] dims, ulong[] maxDims) GetSimpleExtentDims()
+    public IReadOnlyList<Dimension> GetSimpleExtentDims()
     {
         return H5SpaceNativeMethods.GetSimpleExtentDims(this);
     }
 
     #endregion
+
+    public static H5Space Create(params Dimension[] dimensions)
+    {
+        return H5SpaceNativeMethods.CreateSimple(dimensions);
+    }
 }
