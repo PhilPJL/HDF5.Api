@@ -6,8 +6,6 @@ namespace HDF5Api;
 
 public static class H5AttributeWriter
 {
-    internal static readonly ulong[] MaxDims = { H5S.UNLIMITED };
-
     public static IH5AttributeWriter<TInput> CreateAttributeWriter<TInput>
         (IH5Location location, Func<TInput, string> getAttributeName, IH5TypeAdapter<TInput> converter)
     {
@@ -49,9 +47,9 @@ public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
     public void Write(IEnumerable<TInput> recordsChunk)
     {
         // Single dimension (rank 1), unlimited length, chunk size.
-        using var memorySpace = H5SpaceNativeMethods.CreateSimple(1, new ulong[] { 1 }, H5AttributeWriter.MaxDims);
+        using var memorySpace = H5SpaceNativeMethods.CreateSimple(new Dimension(1));
         using var properyList = H5PropertyListNativeMethods.Create(H5P.ATTRIBUTE_CREATE);
-        
+
         foreach (var record in recordsChunk)
         {
             // Create the attribute with our record type and chunk size.

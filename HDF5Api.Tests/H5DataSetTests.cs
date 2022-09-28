@@ -11,11 +11,12 @@ public class H5DataSetTests : H5Test
     {
         const int chunkSize = 1;
 
-        using var memorySpace = H5SpaceNativeMethods.CreateSimple(1, new[] { (ulong)chunkSize }, new[] { H5S.UNLIMITED });
+        using var memorySpace = H5SpaceNativeMethods.CreateSimple(new Dimension(chunkSize));
 
         using var propertyList = H5PropertyListNativeMethods.Create(H5P.DATASET_CREATE);
+
         // Enable chunking. From the user guide: "HDF5 requires the use of chunking when defining extendable datasets."
-        propertyList.SetChunk(1, new[] { (ulong)chunkSize });
+        propertyList.SetChunk(1, chunkSize);
 
         using var type = H5Type.GetNativeType<long>();
 

@@ -1,4 +1,7 @@
-﻿namespace HDF5Api;
+﻿using CommunityToolkit.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+
+namespace HDF5Api;
 
 /// <summary>
 ///     Wrapper for H5P (Property list) API.
@@ -8,9 +11,13 @@ public class H5PropertyList : H5Object<H5PropertyList>
     internal H5PropertyList(long handle) : base(handle, H5PropertyListNativeMethods.Close)
     {
     }
-
-    public void SetChunk(int rank, ulong[] dims)
+      
+    // TODO: remove rank
+    public void SetChunk(int rank, [DisallowNull] params ulong[] dims)
     {
+        Guard.IsNotNull(dims, nameof(dims));
+        Guard.IsGreaterThanOrEqualTo(1, dims.Length, nameof(dims));
+
         H5PropertyListNativeMethods.SetChunk(this, rank, dims);
     }
 

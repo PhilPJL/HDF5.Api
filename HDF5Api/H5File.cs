@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Diagnostics;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace HDF5Api;
@@ -20,23 +22,29 @@ public class H5File : H5Location<H5File>
     /// <summary>
     ///     Open an existing file.  By default opens read-write.
     /// </summary>
-    public static H5File Open(string path, bool readOnly = false)
+    public static H5File Open([DisallowNull] string path, bool readOnly = false)
     {
+        Guard.IsNotNullOrWhiteSpace(path);
+
         return H5FileNativeMethods.Open(path, readOnly);
     }
 
     /// <summary>
     ///     Open an existing file (by default read-write) or create new.
     /// </summary>
-    public static H5File OpenOrCreate(string path, bool readOnly = false)
+    public static H5File OpenOrCreate([DisallowNull] string path, bool readOnly = false)
     {
+        Guard.IsNotNullOrWhiteSpace(path);
+
         return File.Exists(path)
             ? H5FileNativeMethods.Open(path, readOnly)
             : H5FileNativeMethods.Create(path);
     }
 
-    public static H5File Create(string path)
+    public static H5File Create([DisallowNull] string path)
     {
+        Guard.IsNotNullOrWhiteSpace(path);
+
         return H5FileNativeMethods.Create(path);
     }
 }

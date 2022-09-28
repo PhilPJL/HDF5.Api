@@ -121,5 +121,3 @@ internal static partial class H5PropertyListNativeMethods
 
     #endregion
 }
-
-

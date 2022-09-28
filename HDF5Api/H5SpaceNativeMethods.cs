@@ -1,4 +1,6 @@
-﻿namespace HDF5Api;
+﻿using System.Linq;
+
+namespace HDF5Api;
 
 internal static partial class H5SpaceNativeMethods
 {
@@ -19,9 +21,12 @@ internal static partial class H5SpaceNativeMethods
 
     #region CreateSimple
 
-    public static H5Space CreateSimple(int rank, ulong[] dims, ulong[] maxdims)
+    public static H5Space CreateSimple(params Dimension[] dimensions)
     {
-        long h = H5S.create_simple(rank, dims, maxdims);
+        long h = H5S.create_simple(dimensions.Length, 
+            dimensions.Select(d => d.InitialSize).ToArray(), 
+            dimensions.Select(d => d.UpperLimit ?? ulong.MaxValue).ToArray());
+
         h.ThrowIfInvalidHandleValue("H5S.create_simple");
         return new H5Space(h);
     }
@@ -71,3 +76,5 @@ internal static partial class H5SpaceNativeMethods
     #endregion
 }
 
+// TODO: argument validation
+record struct Dimension(ulong InitialSize, ulong? UpperLimit = null);

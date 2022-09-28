@@ -1,5 +1,8 @@
-﻿using System;
+﻿using CommunityToolkit.Diagnostics;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace HDF5Api;
 
@@ -40,38 +43,54 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     /// <summary>
     ///     Open an existing Attribute for this dataset
     /// </summary>
-    public H5Attribute OpenAttribute(string name)
+    public H5Attribute OpenAttribute([DisallowNull] string name)
     {
+        Guard.IsNotNullOrWhiteSpace(name);
+
         return H5AttributeNativeMethods.Open(this, name);
     }
 
-    public H5Attribute CreateAttribute(string name, H5Type type, H5Space space, H5PropertyList? creationPropertyList = null)
+    public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space, H5PropertyList? creationPropertyList = null)
     {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(type);
+        Guard.IsNotNull(space);
+
         return H5AttributeNativeMethods.Create(this, name, type, space, creationPropertyList);
     }
 
-    public void DeleteAttribute(string name)
+    public void DeleteAttribute([DisallowNull] string name)
     {
+        Guard.IsNotNullOrWhiteSpace(name);
+
         H5AttributeNativeMethods.Delete(this, name);
     }
 
-    public bool AttributeExists(string name)
+    public bool AttributeExists([DisallowNull] string name)
     {
+        Guard.IsNotNullOrWhiteSpace(name);
+
         return H5AttributeNativeMethods.Exists(this, name);
     }
 
-    public T ReadAttribute<T>(string name) where T : unmanaged
+    public T ReadAttribute<T>([DisallowNull] string name) where T : unmanaged
     {
+        Guard.IsNotNullOrWhiteSpace(name);
+
         return this.ReadAttribute<H5DataSet, T>(name);
     }
 
-    public string ReadStringAttribute(string name)
+    public string ReadStringAttribute([DisallowNull] string name)
     {
+        Guard.IsNotNullOrWhiteSpace(name);
+
         return H5ObjectWithAttributeExtensions.ReadStringAttribute(this, name);
     }
 
-    public DateTime ReadDateTimeAttribute(string name)
+    public DateTime ReadDateTimeAttribute([DisallowNull] string name)
     {
+        Guard.IsNotNullOrWhiteSpace(name);
+
         return H5ObjectWithAttributeExtensions.ReadDateTimeAttribute(this, name);
     }
 
@@ -113,6 +132,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
             var result = new T[count];
             fixed (T* ptr = result)
             {
+                // TODO: use native H5DDataSetNativeMethods
                 int err = H5D.read(this, type, space, space, 0, new IntPtr(ptr));
                 err.ThrowIfError("H5A.read");
                 return result;

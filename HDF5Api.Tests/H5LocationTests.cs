@@ -172,7 +172,7 @@ public abstract class H5LocationTests : H5Test
         const string ds1Name = "ds1";
 
         using var type = H5TypeNativeMethods.CreateDoubleArrayType(100);
-        using var space = H5SpaceNativeMethods.CreateSimple(1, new ulong[] { 1 }, new ulong[] { 1 });
+        using var space = H5SpaceNativeMethods.CreateSimple(new Dimension(1, 1));
         using var propertyList = H5PropertyListNativeMethods.Create(H5P.DATASET_CREATE);
         using var ds1 = location.CreateDataSet(ds1Name, type, space, propertyList);
 
@@ -184,7 +184,7 @@ public abstract class H5LocationTests : H5Test
         const string ds1Name = "ds1";
 
         using var type = H5TypeNativeMethods.CreateDoubleArrayType(100);
-        using var space = H5SpaceNativeMethods.CreateSimple(1, new ulong[] { 1 }, new ulong[] { 1 });
+        using var space = H5SpaceNativeMethods.CreateSimple(new Dimension(1, 1));
         using var propertyList = H5PropertyListNativeMethods.Create(H5P.DATASET_CREATE);
         {
             using var ds1 = location.CreateDataSet(ds1Name, type, space, propertyList);

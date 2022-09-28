@@ -8,7 +8,7 @@ public static class H5ObjectWithAttributeExtensions
     private static void CreateAndWriteAttribute(IH5ObjectWithAttributes owa, string name, H5Type type, IntPtr buffer)
     {
         // Single dimension (rank 1), unlimited length, chunk size.
-        using var memorySpace = H5SpaceNativeMethods.CreateSimple(1, new ulong[] { 1 }, new ulong[] { 1 });
+        using var memorySpace = H5SpaceNativeMethods.CreateSimple(new Dimension(1));
 
         // Create the attribute-creation property list
         using var propertyList = H5PropertyListNativeMethods.Create(H5P.ATTRIBUTE_CREATE);

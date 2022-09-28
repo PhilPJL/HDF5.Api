@@ -59,7 +59,7 @@ internal static partial class H5TypeNativeMethods
     public static H5Type CreateCompoundType(int size)
     {
         long h = H5Tcreate(H5Class.Compound, new IntPtr(size));
-        h.ThrowIfInvalidHandleValue("H5T.create");
+        h.ThrowIfInvalidHandleValue(nameof(H5Tcreate));
         return new H5Type(h);
     }
 
@@ -84,12 +84,33 @@ internal static partial class H5TypeNativeMethods
 
     #endregion
 
-    public static H5Type CreateByteArrayType(int size)
+    #region ArrayCreate(Byte)
+
+    /// <summary>
+    /// Creates an array datatype object.
+    /// </summary>
+    /// <param name="base_type_id">Datatype identifier for the array base
+    /// datatype.</param>
+    /// <param name="rank">Rank of the array.</param>
+    /// <param name="dims">Size of each array dimension.</param>
+    /// <returns>Returns a valid datatype identifier if successful;
+    /// otherwise returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tarray_create2")]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t H5Tarray_create2
+        (hid_t base_type_id, uint rank,
+        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] hsize_t[] dims);
+
+    public static H5Type CreateByteArrayType(params ulong[] dims)
     {
-        long h = H5T.array_create(H5T.NATIVE_B8, 1, new[] { (ulong)size });
-        h.ThrowIfInvalidHandleValue("H5T.array_create");
+        long h = H5Tarray_create2(H5T.NATIVE_B8, (uint)dims.Length, dims);
+        h.ThrowIfInvalidHandleValue(nameof(H5Tarray_create2));
         return new H5Type(h);
     }
+
+    #endregion
+
+    #region ArrayCreate(Double)
 
     public static H5Type CreateDoubleArrayType(int size)
     {
@@ -97,6 +118,8 @@ internal static partial class H5TypeNativeMethods
         h.ThrowIfInvalidHandleValue("H5T.array_create");
         return new H5Type(h);
     }
+    
+    #endregion
 
     public static H5Type CreateFloatArrayType(int size)
     {
