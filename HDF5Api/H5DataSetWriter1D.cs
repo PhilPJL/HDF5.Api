@@ -59,7 +59,7 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
         // Move the hyperslab window
         using (var fileSpace = DataSet.GetSpace())
         {
-            fileSpace.SelectHyperslab(RowsWritten, numRecords);
+            fileSpace.SelectHyperSlab(RowsWritten, numRecords);
 
             // Match the space to length of records retrieved.
             using var recordSpace = H5SpaceNativeMethods.CreateSimple(new Dimension((ulong)numRecords));

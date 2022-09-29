@@ -32,5 +32,10 @@ public class H5PropertyList : H5Object<H5PropertyList>
     {
         H5PropertyListNativeMethods.EnableDeflateCompression(this, level);
     }
+
+    //public static H5PropertyList Create(long handle)
+    //{
+    //    return H5PropertyListNativeMethods.Create();
+    //}
 }
 

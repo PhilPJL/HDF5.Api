@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace HDF5Api.Tests;
+﻿namespace HDF5Api.Tests;
 
 [TestClass]
 public class H5SpaceTests : H5LocationTests

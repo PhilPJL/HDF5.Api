@@ -13,9 +13,9 @@ public class H5Space : H5Object<H5Space>
 
     #region Public Api
 
-    public void SelectHyperslab(int offset, int count)
+    public void SelectHyperSlab(int offset, int count)
     {
-        H5SpaceNativeMethods.SelectHyperslab(this, offset, count);
+        H5SpaceNativeMethods.SelectHyperSlab(this, offset, count);
     }
 
     public long GetSimpleExtentNPoints()

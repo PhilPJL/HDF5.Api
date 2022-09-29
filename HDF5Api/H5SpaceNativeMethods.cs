@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security;
 using static HDF.PInvoke.H5S;
 
 namespace HDF5Api;
@@ -43,7 +42,7 @@ internal static partial class H5SpaceNativeMethods
     {
         long h = H5Screate_simple(dimensions.Length,
             dimensions.Select(d => d.InitialSize).ToArray(),
-            dimensions.Select(d => d.UpperLimit ?? ulong.MaxValue).ToArray());
+            dimensions.Select(d => d.UpperLimit).ToArray());
 
         h.ThrowIfInvalidHandleValue(nameof(H5Screate_simple));
         return new H5Space(h);
@@ -74,7 +73,7 @@ internal static partial class H5SpaceNativeMethods
         [MarshalAs(UnmanagedType.LPArray)] hsize_t[]? block);
 
     //TODO: expose other params
-    public static void SelectHyperslab(H5Space space, int offset, int count)
+    public static void SelectHyperSlab(H5Space space, int offset, int count)
     {
         int err = H5Sselect_hyperslab(
             space, seloper_t.SET, new[] { (ulong)offset }, null, new[] { (ulong)count }, null);
@@ -158,4 +157,16 @@ internal static partial class H5SpaceNativeMethods
 }
 
 // TODO: argument validation
-public record struct Dimension(ulong InitialSize, ulong? UpperLimit = null);
+public readonly struct Dimension
+{
+    public readonly ulong MaxLimit = ulong.MaxValue;
+
+    public readonly ulong InitialSize { get; }
+    public readonly ulong UpperLimit { get; }
+
+    public Dimension(ulong initialSize, ulong? upperLimit = null)
+    {
+        InitialSize = initialSize;
+        UpperLimit = upperLimit ?? MaxLimit;
+    }
+};

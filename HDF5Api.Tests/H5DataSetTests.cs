@@ -11,7 +11,7 @@ public class H5DataSetTests : H5Test
     {
         const int chunkSize = 1;
 
-        using var memorySpace = H5SpaceNativeMethods.CreateSimple(new Dimension(chunkSize));
+        using var memorySpace = H5Space.Create(new Dimension(chunkSize));
 
         using var propertyList = H5PropertyListNativeMethods.Create(H5P.DATASET_CREATE);
 
