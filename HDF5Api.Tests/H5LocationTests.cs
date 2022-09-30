@@ -1,4 +1,5 @@
-﻿using HDF.PInvoke;
+﻿
+using HDF5Api.NativeMethods;
 
 namespace HDF5Api.Tests;
 
@@ -84,7 +85,7 @@ public abstract class H5LocationTests : H5Test
 
     protected static void CreateGroupEmptyNameFails<T>(H5Location<T> location) where T : H5Object<T>
     {
-        Assert.ThrowsException<Hdf5Exception>(() => location.CreateGroup(null));
+        Assert.ThrowsException<Hdf5Exception>(() => location.CreateGroup(null!));
         Assert.ThrowsException<Hdf5Exception>(() => location.CreateGroup(string.Empty));
     }
 
