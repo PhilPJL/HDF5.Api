@@ -1,4 +1,7 @@
-﻿namespace HDF5Api;
+﻿
+using HDF5Api.NativeMethods;
+
+namespace HDF5Api;
 
 /// <summary>
 /// H5 group native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_g.html"/>

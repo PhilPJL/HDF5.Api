@@ -1,5 +1,7 @@
 ﻿using System;
 
+using HDF5Api.NativeMethods;
+
 namespace HDF5Api;
 
 internal static partial class H5TypeNativeMethods

@@ -1,6 +1,8 @@
 ﻿using HDF5Api.Disposables;
 using System;
 
+using HDF5Api.NativeMethods;
+
 namespace HDF5Api;
 
 public static class H5ObjectWithAttributeExtensions

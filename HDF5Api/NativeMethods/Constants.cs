@@ -13,13 +13,15 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-namespace HDF.PInvoke;
+namespace HDF5Api.NativeMethods;
 
-internal sealed class H5MM
+public static class Constants
 {
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate IntPtr allocate_t(size_t size, IntPtr alloc_info);
+    public const string DLLFileName = "hdf5.dll";
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate IntPtr free_t(IntPtr mem, IntPtr free_info);
+    public const string HLDLLFileName = "hdf5_hl.dll";
+
+    public const string DLL32bitPath = "bin32";
+
+    public const string DLL64bitPath = "bin64";
 }

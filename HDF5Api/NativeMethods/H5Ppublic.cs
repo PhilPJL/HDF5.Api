@@ -14,14 +14,14 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 using off_t = System.IntPtr;
-using prp_close_func_t = HDF.PInvoke.H5P.prp_cb1_t;
-using prp_copy_func_t = HDF.PInvoke.H5P.prp_cb1_t;
-using prp_create_func_t = HDF.PInvoke.H5P.prp_cb1_t;
-using prp_delete_func_t = HDF.PInvoke.H5P.prp_cb2_t;
-using prp_get_func_t = HDF.PInvoke.H5P.prp_cb2_t;
-using prp_set_func_t = HDF.PInvoke.H5P.prp_cb2_t;
+using prp_close_func_t = HDF5Api.NativeMethods.H5P.prp_cb1_t;
+using prp_copy_func_t = HDF5Api.NativeMethods.H5P.prp_cb1_t;
+using prp_create_func_t = HDF5Api.NativeMethods.H5P.prp_cb1_t;
+using prp_delete_func_t = HDF5Api.NativeMethods.H5P.prp_cb2_t;
+using prp_get_func_t = HDF5Api.NativeMethods.H5P.prp_cb2_t;
+using prp_set_func_t = HDF5Api.NativeMethods.H5P.prp_cb2_t;
 
-namespace HDF.PInvoke;
+namespace HDF5Api.NativeMethods;
 
 internal sealed unsafe partial class H5P
 {

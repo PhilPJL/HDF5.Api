@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HDF5Api.NativeMethods;
 
 namespace HDF5Api;
 

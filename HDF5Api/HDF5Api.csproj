@@ -31,7 +31,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Native\" />
+	  <Folder Include="NativeMethods\" />
 	</ItemGroup>
 
 </Project>

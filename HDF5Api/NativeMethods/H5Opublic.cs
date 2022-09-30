@@ -18,7 +18,7 @@ using uint64_t = System.UInt64;
 
 
 
-namespace HDF.PInvoke;
+namespace HDF5Api.NativeMethods;
 
 internal sealed class H5O
 {

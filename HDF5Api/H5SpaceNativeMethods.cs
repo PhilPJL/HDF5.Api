@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using static HDF.PInvoke.H5S;
+
+using HDF5Api.NativeMethods;
+using static HDF5Api.NativeMethods.H5S;
 
 namespace HDF5Api;
 

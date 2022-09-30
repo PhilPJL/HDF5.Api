@@ -13,15 +13,29 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-namespace HDF.PInvoke;
+namespace HDF5Api.NativeMethods;
 
-public static class Constants
+internal sealed class H5C
 {
-    public const string DLLFileName = "hdf5.dll";
+    static H5C() { _ = H5.open(); }
 
-    public const string HLDLLFileName = "hdf5_hl.dll";
+    public enum cache_incr_mode
+    {
+        OFF,
+        THRESHOLD
+    };
 
-    public const string DLL32bitPath = "bin32";
+    public enum cache_flash_incr_mode
+    {
+        OFF,
+        ADD_SPACE
+    };
 
-    public const string DLL64bitPath = "bin64";
+    public enum cache_decr_mode
+    {
+        OFF,
+        THRESHOLD,
+        AGE_OUT,
+        AGE_OUT_WITH_THRESHOLD
+    };
 }

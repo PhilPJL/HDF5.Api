@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 
+using HDF5Api.NativeMethods;
+using H5A = HDF5Api.NativeMethods.H5A;
+
 namespace HDF5Api;
 
 /// <summary>

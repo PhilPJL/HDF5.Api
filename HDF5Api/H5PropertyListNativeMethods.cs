@@ -1,4 +1,7 @@
-﻿namespace HDF5Api;
+﻿
+using HDF5Api.NativeMethods;
+
+namespace HDF5Api;
 
 internal static partial class H5PropertyListNativeMethods
 {

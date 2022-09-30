@@ -15,7 +15,7 @@
 
 using uint32_t = System.UInt32;
 
-namespace HDF.PInvoke;
+namespace HDF5Api.NativeMethods;
 
 internal sealed class H5PL
 {

@@ -1,4 +1,7 @@
-﻿namespace HDF5Api;
+﻿
+using HDF5Api.NativeMethods;
+
+namespace HDF5Api;
 
 /// <summary>
 ///     Factory class for creating data-set writers.

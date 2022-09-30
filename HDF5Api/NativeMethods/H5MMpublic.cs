@@ -13,29 +13,13 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-namespace HDF.PInvoke;
+namespace HDF5Api.NativeMethods;
 
-internal sealed class H5C
+internal sealed class H5MM
 {
-    static H5C() { _ = H5.open(); }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate IntPtr allocate_t(size_t size, IntPtr alloc_info);
 
-    public enum cache_incr_mode
-    {
-        OFF,
-        THRESHOLD
-    };
-
-    public enum cache_flash_incr_mode
-    {
-        OFF,
-        ADD_SPACE
-    };
-
-    public enum cache_decr_mode
-    {
-        OFF,
-        THRESHOLD,
-        AGE_OUT,
-        AGE_OUT_WITH_THRESHOLD
-    };
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate IntPtr free_t(IntPtr mem, IntPtr free_info);
 }

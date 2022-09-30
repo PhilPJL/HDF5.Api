@@ -16,7 +16,7 @@
 
 
 
-namespace HDF.PInvoke;
+namespace HDF5Api.NativeMethods;
 
 internal sealed unsafe class H5Z
 {

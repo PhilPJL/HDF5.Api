@@ -14,7 +14,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-namespace HDF.PInvoke;
+namespace HDF5Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
 internal sealed partial class H5A
