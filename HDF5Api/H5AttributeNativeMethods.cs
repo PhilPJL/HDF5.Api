@@ -9,43 +9,13 @@ namespace HDF5Api;
 /// </summary>
 internal static partial class H5AttributeNativeMethods
 {
-    #region Close
-
-    /// <summary>
-    /// Closes the specified attribute.
-    /// </summary>
-    /// <param name="attr_id">Attribute to release access to.</param>
-    /// <returns>Returns a non-negative value if successful; otherwise
-    /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aclose")]
-    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    private static partial herr_t H5Aclose(hid_t attr_id);
-
     public static void Close(H5Attribute attribute)
     {
-        H5Aclose(attribute).ThrowIfError(nameof(H5Aclose));
+        int err = H5A.close(attribute);
+
+        err.ThrowIfError(nameof(H5A.close));
     }
 
-    #endregion
-
-    #region Create
-
-    /// <summary>
-    /// Creates an attribute attached to a specified object.
-    /// </summary>
-    /// <param name="loc_id">Location or object identifier</param>
-    /// <param name="attr_name">Attribute name</param>
-    /// <param name="type_id">Attribute datatype identifier</param>
-    /// <param name="space_id">Attribute dataspace identifier</param>
-    /// <param name="acpl_id">Attribute creation property list identifier</param>
-    /// <param name="aapl_id">Attribute access property list identifier</param>
-    /// <returns>Returns an attribute identifier if successful; otherwise
-    /// returns a negative value.</returns>
-    /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Acreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    private static partial hid_t H5Acreate2
-        (hid_t loc_id, string attr_name, hid_t type_id, hid_t space_id, hid_t acpl_id, hid_t aapl_id);
 
     /// <summary>
     /// Creates an attribute attached to a specified object.
@@ -62,14 +32,13 @@ internal static partial class H5AttributeNativeMethods
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        var h = H5Acreate2(h5Object, name, type, space, creationPropertyList, accessPropertyList);
+        var h = H5A.create(h5Object, name, type, space, creationPropertyList, accessPropertyList);
 
-        h.ThrowIfInvalidHandleValue(nameof(H5Acreate2));
+        h.ThrowIfInvalidHandleValue(nameof(H5A.create));
 
         return new H5Attribute(h);
     }
 
-    #endregion
 
     #region Open
 
