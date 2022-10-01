@@ -165,6 +165,19 @@ public class H5AttributeTests : H5Test
                 Assert.AreEqual(value, readValue);
             }
 
+            using var a = location.OpenAttribute(name);
+            string readValue2 = location.ReadStringAttribute(name);
+
+            if (maxLength != 0)
+            {
+                Assert.AreEqual(maxLength, readValue2.Length);
+                Assert.IsTrue(value.StartsWith(readValue, StringComparison.Ordinal));
+            }
+            else
+            {
+                Assert.AreEqual(value, readValue2);
+            }
+
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
         }
@@ -179,9 +192,12 @@ public class H5AttributeTests : H5Test
             T readValue = location.ReadAttribute<T>(name);
             Assert.AreEqual(value, readValue);
 
+            using var a = location.OpenAttribute(name);
+            T readValue2 = location.ReadAttribute<T>(name);
+            Assert.AreEqual(value, readValue2);
+
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
         }
     }
-
 }
