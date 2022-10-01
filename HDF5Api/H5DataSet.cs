@@ -1,10 +1,7 @@
 ﻿using CommunityToolkit.Diagnostics;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 
-using HDF5Api.NativeMethods;
+using HDF5Api.NativeMethodAdapters;
 
 namespace HDF5Api;
 
@@ -49,7 +46,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5AttributeNativeMethods.Open(this, name);
+        return H5A.Open(this, name);
     }
 
     public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space, H5PropertyList? creationPropertyList = null)
@@ -58,21 +55,21 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
 
-        return H5AttributeNativeMethods.Create(this, name, type, space, creationPropertyList);
+        return H5A.Create(this, name, type, space, creationPropertyList);
     }
 
     public void DeleteAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        H5AttributeNativeMethods.Delete(this, name);
+        H5A.Delete(this, name);
     }
 
     public bool AttributeExists([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5AttributeNativeMethods.Exists(this, name);
+        return H5A.Exists(this, name);
     }
 
     public T ReadAttribute<T>([DisallowNull] string name) where T : unmanaged
@@ -98,7 +95,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
     public IEnumerable<string> ListAttributeNames()
     {
-        return H5AttributeNativeMethods.ListAttributeNames(this);
+        return H5A.ListAttributeNames(this);
     }
 
     /// <summary>
@@ -118,7 +115,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         var cls = type.GetClass();
         if (cls != H5Class.Compound)
         {
-            throw new Hdf5Exception($"DataSet is of class {cls} when expecting {H5T.class_t.COMPOUND}.");
+            throw new Hdf5Exception($"DataSet is of class {cls} when expecting {NativeMethods.H5T.class_t.COMPOUND}.");
         }
 
         long size = H5DataSetNativeMethods.GetStorageSize(this);
@@ -135,7 +132,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
             fixed (T* ptr = result)
             {
                 // TODO: use native H5DDataSetNativeMethods
-                int err = H5D.read(this, type, space, space, 0, new IntPtr(ptr));
+                int err = NativeMethods.H5D.read(this, type, space, space, 0, new IntPtr(ptr));
                 err.ThrowIfError("H5A.read");
                 return result;
             }

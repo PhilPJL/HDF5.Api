@@ -1,7 +1,6 @@
 ﻿using HDF5Api.Disposables;
-using System;
 
-using HDF5Api.NativeMethods;
+using HDF5Api.NativeMethodAdapters;
 
 namespace HDF5Api;
 
@@ -13,7 +12,7 @@ public static class H5ObjectWithAttributeExtensions
         using var memorySpace = H5SpaceNativeMethods.CreateSimple(new Dimension(1));
 
         // Create the attribute-creation property list
-        using var propertyList = H5PropertyListNativeMethods.Create(H5P.ATTRIBUTE_CREATE);
+        using var propertyList = H5PropertyListNativeMethods.Create(NativeMethods.H5P.ATTRIBUTE_CREATE);
 
         // Create an attribute
         using var attribute = owa.CreateAttribute(name, type, memorySpace, propertyList);
@@ -54,7 +53,7 @@ public static class H5ObjectWithAttributeExtensions
         where T : H5Object<T>
         where TV : unmanaged
     {
-        using var attribute = H5AttributeNativeMethods.Open(h5Object, name);
+        using var attribute = H5A.Open(h5Object, name);
 
         return attribute.Read<TV>();
     }
@@ -62,7 +61,7 @@ public static class H5ObjectWithAttributeExtensions
     internal static string ReadStringAttribute<T>(this H5Object<T> h5Object, string name)
         where T : H5Object<T>
     {
-        using var attribute = H5AttributeNativeMethods.Open(h5Object, name);
+        using var attribute = H5A.Open(h5Object, name);
 
         return attribute.ReadString();
     }
@@ -70,7 +69,7 @@ public static class H5ObjectWithAttributeExtensions
     internal static DateTime ReadDateTimeAttribute<T>(this H5Object<T> h5Object, string name)
         where T : H5Object<T>
     {
-        using var attribute = H5AttributeNativeMethods.Open(h5Object, name);
+        using var attribute = H5A.Open(h5Object, name);
 
         return attribute.ReadDateTime();
     }

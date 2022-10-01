@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-
-using HDF5Api.NativeMethods;
+﻿using System.Collections.Generic;
+using HDF5Api.NativeMethodAdapters;
 
 namespace HDF5Api;
 
@@ -27,7 +25,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
             throw new Hdf5Exception($"Attribute {name} already exists");
         }
 
-        return H5AttributeNativeMethods.Create(this, name, type, space, propertyListId);
+        return H5A.Create(this, name, type, space, propertyListId);
     }
 
     /// <summary>
@@ -35,17 +33,17 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// </summary>
     public H5Attribute OpenAttribute(string name)
     {
-        return H5AttributeNativeMethods.Open(this, name);
+        return H5A.Open(this, name);
     }
 
     public void DeleteAttribute(string name)
     {
-        H5AttributeNativeMethods.Delete(this, name);
+        H5A.Delete(this, name);
     }
 
     public bool AttributeExists(string name)
     {
-        return H5AttributeNativeMethods.Exists(this, name);
+        return H5A.Exists(this, name);
     }
 
     public TA ReadAttribute<TA>(string name) where TA : unmanaged
@@ -65,7 +63,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
 
     public IEnumerable<string> ListAttributeNames()
     {
-        return H5AttributeNativeMethods.ListAttributeNames(this);
+        return H5A.ListAttributeNames(this);
     }
 
     /// <summary>
@@ -134,22 +132,22 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
 
         var names = new List<(string name, bool isGroup)>();
 
-        int err = H5L.iterate(handle, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
+        int err = NativeMethods.H5L.iterate(handle, NativeMethods.H5.index_t.NAME, NativeMethods.H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
         err.ThrowIfError("H5L.iterate");
 
         return names;
 
-        int Callback(long groupId, IntPtr intPtrName, ref H5L.info_t info, IntPtr _)
+        int Callback(long groupId, IntPtr intPtrName, ref NativeMethods.H5L.info_t info, IntPtr _)
         {
             string? name = Marshal.PtrToStringAnsi(intPtrName);
 
-            H5O.info_t oinfo = default;
-            int err1 = H5O.get_info_by_name(groupId, name, ref oinfo);
+            NativeMethods.H5O.info_t oinfo = default;
+            int err1 = NativeMethods.H5O.get_info_by_name(groupId, name, ref oinfo);
             err1.ThrowIfError("H5O.get_info_by_name");
 
             // TODO: nullability - converting to "(unknown)" isn't great
 
-            names.Add((name ?? "(unknown)", oinfo.type == H5O.type_t.GROUP));
+            names.Add((name ?? "(unknown)", oinfo.type == NativeMethods.H5O.type_t.GROUP));
             return 0;
         }
     }

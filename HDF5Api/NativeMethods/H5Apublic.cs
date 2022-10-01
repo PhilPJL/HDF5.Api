@@ -944,11 +944,13 @@ internal sealed partial class H5A
     ///     Returns a non-negative value if successful; otherwise
     ///     returns a negative value.
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread")
-    ]
+    /// <remarks>
+    /// Altered from original definition - changed IntPtr to Span
+    /// </remarks>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread")    ]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     public static partial herr_t read
-        (hid_t attr_id, hid_t type_id, IntPtr buf);
+        (hid_t attr_id, hid_t type_id, Span<byte> buf);
 
     /// <summary>
     ///     Renames an attribute.

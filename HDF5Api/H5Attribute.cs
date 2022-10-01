@@ -1,14 +1,12 @@
-﻿using System;
-using System.Text;
-
+﻿using HDF5Api.NativeMethodAdapters;
 namespace HDF5Api;
 
 /// <summary>
-///     .NET wrapper for the H5A (Attribute) API: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
+///     .NET class for the H5A (Attribute) API: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
 /// </summary>
 public class H5Attribute : H5Object<H5Attribute>
 {
-    internal H5Attribute(long handle) : base(handle, H5AttributeNativeMethods.Close)
+    internal H5Attribute(long handle) : base(handle, H5A.Close)
     {
     }
 
@@ -16,12 +14,12 @@ public class H5Attribute : H5Object<H5Attribute>
 
     public H5Space GetSpace()
     {
-        return H5AttributeNativeMethods.GetSpace(this);
+        return H5A.GetSpace(this);
     }
 
     public H5Type GetH5Type()
     {
-        return H5AttributeNativeMethods.GetType(this);
+        return H5A.GetType(this);
     }
 
     public string ReadString()
@@ -42,10 +40,10 @@ public class H5Attribute : H5Object<H5Attribute>
             throw new Hdf5Exception($"Attribute is of class {cls} when expecting STRING.");
         }
 
-        long size = H5AttributeNativeMethods.GetStorageSize(this);
+        long size = H5A.GetStorageSize(this);
 
         Span<byte> buffer = stackalloc byte[(int)size];
-        H5AttributeNativeMethods.Read(this, type, buffer);
+        H5A.Read(this, type, buffer);
         return Encoding.ASCII.GetString(buffer);
     }
 
@@ -76,7 +74,7 @@ public class H5Attribute : H5Object<H5Attribute>
             throw new Hdf5Exception($"Attribute is of class {cls} when expecting {expectedCls}.");
         }
 
-        int size = (int)H5AttributeNativeMethods.GetStorageSize(this);
+        int size = (int)H5A.GetStorageSize(this);
 
         if (size != Marshal.SizeOf<T>())
         {
@@ -84,15 +82,16 @@ public class H5Attribute : H5Object<H5Attribute>
                 $"Attribute storage size is {size}, which does not match the expected size for type {typeof(T).Name} of {Marshal.SizeOf<T>()}.");
         }
 
+        // TODO: consider memory alignment on different platforms 
         Span<T> buffer = stackalloc T[1];
-        H5AttributeNativeMethods.Read(this, type, buffer);
+        H5A.Read(this, type, buffer);
         return buffer[0];
     }
 
     // TODO: expose public Write<T> etc as per Read
     internal void Write(H5Type type, IntPtr buffer)
     {
-        H5AttributeNativeMethods.Write(this, type, buffer);
+        H5A.Write(this, type, buffer);
     }
 
     #endregion
