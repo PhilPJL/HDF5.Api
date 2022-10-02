@@ -84,11 +84,10 @@ internal sealed unsafe partial class H5P
     /// <param name="path">The path to be added.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName,
-        EntryPoint = "H5Padd_merge_committed_dtype_path",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Padd_merge_committed_dtype_path")
     ]
-    public static extern herr_t add_merge_committed_dtype_path
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t add_merge_committed_dtype_path
         (hid_t ocpypl_id, byte[] path);
 
     /// <summary>
@@ -101,12 +100,10 @@ internal sealed unsafe partial class H5P
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [DllImport(Constants.DLLFileName,
-        EntryPoint = "H5Padd_merge_committed_dtype_path",
-        CharSet = CharSet.Ansi,
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Padd_merge_committed_dtype_path", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
     ]
-    public static extern herr_t add_merge_committed_dtype_path
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t add_merge_committed_dtype_path
         (hid_t ocpypl_id, string path);
 
     /// <summary>
@@ -118,10 +115,10 @@ internal sealed unsafe partial class H5P
     /// <returns>Returns 1 if all filters are available and 0 if one or
     /// more is not currently available. Returns a negative value
     /// on error.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Pall_filters_avail",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pall_filters_avail")
     ]
-    public static extern htri_t all_filters_avail(hid_t plist_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial htri_t all_filters_avail(hid_t plist_id);
 
     /// <summary>
     /// Terminates access to a property list.
@@ -131,10 +128,10 @@ internal sealed unsafe partial class H5P
     /// access is terminated.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Pclose",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pclose")
     ]
-    public static extern herr_t close(hid_t plist);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t close(hid_t plist);
 
     /// <summary>
     /// Closes an existing property list class.
@@ -155,10 +152,10 @@ internal sealed unsafe partial class H5P
     /// <param name="plist">Identifier of property list to duplicate.</param>
     /// <returns>Returns a property list identifier if successful;
     /// otherwise returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Pcopy",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pcopy")
     ]
-    public static extern hid_t copy(hid_t plist);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t copy(hid_t plist);
 
     /// <summary>
     /// Copies a property from one list or class to another.

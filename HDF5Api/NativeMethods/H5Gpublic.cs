@@ -18,7 +18,7 @@
 
 namespace HDF5Api.NativeMethods;
 
-internal sealed class H5G
+internal sealed partial class H5G
 {
     static H5G() { _ = H5.open(); }
 
@@ -78,10 +78,10 @@ internal sealed class H5G
     /// <param name="group_id">Group identifier to release.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gclose",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gclose")
     ]
-    public static extern herr_t close(hid_t group_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t close(hid_t group_id);
 
     /// <summary>
     /// Creates a new group and links it into the file.
@@ -95,10 +95,10 @@ internal sealed class H5G
     /// <param name="gapl_id">Group access property list identifier</param>
     /// <returns>Returns a group identifier if successful; otherwise returns
     /// a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gcreate2",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gcreate2")
     ]
-    public static extern hid_t create
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t create
         (hid_t loc_id, byte[] name, hid_t lcpl_id = H5P.DEFAULT,
         hid_t gcpl_id = H5P.DEFAULT, hid_t gapl_id = H5P.DEFAULT);
 
@@ -115,11 +115,10 @@ internal sealed class H5G
     /// <returns>Returns a group identifier if successful; otherwise returns
     /// a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gcreate2",
-        CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gcreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
     ]
-    public static extern hid_t create
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t create
         (hid_t loc_id, string name, hid_t lcpl_id = H5P.DEFAULT,
         hid_t gcpl_id = H5P.DEFAULT, hid_t gapl_id = H5P.DEFAULT);
 
@@ -133,10 +132,10 @@ internal sealed class H5G
     /// <param name="gapl_id">Group access property list identifier</param>
     /// <returns>Returns a new group identifier if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gcreate_anon",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gcreate_anon")
     ]
-    public static extern hid_t create_anon
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t create_anon
         (hid_t loc_id, hid_t gcpl_id = H5P.DEFAULT,
         hid_t gapl_id = H5P.DEFAULT);
 
@@ -147,10 +146,10 @@ internal sealed class H5G
     /// <param name="group_id"> Identifier of the group.</param>
     /// <returns>Returns an identifier for the group’s creation property
     /// list if successful. Otherwise returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gget_create_plist",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gget_create_plist")
     ]
-    public static extern hid_t get_create_plist(hid_t group_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t get_create_plist(hid_t group_id);
 
     /// <summary>
     /// Flushes all buffers associated with a group to disk.
@@ -159,10 +158,10 @@ internal sealed class H5G
     /// <param name="group_id">Identifier of the group to be flushed.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gflush",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gflush")
     ]
-    public static extern herr_t flush(hid_t group_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t flush(hid_t group_id);
 
     /// <summary>
     /// Retrieves information about a group.
@@ -173,10 +172,10 @@ internal sealed class H5G
     /// </param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gget_info",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gget_info")
     ]
-    public static extern herr_t get_info
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_info
         (hid_t loc_id, ref info_t ginfo);
 
     /// <summary>
@@ -195,10 +194,10 @@ internal sealed class H5G
     /// <param name="lapl_id">Link access property list</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_idx",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_idx")
     ]
-    public static extern herr_t get_info_by_idx
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_info_by_idx
         (hid_t loc_id, byte[] group_name,
         H5.index_t idx_type, H5.iter_order_t order, hsize_t n,
         ref info_t ginfo, hid_t lapl_id = H5P.DEFAULT);
@@ -220,11 +219,10 @@ internal sealed class H5G
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_idx",
-        CharSet = CharSet.Ansi,
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_idx", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
     ]
-    public static extern herr_t get_info_by_idx
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_info_by_idx
         (hid_t loc_id, string group_name,
         H5.index_t idx_type, H5.iter_order_t order, hsize_t n,
         ref info_t ginfo, hid_t lapl_id = H5P.DEFAULT);
@@ -240,10 +238,10 @@ internal sealed class H5G
     /// <param name="lapl_id">Link access property list</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_name",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_name")
     ]
-    public static extern herr_t get_info_by_name
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_info_by_name
         (hid_t loc_id, byte[] name, ref info_t ginfo,
         hid_t lapl_id = H5P.DEFAULT);
 
@@ -259,11 +257,10 @@ internal sealed class H5G
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strngs ONLY!</remarks>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_name",
-        CharSet = CharSet.Ansi,
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_name", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
     ]
-    public static extern herr_t get_info_by_name
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_info_by_name
         (hid_t loc_id, string name, ref info_t ginfo,
         hid_t lapl_id = H5P.DEFAULT);
 
@@ -277,10 +274,10 @@ internal sealed class H5G
     /// <param name="gapl_id">Group access property list identifier</param>
     /// <returns>Returns a group identifier if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gopen2",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gopen2")
     ]
-    public static extern hid_t open
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t open
         (hid_t loc_id, byte[] name, hid_t gapl_id = H5P.DEFAULT);
 
     /// <summary>
@@ -294,11 +291,10 @@ internal sealed class H5G
     /// <returns>Returns a group identifier if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gopen2",
-        CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gopen2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
     ]
-    public static extern hid_t open
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t open
         (hid_t loc_id, string name, hid_t gapl_id = H5P.DEFAULT);
 
     /// <summary>
@@ -308,9 +304,8 @@ internal sealed class H5G
     /// <param name="group_id">Identifier of the group to be refreshed.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Grefresh",
-        CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Grefresh")
     ]
-    public static extern herr_t refresh(hid_t group_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t refresh(hid_t group_id);
 }

@@ -62,7 +62,7 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
             fileSpace.SelectHyperSlab(RowsWritten, numRecords);
 
             // Match the space to length of records retrieved.
-            using var recordSpace = H5SpaceNativeMethods.CreateSimple(new Dimension((ulong)numRecords));
+            using var recordSpace = H5SAdapter.CreateSimple(new Dimension((ulong)numRecords));
 
             // Configure most parameters for DataSet.WriteChunk and then pass the curried method as an Action<IntPtr> to Converter which only needs to supply the last param.
             Converter.Write(WriteAdaptor(DataSet, Type, recordSpace, fileSpace), recordsChunk);

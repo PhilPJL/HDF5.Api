@@ -9,10 +9,10 @@ public static class H5ObjectWithAttributeExtensions
     private static void CreateAndWriteAttribute(IH5ObjectWithAttributes owa, string name, H5Type type, IntPtr buffer)
     {
         // Single dimension (rank 1), unlimited length, chunk size.
-        using var memorySpace = H5SpaceNativeMethods.CreateSimple(new Dimension(1));
+        using var memorySpace = H5SAdapter.CreateSimple(new Dimension(1));
 
         // Create the attribute-creation property list
-        using var propertyList = H5PropertyListNativeMethods.Create(NativeMethods.H5P.ATTRIBUTE_CREATE);
+        using var propertyList = H5PAdapter.Create(NativeMethods.H5P.ATTRIBUTE_CREATE);
 
         // Create an attribute
         using var attribute = owa.CreateAttribute(name, type, memorySpace, propertyList);
@@ -42,7 +42,7 @@ public static class H5ObjectWithAttributeExtensions
         string subString = value.Length > maxLength ? value[..maxLength] : value;
 
         // can't create a zero length string type so use a length of 1 minimum
-        using var typeId = H5TypeNativeMethods.CreateFixedLengthStringType(subString.Length < 1 ? 1 : subString.Length);
+        using var typeId = H5TAdapter.CreateFixedLengthStringType(subString.Length < 1 ? 1 : subString.Length);
         byte[] sourceBytes = H5TypeAdapterBase.Ascii.GetBytes(subString);
 
         using var pinned = new PinnedObject(sourceBytes);
@@ -53,7 +53,7 @@ public static class H5ObjectWithAttributeExtensions
         where T : H5Object<T>
         where TV : unmanaged
     {
-        using var attribute = H5A.Open(h5Object, name);
+        using var attribute = H5AAdapter.Open(h5Object, name);
 
         return attribute.Read<TV>();
     }
@@ -61,7 +61,7 @@ public static class H5ObjectWithAttributeExtensions
     internal static string ReadStringAttribute<T>(this H5Object<T> h5Object, string name)
         where T : H5Object<T>
     {
-        using var attribute = H5A.Open(h5Object, name);
+        using var attribute = H5AAdapter.Open(h5Object, name);
 
         return attribute.ReadString();
     }
@@ -69,7 +69,7 @@ public static class H5ObjectWithAttributeExtensions
     internal static DateTime ReadDateTimeAttribute<T>(this H5Object<T> h5Object, string name)
         where T : H5Object<T>
     {
-        using var attribute = H5A.Open(h5Object, name);
+        using var attribute = H5AAdapter.Open(h5Object, name);
 
         return attribute.ReadDateTime();
     }

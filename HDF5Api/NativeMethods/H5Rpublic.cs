@@ -18,7 +18,7 @@
 
 namespace HDF5Api.NativeMethods;
 
-internal sealed class H5R
+internal sealed partial class H5R
 {
     static H5R() { _ = H5.open(); }
 
@@ -64,10 +64,10 @@ internal sealed class H5R
     /// object reference.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Rcreate",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Rcreate")
     ]
-    public static extern herr_t create
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t create
         (IntPtr refer, hid_t loc_id, byte[] name, type_t ref_type,
         hid_t space_id);
 
@@ -87,11 +87,10 @@ internal sealed class H5R
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Rcreate",
-        CharSet = CharSet.Ansi,
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Rcreate", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
     ]
-    public static extern herr_t create
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t create
         (IntPtr refer, hid_t loc_id, string name, type_t ref_type,
         hid_t space_id);
 
@@ -106,10 +105,10 @@ internal sealed class H5R
     /// <param name="refer">Reference to open.</param>
     /// <returns>Returns identifier of referenced object if successful;
     /// otherwise returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Rdereference2",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Rdereference2")
     ]
-    public static extern hid_t dereference
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t dereference
         (hid_t obj_id, hid_t oapl_id, type_t ref_type, IntPtr refer);
 
     /// <summary>
@@ -171,10 +170,10 @@ internal sealed class H5R
     /// <param name="obj_type">Type of referenced object.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Rget_obj_type2",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Rget_obj_type2")
     ]
-    public static extern herr_t get_obj_type
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_obj_type
         (hid_t loc_id, type_t ref_type, IntPtr refer,
         ref H5O.type_t obj_type);
 
@@ -189,9 +188,9 @@ internal sealed class H5R
     /// <param name="refer">Region reference to open</param>
     /// <returns>Returns a valid dataspace identifier if successful;
     /// otherwise returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Rget_region",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Rget_region")
     ]
-    public static extern hid_t get_region
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t get_region
         (hid_t loc_id, type_t ref_type, IntPtr refer);
 }

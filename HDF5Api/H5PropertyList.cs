@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Diagnostics;
+using HDF5Api.NativeMethodAdapters;
 using System.Diagnostics.CodeAnalysis;
 
 namespace HDF5Api;
@@ -8,7 +9,7 @@ namespace HDF5Api;
 /// </summary>
 public class H5PropertyList : H5Object<H5PropertyList>
 {
-    internal H5PropertyList(long handle) : base(handle, H5PropertyListNativeMethods.Close)
+    internal H5PropertyList(long handle) : base(handle, H5PAdapter.Close)
     {
     }
       
@@ -18,7 +19,7 @@ public class H5PropertyList : H5Object<H5PropertyList>
         Guard.IsNotNull(dims, nameof(dims));
         Guard.IsGreaterThanOrEqualTo(1, dims.Length, nameof(dims));
 
-        H5PropertyListNativeMethods.SetChunk(this, rank, dims);
+        H5PAdapter.SetChunk(this, rank, dims);
     }
 
     /// <summary>
@@ -30,7 +31,7 @@ public class H5PropertyList : H5Object<H5PropertyList>
     /// <param name="level"></param>
     public void EnableDeflateCompression(uint level)
     {
-        H5PropertyListNativeMethods.EnableDeflateCompression(this, level);
+        H5PAdapter.EnableDeflateCompression(this, level);
     }
 
     //public static H5PropertyList Create(long handle)

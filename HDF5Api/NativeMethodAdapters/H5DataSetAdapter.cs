@@ -2,12 +2,12 @@
 
 using HDF5Api.NativeMethods;
 
-namespace HDF5Api;
+namespace HDF5Api.NativeMethodAdapters;
 
 /// <summary>
 /// H5 data-set native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_d.html"/>
 /// </summary>
-internal static partial class H5DataSetNativeMethods
+internal static partial class H5DAdapter
 {
     #region Close
 
@@ -185,14 +185,14 @@ internal static partial class H5DataSetNativeMethods
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dwrite")]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Dwrite
-        (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id, hid_t file_space_id, hid_t plist_id, IntPtr buf);
+        (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id, hid_t file_space_id, hid_t plist_id, ssize_t buf);
 
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dwrite")]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static partial herr_t H5Dwrite
         (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id, hid_t file_space_id, hid_t plist_id, Span<byte> buf);
 
-    public static void Write(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, IntPtr buffer, H5PropertyList? transferPropertyList = null)
+    public static void Write(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, ssize_t buffer, H5PropertyList? transferPropertyList = null)
     {
         int err = H5Dwrite(dataSet, type, memorySpace, fileSpace, transferPropertyList, buffer);
 

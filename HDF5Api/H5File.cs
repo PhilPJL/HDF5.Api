@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 using HDF5Api.NativeMethods;
+using HDF5Api.NativeMethodAdapters;
 
 namespace HDF5Api;
 
@@ -12,13 +13,13 @@ namespace HDF5Api;
 /// </summary>
 public class H5File : H5Location<H5File>
 {
-    public H5File(long handle) : base(handle, H5FileNativeMethods.Close)
+    public H5File(long handle) : base(handle, H5FAdapter.Close)
     {
     }
 
     public long GetObjectCount(H5ObjectTypes types = H5ObjectTypes.All)
     {
-        return H5FileNativeMethods.GetObjectCount(this, types);
+        return H5FAdapter.GetObjectCount(this, types);
     }
 
     /// <summary>
@@ -28,7 +29,7 @@ public class H5File : H5Location<H5File>
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
-        return H5FileNativeMethods.Open(path, readOnly);
+        return H5FAdapter.Open(path, readOnly);
     }
 
     /// <summary>
@@ -39,15 +40,15 @@ public class H5File : H5Location<H5File>
         Guard.IsNotNullOrWhiteSpace(path);
 
         return File.Exists(path)
-            ? H5FileNativeMethods.Open(path, readOnly)
-            : H5FileNativeMethods.Create(path);
+            ? H5FAdapter.Open(path, readOnly)
+            : H5FAdapter.Create(path);
     }
 
     public static H5File Create([DisallowNull] string path)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
-        return H5FileNativeMethods.Create(path);
+        return H5FAdapter.Create(path);
     }
 }
 

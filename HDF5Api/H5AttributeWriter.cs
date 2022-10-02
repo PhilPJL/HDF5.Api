@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HDF5Api.NativeMethodAdapters;
 using HDF5Api.NativeMethods;
 
 namespace HDF5Api;
@@ -48,8 +49,8 @@ public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
     public void Write(IEnumerable<TInput> recordsChunk)
     {
         // Single dimension (rank 1), unlimited length, chunk size.
-        using var memorySpace = H5SpaceNativeMethods.CreateSimple(new Dimension(1));
-        using var properyList = H5PropertyListNativeMethods.Create(H5P.ATTRIBUTE_CREATE);
+        using var memorySpace = H5SAdapter.CreateSimple(new Dimension(1));
+        using var properyList = H5PAdapter.Create(H5P.ATTRIBUTE_CREATE);
 
         foreach (var record in recordsChunk)
         {

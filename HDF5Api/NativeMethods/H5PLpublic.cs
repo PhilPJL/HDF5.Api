@@ -17,7 +17,7 @@ using uint32_t = System.UInt32;
 
 namespace HDF5Api.NativeMethods;
 
-internal sealed class H5PL
+internal sealed partial class H5PL
 {
     static H5PL() { _ = H5.open(); }
 
@@ -39,10 +39,10 @@ internal sealed class H5PL
     /// <param name="plugin_path">The plugin path</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5PLappend",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5PLappend")
     ]
-    public static extern herr_t append(string plugin_path);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t append(string plugin_path);
 
     /// <summary>
     /// Query the plugin path at the specified index.
@@ -67,10 +67,10 @@ internal sealed class H5PL
     /// enabled or disabled.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5PLget_loading_state",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5PLget_loading_state")
     ]
-    public static extern herr_t get_loading_state(ref int plugin_flags);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_loading_state(ref int plugin_flags);
 
     /// <summary>
     /// Insert a plugin path at the specified index.
@@ -80,10 +80,10 @@ internal sealed class H5PL
     /// <param name="index">Index</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5PLinsert",
-       CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5PLinsert")
     ]
-    public static extern herr_t insert(string plugin_path,
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t insert(string plugin_path,
         uint32_t index);
 
     /// <summary>
@@ -93,10 +93,10 @@ internal sealed class H5PL
     /// <param name="plugin_path">The plugin path</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5PLprepend",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5PLprepend")
     ]
-    public static extern herr_t prepend(string plugin_path);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t prepend(string plugin_path);
 
     /// <summary>
     /// Remove the plugin path at the specified index.
@@ -105,10 +105,10 @@ internal sealed class H5PL
     /// <param name="index">Index</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5PLremove",
-       CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5PLremove")
     ]
-    public static extern herr_t remove(uint32_t index);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t remove(uint32_t index);
 
     /// <summary>
     /// Replace the plugin path at the specified index.
@@ -118,10 +118,10 @@ internal sealed class H5PL
     /// <param name="index">Index</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5PLreplace",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5PLreplace")
     ]
-    public static extern herr_t replace(string plugin_path,
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t replace(string plugin_path,
         uint32_t index);
 
     /// <summary>
@@ -132,10 +132,10 @@ internal sealed class H5PL
     /// enable or disable.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5PLset_loading_state",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5PLset_loading_state")
     ]
-    public static extern herr_t set_loading_state(int plugin_flags);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t set_loading_state(int plugin_flags);
 
     /// <summary>
     /// Query the size of the current list of plugin paths.
@@ -145,8 +145,8 @@ internal sealed class H5PL
     /// paths.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5PLsize",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5PLsize")
     ]
-    public static extern herr_t size(ref uint32_t listsize);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t size(ref uint32_t listsize);
 }

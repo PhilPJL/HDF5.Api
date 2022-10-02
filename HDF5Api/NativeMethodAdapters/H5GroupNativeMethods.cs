@@ -1,12 +1,11 @@
-﻿
-using HDF5Api.NativeMethods;
+﻿using HDF5Api.NativeMethods;
 
-namespace HDF5Api;
+namespace HDF5Api.NativeMethodAdapters;
 
 /// <summary>
 /// H5 group native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_g.html"/>
 /// </summary>
-internal static partial class H5GroupNativeMethods
+internal static partial class H5GAdapter
 {
     #region Close
 

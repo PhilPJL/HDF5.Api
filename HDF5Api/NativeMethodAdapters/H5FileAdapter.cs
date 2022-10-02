@@ -1,12 +1,11 @@
-﻿
-using HDF5Api.NativeMethods;
+﻿using HDF5Api.NativeMethods;
 
-namespace HDF5Api;
+namespace HDF5Api.NativeMethodAdapters;
 
 /// <summary>
 /// H5 file native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_f.html"/>
 /// </summary>
-internal static partial class H5FileNativeMethods
+internal static partial class H5FAdapter
 {
     #region Close
 
@@ -107,7 +106,7 @@ internal static partial class H5FileNativeMethods
 
     public static long GetObjectCount(H5File file, H5ObjectTypes types = H5ObjectTypes.All)
     {
-        return (long)H5Fget_obj_count(file, (uint)types);
+        return H5Fget_obj_count(file, (uint)types);
     }
 
     #endregion

@@ -620,10 +620,10 @@ internal sealed partial class H5T
     /// <param name="type_id">Identifier of datatype to copy.</param>
     /// <returns>Returns a datatype identifier if successful; otherwise
     /// returns a negative value</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tcopy",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcopy")
     ]
-    public static extern hid_t copy(hid_t type_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t copy(hid_t type_id);
 
     /// <summary>
     /// Creates a new datatype.
@@ -633,10 +633,10 @@ internal sealed partial class H5T
     /// <param name="size">Size, in bytes, of the datatype being created</param>
     /// <returns>Returns datatype identifier if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tcreate",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcreate")
     ]
-    public static extern hid_t create(class_t cls, size_t size);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t create(class_t cls, size_t size);
 
     /// <summary>
     /// Decode a binary object description of datatype and return a new
@@ -646,10 +646,10 @@ internal sealed partial class H5T
     /// <param name="buf">Buffer for the datatype object to be decoded.</param>
     /// <returns>Returns an object identifier (non-negative) if successful;
     /// otherwise returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tdecode",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tdecode")
     ]
-    public static extern hid_t decode(byte[] buf);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t decode(byte[] buf);
 
     /// <summary>
     /// Determines whether a datatype contains any datatypes of the given

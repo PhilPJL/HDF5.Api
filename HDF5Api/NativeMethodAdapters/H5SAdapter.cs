@@ -6,7 +6,7 @@ using static HDF5Api.NativeMethods.H5S;
 
 namespace HDF5Api;
 
-internal static partial class H5SpaceNativeMethods
+internal static partial class H5SAdapter
 {
     #region Close
 

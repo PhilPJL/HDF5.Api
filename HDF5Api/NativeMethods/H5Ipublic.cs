@@ -18,7 +18,7 @@
 
 namespace HDF5Api.NativeMethods;
 
-internal sealed class H5I
+internal sealed partial class H5I
 {
     static H5I() { _ = H5.open(); }
 
@@ -122,10 +122,10 @@ internal sealed class H5I
     /// <param name="force">Whether or not to force deletion of all
     /// identifiers</param>
     /// <returns>Returns non-negative on success, negative on failure.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iclear_type",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iclear_type")
     ]
-    public static extern herr_t clear_type(type_t type, hbool_t force);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t clear_type(type_t type, hbool_t force);
 
     /// <summary>
     /// Decrements the reference count for an object.
@@ -136,10 +136,10 @@ internal sealed class H5I
     /// <returns>Returns a non-negative reference count of the object
     /// identifier after decrementing it, if successful; otherwise a
     /// negative value is returned.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Idec_ref",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Idec_ref")
     ]
-    public static extern int dec_ref(hid_t obj_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial int dec_ref(hid_t obj_id);
 
     /// <summary>
     /// Decrements the reference count on an identifier type.
@@ -149,10 +149,10 @@ internal sealed class H5I
     /// is to be decremented</param>
     /// <returns>Returns the current reference count on success, negative
     /// on failure.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Idec_type_ref",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Idec_type_ref")
     ]
-    public static extern int dec_type_ref(type_t type);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial int dec_type_ref(type_t type);
 
     /// <summary>
     /// Removes the type type and all identifiers within that type.
@@ -161,10 +161,10 @@ internal sealed class H5I
     /// <param name="type">Identifier of identifier type which is to be
     /// destroyed</param>
     /// <returns>Returns non-negative on success, negative on failure.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Idestroy_type",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Idestroy_type")
     ]
-    public static extern herr_t destroy_type(type_t type);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t destroy_type(type_t type);
 
     /// <summary>
     /// Retrieves an identifier for the file containing the specified object.
@@ -173,10 +173,10 @@ internal sealed class H5I
     /// <param name="obj_id">Identifier of the object whose associated file
     /// identifier will be returned.</param>
     /// <returns>Returns a file identifier on success, negative on failure.S</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iget_file_id",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iget_file_id")
     ]
-    public static extern hid_t get_file_id(hid_t obj_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t get_file_id(hid_t obj_id);
 
     /// <summary>
     /// Retrieves a name of an object based on the object identifier.
@@ -208,10 +208,10 @@ internal sealed class H5I
     /// <returns>Returns a non-negative current reference count of the
     /// object identifier if successful; otherwise a negative value is
     /// returned.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iget_ref",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iget_ref")
     ]
-    public static extern int get_ref(hid_t obj_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial int get_ref(hid_t obj_id);
 
     /// <summary>
     /// Retrieves the type of an object.
@@ -221,10 +221,10 @@ internal sealed class H5I
     /// determined.</param>
     /// <returns>Returns the object type if successful; otherwise
     /// <code>H5I_BADID</code>.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iget_type",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iget_type")
     ]
-    public static extern type_t get_type(hid_t obj_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial type_t get_type(hid_t obj_id);
 
     /// <summary>
     /// Retrieves the reference count on an ID type.
@@ -234,10 +234,10 @@ internal sealed class H5I
     /// is to be retrieved</param>
     /// <returns>Returns the current reference count on success, negative
     /// on failure.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iget_type",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iget_type")
     ]
-    public static extern int H5Iget_type_ref(type_t type);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial int H5Iget_type_ref(type_t type);
 
     /// <summary>
     /// Increments the reference count for an object.
@@ -248,10 +248,10 @@ internal sealed class H5I
     /// <returns>Returns a non-negative reference count of the object ID
     /// after incrementing it if successful; otherwise a negative value is
     /// returned.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iinc_ref",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iinc_ref")
     ]
-    public static extern int inc_ref(hid_t obj_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial int inc_ref(hid_t obj_id);
 
     /// <summary>
     /// Increments the reference count on an ID type.
@@ -261,10 +261,10 @@ internal sealed class H5I
     /// is to be incremented</param>
     /// <returns>Returns the current reference count on success, negative
     /// on failure.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iinc_type_ref",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iinc_type_ref")
     ]
-    public static extern int inc_type_ref(type_t type);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial int inc_type_ref(type_t type);
 
     /// <summary>
     /// Determines whether an identifier is valid.
@@ -274,10 +274,10 @@ internal sealed class H5I
     /// <returns>Returns <code>TRUE</code> if <paramref name="obj_id"/> is
     /// valid and <code>FALSE</code> if invalid.
     /// Otherwise returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iis_valid",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iis_valid")
     ]
-    public static extern htri_t is_valid(hid_t obj_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial htri_t is_valid(hid_t obj_id);
 
     /// <summary>
     /// Returns the number of identifiers in a given identifier type.
@@ -289,10 +289,10 @@ internal sealed class H5I
     /// identifier type.</param>
     /// <returns>Returns a non-negative value on success; otherwise returns
     /// negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Inmembers",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Inmembers")
     ]
-    public static extern herr_t nmembers
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t nmembers
         (type_t type, ref hsize_t num_members);
 
     /// <summary>
@@ -303,10 +303,10 @@ internal sealed class H5I
     /// <param name="id_type">ID type to which id should belong</param>
     /// <returns>Pointer to the object referenced by id on success,
     /// <code>NULL</code> on failure.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iobject_verify",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iobject_verify")
     ]
-    public static extern IntPtr object_verify
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial IntPtr object_verify
         (hid_t id, type_t id_type);
 
     /// <summary>
@@ -317,10 +317,10 @@ internal sealed class H5I
     /// will belong</param>
     /// <param name="obj">Pointer to memory for the library to store</param>
     /// <returns>Returns the new ID on success, negative on failure.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iregister",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iregister")
     ]
-    public static extern hid_t register(type_t type, IntPtr obj);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t register(type_t type, IntPtr obj);
 
     /// <summary>
     /// Creates and returns a new ID type.
@@ -333,10 +333,10 @@ internal sealed class H5I
     /// single ID</param>
     /// <returns>Returns the type identifier on success, negative on
     /// failure.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iregister_type",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iregister_type")
     ]
-    public static extern type_t register_type
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial type_t register_type
         (size_t hash_size, uint reserved, free_t free_func);
 
     /// <summary>
@@ -348,10 +348,10 @@ internal sealed class H5I
     /// count is to be retrieved</param>
     /// <returns>Returns a pointer to the memory referred to by id on
     /// success, <code>NULL</code> on failure.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iremove_verify",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iremove_verify")
     ]
-    public static extern IntPtr remove_verify
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial IntPtr remove_verify
         (hid_t id, type_t id_type);
 
     /// <summary>
@@ -364,10 +364,10 @@ internal sealed class H5I
     /// <param name="key">A key for the search function</param>
     /// <returns>Returns a pointer to the object which satisfies the search
     /// function on success, NULL on failure.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Isearch",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Isearch")
     ]
-    public static extern IntPtr search
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial IntPtr search
         (type_t type, search_func_t func, IntPtr key);
 
     /// <summary>
@@ -377,8 +377,8 @@ internal sealed class H5I
     /// <param name="type">Identifier type.</param>
     /// <returns>Returns 1 if the type is registered and 0 if not. Returns
     /// a negative value on failure.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Itype_exists",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Itype_exists")
     ]
-    public static extern htri_t type_exists(type_t type);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial htri_t type_exists(type_t type);
 }

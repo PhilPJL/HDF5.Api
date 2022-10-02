@@ -25,7 +25,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
             throw new Hdf5Exception($"Attribute {name} already exists");
         }
 
-        return H5A.Create(this, name, type, space, propertyListId);
+        return H5AAdapter.Create(this, name, type, space, propertyListId);
     }
 
     /// <summary>
@@ -33,17 +33,17 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// </summary>
     public H5Attribute OpenAttribute(string name)
     {
-        return H5A.Open(this, name);
+        return H5AAdapter.Open(this, name);
     }
 
     public void DeleteAttribute(string name)
     {
-        H5A.Delete(this, name);
+        H5AAdapter.Delete(this, name);
     }
 
     public bool AttributeExists(string name)
     {
-        return H5A.Exists(this, name);
+        return H5AAdapter.Exists(this, name);
     }
 
     public TA ReadAttribute<TA>(string name) where TA : unmanaged
@@ -63,7 +63,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
 
     public IEnumerable<string> ListAttributeNames()
     {
-        return H5A.ListAttributeNames(this);
+        return H5AAdapter.ListAttributeNames(this);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// </summary>
     public H5Group CreateGroup(string name)
     {
-        return H5GroupNativeMethods.Create(this, name);
+        return H5GAdapter.Create(this, name);
     }
 
     /// <summary>
@@ -79,22 +79,22 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// </summary>
     public H5Group OpenGroup(string name)
     {
-        return H5GroupNativeMethods.Open(this, name);
+        return H5GAdapter.Open(this, name);
     }
 
     public bool GroupExists(string name)
     {
-        return H5GroupNativeMethods.Exists(this, name);
+        return H5GAdapter.Exists(this, name);
     }
 
     public bool GroupPathExists(string path)
     {
-        return H5GroupNativeMethods.PathExists(this, path);
+        return H5GAdapter.PathExists(this, path);
     }
 
     public void DeleteGroup(string path)
     {
-        H5GroupNativeMethods.Delete(this, path);
+        H5GAdapter.Delete(this, path);
     }
 
     /// <summary>
@@ -102,7 +102,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// </summary>
     public H5DataSet CreateDataSet(string name, H5Type type, H5Space space, H5PropertyList dataSetCreationPropertyList)
     {
-        return H5DataSetNativeMethods.Create(this, name, type, space, null, dataSetCreationPropertyList);
+        return H5DAdapter.Create(this, name, type, space, null, dataSetCreationPropertyList);
     }
 
     /// <summary>
@@ -110,12 +110,12 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// </summary>
     public H5DataSet OpenDataSet(string name)
     {
-        return H5DataSetNativeMethods.Open(this, name);
+        return H5DAdapter.Open(this, name);
     }
 
     public bool DataSetExists(string name)
     {
-        return H5DataSetNativeMethods.Exists(this, name);
+        return H5DAdapter.Exists(this, name);
     }
 
     /// <summary>

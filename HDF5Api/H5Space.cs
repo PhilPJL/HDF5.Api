@@ -7,7 +7,7 @@ namespace HDF5Api;
 /// </summary>
 public class H5Space : H5Object<H5Space>
 {
-    internal H5Space(long handle) : base(handle, H5SpaceNativeMethods.Close)
+    internal H5Space(long handle) : base(handle, H5SAdapter.Close)
     {
     }
 
@@ -15,28 +15,28 @@ public class H5Space : H5Object<H5Space>
 
     public void SelectHyperSlab(int offset, int count)
     {
-        H5SpaceNativeMethods.SelectHyperSlab(this, offset, count);
+        H5SAdapter.SelectHyperSlab(this, offset, count);
     }
 
     public long GetSimpleExtentNPoints()
     {
-        return H5SpaceNativeMethods.GetSimpleExtentNPoints(this);
+        return H5SAdapter.GetSimpleExtentNPoints(this);
     }
 
     public int GetSimpleExtentNDims()
     {
-        return H5SpaceNativeMethods.GetSimpleExtentNDims(this);
+        return H5SAdapter.GetSimpleExtentNDims(this);
     }
 
     public IReadOnlyList<Dimension> GetSimpleExtentDims()
     {
-        return H5SpaceNativeMethods.GetSimpleExtentDims(this);
+        return H5SAdapter.GetSimpleExtentDims(this);
     }
 
     #endregion
 
     public static H5Space Create(params Dimension[] dimensions)
     {
-        return H5SpaceNativeMethods.CreateSimple(dimensions);
+        return H5SAdapter.CreateSimple(dimensions);
     }
 }

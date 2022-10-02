@@ -9,7 +9,7 @@ namespace HDF5Api.NativeMethodAdapters;
 /// <summary>
 /// H5 attribute native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
 /// </summary>
-internal static partial class H5A
+internal static partial class H5AAdapter
 {
     public static void Close(H5Attribute attribute)
     {

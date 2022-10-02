@@ -1,9 +1,8 @@
-﻿
-using HDF5Api.NativeMethods;
+﻿using HDF5Api.NativeMethods;
 
-namespace HDF5Api;
+namespace HDF5Api.NativeMethodAdapters;
 
-internal static partial class H5PropertyListNativeMethods
+internal static partial class H5PAdapter
 {
     #region Close
 

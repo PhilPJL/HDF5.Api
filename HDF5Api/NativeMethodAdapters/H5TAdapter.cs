@@ -2,9 +2,9 @@
 
 using HDF5Api.NativeMethods;
 
-namespace HDF5Api;
+namespace HDF5Api.NativeMethodAdapters;
 
-internal static partial class H5TypeNativeMethods
+internal static partial class H5TAdapter
 {
     #region Close
 
@@ -53,14 +53,14 @@ internal static partial class H5TypeNativeMethods
     /// returns a negative value.</returns>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcreate")]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    private static partial long H5Tcreate(H5Class cls, IntPtr size);
+    private static partial long H5Tcreate(H5Class cls, ssize_t size);
 
     /// <summary>
     ///     Create a Compound type of the specified size./>
     /// </summary>
     public static H5Type CreateCompoundType(int size)
     {
-        long h = H5Tcreate(H5Class.Compound, new IntPtr(size));
+        long h = H5Tcreate(H5Class.Compound, new ssize_t(size));
         h.ThrowIfInvalidHandleValue(nameof(H5Tcreate));
         return new H5Type(h);
     }
@@ -120,7 +120,7 @@ internal static partial class H5TypeNativeMethods
         h.ThrowIfInvalidHandleValue("H5T.array_create");
         return new H5Type(h);
     }
-    
+
     #endregion
 
     public static H5Type CreateFloatArrayType(int size)
@@ -141,18 +141,18 @@ internal static partial class H5TypeNativeMethods
     {
         long h = H5T.copy(H5T.C_S1);
         h.ThrowIfInvalidHandleValue("H5T.copy");
-        int err = H5T.set_size(h, new IntPtr(length));
+        int err = H5T.set_size(h, new ssize_t(length));
         err.ThrowIfError("H5T.set_size");
         return new H5Type(h);
     }
 
-    public static void Insert(H5Type typeId, string name, IntPtr offset, long nativeTypeId)
+    public static void Insert(H5Type typeId, string name, ssize_t offset, long nativeTypeId)
     {
         int err = H5T.insert(typeId, name, offset, nativeTypeId);
         err.ThrowIfError("H5T.insert");
     }
 
-    public static void Insert(H5Type typeId, string name, IntPtr offset, H5Type dataTypeId)
+    public static void Insert(H5Type typeId, string name, ssize_t offset, H5Type dataTypeId)
     {
         int err = H5T.insert(typeId, name, offset, dataTypeId);
         err.ThrowIfError("H5T.insert");

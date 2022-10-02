@@ -10,33 +10,33 @@ namespace HDF5Api;
 /// </summary>
 public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 {
-    internal H5DataSet(long handle) : base(handle, H5DataSetNativeMethods.Close)
+    internal H5DataSet(long handle) : base(handle, H5DAdapter.Close)
     {
     }
 
     public void Write(H5Type type, H5Space memorySpace, H5Space fileSpace, IntPtr buffer)
     {
-        H5DataSetNativeMethods.Write(this, type, memorySpace, fileSpace, buffer);
+        H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
     }
 
     public void Write<T>(H5Type type, H5Space memorySpace, H5Space fileSpace, Span<T> buffer) where T : unmanaged
     {
-        H5DataSetNativeMethods.Write(this, type, memorySpace, fileSpace, buffer);
+        H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
     }
 
     public H5Space GetSpace()
     {
-        return H5DataSetNativeMethods.GetSpace(this);
+        return H5DAdapter.GetSpace(this);
     }
 
     public void SetExtent(ulong[] dims)
     {
-        H5DataSetNativeMethods.SetExtent(this, dims);
+        H5DAdapter.SetExtent(this, dims);
     }
 
     public H5Type GetH5Type()
     {
-        return H5DataSetNativeMethods.GetType(this);
+        return H5DAdapter.GetType(this);
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5A.Open(this, name);
+        return H5AAdapter.Open(this, name);
     }
 
     public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space, H5PropertyList? creationPropertyList = null)
@@ -55,21 +55,21 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
 
-        return H5A.Create(this, name, type, space, creationPropertyList);
+        return H5AAdapter.Create(this, name, type, space, creationPropertyList);
     }
 
     public void DeleteAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        H5A.Delete(this, name);
+        H5AAdapter.Delete(this, name);
     }
 
     public bool AttributeExists([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5A.Exists(this, name);
+        return H5AAdapter.Exists(this, name);
     }
 
     public T ReadAttribute<T>([DisallowNull] string name) where T : unmanaged
@@ -95,7 +95,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
     public IEnumerable<string> ListAttributeNames()
     {
-        return H5A.ListAttributeNames(this);
+        return H5AAdapter.ListAttributeNames(this);
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     /// </summary>
     public H5PropertyList GetCreationPropertyList()
     {
-        return H5PropertyListNativeMethods.GetCreationPropertyList(this);
+        return H5PAdapter.GetCreationPropertyList(this);
     }
 
     public IEnumerable<T> Read<T>() where T : unmanaged
@@ -118,7 +118,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
             throw new Hdf5Exception($"DataSet is of class {cls} when expecting {NativeMethods.H5T.class_t.COMPOUND}.");
         }
 
-        long size = H5DataSetNativeMethods.GetStorageSize(this);
+        long size = H5DAdapter.GetStorageSize(this);
 
         if (size != count * Marshal.SizeOf<T>())
         {

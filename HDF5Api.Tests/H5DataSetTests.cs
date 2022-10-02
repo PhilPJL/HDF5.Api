@@ -1,4 +1,5 @@
 ﻿
+using HDF5Api.NativeMethodAdapters;
 using HDF5Api.NativeMethods;
 
 namespace HDF5Api.Tests;
@@ -14,7 +15,7 @@ public class H5DataSetTests : H5Test
 
         using var memorySpace = H5Space.Create(new Dimension(chunkSize));
 
-        using var propertyList = H5PropertyListNativeMethods.Create(H5P.DATASET_CREATE);
+        using var propertyList = H5PAdapter.Create(H5P.DATASET_CREATE);
 
         // Enable chunking. From the user guide: "HDF5 requires the use of chunking when defining extendable datasets."
         propertyList.SetChunk(1, chunkSize);

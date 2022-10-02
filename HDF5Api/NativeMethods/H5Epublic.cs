@@ -141,10 +141,10 @@ internal sealed partial class H5E
     /// the specified error stack conforms to.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eauto_is_v2",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eauto_is_v2")
     ]
-    public static extern herr_t auto_is_v2
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t auto_is_v2
         (hid_t estack_id, ref uint is_stack);
 
     /// <summary>
@@ -155,10 +155,10 @@ internal sealed partial class H5E
     /// <param name="estack_id">Error stack identifier.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eclear2",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eclear2")
     ]
-    public static extern herr_t clear(hid_t estack_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t clear(hid_t estack_id);
 
     /// <summary>
     /// Closes an error message identifier.
@@ -167,10 +167,10 @@ internal sealed partial class H5E
     /// <param name="msg_id">Error message identifier.</param>
     /// <returns>Returns a non-negative value on success; otherwise returns
     /// a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eclose_msg",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eclose_msg")
     ]
-    public static extern herr_t close_msg(hid_t msg_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t close_msg(hid_t msg_id);
 
     /// <summary>
     /// Closes object handle for error stack.
@@ -179,10 +179,10 @@ internal sealed partial class H5E
     /// <param name="estack_id">Error stack identifier.</param>
     /// <returns>Returns a non-negative value on success; otherwise returns
     /// a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eclose_stack",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eclose_stack")
     ]
-    public static extern herr_t close_stack(hid_t estack_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t close_stack(hid_t estack_id);
 
     /// <summary>
     /// Add major error message to an error class.
@@ -194,11 +194,10 @@ internal sealed partial class H5E
     /// <returns>Returns a message identifier on success; otherwise returns
     /// a negative value.</returns>
     /// <remarks>ASCII strings ONLY.</remarks>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Ecreate_msg",
-        CharSet = CharSet.Ansi,
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Ecreate_msg", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
     ]
-    public static extern hid_t create_msg
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t create_msg
         (hid_t cls, type_t msg_type,
         [MarshalAs(UnmanagedType.LPStr)] string msg);
 
@@ -208,10 +207,10 @@ internal sealed partial class H5E
     /// </summary>
     /// <returns>Returns an error stack identifier on success; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Ecreate_stack",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Ecreate_stack")
     ]
-    public static extern hid_t create_stack();
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t create_stack();
 
     /// <summary>
     /// Returns the settings for the automatic error stack traversal
@@ -225,10 +224,10 @@ internal sealed partial class H5E
     /// <param name="client_data">Data currently set to be passed to the
     /// error function.</param>
     /// <returns></returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eget_auto2",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eget_auto2")
     ]
-    public static extern herr_t get_auto
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_auto
         (hid_t estack_id, ref auto_t func, ref IntPtr client_data);
 
     /// <summary>
@@ -255,10 +254,10 @@ internal sealed partial class H5E
     /// </summary>
     /// <returns>Returns an error stack identifier on success; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eget_current_stack",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eget_current_stack")
     ]
-    public static extern hid_t get_current_stack();
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t get_current_stack();
 
     /// <summary>
     /// Retrieves an error message.
@@ -284,10 +283,10 @@ internal sealed partial class H5E
     /// <param name="estack_id">Error stack identifier.</param>
     /// <returns>Returns a non-negative value on success; otherwise returns
     /// a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eget_num",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eget_num")
     ]
-    public static extern ssize_t get_num(hid_t estack_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial ssize_t get_num(hid_t estack_id);
 
     /// <summary>
     /// Deletes specified number of error messages from the error stack.
@@ -297,10 +296,10 @@ internal sealed partial class H5E
     /// <param name="count">The number of error messages to be deleted from
     /// the top of error stack.</param>
     /// <returns></returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Epop",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Epop")
     ]
-    public static extern herr_t pop(hid_t estack_id, size_t count);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t pop(hid_t estack_id, size_t count);
 
     /// <summary>
     /// Prints the specified error stack in a default manner.
@@ -310,10 +309,10 @@ internal sealed partial class H5E
     /// <param name="stream">File pointer, or stderr if NULL.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eprint2",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eprint2")
     ]
-    public static extern herr_t print
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t print
         (hid_t estack_id, IntPtr stream);
 
     /// <summary>
@@ -337,11 +336,10 @@ internal sealed partial class H5E
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Epush2",
-        CharSet = CharSet.Ansi,
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Epush2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
     ]
-    public static extern herr_t push
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t push
         (hid_t estack_id, string file, string func, uint line,
         hid_t class_id, hid_t major_id, hid_t minor_id, string msg);
 
@@ -357,10 +355,10 @@ internal sealed partial class H5E
     /// to which the error class belongs. A NULL can be passed in.</param>
     /// <returns>Returns a class identifier on success; otherwise returns a
     /// negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eregister_class",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eregister_class")
     ]
-    public static extern hid_t register_class
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t register_class
         ([MarshalAs(UnmanagedType.LPStr)] string cls_name,
         [MarshalAs(UnmanagedType.LPStr)] string lib_name,
         [MarshalAs(UnmanagedType.LPStr)] string version);
@@ -374,10 +372,10 @@ internal sealed partial class H5E
     /// <param name="client_data">Data passed to the error function.</param>
     /// <returns>Returns a non-negative value on success; otherwise returns
     /// a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eset_auto2",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eset_auto2")
     ]
-    public static extern herr_t set_auto
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t set_auto
         (hid_t estack_id, auto_t func, IntPtr client_data);
 
     /// <summary>
@@ -387,10 +385,10 @@ internal sealed partial class H5E
     /// <param name="estack_id">Error stack identifier.</param>
     /// <returns>Returns a non-negative value on success; otherwise returns
     /// a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eset_current_stack",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eset_current_stack")
     ]
-    public static extern herr_t set_current_stack(hid_t estack_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t set_current_stack(hid_t estack_id);
 
     /// <summary>
     /// Removes an error class.
@@ -399,10 +397,10 @@ internal sealed partial class H5E
     /// <param name="class_id">Error class identifier.</param>
     /// <returns>Returns a non-negative value on success; otherwise returns
     /// a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Eunregister_class",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Eunregister_class")
     ]
-    public static extern herr_t unregister_class(hid_t class_id);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t unregister_class(hid_t class_id);
 
     /// <summary>
     /// Walks the specified error stack, calling the specified function.
@@ -415,10 +413,10 @@ internal sealed partial class H5E
     /// <param name="client_data">Data to be passed with
     /// <paramref name="func"/>.</param>
     /// <returns></returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Ewalk2",
-        CallingConvention = CallingConvention.Cdecl)
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Ewalk2")
     ]
-    public static extern herr_t walk
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t walk
         (hid_t estack_id, direction_t direction, walk_t func,
         IntPtr client_data);
 }

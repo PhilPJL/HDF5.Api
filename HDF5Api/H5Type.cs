@@ -1,5 +1,5 @@
 ﻿using System;
-
+using HDF5Api.NativeMethodAdapters;
 using HDF5Api.NativeMethods;
 
 namespace HDF5Api;
@@ -9,7 +9,7 @@ namespace HDF5Api;
 /// </summary>
 public class H5Type : H5Object<H5Type>
 {
-    internal H5Type(long handle) : base(handle, H5TypeNativeMethods.Close)
+    internal H5Type(long handle) : base(handle, H5TAdapter.Close)
     {
     }
 
@@ -42,26 +42,26 @@ public class H5Type : H5Object<H5Type>
 
     public H5Type Insert(string name, int offset, H5Type dataTypeId)
     {
-        H5TypeNativeMethods.Insert(this, name, new IntPtr(offset), dataTypeId);
+        H5TAdapter.Insert(this, name, new IntPtr(offset), dataTypeId);
         return this;
     }
 
     public H5Type Insert(string name, IntPtr offset, H5Type dataTypeId)
     {
-        H5TypeNativeMethods.Insert(this, name, offset, dataTypeId);
+        H5TAdapter.Insert(this, name, offset, dataTypeId);
         return this;
     }
 
     public H5Type Insert<S>(string name, H5Type dataTypeId) where S : struct
     {
         var offset = Marshal.OffsetOf<S>(name);
-        H5TypeNativeMethods.Insert(this, name, offset, dataTypeId);
+        H5TAdapter.Insert(this, name, offset, dataTypeId);
         return this;
     }
 
     public H5Class GetClass()
     {
-        return H5TypeNativeMethods.GetClass(this);
+        return H5TAdapter.GetClass(this);
     }
 
     #endregion
