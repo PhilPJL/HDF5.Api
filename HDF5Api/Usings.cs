@@ -2,7 +2,9 @@
 global using System.Diagnostics.CodeAnalysis;
 global using System.Runtime.CompilerServices;
 global using System.Runtime.InteropServices;
+#if NET7_0_OR_GREATER
 global using System.Runtime.InteropServices.Marshalling;
+#endif
 global using System.Security;
 global using System.Text;
 global using herr_t = System.Int32;

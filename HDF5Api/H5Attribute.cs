@@ -27,7 +27,7 @@ public class H5Attribute : H5Object<H5Attribute>
         using var type = GetH5Type();
         using var space = GetSpace();
 
-        long count = space.GetSimpleExtentNPoints();
+        var count = space.GetSimpleExtentNPoints();
 
         if (count != 1)
         {
@@ -40,7 +40,7 @@ public class H5Attribute : H5Object<H5Attribute>
             throw new Hdf5Exception($"Attribute is of class {cls} when expecting STRING.");
         }
 
-        long size = H5AAdapter.GetStorageSize(this);
+        var size = H5AAdapter.GetStorageSize(this);
 
         Span<byte> buffer = stackalloc byte[(int)size];
         H5AAdapter.Read(this, type, buffer);

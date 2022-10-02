@@ -1,67 +1,25 @@
-﻿using System;
-
-using HDF5Api.NativeMethods;
+﻿using static HDF5Api.NativeMethods.H5T;
 
 namespace HDF5Api.NativeMethodAdapters;
 
 internal static partial class H5TAdapter
 {
-    #region Close
-
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tclose")]
-    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    private static partial int H5Tclose(long handle);
-
     public static void Close(H5Type type)
     {
-        int err = H5Tclose(type);
+        int err = close(type);
 
-        err.ThrowIfError("H5Tclose");
+        err.ThrowIfError(nameof(close));
     }
-
-    #endregion
-
-    #region GetClass
-
-    /// <summary>
-    /// Returns the datatype class identifier.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-GetClass
-    /// </summary>
-    /// <param name="type_id">Identifier of datatype to query.</param>
-    /// <returns>Returns datatype class identifier if successful; otherwise
-    /// <code>H5T_NO_CLASS</code>.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tget_class")]
-    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    private static partial int H5Tget_class(long type_id);
 
     public static H5Class GetClass(H5Type typeId)
     {
-        return (H5Class)H5Tget_class(typeId);
+        return (H5Class)get_class(typeId);
     }
 
-    #endregion
-
-    #region Create
-
-    /// <summary>
-    /// Creates a new datatype.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Create
-    /// </summary>
-    /// <param name="cls">Class of datatype to create.</param>
-    /// <param name="size">Size, in bytes, of the datatype being created</param>
-    /// <returns>Returns datatype identifier if successful; otherwise
-    /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcreate")]
-    [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    private static partial long H5Tcreate(H5Class cls, ssize_t size);
-
-    /// <summary>
-    ///     Create a Compound type of the specified size./>
-    /// </summary>
     public static H5Type CreateCompoundType(int size)
     {
-        long h = H5Tcreate(H5Class.Compound, new ssize_t(size));
-        h.ThrowIfInvalidHandleValue(nameof(H5Tcreate));
+        long h = create((class_t)H5Class.Compound, new ssize_t(size));
+        h.ThrowIfInvalidHandleValue(nameof(create));
         return new H5Type(h);
     }
 
@@ -84,83 +42,58 @@ internal static partial class H5TAdapter
         return CreateCompoundType(size);
     }
 
-    #endregion
-
-    #region ArrayCreate(Byte)
-
-    /// <summary>
-    /// Creates an array datatype object.
-    /// </summary>
-    /// <param name="base_type_id">Datatype identifier for the array base
-    /// datatype.</param>
-    /// <param name="rank">Rank of the array.</param>
-    /// <param name="dims">Size of each array dimension.</param>
-    /// <returns>Returns a valid datatype identifier if successful;
-    /// otherwise returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tarray_create2")]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t H5Tarray_create2
-        (hid_t base_type_id, uint rank,
-        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] hsize_t[] dims);
-
     public static H5Type CreateByteArrayType(params ulong[] dims)
     {
-        long h = H5Tarray_create2(H5T.NATIVE_B8, (uint)dims.Length, dims);
-        h.ThrowIfInvalidHandleValue(nameof(H5Tarray_create2));
+        long h = array_create(NATIVE_B8, (uint)dims.Length, dims);
+        h.ThrowIfInvalidHandleValue(nameof(array_create));
         return new H5Type(h);
     }
 
-    #endregion
-
-    #region ArrayCreate(Double)
-
     public static H5Type CreateDoubleArrayType(int size)
     {
-        long h = H5T.array_create(H5T.NATIVE_DOUBLE, 1, new[] { (ulong)size });
+        long h = array_create(NATIVE_DOUBLE, 1, new[] { (ulong)size });
         h.ThrowIfInvalidHandleValue("H5T.array_create");
         return new H5Type(h);
     }
 
-    #endregion
-
     public static H5Type CreateFloatArrayType(int size)
     {
-        long h = H5T.array_create(H5T.NATIVE_FLOAT, 1, new[] { (ulong)size });
+        long h = array_create(NATIVE_FLOAT, 1, new[] { (ulong)size });
         h.ThrowIfInvalidHandleValue("H5T.array_create");
         return new H5Type(h);
     }
 
     public static H5Type CreateVariableLengthByteArrayType()
     {
-        long h = H5T.vlen_create(H5T.NATIVE_B8);
+        long h = vlen_create(NATIVE_B8);
         h.ThrowIfInvalidHandleValue("H5T.vlen_create");
         return new H5Type(h);
     }
 
     public static H5Type CreateFixedLengthStringType(int length)
     {
-        long h = H5T.copy(H5T.C_S1);
+        long h = copy(C_S1);
         h.ThrowIfInvalidHandleValue("H5T.copy");
-        int err = H5T.set_size(h, new ssize_t(length));
+        int err = set_size(h, new ssize_t(length));
         err.ThrowIfError("H5T.set_size");
         return new H5Type(h);
     }
 
     public static void Insert(H5Type typeId, string name, ssize_t offset, long nativeTypeId)
     {
-        int err = H5T.insert(typeId, name, offset, nativeTypeId);
+        int err = insert(typeId, name, offset, nativeTypeId);
         err.ThrowIfError("H5T.insert");
     }
 
     public static void Insert(H5Type typeId, string name, ssize_t offset, H5Type dataTypeId)
     {
-        int err = H5T.insert(typeId, name, offset, dataTypeId);
+        int err = insert(typeId, name, offset, dataTypeId);
         err.ThrowIfError("H5T.insert");
     }
 
     public static bool IsVariableLengthString(H5Type typeId)
     {
-        int err = H5T.is_variable_str(typeId);
+        int err = is_variable_str(typeId);
         err.ThrowIfError("H5T.is_variable_str");
         return err > 0;
     }
@@ -180,5 +113,5 @@ public enum H5Class
     Enum = 8,
     VariableLength = 9,
     Array = 10,
-    NClasses // ??
+    NClasses 
 }

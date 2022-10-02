@@ -118,7 +118,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
             throw new Hdf5Exception($"DataSet is of class {cls} when expecting {NativeMethods.H5T.class_t.COMPOUND}.");
         }
 
-        long size = H5DAdapter.GetStorageSize(this);
+        long size = (long)H5DAdapter.GetStorageSize(this);
 
         if (size != count * Marshal.SizeOf<T>())
         {
@@ -126,6 +126,8 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
                 $"Attribute storage size is {size}, which does not match the expected size for {count} items of type {typeof(T).Name} of {count * Marshal.SizeOf<T>()}.");
         }
 
+        // TODO: move into adapter
+        // TODO: create .NET7 Span<T> variant
         unsafe
         {
             var result = new T[count];
@@ -133,7 +135,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
             {
                 // TODO: use native H5DDataSetNativeMethods
                 int err = NativeMethods.H5D.read(this, type, space, space, 0, new IntPtr(ptr));
-                err.ThrowIfError("H5A.read");
+                err.ThrowIfError(nameof(NativeMethods.H5D.read));
                 return result;
             }
         }

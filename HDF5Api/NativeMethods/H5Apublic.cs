@@ -856,7 +856,7 @@ internal static partial class H5A
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread"),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t read
+    public static partial herr_t read_span
         (hid_t attr_id, hid_t type_id, Span<byte> buf);
 #endif
 

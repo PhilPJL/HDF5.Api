@@ -16,7 +16,7 @@
 namespace HDF5Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static class H5D
+internal static partial class H5D
 {
     static H5D() { _ = H5.open(); }
 
@@ -815,6 +815,28 @@ internal static class H5D
     public static extern herr_t write
         (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id,
         hid_t file_space_id, hid_t plist_id, IntPtr buf);
+
+#if NET7_0_OR_GREATER
+    /// <summary>
+    /// Writes raw data from a buffer to a dataset.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Write
+    /// </summary>
+    /// <param name="dset_id">Identifier of the dataset to write to.</param>
+    /// <param name="mem_type_id">Identifier of the memory datatype.</param>
+    /// <param name="mem_space_id">Identifier of the memory dataspace.</param>
+    /// <param name="file_space_id">Identifier of the dataset's dataspace
+    /// in the file.</param>
+    /// <param name="plist_id">Identifier of a transfer property list for
+    /// this I/O operation.</param>
+    /// <param name="buf">Buffer with data to be written to the file.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dwrite"), SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t write
+        (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id,
+        hid_t file_space_id, hid_t plist_id, Span<byte> buf);
+#endif
 
     /// <summary>
     /// Writes a raw data chunk from a buffer directly to a dataset.

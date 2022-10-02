@@ -29,7 +29,7 @@ public static class H5Handle
     internal static void UntrackHandle(long handle)
     {
 #if DEBUG
-        Handles.Remove(handle, out _);
+        Handles.TryRemove(handle, out _);
 #endif
 
         OpenHandleCount--;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 using HDF5Api.NativeMethods;
-using H5A_NM = HDF5Api.NativeMethods.H5A;
+using static HDF5Api.NativeMethods.H5A;
 
 namespace HDF5Api.NativeMethodAdapters;
 
@@ -13,9 +13,9 @@ internal static partial class H5AAdapter
 {
     public static void Close(H5Attribute attribute)
     {
-        int err = H5A_NM.close(attribute);
+        int err = close(attribute);
 
-        err.ThrowIfError(nameof(H5A_NM.close));
+        err.ThrowIfError(nameof(close));
     }
 
     public static H5Attribute Create<T>(H5Object<T> h5Object, string name, H5Type type, H5Space space,
@@ -23,9 +23,9 @@ internal static partial class H5AAdapter
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        var h = H5A_NM.create(h5Object, name, type, space, creationPropertyList, accessPropertyList);
+        var h = create(h5Object, name, type, space, creationPropertyList, accessPropertyList);
 
-        h.ThrowIfInvalidHandleValue(nameof(H5A_NM.create));
+        h.ThrowIfInvalidHandleValue(nameof(create));
 
         return new H5Attribute(h);
     }
@@ -34,9 +34,9 @@ internal static partial class H5AAdapter
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        long h = H5A_NM.open(h5Object, name, attributeAccessPropertyList);
+        long h = open(h5Object, name, attributeAccessPropertyList);
 
-        h.ThrowIfInvalidHandleValue(nameof(H5A_NM.open));
+        h.ThrowIfInvalidHandleValue(nameof(open));
 
         return new H5Attribute(h);
     }
@@ -45,18 +45,18 @@ internal static partial class H5AAdapter
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        int err = H5A_NM.delete(h5Object, name);
+        int err = delete(h5Object, name);
 
-        err.ThrowIfError(nameof(H5A_NM.delete));
+        err.ThrowIfError(nameof(delete));
     }
 
     public static bool Exists<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        int err = H5A_NM.exists(h5Object, name);
+        int err = exists(h5Object, name);
 
-        err.ThrowIfError(nameof(H5A_NM.exists));
+        err.ThrowIfError(nameof(exists));
         return err > 0;
     }
 
@@ -68,14 +68,14 @@ internal static partial class H5AAdapter
 
         var names = new List<string>();
 
-        int err = H5A_NM.iterate(h5Object,
+        int err = iterate(h5Object,
             H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
 
-        err.ThrowIfError(nameof(H5A_NM.iterate));
+        err.ThrowIfError(nameof(iterate));
 
         return names;
 
-        int Callback(long id, IntPtr intPtrName, ref H5A_NM.info_t info, IntPtr _)
+        int Callback(long id, IntPtr intPtrName, ref info_t info, IntPtr _)
         {
             string? name = Marshal.PtrToStringAnsi(intPtrName);
 
@@ -89,48 +89,58 @@ internal static partial class H5AAdapter
     }
 
     // TODO: make public?
-    private static H5A_NM.info_t GetInfoByName<T>(H5Object<T> h5Object,
+    private static info_t GetInfoByName<T>(H5Object<T> h5Object,
         string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
     {
-        H5A_NM.info_t info = default;
-        int err = H5A_NM.get_info_by_name(h5Object, objectName, attributeName, ref info, linkAccessPropertyList);
-        err.ThrowIfError(nameof(H5A_NM.get_info_by_name));
+        info_t info = default;
+        int err = get_info_by_name(h5Object, objectName, attributeName, ref info, linkAccessPropertyList);
+        err.ThrowIfError(nameof(get_info_by_name));
         return info;
     }
 
     public static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
     {
-        int err = H5A_NM.write(attribute, type, buffer);
+        int err = write(attribute, type, buffer);
 
-        err.ThrowIfError(nameof(H5A_NM.write));
+        err.ThrowIfError(nameof(write));
     }
 
     public static H5Space GetSpace(H5Attribute attribute)
     {
-        var space = H5A_NM.get_space(attribute);
+        var space = get_space(attribute);
 
-        space.ThrowIfError(nameof(H5A_NM.get_space));
+        space.ThrowIfError(nameof(get_space));
 
         return new H5Space(space);
     }
 
-    public static long GetStorageSize(H5Attribute attribute)
+    public static ulong GetStorageSize(H5Attribute attribute)
     {
-        return (long)H5A_NM.get_storage_size(attribute);
+        return get_storage_size(attribute);
     }
 
     public static H5Type GetType(H5Attribute attribute)
     {
-        long typeHandle = H5A_NM.get_type(attribute);
-        typeHandle.ThrowIfInvalidHandleValue(nameof(H5A_NM.get_type));
+        long typeHandle = get_type(attribute);
+        typeHandle.ThrowIfInvalidHandleValue(nameof(get_type));
         return new H5Type(typeHandle);
     }
 
+#if NET7_0_OR_GREATER
     public static void Read<T>(H5Attribute attribute, H5Type type, Span<T> buffer) where T : unmanaged
     {
-        int err = H5A_NM.read(attribute, type, MemoryMarshal.AsBytes(buffer));
+        int err = read_span(attribute, type, MemoryMarshal.AsBytes(buffer));
 
-        err.ThrowIfError(nameof(H5A_NM.read));
+        err.ThrowIfError(nameof(read));
     }
+#else
+    public static void Read<T>(H5Attribute attribute, H5Type type, T[] buffer) where T : unmanaged
+    {
+        //int err = read(attribute, type, MemoryMarshal.AsBytes(buffer));
+
+        //err.ThrowIfError(nameof(read));
+        throw new NotImplementedException();
+    }
+#endif
 }
 
