@@ -1,8 +1,9 @@
-﻿using HDF5Api;
-using HDF5Api.NativeMethods;
+﻿using HDF5Api.NativeMethods;
 using static HDF5Api.NativeMethods.H5P;
 
-internal static partial class H5PAdapter
+namespace HDF5Api.NativeMethodAdapters;
+
+internal static class H5PAdapter
 {
     public static void Close(H5PropertyList propertyList)
     {

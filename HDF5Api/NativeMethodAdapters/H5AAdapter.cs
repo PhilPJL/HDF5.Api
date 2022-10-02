@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using HDF5Api.NativeMethods;
 using static HDF5Api.NativeMethods.H5A;
 using CommunityToolkit.HighPerformance.Buffers;
-using System.Text;
 using HDF5Api.Disposables;
 
 namespace HDF5Api.NativeMethodAdapters;
@@ -12,7 +11,7 @@ namespace HDF5Api.NativeMethodAdapters;
 /// <summary>
 /// H5 attribute native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
 /// </summary>
-internal static partial class H5AAdapter
+internal static class H5AAdapter
 {
     public static void Close(H5Attribute attribute)
     {
@@ -84,7 +83,8 @@ internal static partial class H5AAdapter
 
             Guard.IsNotNull(name);
 
-            var ainfo = GetInfoByName(h5Object, ".", name, linkAccessPropertyList);
+            // TODO: use return info?
+            var __ = GetInfoByName(h5Object, ".", name, linkAccessPropertyList);
 
             names.Add(name);
             return 0;

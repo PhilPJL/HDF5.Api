@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using HDF5Api.NativeMethodAdapters;
 
 namespace HDF5Api;
 

@@ -5,7 +5,7 @@ namespace HDF5Api.NativeMethodAdapters;
 /// <summary>
 /// H5 file native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_f.html"/>
 /// </summary>
-internal static partial class H5FAdapter
+internal static class H5FAdapter
 {
     #region Close
 

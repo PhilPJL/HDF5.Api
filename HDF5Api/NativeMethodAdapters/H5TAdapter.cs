@@ -2,7 +2,7 @@
 
 namespace HDF5Api.NativeMethodAdapters;
 
-internal static partial class H5TAdapter
+internal static class H5TAdapter
 {
     public static void Close(H5Type type)
     {
@@ -24,21 +24,21 @@ internal static partial class H5TAdapter
     }
 
     /// <summary>
-    ///     Create a Compound type in order to hold an <typeparamref name="S" />
+    ///     Create a Compound type in order to hold an <typeparamref name="T" />
     /// </summary>
-    public static H5Type CreateCompoundType<S>() where S : struct
+    public static H5Type CreateCompoundType<T>() where T : struct
     {
-        int size = Marshal.SizeOf<S>();
+        int size = Marshal.SizeOf<T>();
         return CreateCompoundType(size);
     }
 
     /// <summary>
-    ///     Create a Compound type in order to hold an <typeparamref name="S" /> plus additional space as defined by
+    ///     Create a Compound type in order to hold an <typeparamref name="T" /> plus additional space as defined by
     ///     <paramref name="extraSpace" />
     /// </summary>
-    public static H5Type CreateCompoundType<S>(int extraSpace) where S : struct
+    public static H5Type CreateCompoundType<T>(int extraSpace) where T : struct
     {
-        int size = Marshal.SizeOf<S>() + extraSpace;
+        int size = Marshal.SizeOf<T>() + extraSpace;
         return CreateCompoundType(size);
     }
 
@@ -52,28 +52,28 @@ internal static partial class H5TAdapter
     public static H5Type CreateDoubleArrayType(int size)
     {
         long h = array_create(NATIVE_DOUBLE, 1, new[] { (ulong)size });
-        h.ThrowIfInvalidHandleValue("H5T.array_create");
+        h.ThrowIfInvalidHandleValue(nameof(array_create));
         return new H5Type(h);
     }
 
     public static H5Type CreateFloatArrayType(int size)
     {
         long h = array_create(NATIVE_FLOAT, 1, new[] { (ulong)size });
-        h.ThrowIfInvalidHandleValue("H5T.array_create");
+        h.ThrowIfInvalidHandleValue(nameof(array_create));
         return new H5Type(h);
     }
 
     public static H5Type CreateVariableLengthByteArrayType()
     {
         long h = vlen_create(NATIVE_B8);
-        h.ThrowIfInvalidHandleValue("H5T.vlen_create");
+        h.ThrowIfInvalidHandleValue(nameof(vlen_create));
         return new H5Type(h);
     }
 
     public static H5Type CreateFixedLengthStringType(int length)
     {
         long h = copy(C_S1);
-        h.ThrowIfInvalidHandleValue("H5T.copy");
+        h.ThrowIfInvalidHandleValue(nameof(copy));
         int err = set_size(h, new ssize_t(length));
         err.ThrowIfError("H5T.set_size");
         return new H5Type(h);
@@ -82,19 +82,19 @@ internal static partial class H5TAdapter
     public static void Insert(H5Type typeId, string name, ssize_t offset, long nativeTypeId)
     {
         int err = insert(typeId, name, offset, nativeTypeId);
-        err.ThrowIfError("H5T.insert");
+        err.ThrowIfError(nameof(insert));
     }
 
     public static void Insert(H5Type typeId, string name, ssize_t offset, H5Type dataTypeId)
     {
         int err = insert(typeId, name, offset, dataTypeId);
-        err.ThrowIfError("H5T.insert");
+        err.ThrowIfError(nameof(insert));
     }
 
     public static bool IsVariableLengthString(H5Type typeId)
     {
         int err = is_variable_str(typeId);
-        err.ThrowIfError("H5T.is_variable_str");
+        err.ThrowIfError(nameof(is_variable_str));
         return err > 0;
     }
 }

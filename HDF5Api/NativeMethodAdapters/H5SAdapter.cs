@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
 using static HDF5Api.NativeMethods.H5S;
 
-namespace HDF5Api;
+namespace HDF5Api.NativeMethodAdapters;
 
-internal static partial class H5SAdapter
+internal static class H5SAdapter
 {
     public static void Close(H5Space attribute)
     {
