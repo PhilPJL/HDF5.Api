@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 using HDF5Api.NativeMethods;
 using static HDF5Api.NativeMethods.H5A;
+using CommunityToolkit.HighPerformance.Buffers;
+using System.Text;
+using HDF5Api.Disposables;
 
 namespace HDF5Api.NativeMethodAdapters;
 
@@ -98,7 +101,7 @@ internal static partial class H5AAdapter
         return info;
     }
 
-    public static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
+    internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
     {
         int err = write(attribute, type, buffer);
 
@@ -114,9 +117,9 @@ internal static partial class H5AAdapter
         return new H5Space(space);
     }
 
-    public static ulong GetStorageSize(H5Attribute attribute)
+    public static int GetStorageSize(H5Attribute attribute)
     {
-        return get_storage_size(attribute);
+        return (int)get_storage_size(attribute);
     }
 
     public static H5Type GetType(H5Attribute attribute)
@@ -126,21 +129,89 @@ internal static partial class H5AAdapter
         return new H5Type(typeHandle);
     }
 
+    public static string ReadString(H5Attribute attribute)
+    {
+        using var type = attribute.GetH5Type();
+        using var space = attribute.GetSpace();
+
+        var count = space.GetSimpleExtentNPoints();
+
+        if (count != 1)
+        {
+            throw new Hdf5Exception("Attribute contains an array type (not supported).");
+        }
+
+        var cls = type.GetClass();
+        if (cls != H5Class.String)
+        {
+            throw new Hdf5Exception($"Attribute is of class {cls} when expecting STRING.");
+        }
+
+        var size = GetStorageSize(attribute);
+
 #if NET7_0_OR_GREATER
-    public static void Read<T>(H5Attribute attribute, H5Type type, Span<T> buffer) where T : unmanaged
-    {
-        int err = read_span(attribute, type, MemoryMarshal.AsBytes(buffer));
-
-        err.ThrowIfError(nameof(read));
-    }
+        if (size < 256)
+        {
+            Span<byte> buffer = stackalloc byte[size];
+            read(attribute, type, buffer);
+            return Encoding.ASCII.GetString(buffer);
+        }
+        else
+        {
+            var buffer = MemoryOwner<byte>.Allocate(size);
+            read(attribute, type, buffer.Span);
+            return Encoding.ASCII.GetString(buffer.Span);
+        }
 #else
-    public static void Read<T>(H5Attribute attribute, H5Type type, T[] buffer) where T : unmanaged
-    {
-        //int err = read(attribute, type, MemoryMarshal.AsBytes(buffer));
-
-        //err.ThrowIfError(nameof(read));
-        throw new NotImplementedException();
-    }
+        using var buffer = new GlobalMemory(size + 1);
+        read(attribute, type, buffer.IntPtr);
+        return Marshal.PtrToStringAnsi(buffer.IntPtr, (int)size);
 #endif
+    }
+
+    public static T Read<T>(H5Attribute attribute) where T : unmanaged
+    {
+        using var type = attribute.GetH5Type();
+        using var space = attribute.GetSpace();
+
+        long count = space.GetSimpleExtentNPoints();
+
+        if (count != 1)
+        {
+            throw new Hdf5Exception("Attribute contains an array type (not supported).");
+        }
+
+        var cls = type.GetClass();
+
+        using var nativeType = H5Type.GetNativeType<T>();
+        var expectedCls = H5TAdapter.GetClass(nativeType);
+
+        if (cls != expectedCls)
+        {
+            throw new Hdf5Exception($"Attribute is of class {cls} when expecting {expectedCls}.");
+        }
+
+        int size = GetStorageSize(attribute);
+
+        if (size != Marshal.SizeOf<T>())
+        {
+            throw new Hdf5Exception(
+                $"Attribute storage size is {size}, which does not match the expected size for type {typeof(T).Name} of {Marshal.SizeOf<T>()}.");
+        }
+
+#if NET7_0_OR_GREATER
+        using var buf = SpanOwner<T>.Allocate(size);
+        read(attribute, type, MemoryMarshal.AsBytes(buf.Span));
+        return buf.Span[0];
+#else
+        unsafe
+        {
+            T result = default;
+            int err = read(attribute, type, new IntPtr(&result));
+            err.ThrowIfError(nameof(read));
+            return result;
+        }
+#endif
+    }
 }
 

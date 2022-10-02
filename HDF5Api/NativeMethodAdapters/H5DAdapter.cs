@@ -64,30 +64,19 @@ internal static partial class H5DAdapter
         err.ThrowIfError(nameof(set_extent));
     }
 
-    public static void Write(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, ssize_t buffer, H5PropertyList? transferPropertyList = null)
+/*    internal static void Write<T>(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, IntPtr buffer, H5PropertyList? transferPropertyList = null) where T : unmanaged
     {
         int err = write(dataSet, type, memorySpace, fileSpace, transferPropertyList, buffer);
 
         err.ThrowIfError(nameof(write));
     }
-
-#if NET7_0_OR_GREATER
+*/
     public static void Write<T>(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, Span<T> buffer, H5PropertyList? transferPropertyList = null) where T : unmanaged
     {
         int err = write(dataSet, type, memorySpace, fileSpace, transferPropertyList, MemoryMarshal.Cast<T, byte>(buffer));
 
         err.ThrowIfError(nameof(write));
     }
-#else
-    public static void Write<T>(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, T[] buffer, H5PropertyList? transferPropertyList = null) where T : unmanaged
-    {
-        //int err = write(dataSet, type, memorySpace, fileSpace, transferPropertyList, MemoryMarshal.Cast<T, byte>(buffer));
-
-        //err.ThrowIfError(nameof(write));
-
-        throw new NotImplementedException();
-    }
-#endif
 
     public static H5Space GetSpace(H5DataSet dataSet)
     {

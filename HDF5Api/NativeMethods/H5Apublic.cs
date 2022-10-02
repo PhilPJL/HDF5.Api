@@ -826,6 +826,7 @@ internal static partial class H5A
         (hid_t loc_id, string obj_name, string attr_name,
         hid_t aapl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
 
+#if NETSTANDARD
     /// <summary>
     /// Reads an attribute.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Read
@@ -839,8 +840,9 @@ internal static partial class H5A
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Aread",
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    public static extern herr_t read
+    public static extern unsafe herr_t read
         (hid_t attr_id, hid_t type_id, IntPtr buf);
+#endif
 
 #if NET7_0_OR_GREATER
     /// <summary>
@@ -856,7 +858,7 @@ internal static partial class H5A
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread"),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t read_span
+    public static partial herr_t read
         (hid_t attr_id, hid_t type_id, Span<byte> buf);
 #endif
 

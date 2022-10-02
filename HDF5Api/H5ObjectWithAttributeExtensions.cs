@@ -39,7 +39,10 @@ public static class H5ObjectWithAttributeExtensions
 
         maxLength = maxLength <= 0 ? value.Length : Math.Min(value.Length, maxLength);
 
-        string subString = value.Length > maxLength ? value[..maxLength] : value;
+
+#pragma warning disable IDE0057 // Use range operator
+        string subString = value.Length > maxLength ? value.Substring(0, maxLength) : value;
+#pragma warning restore IDE0057 // Use range operator
 
         // can't create a zero length string type so use a length of 1 minimum
         using var typeId = H5TAdapter.CreateFixedLengthStringType(subString.Length < 1 ? 1 : subString.Length);

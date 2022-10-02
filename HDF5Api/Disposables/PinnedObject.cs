@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HDF5Api.Disposables;
+﻿namespace HDF5Api.Disposables;
 
 /// <summary>
 ///     Disposable wrapper for safely pinning/releasing objects

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HDF5Api.Disposables;
+﻿namespace HDF5Api.Disposables;
 
 /// <summary>
 ///     Disposable wrapper for safe allocation of global memory

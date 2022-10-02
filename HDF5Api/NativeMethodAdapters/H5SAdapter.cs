@@ -28,7 +28,7 @@ internal static partial class H5SAdapter
     public static void SelectHyperSlab(H5Space space, int offset, int count)
     {
         int err = select_hyperslab(
-            space, seloper_t.SET, new[] { (ulong)offset }, null, new[] { (ulong)count }, null);
+            space, seloper_t.SET, new[] { (ulong)offset }, null!, new[] { (ulong)count }, null!);
 
         err.ThrowIfError(nameof(select_hyperslab));
     }

@@ -14,9 +14,9 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     {
     }
 
-    public void Write(H5Type type, H5Space memorySpace, H5Space fileSpace, IntPtr buffer)
+    public void Write<T>(H5Type type, H5Space memorySpace, H5Space fileSpace, T[] buffer) where T : unmanaged
     {
-        H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
+        H5DAdapter.Write<T>(this, type, memorySpace, fileSpace, buffer);
     }
 
     public void Write<T>(H5Type type, H5Space memorySpace, H5Space fileSpace, Span<T> buffer) where T : unmanaged

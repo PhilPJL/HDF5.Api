@@ -24,68 +24,17 @@ public class H5Attribute : H5Object<H5Attribute>
 
     public string ReadString()
     {
-        using var type = GetH5Type();
-        using var space = GetSpace();
+        return H5AAdapter.ReadString(this);
+    }
 
-        var count = space.GetSimpleExtentNPoints();
-
-        if (count != 1)
-        {
-            throw new Hdf5Exception("Attribute contains an array type (not supported).");
-        }
-
-        var cls = type.GetClass();
-        if (cls != H5Class.String)
-        {
-            throw new Hdf5Exception($"Attribute is of class {cls} when expecting STRING.");
-        }
-
-        var size = H5AAdapter.GetStorageSize(this);
-
-        Span<byte> buffer = stackalloc byte[(int)size];
-        H5AAdapter.Read(this, type, buffer);
-        return Encoding.ASCII.GetString(buffer);
+    public T Read<T>() where T : unmanaged
+    {
+        return H5AAdapter.Read<T>(this);
     }
 
     public DateTime ReadDateTime()
     {
         return DateTime.FromOADate(Read<double>());
-    }
-
-    public T Read<T>() where T : unmanaged
-    {
-        using var type = GetH5Type();
-        using var space = GetSpace();
-
-        long count = space.GetSimpleExtentNPoints();
-
-        if (count != 1)
-        {
-            throw new Hdf5Exception("Attribute contains an array type (not supported).");
-        }
-
-        var cls = type.GetClass();
-
-        using var nativeType = H5Type.GetNativeType<T>();
-        var expectedCls = H5TAdapter.GetClass(nativeType);
-
-        if (cls != expectedCls)
-        {
-            throw new Hdf5Exception($"Attribute is of class {cls} when expecting {expectedCls}.");
-        }
-
-        int size = (int)H5AAdapter.GetStorageSize(this);
-
-        if (size != Marshal.SizeOf<T>())
-        {
-            throw new Hdf5Exception(
-                $"Attribute storage size is {size}, which does not match the expected size for type {typeof(T).Name} of {Marshal.SizeOf<T>()}.");
-        }
-
-        // TODO: consider memory alignment on different platforms 
-        Span<T> buffer = stackalloc T[1];
-        H5AAdapter.Read(this, type, buffer);
-        return buffer[0];
     }
 
     // TODO: expose public Write<T> etc as per Read

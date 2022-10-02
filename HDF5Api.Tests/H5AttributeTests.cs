@@ -130,6 +130,7 @@ public class H5AttributeTests : H5Test
         CreateWriteReadDeleteStringAttribute("1234567890");
         CreateWriteReadDeleteStringAttribute("1234567890", 5);
         CreateWriteReadDeleteDateTimeAttribute(DateTime.UtcNow);
+        CreateWriteReadDeleteStringAttribute(new string('A', 1000));
 
         void CreateWriteReadDeleteDateTimeAttribute(DateTime value)
         {

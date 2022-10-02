@@ -222,6 +222,7 @@ internal static partial class H5D
     IntPtr op_data
     );
 
+#if NETSTANDARD
     /// <summary>
     /// Closes the specified dataset.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Close
@@ -234,6 +235,23 @@ internal static partial class H5D
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t close(hid_t dset_id);
+#endif
+
+#if NET7_0_OR_GREATER
+    /// <summary>
+    /// Closes the specified dataset.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Close
+    /// </summary>
+    /// <param name="dset_id">Identifier of the dataset to close access to.
+    /// </param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dclose"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t close(hid_t dset_id);
+#endif
+
 
     /// <summary>
     /// Creates a new dataset and links it into the file.
@@ -795,6 +813,7 @@ internal static partial class H5D
     public static extern herr_t vlen_reclaim
         (hid_t type_id, hid_t space_id, hid_t plist_id, IntPtr buf);
 
+#if NETSTANDARD
     /// <summary>
     /// Writes raw data from a buffer to a dataset.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Write
@@ -814,7 +833,8 @@ internal static partial class H5D
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t write
         (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id,
-        hid_t file_space_id, hid_t plist_id, IntPtr buf);
+        hid_t file_space_id, hid_t plist_id, Span<byte> buf);
+#endif
 
 #if NET7_0_OR_GREATER
     /// <summary>
