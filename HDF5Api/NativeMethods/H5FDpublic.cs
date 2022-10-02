@@ -15,7 +15,8 @@
 
 namespace HDF5Api.NativeMethods;
 
-internal sealed class H5FD
+[SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+internal static class H5FD
 {
     static H5FD() { _ = H5.open(); }
 

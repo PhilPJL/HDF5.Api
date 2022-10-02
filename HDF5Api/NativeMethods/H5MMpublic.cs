@@ -15,7 +15,7 @@
 
 namespace HDF5Api.NativeMethods;
 
-internal sealed class H5MM
+internal static class H5MM
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IntPtr allocate_t(size_t size, IntPtr alloc_info);

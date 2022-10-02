@@ -13,12 +13,10 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-
-
 namespace HDF5Api.NativeMethods;
 
-internal sealed partial class H5L
+[SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+internal static class H5L
 {
     static H5L() { _ = H5.open(); }
 
@@ -400,10 +398,10 @@ internal sealed partial class H5L
     /// <param name="lapl_id">Link access property list identifier</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lcopy")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t copy
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lcopy",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t copy
         (hid_t src_loc, byte[] src_name, hid_t dst_loc, byte[] dst_name,
         hid_t lcpl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
 
@@ -421,10 +419,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lcopy", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t copy
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lcopy",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t copy
         (hid_t src_loc, string src_name, hid_t dst_loc, string dst_name,
         hid_t lcpl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
 
@@ -445,10 +444,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>The <paramref name="file_name"/> must be an ASCII string!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_external", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t create_external
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_external",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t create_external
         (string file_name, byte[] obj_name, hid_t link_loc_id,
         byte[] link_name, hid_t lcpl_id = H5P.DEFAULT,
         hid_t lapl_id = H5P.DEFAULT);
@@ -471,8 +471,8 @@ internal sealed partial class H5L
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_external",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t create_external
         (string file_name, string obj_name, hid_t link_loc_id,
         string link_name, hid_t lcpl_id = H5P.DEFAULT,
@@ -492,10 +492,10 @@ internal sealed partial class H5L
     /// <param name="lapl_id">Link access property list identifier.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_hard")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t create_hard
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_hard",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t create_hard
         (hid_t cur_loc, byte[] cur_name, hid_t dst_loc, byte[] dst_name,
         hid_t lcpl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
 
@@ -514,10 +514,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings only!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_hard", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t create_hard
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_hard",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t create_hard
         (hid_t cur_loc, string cur_name, hid_t dst_loc, string dst_name,
         hid_t lcpl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
 
@@ -534,10 +535,10 @@ internal sealed partial class H5L
     /// <param name="lapl_id">Link access property list identifier.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_soft")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t create_soft
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_soft",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t create_soft
         (byte[] link_target, hid_t link_loc_id, byte[] link_name,
         hid_t lcpl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
 
@@ -555,10 +556,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_soft", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t create_soft
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_soft",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t create_soft
         (string link_target, hid_t link_loc_id, string link_name,
         hid_t lcpl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
 
@@ -575,10 +577,10 @@ internal sealed partial class H5L
     /// <param name="lapl_id">Link access property list identifier</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_ud")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t create_ud
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_ud",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t create_ud
         (hid_t link_loc_id, byte[] link_name, type_t link_type,
         IntPtr udata, size_t udata_size,
         hid_t lcpl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
@@ -597,10 +599,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_ud", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t create_ud
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lcreate_ud",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t create_ud
         (hid_t link_loc_id, string link_name, type_t link_type,
         IntPtr udata, size_t udata_size,
         hid_t lcpl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
@@ -615,10 +618,10 @@ internal sealed partial class H5L
     /// <param name="lapl_id">Link access property list identifier.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Ldelete")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t delete(hid_t loc_id, byte[] name,
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Ldelete",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t delete(hid_t loc_id, byte[] name,
         hid_t lapl_id = H5P.DEFAULT);
 
     /// <summary>
@@ -632,10 +635,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Ldelete", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t delete(hid_t loc_id, string name,
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Ldelete",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t delete(hid_t loc_id, string name,
         hid_t lapl_id = H5P.DEFAULT);
 
     /// <summary>
@@ -651,10 +655,10 @@ internal sealed partial class H5L
     /// <param name="lapl_id">Link access property list</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Ldelete_by_idx")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t delete_by_idx
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Ldelete_by_idx",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t delete_by_idx
         (hid_t loc_id, byte[] group_name, H5.index_t idx_type,
         H5.iter_order_t order, hsize_t n, hid_t lapl_id = H5P.DEFAULT);
 
@@ -672,10 +676,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Ldelete_by_idx", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t delete_by_idx
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Ldelete_by_idx",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t delete_by_idx
         (hid_t loc_id, string group_name, H5.index_t idx_type,
         H5.iter_order_t order, hsize_t n, hid_t lapl_id = H5P.DEFAULT);
 
@@ -688,10 +693,10 @@ internal sealed partial class H5L
     /// <param name="lapl_id">Link access property list identifier.</param>
     /// <returns>Returns 1 or 0 if successful; otherwise returns a negative
     /// value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lexists")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial htri_t exists(hid_t loc_id, byte[] name,
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lexists",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern htri_t exists(hid_t loc_id, byte[] name,
         hid_t lapl_id = H5P.DEFAULT);
 
     /// <summary>
@@ -704,10 +709,11 @@ internal sealed partial class H5L
     /// <returns>Returns 1 or 0 if successful; otherwise returns a negative
     /// value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lexists", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial htri_t exists(hid_t loc_id, string name,
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lexists",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern htri_t exists(hid_t loc_id, string name,
         hid_t lapl_id = H5P.DEFAULT);
 
     /// <summary>
@@ -721,10 +727,10 @@ internal sealed partial class H5L
     /// <param name="lapl_id">Link access property list identifier.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lget_info")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_info
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lget_info",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_info
         (hid_t loc_id, byte[] name, ref info_t linfo,
         hid_t lapl_id = H5P.DEFAULT);
 
@@ -740,10 +746,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lget_info", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_info
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lget_info",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_info
         (hid_t loc_id, string name, ref info_t linfo,
         hid_t lapl_id = H5P.DEFAULT);
 
@@ -762,10 +769,10 @@ internal sealed partial class H5L
     /// <param name="lapl_id">Link access property list</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lget_info_by_idx")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_info_by_idx
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lget_info_by_idx",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_info_by_idx
         (hid_t loc_id, byte[] group_name, H5.index_t idx_type,
         H5.iter_order_t order, hsize_t n, ref info_t linfo,
         hid_t lapl_id = H5P.DEFAULT);
@@ -786,10 +793,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lget_info_by_idx", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_info_by_idx
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lget_info_by_idx",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_info_by_idx
         (hid_t loc_id, string group_name, H5.index_t idx_type,
         H5.iter_order_t order, hsize_t n, ref info_t linfo /*out*/,
         hid_t lapl_id = H5P.DEFAULT);
@@ -811,8 +819,8 @@ internal sealed partial class H5L
     /// <returns>Returns the size of the link name if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Lget_name_by_idx",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern ssize_t get_name_by_idx
         (hid_t loc_id, byte[] group_name, H5.index_t idx_type,
         H5.iter_order_t order, hsize_t n, [In][Out] byte[] name, size_t size,
@@ -837,8 +845,8 @@ internal sealed partial class H5L
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Lget_name_by_idx",
         CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
-    ]
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern ssize_t get_name_by_idx
         (hid_t loc_id, string group_name, H5.index_t idx_type,
         H5.iter_order_t order, hsize_t n, [In][Out] StringBuilder name, size_t size,
@@ -861,10 +869,11 @@ internal sealed partial class H5L
     /// <returns>Returns the size of the link name if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lget_name_by_idx", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial ssize_t get_name_by_idx(hid_t loc_id, string group_name,
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lget_name_by_idx",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern ssize_t get_name_by_idx(hid_t loc_id, string group_name,
         H5.index_t idx_type, H5.iter_order_t order, hsize_t n,
         IntPtr name /*out*/, size_t size, hid_t lapl_id);
 
@@ -881,10 +890,10 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value, with the link value in
     /// <paramref name="buf"/>, if successful. Otherwise returns a negative
     /// value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lget_val")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_val
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lget_val",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_val
         (hid_t loc_id, byte[] name, IntPtr buf, size_t size,
         hid_t lapl_id = H5P.DEFAULT);
 
@@ -902,10 +911,11 @@ internal sealed partial class H5L
     /// <paramref name="buf"/>, if successful. Otherwise returns a negative
     /// value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lget_val", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_val
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lget_val",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_val
         (hid_t loc_id, string name, IntPtr buf, size_t size,
         hid_t lapl_id = H5P.DEFAULT);
 
@@ -925,10 +935,10 @@ internal sealed partial class H5L
     /// <param name="lapl_id">Link access property list</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lget_val_by_idx")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_val_by_idx
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lget_val_by_idx",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_val_by_idx
         (hid_t loc_id, byte[] group_name, H5.index_t idx_type,
         H5.iter_order_t order, hsize_t n, IntPtr buf, size_t size,
         hid_t lapl_id = H5P.DEFAULT);
@@ -950,10 +960,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lget_val_by_idx", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_val_by_idx
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lget_val_by_idx",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_val_by_idx
         (hid_t loc_id, string group_name, H5.index_t idx_type,
         H5.iter_order_t order, hsize_t n, IntPtr buf, size_t size,
         hid_t lapl_id = H5P.DEFAULT);
@@ -967,10 +978,10 @@ internal sealed partial class H5L
     /// registered and zero if it is unregistered. Otherwise returns a
     /// negative value; this may mean that the identifier is not a valid
     /// user-defined class identifier.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lis_registered")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial htri_t is_registered(type_t id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lis_registered",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern htri_t is_registered(type_t id);
 
     /// <summary>
     /// Iterates through links in a group.
@@ -989,10 +1000,10 @@ internal sealed partial class H5L
     /// processed with no operator returning non-zero. On failure, returns
     /// a negative value if something goes wrong within the library, or the
     /// first negative value returned by an operator.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Literate")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t iterate
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Literate",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t iterate
         (hid_t grp_id, H5.index_t idx_type, H5.iter_order_t order,
         ref hsize_t idx, iterate_t op, IntPtr op_data);
 
@@ -1013,10 +1024,10 @@ internal sealed partial class H5L
     /// <param name="lapl_id">Link access property list</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Literate_by_name")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t iterate_by_name
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Literate_by_name",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t iterate_by_name
         (hid_t loc_id, byte[] group_name, H5.index_t idx_type,
         H5.iter_order_t order, ref hsize_t idx, iterate_t op,
         IntPtr op_data, hid_t lapl_id = H5P.DEFAULT);
@@ -1039,10 +1050,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Literate_by_name", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t iterate_by_name
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Literate_by_name",
+        CharSet = CharSet.Ansi,
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t iterate_by_name
         (hid_t loc_id, string group_name, H5.index_t idx_type,
         H5.iter_order_t order, ref hsize_t idx, iterate_t op,
         IntPtr op_data, hid_t lapl_id = H5P.DEFAULT);
@@ -1061,10 +1073,10 @@ internal sealed partial class H5L
     /// associated with the new link.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lmove")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t move
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lmove",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t move
         (hid_t src_loc, byte[] src_name, hid_t dst_loc, byte[] dst_name,
         hid_t lcpl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
 
@@ -1083,10 +1095,11 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lmove", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t move
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lmove",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t move
         (hid_t src_loc, string src_name, hid_t dst_loc, string dst_name,
         hid_t lcpl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
 
@@ -1099,8 +1112,8 @@ internal sealed partial class H5L
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Lregister",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t register(ref class_t cls);
 
     /// <summary>
@@ -1117,10 +1130,10 @@ internal sealed partial class H5L
     /// <paramref name="filename"/></param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lunpack_elink_val")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t unpack_elink_val
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lunpack_elink_val",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t unpack_elink_val
         (IntPtr ext_linkval, size_t link_size, ref uint flags,
         ref IntPtr filename, ref IntPtr obj_path);
 
@@ -1131,10 +1144,10 @@ internal sealed partial class H5L
     /// <param name="id">User-defined link class identifier</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lunregister")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t unregister(type_t id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lunregister",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t unregister(type_t id);
 
     /// <summary>
     /// Recursively visits all links starting from a specified group.
@@ -1153,10 +1166,10 @@ internal sealed partial class H5L
     /// processed with no operator returning non-zero. On failure, returns
     /// a negative value if something goes wrong within the library, or the
     /// first negative value returned by an operator.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lvisit")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t visit
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lvisit",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t visit
         (hid_t grp_id, H5.index_t idx_type, H5.iter_order_t order,
         iterate_t op, IntPtr op_data);
 
@@ -1179,10 +1192,10 @@ internal sealed partial class H5L
     /// processed with no operator returning non-zero. On failure, returns
     /// a negative value if something goes wrong within the library, or the
     /// first negative value returned by an operator.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lvisit_by_name")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t visit_by_name
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lvisit_by_name",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t visit_by_name
         (hid_t loc_id, byte[] group_name, H5.index_t idx_type,
         H5.iter_order_t order, iterate_t op, IntPtr op_data,
         hid_t lapl_id = H5P.DEFAULT);
@@ -1207,10 +1220,11 @@ internal sealed partial class H5L
     /// a negative value if something goes wrong within the library, or the
     /// first negative value returned by an operator.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lvisit_by_name", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t visit_by_name
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lvisit_by_name",
+        CharSet = CharSet.Ansi,
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t visit_by_name
         (hid_t loc_id, string group_name, H5.index_t idx_type,
         H5.iter_order_t order, iterate_t op, IntPtr op_data,
         hid_t lapl_id = H5P.DEFAULT);

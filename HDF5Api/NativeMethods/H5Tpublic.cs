@@ -13,12 +13,10 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-
-
 namespace HDF5Api.NativeMethods;
 
-internal sealed partial class H5T
+[SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+internal static partial class H5T
 {
     static H5T()
     {
@@ -154,7 +152,7 @@ internal sealed partial class H5T
         RESERVED_11 = 11,
         RESERVED_12 = 12,
         RESERVED_13 = 13,
-        RESERVED_14 = 14
+        RESERVED_14 = 14,
     }
 
     /// <summary>
@@ -483,8 +481,8 @@ internal sealed partial class H5T
     /// <returns>Returns a valid datatype identifier if successful;
     /// otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tarray_create2",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t array_create
         (hid_t base_type_id, uint rank,
         [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] hsize_t[] dims);
@@ -497,8 +495,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tclose",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t close(hid_t type_id);
 
     /// <summary>
@@ -516,8 +514,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tcommit2",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t commit
         (hid_t loc_id, byte[] name, hid_t dtype_id,
         hid_t lcpl_id = H5P.DEFAULT, hid_t tcpl_id = H5P.DEFAULT,
@@ -540,8 +538,8 @@ internal sealed partial class H5T
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tcommit2",
         CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
-    ]
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t commit
         (hid_t loc_id, string name, hid_t dtype_id,
         hid_t lcpl_id = H5P.DEFAULT, hid_t tcpl_id = H5P.DEFAULT,
@@ -559,8 +557,8 @@ internal sealed partial class H5T
     /// <param name="tapl_id">A datatype access property list identifier.</param>
     /// <returns></returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tcommit_anon",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t commit_anon
         (hid_t loc_id, hid_t dtype_id, hid_t tcpl_id = H5P.DEFAULT,
         hid_t tapl_id = H5P.DEFAULT);
@@ -575,8 +573,8 @@ internal sealed partial class H5T
     /// for <code>FALSE</code>, if the datatype has not been committed.
     /// Otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tcommitted",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern htri_t committed(hid_t dtype_id);
 
     /// <summary>
@@ -590,8 +588,8 @@ internal sealed partial class H5T
     /// for <code>FALSE</code>, if the datatype has not been committed.
     /// Otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tcompiler_conv",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern htri_t compiler_conv(hid_t src_id, hid_t dst_id);
 
     /// <summary>
@@ -607,8 +605,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tconvert",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t convert
         (hid_t src_type_id, hid_t dest_type_id, size_t nelmts,
         IntPtr buf, IntPtr background, hid_t plist_id = H5P.DEFAULT);
@@ -620,10 +618,10 @@ internal sealed partial class H5T
     /// <param name="type_id">Identifier of datatype to copy.</param>
     /// <returns>Returns a datatype identifier if successful; otherwise
     /// returns a negative value</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcopy")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t copy(hid_t type_id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tcopy",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t copy(hid_t type_id);
 
     /// <summary>
     /// Creates a new datatype.
@@ -633,10 +631,10 @@ internal sealed partial class H5T
     /// <param name="size">Size, in bytes, of the datatype being created</param>
     /// <returns>Returns datatype identifier if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcreate")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t create(class_t cls, size_t size);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tcreate",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t create(class_t cls, size_t size);
 
     /// <summary>
     /// Decode a binary object description of datatype and return a new
@@ -646,10 +644,10 @@ internal sealed partial class H5T
     /// <param name="buf">Buffer for the datatype object to be decoded.</param>
     /// <returns>Returns an object identifier (non-negative) if successful;
     /// otherwise returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tdecode")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t decode(byte[] buf);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tdecode",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t decode(byte[] buf);
 
     /// <summary>
     /// Determines whether a datatype contains any datatypes of the given
@@ -661,8 +659,8 @@ internal sealed partial class H5T
     /// <returns>Returns <code>TRUE</code> or <code>FALSE</code> if
     /// successful; otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tdetect_class",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern htri_t detect_class
         (hid_t dtype_id, class_t dtype_class);
 
@@ -677,8 +675,8 @@ internal sealed partial class H5T
     /// <param name="nalloc">The size of the buffer allocated or needed.</param>
     /// <returns></returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tencode",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t encode
         (hid_t obj_id, byte[] buf, ref size_t nalloc);
 
@@ -691,8 +689,8 @@ internal sealed partial class H5T
     /// <returns>Returns the datatype identifier for the new enumeration
     /// datatype if successful; otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tenum_create",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t enum_create(hid_t dtype_id);
 
     /// <summary>
@@ -708,8 +706,8 @@ internal sealed partial class H5T
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tenum_insert",
         CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
-    ]
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t enum_insert
         (hid_t dtype_id, string name, IntPtr value);
 
@@ -728,8 +726,8 @@ internal sealed partial class H5T
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tenum_nameof",
         CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
-    ]
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t enum_nameof
         (hid_t dtype_id, IntPtr value, [In][Out] StringBuilder name, size_t size);
 
@@ -747,8 +745,8 @@ internal sealed partial class H5T
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tenum_valueof",
         CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
-    ]
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t enum_valueof
         (hid_t dtype_id, string name, IntPtr value);
 
@@ -764,8 +762,8 @@ internal sealed partial class H5T
     /// for <code>FALSE</code>, if the datatype has not been committed.
     /// Otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tequal",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern htri_t equal(hid_t type_id1, hid_t type_id2);
 
     /// <summary>
@@ -778,8 +776,8 @@ internal sealed partial class H5T
     /// <returns>Returns a pointer to a suitable conversion function if
     /// successful. Otherwise returns <code>NULL</code>.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tfind",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern conv_t find
         (hid_t src_id, hid_t dst_id, ref cdata_t pcdata);
 
@@ -792,8 +790,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tflush",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t flush(hid_t type_id);
 
     /// <summary>
@@ -805,8 +803,8 @@ internal sealed partial class H5T
     /// <returns>Returns the non-negative number of dimensions of the array
     /// type if successful; otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_array_dims2",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern int get_array_dims
         (hid_t adtype_id, hsize_t[] dims);
 
@@ -818,8 +816,8 @@ internal sealed partial class H5T
     /// <returns>Returns the rank of the array if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_array_ndims",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern int get_array_ndims(hid_t adtype_id);
 
     /// <summary>
@@ -830,8 +828,8 @@ internal sealed partial class H5T
     /// <returns>Returns datatype class identifier if successful; otherwise
     /// <code>H5T_NO_CLASS</code>.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_class",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern class_t get_class(hid_t dtype_id);
 
     /// <summary>
@@ -842,8 +840,8 @@ internal sealed partial class H5T
     /// <returns>Returns a datatype property list identifier if successful;
     /// otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_create_plist",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t get_create_plist(hid_t dtype_id);
 
     /// <summary>
@@ -854,8 +852,8 @@ internal sealed partial class H5T
     /// <returns>Returns a valid character set type if successful;
     /// otherwise <code>H5T.cset_t.CSET_ERROR</code>.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_cset",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern cset_t get_cset(hid_t dtype_id);
 
     /// <summary>
@@ -865,8 +863,8 @@ internal sealed partial class H5T
     /// <param name="dtype_id">Identifier of datatype to query.</param>
     /// <returns>Returns the bias if successful; otherwise 0.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_ebias",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern size_t get_ebias(hid_t dtype_id);
 
     /// <summary>
@@ -887,8 +885,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_fields",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t get_fields
         (hid_t dtype_id, ref size_t spos, ref size_t epos,
         ref size_t esize, ref size_t mpos, ref size_t msize);
@@ -902,8 +900,8 @@ internal sealed partial class H5T
     /// <returns>Returns a valid padding type if successful; otherwise
     /// <code>H5T.pad_t.ERROR</code>.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_inpad",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern pad_t get_inpad(hid_t dtype_id);
 
     /// <summary>
@@ -915,8 +913,8 @@ internal sealed partial class H5T
     /// <returns>Returns the datatype class, a non-negative value, if
     /// successful; otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_member_class",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern class_t get_member_class
         (hid_t cdtype_id, uint member_no);
 
@@ -932,8 +930,8 @@ internal sealed partial class H5T
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_member_index",
         CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
-    ]
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern int get_member_index
         (hid_t dtype_id, string field_name);
 
@@ -949,8 +947,8 @@ internal sealed partial class H5T
     /// <remarks>The caller is responsible for freeing the allocated
     /// memory.</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_member_name",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern IntPtr get_member_name
         (hid_t dtype_id, uint field_idx);
 
@@ -963,8 +961,8 @@ internal sealed partial class H5T
     /// requested.</param>
     /// <returns></returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_member_offset",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern size_t get_member_offset
         (hid_t dtype_id, uint memb_no);
 
@@ -978,8 +976,8 @@ internal sealed partial class H5T
     /// <returns>Returns the identifier of a copy of the datatype of the
     /// field if successful; otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_member_type",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t get_member_type
         (hid_t dtype_id, uint field_idx);
 
@@ -995,8 +993,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_member_value",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t get_member_value
         (hid_t dtype_id, uint memb_no, IntPtr value);
 
@@ -1010,8 +1008,8 @@ internal sealed partial class H5T
     /// <returns>Returns the native datatype identifier for the specified
     /// dataset datatype if successful; otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_native_type",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t get_native_type
         (hid_t dtype_id, direction_t direction);
 
@@ -1024,8 +1022,8 @@ internal sealed partial class H5T
     /// <returns>Returns the number of elements if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_nmembers",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern int get_nmembers(hid_t dtype_id);
 
     /// <summary>
@@ -1036,8 +1034,8 @@ internal sealed partial class H5T
     /// <returns>Returns a valid normalization type if successful;
     /// otherwise <code>H5T.norm_t.ERROR</code>.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_norm",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern norm_t get_norm(hid_t dtype_id);
 
     /// <summary>
@@ -1048,8 +1046,8 @@ internal sealed partial class H5T
     /// <returns>Returns an offset value if successful; otherwise returns a
     /// negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_offset",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern int get_offset(hid_t dtype_id);
 
     /// <summary>
@@ -1060,8 +1058,8 @@ internal sealed partial class H5T
     /// <returns>Returns a byte order constant if successful; otherwise
     /// <code>H5T.order_t.ERROR</code>.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_order",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern order_t get_order(hid_t dtype_id);
 
     /// <summary>
@@ -1077,8 +1075,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_pad",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t get_pad
         (hid_t dtype_id, ref pad_t lsb, ref pad_t msb);
 
@@ -1090,8 +1088,8 @@ internal sealed partial class H5T
     /// <returns>Returns the number of significant bits if successful;
     /// otherwise 0.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_precision",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern size_t get_precision(hid_t dtype_id);
 
     /// <summary>
@@ -1102,8 +1100,8 @@ internal sealed partial class H5T
     /// <returns>Returns a valid sign type if successful; otherwise
     /// <code>H5T.sign_t.ERROR</code>.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_sign",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern sign_t get_sign(hid_t dtype_id);
 
     /// <summary>
@@ -1114,8 +1112,8 @@ internal sealed partial class H5T
     /// <returns>Returns the size of the datatype in bytes if successful;
     /// otherwise 0.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_size",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern size_t get_size(hid_t dtype_id);
 
     /// <summary>
@@ -1126,8 +1124,8 @@ internal sealed partial class H5T
     /// <returns>Returns a valid string storage mechanism if successful;
     /// otherwise <code>H5T.str_t.ERROR</code>.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_strpad",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern str_t get_strpad(hid_t dtype_id);
 
     /// <summary>
@@ -1139,8 +1137,8 @@ internal sealed partial class H5T
     /// <returns>Returns the datatype identifier for the base datatype if
     /// successful; otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_super",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t get_super(hid_t dtype_id);
 
     /// <summary>
@@ -1153,8 +1151,8 @@ internal sealed partial class H5T
     /// <remarks>The caller is responsible for freeing the allocated
     /// memory.</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tget_tag",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern IntPtr get_tag(hid_t dtype_id);
 
     /// <summary>
@@ -1171,8 +1169,8 @@ internal sealed partial class H5T
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tinsert",
         CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
-    ]
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t insert
         (hid_t dtype_id, string name, size_t offset, hid_t field_id);
 
@@ -1184,8 +1182,8 @@ internal sealed partial class H5T
     /// <returns>Returns <code>TRUE</code> or <code>FALSE</code> if
     /// successful; otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tis_variable_str",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern htri_t is_variable_str(hid_t dtype_id);
 
     /// <summary>
@@ -1196,8 +1194,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tlock",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t lock_datatype(hid_t dtype_id);
 
     /// <summary>
@@ -1211,8 +1209,8 @@ internal sealed partial class H5T
     /// <returns>Returns a committed datatype identifier if successful;
     /// otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Topen2",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t open
         (hid_t loc_id, byte[] name, hid_t tapl_id = H5P.DEFAULT);
 
@@ -1229,8 +1227,8 @@ internal sealed partial class H5T
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Topen2",
         CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
-    ]
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t open
         (hid_t loc_id, string name, hid_t tapl_id = H5P.DEFAULT);
 
@@ -1242,8 +1240,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tpack",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t pack(hid_t dtype_id);
 
     /// <summary>
@@ -1255,8 +1253,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Trefresh",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t H5Trefresh(hid_t type_id);
 
     /// <summary>
@@ -1274,8 +1272,8 @@ internal sealed partial class H5T
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tregister",
         CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
-    ]
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t register(pers_t type, string name,
         hid_t src_id, hid_t dst_id, conv_t func);
 
@@ -1288,8 +1286,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_cset",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_cset(hid_t dtype_id, cset_t cset);
 
     /// <summary>
@@ -1301,8 +1299,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_ebias",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_ebias(hid_t dtype_id, size_t ebias);
 
     /// <summary>
@@ -1319,8 +1317,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_fields",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_fields
         (hid_t dtype_id, size_t spos, size_t epos, size_t esize,
         size_t mpos, size_t msize);
@@ -1334,8 +1332,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_inpad",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_inpad(hid_t dtype_id, pad_t inpad);
 
     /// <summary>
@@ -1347,8 +1345,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_norm",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_norm(hid_t dtype_id, norm_t norm);
 
     /// <summary>
@@ -1360,8 +1358,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_offset",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_offset(hid_t dtype_id, size_t offset);
 
     /// <summary>
@@ -1373,8 +1371,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_order",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_order(hid_t dtype_id, order_t order);
 
     /// <summary>
@@ -1387,8 +1385,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_pad",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_pad
         (hid_t dtype_id, pad_t lsb, pad_t msb);
 
@@ -1401,8 +1399,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_precision",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_precision
         (hid_t dtype_id, size_t precision);
 
@@ -1415,8 +1413,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_sign",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_sign(hid_t dtype_id, sign_t sign);
 
     /// <summary>
@@ -1429,8 +1427,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_size",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_size(hid_t dtype_id, size_t size);
 
     /// <summary>
@@ -1442,8 +1440,8 @@ internal sealed partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_strpad",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_strpad(hid_t dtype_id, str_t strpad);
 
     /// <summary>
@@ -1461,8 +1459,8 @@ internal sealed partial class H5T
     /// 256 bytes </remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_tag",
         CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
-    ]
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_tag(hid_t dtype_id, string tag);
 
     /// <summary>
@@ -1480,8 +1478,8 @@ internal sealed partial class H5T
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tunregister",
         CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Ansi)
-    ]
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t unregister
         (pers_t type, string name, hid_t src_id, hid_t dst_id, conv_t func);
 
@@ -1493,7 +1491,7 @@ internal sealed partial class H5T
     /// <returns>Returns datatype identifier if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tvlen_create",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t vlen_create(hid_t base_type_id);
 }

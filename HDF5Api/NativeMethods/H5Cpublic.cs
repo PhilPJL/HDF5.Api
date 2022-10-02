@@ -15,7 +15,8 @@
 
 namespace HDF5Api.NativeMethods;
 
-internal sealed class H5C
+[SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+internal static class H5C
 {
     static H5C() { _ = H5.open(); }
 
@@ -39,3 +40,4 @@ internal sealed class H5C
         AGE_OUT_WITH_THRESHOLD
     };
 }
+

@@ -13,16 +13,15 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-
-
 namespace HDF5Api.NativeMethods;
 
-internal sealed partial class H5
+[SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+internal static class H5
 {
     static H5()
     {
-        //NativeDependencies.ResolvePathToExternalDependencies();
+        // TODO ?
+        // NativeDependencies.ResolvePathToExternalDependencies();
     }
 
     public const hsize_t HSIZE_UNDEF = unchecked((hsize_t)(hssize_t)(-1));
@@ -132,10 +131,10 @@ internal sealed partial class H5
     /// On success, returns pointer to newly allocated buffer or returns
     /// NULL if size is 0 (zero). Returns NULL on failure.
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5allocate_memory")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial IntPtr allocate_memory
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5allocate_memory",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern IntPtr allocate_memory
         (IntPtr size, hbool_t clear);
 
     /// <summary>
@@ -147,10 +146,10 @@ internal sealed partial class H5
     /// Returns a non-negative value if successful; otherwise returns a
     /// negative value.
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5close")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t close();
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5close",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t close();
 
     /// <summary>
     /// Instructs library not to install atexit cleanup routine.
@@ -160,10 +159,10 @@ internal sealed partial class H5
     /// Returns a non-negative value if successful; otherwise returns a
     /// negative value.
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5dont_atexit")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t dont_atexit();
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5dont_atexit",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t dont_atexit();
 
     /// <summary>
     /// Frees memory allocated by the HDF5 Library.
@@ -176,10 +175,10 @@ internal sealed partial class H5
     /// Returns a non-negative value if successful; otherwise returns a
     /// negative value.
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5free_memory")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t free_memory(IntPtr buf);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5free_memory",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t free_memory(IntPtr buf);
 
     /// <summary>
     /// Garbage collects on all free-lists of all types.
@@ -189,10 +188,10 @@ internal sealed partial class H5
     /// Returns a non-negative value if successful; otherwise returns a
     /// negative value.
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5garbage_collect")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t garbage_collect();
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5garbage_collect",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t garbage_collect();
 
     /// <summary>
     /// Returns the HDF library release number.
@@ -211,10 +210,10 @@ internal sealed partial class H5
     /// Returns a non-negative value if successful; otherwise returns a
     /// negative value.
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5get_libversion")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_libversion
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5get_libversion",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_libversion
         (ref uint majnum, ref uint minnum, ref uint relnum);
 
     /// <summary>
@@ -230,10 +229,10 @@ internal sealed partial class H5
     /// Returns a non-negative value if successful; otherwise returns a
     /// negative value.
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5is_library_threadsafe")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t is_library_threadsafe(ref hbool_t is_ts);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5is_library_threadsafe",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t is_library_threadsafe(ref hbool_t is_ts);
 
     /// <summary>
     /// Initializes the HDF5 library.
@@ -243,10 +242,10 @@ internal sealed partial class H5
     /// Returns a non-negative value if successful; otherwise returns a
     /// negative value.
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5open")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t open();
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5open",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t open();
 
     /// <summary>
     /// Resizes and possibly re-allocates memory that will later be freed
@@ -263,10 +262,10 @@ internal sealed partial class H5
     /// On success, returns pointer to resized or reallocated buffer or
     /// returns NULL if size is 0 (zero). Returns NULL on failure.
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5resize_memory")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial IntPtr resize_memory(IntPtr mem, IntPtr size);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5resize_memory",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern IntPtr resize_memory(IntPtr mem, IntPtr size);
 
 
     /// <summary>
@@ -302,10 +301,11 @@ internal sealed partial class H5
     /// Returns a non-negative value if successful; otherwise returns a
     /// negative value.
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5set_free_list_limits")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t set_free_list_limits
+    [DllImport(Constants.DLLFileName,
+        EntryPoint = "H5set_free_list_limits",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t set_free_list_limits
         (int reg_global_lim, int reg_list_lim, int arr_global_lim,
         int arr_list_lim, int blk_global_lim, int blk_list_lim);
 }

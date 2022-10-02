@@ -13,13 +13,9 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-using uint32_t = System.UInt32;
-
-
-
 namespace HDF5Api.NativeMethods;
 
-internal sealed partial class H5DO
+internal static class H5DO
 {
     static H5DO() { _ = H5.open(); }
 
@@ -37,10 +33,10 @@ internal sealed partial class H5DO
     /// <param name="buf">Buffer containing the chunk read from the dataset</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.HLDLLFileName, EntryPoint = "H5DOread_chunk")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t read_chunk
+    [DllImport(Constants.HLDLLFileName, EntryPoint = "H5DOread_chunk",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t read_chunk
         (hid_t dset_id, hid_t dxpl_id, ref hsize_t offset,
         ref uint32_t filter_mask, IntPtr buf);
 
@@ -58,10 +54,10 @@ internal sealed partial class H5DO
     /// <param name="buf">Buffer containing data to be written to the file</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.HLDLLFileName, EntryPoint = "H5DOwrite_chunk")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t write_chunk
+    [DllImport(Constants.HLDLLFileName, EntryPoint = "H5DOwrite_chunk",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t write_chunk
         (hid_t dset_id, hid_t dxpl_id, uint32_t filter_mask,
         ref hsize_t offset, size_t data_size, IntPtr buf);
 
@@ -78,10 +74,10 @@ internal sealed partial class H5DO
     /// <param name="buf">Data buffer.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.HLDLLFileName, EntryPoint = "H5DOappend")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t append
+    [DllImport(Constants.HLDLLFileName, EntryPoint = "H5DOappend",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t append
         (hid_t dset_id, hid_t dxpl_id, uint axis,
         size_t num_elem, hid_t memtype, IntPtr buf);
 

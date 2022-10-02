@@ -13,9 +13,6 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-
-
 namespace HDF5Api.NativeMethods;
 
 internal delegate T Converter<T>(IntPtr address);
@@ -161,7 +158,7 @@ internal class H5UnixDllImporter : H5DLLImporter
         if (hLib == IntPtr.Zero)
         {
             throw new ArgumentException(
-                String.Format(
+                string.Format(
                     "Unable to load unmanaged module \"{0}\"",
                     libName));
         }

@@ -13,11 +13,9 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-
-
 namespace HDF5Api.NativeMethods;
 
+[SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
 internal sealed partial class H5R
 {
     static H5R() { _ = H5.open(); }

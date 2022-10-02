@@ -13,18 +13,15 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-using uint32_t = System.UInt32;
-
-
-
 namespace HDF5Api.NativeMethods;
 
-internal sealed unsafe partial class H5D
+[SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+internal static class H5D
 {
     static H5D() { _ = H5.open(); }
 
-    public readonly size_t CACHE_NSLOTS_DEFAULT = new(-1);
-    public readonly size_t CACHE_NBYTES_DEFAULT = new(-1);
+    public readonly static size_t CACHE_NSLOTS_DEFAULT = new(-1);
+    public readonly static size_t CACHE_NBYTES_DEFAULT = new(-1);
     public const float CACHE_W0_DEFAULT = -1.0f;
 
     /// <summary>
@@ -85,7 +82,7 @@ internal sealed unsafe partial class H5D
         /// v2 B-tree index (for >1 unlimited dims)
         /// </summary>
         BT2 = 5,
-        IDX_NTYPES = 6
+        IDX_NTYPES = 6,
     }
 
     /// <summary>
@@ -233,10 +230,10 @@ internal sealed unsafe partial class H5D
     /// </param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dclose")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t close(hid_t dset_id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dclose",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t close(hid_t dset_id);
 
     /// <summary>
     /// Creates a new dataset and links it into the file.
@@ -251,10 +248,10 @@ internal sealed unsafe partial class H5D
     /// <param name="dapl_id">Dataset access property list</param>
     /// <returns>Returns a dataset identifier if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dcreate2")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t create
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dcreate2",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t create
         (hid_t loc_id, byte[] name, hid_t type_id, hid_t space_id,
         hid_t lcpl_id = H5P.DEFAULT, hid_t dcpl_id = H5P.DEFAULT,
         hid_t dapl_id = H5P.DEFAULT);
@@ -273,10 +270,11 @@ internal sealed unsafe partial class H5D
     /// <returns>Returns a dataset identifier if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dcreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t create
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dcreate2",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t create
         (hid_t loc_id, string name, hid_t type_id, hid_t space_id,
         hid_t lcpl_id = H5P.DEFAULT, hid_t dcpl_id = H5P.DEFAULT,
         hid_t dapl_id = H5P.DEFAULT);
@@ -295,10 +293,10 @@ internal sealed unsafe partial class H5D
     /// <param name="dapl_id">Dataset access property list identifier.</param>
     /// <returns>Returns a dataset identifier if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dcreate_anon")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t create_anon
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dcreate_anon",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t create_anon
         (hid_t file_id, hid_t type_id, hid_t space_id,
         hid_t dcpl_id = H5P.DEFAULT, hid_t dapl_id = H5P.DEFAULT);
 
@@ -316,10 +314,10 @@ internal sealed unsafe partial class H5D
     /// containing the selection to be filled.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dfill")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t fill
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dfill",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t fill
         (IntPtr fill, hid_t fill_type, IntPtr buf, hid_t buf_type,
         hid_t space);
 
@@ -330,20 +328,20 @@ internal sealed unsafe partial class H5D
     /// <param name="dset_id">Identifier of the dataset to be flushed.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dflush")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t flush(hid_t dset_id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dflush",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t flush(hid_t dset_id);
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="dset_id">Identifier of the dataset to be flushed.</param>
     /// <returns></returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dformat_convert")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t format_convert(hid_t dset_id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dformat_convert",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t format_convert(hid_t dset_id);
 
     /// <summary>
     /// Gathers data from a selection within a memory buffer.
@@ -368,10 +366,10 @@ internal sealed unsafe partial class H5D
     /// <paramref name="op"/>.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dgather")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t gather
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dgather",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t gather
         (hid_t src_space_id, IntPtr src_buf, hid_t type_id,
         size_t dst_buf_size, IntPtr dst_buf, gather_func_t op,
         IntPtr op_data);
@@ -384,10 +382,10 @@ internal sealed unsafe partial class H5D
     /// property list of.</param>
     /// <returns>Returns a dataset access property list identifier if
     /// Ssuccessful; otherwise returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_access_plist")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t get_access_plist(hid_t dset_id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_access_plist",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t get_access_plist(hid_t dset_id);
 
     /// <summary>
     /// 
@@ -395,10 +393,10 @@ internal sealed unsafe partial class H5D
     /// <param name="did"></param>
     /// <param name="idx_type"></param>
     /// <returns></returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_chunk_index_type")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_chunk_index_type
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_chunk_index_type",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_chunk_index_type
         (hid_t did, ref chunk_index_t idx_type);
 
     /// <summary>
@@ -415,10 +413,10 @@ internal sealed unsafe partial class H5D
     /// <param name="size">Chunk size in bytes.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_chunk_info")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_chunk_info
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_chunk_info",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern unsafe herr_t get_chunk_info
         (hid_t dset_id, hid_t fspace_id, hsize_t index, hsize_t* offset,
         ref uint32_t filter_mask, ref haddr_t addr, ref hsize_t size);
 
@@ -437,8 +435,8 @@ internal sealed unsafe partial class H5D
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_chunk_info",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t get_chunk_info
         (hid_t dset_id, hid_t fspace_id, hsize_t index, [In][Out] hsize_t[] offset,
         ref uint32_t filter_mask, ref haddr_t addr, ref hsize_t size);
@@ -455,10 +453,10 @@ internal sealed unsafe partial class H5D
     /// <param name="size">Chunk size in bytes.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_chunk_info_by_coord")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_chunk_info_by_coord
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_chunk_info_by_coord",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern unsafe herr_t get_chunk_info_by_coord
         (hid_t dset_id, hsize_t* offset, ref uint32_t filter_mask,
         ref haddr_t addr, ref hsize_t size);
 
@@ -475,8 +473,8 @@ internal sealed unsafe partial class H5D
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_chunk_info_by_coord",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t get_chunk_info_by_coord
         (hid_t dset_id, [In][Out] hsize_t[] offset, ref uint32_t filter_mask,
         ref haddr_t addr, ref hsize_t size);
@@ -490,10 +488,10 @@ internal sealed unsafe partial class H5D
     /// <param name="chunk_bytes">The chunk size in bytes.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_chunk_storage_size")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_chunk_storage_size
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_chunk_storage_size",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern unsafe herr_t get_chunk_storage_size
         (hid_t dset_id, hsize_t* offset, ref hsize_t chunk_bytes);
 
     /// <summary>
@@ -506,8 +504,8 @@ internal sealed unsafe partial class H5D
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_chunk_storage_size",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t get_chunk_storage_size
         (hid_t dset_id, [In][Out] hsize_t[] offset, ref hsize_t chunk_bytes);
 
@@ -519,10 +517,10 @@ internal sealed unsafe partial class H5D
     /// <param name="dset_id">Identifier of the dataset to query.</param>
     /// <returns>Returns a dataset creation property list identifier if
     /// successful; otherwise returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_create_plist")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t get_create_plist(hid_t dset_id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_create_plist",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t get_create_plist(hid_t dset_id);
 
     /// <summary>
     /// Retrieves number of chunks that have nonempty intersection with a specified selection.
@@ -533,10 +531,10 @@ internal sealed unsafe partial class H5D
     /// <param name="nchunks">Number of chunks in the selection.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_num_chunks")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t get_num_chunks(hid_t dset_id, hid_t fspace_id, ref hsize_t nchunks);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_num_chunks",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t get_num_chunks(hid_t dset_id, hid_t fspace_id, ref hsize_t nchunks);
 
     /// <summary>
     /// Returns dataset address in file.
@@ -545,10 +543,10 @@ internal sealed unsafe partial class H5D
     /// <param name="dset_id">Dataset identifier.</param>
     /// <returns>Returns the offset in bytes; otherwise returns
     /// <code>HADDR_UNDEF</code>, a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_offset")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial haddr_t get_offset(hid_t dset_id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_offset",
+       CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern haddr_t get_offset(hid_t dset_id);
 
     /// <summary>
     /// Returns an identifier for a copy of the dataspace for a dataset.
@@ -557,10 +555,10 @@ internal sealed unsafe partial class H5D
     /// <param name="dset_id">Identifier of the dataset to query.</param>
     /// <returns>Returns a dataspace identifier if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_space")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t get_space(hid_t dset_id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_space",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t get_space(hid_t dset_id);
 
     /// <summary>
     /// Determines whether space has been allocated for a dataset.
@@ -570,10 +568,10 @@ internal sealed unsafe partial class H5D
     /// <param name="allocation">Space allocation status.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_space_status")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t get_space_status
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_space_status",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_space_status
         (hid_t dset_id, ref space_status_t allocation);
 
     /// <summary>
@@ -584,10 +582,10 @@ internal sealed unsafe partial class H5D
     /// <returns>Returns the amount of storage space, in bytes, allocated
     /// for the dataset, not counting metadata; otherwise returns 0 (zero).
     /// </returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_storage_size")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hsize_t get_storage_size(hid_t dset_id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_storage_size",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hsize_t get_storage_size(hid_t dset_id);
 
     /// <summary>
     /// Returns an identifier for a copy of the datatype for a dataset.
@@ -596,10 +594,10 @@ internal sealed unsafe partial class H5D
     /// <param name="dset_id">Identifier of the dataset to query.</param>
     /// <returns>Returns a datatype identifier if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dget_type")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t get_type(hid_t dset_id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dget_type",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t get_type(hid_t dset_id);
 
     /// <summary>
     /// Iterates over all selected elements in a dataspace.
@@ -617,10 +615,10 @@ internal sealed unsafe partial class H5D
     /// <returns>Returns the return value of the last operator if it was
     /// non-zero, or zero if all elements have been processed. Otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Diterate")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t iterate
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Diterate",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t iterate
         (IntPtr buf, hid_t type_id, hid_t space_id,
         operator_t op, IntPtr op_data);
 
@@ -633,10 +631,10 @@ internal sealed unsafe partial class H5D
     /// <param name="dapl_id">Dataset access property list</param>
     /// <returns>Returns a dataset identifier if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dopen2")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t open
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dopen2",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t open
         (hid_t file_id, byte[] name, hid_t dapl_id = H5P.DEFAULT);
 
     /// <summary>
@@ -649,10 +647,11 @@ internal sealed unsafe partial class H5D
     /// <returns>Returns a dataset identifier if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dopen2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller))
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t open
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dopen2",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t open
         (hid_t file_id, string name, hid_t dapl_id = H5P.DEFAULT);
 
     /// <summary>
@@ -669,10 +668,10 @@ internal sealed unsafe partial class H5D
     /// <param name="buf">Buffer to receive data read from file.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dread")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t read
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dread",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t read
         (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id,
         hid_t file_space_id, hid_t plist_id, IntPtr buf);
 
@@ -690,10 +689,10 @@ internal sealed unsafe partial class H5D
     /// <param name="buf">Buffer containing the chunk read from the dataset</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dread_chunk")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t read_chunk
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dread_chunk",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t read_chunk
         (hid_t dset_id, hid_t dxpl_id, ref hsize_t offset,
         ref uint32_t filter_mask, IntPtr buf);
 
@@ -704,10 +703,10 @@ internal sealed unsafe partial class H5D
     /// <param name="dset_id">Identifier of the dataset to be refreshed.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Drefresh")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t refresh(hid_t dset_id);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Drefresh",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t refresh(hid_t dset_id);
 
     /// <summary>
     /// Scatters data into a selection within a memory buffer.
@@ -726,10 +725,10 @@ internal sealed unsafe partial class H5D
     /// scattered to.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dscatter")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t scatter
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dscatter",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t scatter
         (scatter_func_t op, IntPtr op_data, hid_t type_id,
         hid_t dst_space_id, IntPtr dst_buf);
 
@@ -742,10 +741,10 @@ internal sealed unsafe partial class H5D
     /// dimension of the dataset.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dset_extent")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t set_extent(hid_t dset_id, hsize_t[] size);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dset_extent",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t set_extent(hid_t dset_id, hsize_t[] size);
 
     /// <summary>
     /// Changes the sizes of a dataset’s dimensions.
@@ -756,10 +755,10 @@ internal sealed unsafe partial class H5D
     /// dimension of the dataset.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dset_extent")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t set_extent(hid_t dset_id, hsize_t* size);
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dset_extent",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern unsafe herr_t set_extent(hid_t dset_id, hsize_t* size);
 
     /// <summary>
     /// Determines the number of bytes required to store variable-length
@@ -773,10 +772,10 @@ internal sealed unsafe partial class H5D
     /// to store the VL data.</param>
     /// <returns>Returns non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dvlen_get_buf_size")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t vlen_get_buf_size
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dvlen_get_buf_size",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t vlen_get_buf_size
         (hid_t dataset_id, hid_t type_id, hid_t space_id, ref hsize_t size);
 
     /// <summary>
@@ -790,10 +789,10 @@ internal sealed unsafe partial class H5D
     /// <param name="buf">Pointer to the buffer to be reclaimed.</param>
     /// <returns>Returns non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dvlen_reclaim")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t vlen_reclaim
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dvlen_reclaim",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t vlen_reclaim
         (hid_t type_id, hid_t space_id, hid_t plist_id, IntPtr buf);
 
     /// <summary>
@@ -810,10 +809,10 @@ internal sealed unsafe partial class H5D
     /// <param name="buf">Buffer with data to be written to the file.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dwrite")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t write
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dwrite",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t write
         (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id,
         hid_t file_space_id, hid_t plist_id, IntPtr buf);
 
@@ -831,10 +830,10 @@ internal sealed unsafe partial class H5D
     /// <param name="buf">Buffer containing data to be written to the file</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dwrite_chunk")
-    ]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t write_chunk
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dwrite_chunk",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t write_chunk
         (hid_t dset_id, hid_t dxpl_id, uint32_t filter_mask,
         ref hsize_t offset, size_t data_size, IntPtr buf);
 }

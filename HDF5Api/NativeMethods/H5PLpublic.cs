@@ -13,12 +13,10 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-using uint32_t = System.UInt32;
-
 namespace HDF5Api.NativeMethods;
 
-#if false // NOT supported yet
-internal sealed class H5PL
+[SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+internal static class H5PL
 {
     static H5PL() { _ = H5.open(); }
 
@@ -41,8 +39,8 @@ internal sealed class H5PL
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5PLappend",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t append(string plugin_path);
 
     /// <summary>
@@ -55,8 +53,8 @@ internal sealed class H5PL
     /// <returns>Returns the length of the path, a non-negative value if
     /// successful; otherwise returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5PLget",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern ssize_t get(uint32_t index,
         StringBuilder pathname, IntPtr size);
 
@@ -69,8 +67,8 @@ internal sealed class H5PL
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5PLget_loading_state",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t get_loading_state(ref int plugin_flags);
 
     /// <summary>
@@ -82,8 +80,8 @@ internal sealed class H5PL
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5PLinsert",
-       CallingConvention = CallingConvention.Cdecl)
-    ]
+       CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t insert(string plugin_path,
         uint32_t index);
 
@@ -95,8 +93,8 @@ internal sealed class H5PL
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5PLprepend",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t prepend(string plugin_path);
 
     /// <summary>
@@ -107,8 +105,8 @@ internal sealed class H5PL
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5PLremove",
-       CallingConvention = CallingConvention.Cdecl)
-    ]
+       CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t remove(uint32_t index);
 
     /// <summary>
@@ -120,8 +118,8 @@ internal sealed class H5PL
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5PLreplace",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t replace(string plugin_path,
         uint32_t index);
 
@@ -134,8 +132,8 @@ internal sealed class H5PL
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5PLset_loading_state",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t set_loading_state(int plugin_flags);
 
     /// <summary>
@@ -147,8 +145,7 @@ internal sealed class H5PL
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5PLsize",
-        CallingConvention = CallingConvention.Cdecl)
-    ]
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t size(ref uint32_t listsize);
 }
-#endif
