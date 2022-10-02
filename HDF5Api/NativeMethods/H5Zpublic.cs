@@ -186,8 +186,7 @@ internal sealed unsafe partial class H5Z
     /// <param name="filter">Filter identifier.</param>
     /// <returns>Returns a Boolean value if successful;
     /// otherwise returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Zfilter_avail")
-    ]
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Zfilter_avail")]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial htri_t filter_avail(filter_t filter);
 
@@ -200,13 +199,13 @@ internal sealed unsafe partial class H5Z
     /// filter information</param>
     /// <returns>Returns a non-negative value on success, a negative value
     /// on failure.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Zget_filter_info")
-    ]
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Zget_filter_info")    ]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t get_filter_info
         (filter_t filter, ref uint filter_config);
 
-    /// <summary>
+    // TODO: class_t Not supported by LibraryImport
+/*    /// <summary>
     /// Registers new filter.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5Z.html#Compression-Register
     /// </summary>
@@ -214,11 +213,10 @@ internal sealed unsafe partial class H5Z
     /// containing filter-definition information.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Zregister")
-    ]
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Zregister")]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t register(ref class_t filter_class);
-
+*/
     /// <summary>
     /// Unregisters a filter.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5Z.html#Compression-Unregister
@@ -226,8 +224,7 @@ internal sealed unsafe partial class H5Z
     /// <param name="filter">Identifier of the filter to be unregistered.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Zunregister")
-    ]
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Zunregister")]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t unregister(filter_t filter);
 }
