@@ -20,9 +20,9 @@ internal static class H5FAdapter
 
     #region Create
 
-    public static H5File Create(string path, H5PropertyList? fileCreationPropertyList = null, H5PropertyList? fileAccessPropertyList = null)
+    public static H5File Create(string path, bool failIfExists = false, H5PropertyList? fileCreationPropertyList = null, H5PropertyList? fileAccessPropertyList = null)
     {
-        long h = create(path, ACC_TRUNC, fileCreationPropertyList, fileAccessPropertyList);
+        long h = create(path, failIfExists ? ACC_EXCL : ACC_TRUNC, fileCreationPropertyList, fileAccessPropertyList);
 
         h.ThrowIfInvalidHandleValue(nameof(create));
 
@@ -33,7 +33,7 @@ internal static class H5FAdapter
 
     public static H5File Open(string path, bool readOnly, H5PropertyList? fileAccessPropertyList = null)
     {
-        long h = open(path, (uint)(readOnly ? ACC_RDONLY : ACC_RDWR), fileAccessPropertyList);
+        long h = open(path, readOnly ? ACC_RDONLY : ACC_RDWR, fileAccessPropertyList);
 
         h.ThrowIfInvalidHandleValue(nameof(open));
 

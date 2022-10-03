@@ -10,5 +10,5 @@ namespace HDF5Api;
 public interface IH5DataSetWriter<in TInput> : IDisposable
 {
     void Write(IEnumerable<TInput> recordsChunk);
-    int RowsWritten { get; }
+    long RowsWritten { get; }
 }

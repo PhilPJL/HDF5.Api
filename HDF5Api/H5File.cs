@@ -7,11 +7,12 @@ using HDF5Api.NativeMethodAdapters;
 namespace HDF5Api;
 
 /// <summary>
-///     Wrapper for H5F (File) API.
+///     <para>.NET friendly wrapper for H5F (File) API.</para>
+///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_f.html"/>
 /// </summary>
 public class H5File : H5Location<H5File>
 {
-    public H5File(long handle) : base(handle, H5FAdapter.Close)
+    internal H5File(long handle) : base(handle, H5FAdapter.Close)
     {
     }
 
@@ -23,34 +24,40 @@ public class H5File : H5Location<H5File>
     /// <summary>
     ///     Open an existing file.  By default opens read-write.
     /// </summary>
-    public static H5File Open([DisallowNull] string path, bool readOnly = false)
+    public static H5File Open([DisallowNull] string path, bool readOnly = false, 
+        [AllowNull] H5PropertyList? fileAccessPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
-        return H5FAdapter.Open(path, readOnly);
+        return H5FAdapter.Open(path, readOnly, fileAccessPropertyList);
     }
 
     /// <summary>
     ///     Open an existing file (by default read-write) or create new.
     /// </summary>
-    public static H5File OpenOrCreate([DisallowNull] string path, bool readOnly = false)
+    public static H5File OpenOrCreate([DisallowNull] string path, bool readOnly = false,
+        [AllowNull] H5PropertyList? fileCreationPropertyList = null,
+        [AllowNull] H5PropertyList? fileAccessPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
         return File.Exists(path)
-            ? H5FAdapter.Open(path, readOnly)
-            : H5FAdapter.Create(path);
+            ? H5FAdapter.Open(path, readOnly, fileAccessPropertyList)
+            : H5FAdapter.Create(path, true, fileCreationPropertyList, fileAccessPropertyList);
     }
 
     /// <summary>
     /// Create a new H5 file
     /// </summary>
-    /// <param name="path">Path to the file</param>
-    public static H5File Create([DisallowNull] string path)
+    /// <param name="path">Path of the file</param>
+    public static H5File Create([DisallowNull] string path, 
+        bool failIfExists = false, 
+        [AllowNull] H5PropertyList? fileCreationPropertyList = null, 
+        [AllowNull] H5PropertyList? fileAccessPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
-        return H5FAdapter.Create(path);
+        return H5FAdapter.Create(path, failIfExists, fileCreationPropertyList, fileAccessPropertyList);
     }
 }
 
@@ -61,6 +68,7 @@ public enum H5ObjectTypes : uint
     Attribute = H5F.OBJ_ATTR,
     DataSet = H5F.OBJ_DATASET,
     DataType = H5F.OBJ_DATATYPE,
+    File = H5F.OBJ_FILE,
     Group = H5F.OBJ_GROUP,
     Local = H5F.OBJ_LOCAL
 }

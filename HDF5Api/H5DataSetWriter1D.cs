@@ -27,14 +27,14 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
     private H5Type Type { get; set; }
     private IH5TypeAdapter<TInput> Converter { get; }
     private bool OwnsDataSet { get; }
-    public int RowsWritten { get; private set; }
+    public long RowsWritten { get; private set; }
 
     protected override void Dispose(bool disposing)
     {
         if (disposing)
         {
             // Finalize the length of the data set
-            DataSet.SetExtent(new[] { (ulong)RowsWritten });
+            DataSet.SetExtent(new[] { RowsWritten });
 
             // We may own the data-set
             if (OwnsDataSet)
@@ -55,15 +55,15 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
         int numRecords = recordsChunk.Count();
 
         // Extend the dataset to accept this chunk
-        DataSet.SetExtent(new[] { (ulong)(RowsWritten + numRecords) });
+        DataSet.SetExtent(new[] { RowsWritten + numRecords });
 
         // Move the hyperslab window
         using (var fileSpace = DataSet.GetSpace())
         {
-            fileSpace.SelectHyperSlab(RowsWritten, numRecords);
+            fileSpace.SelectHyperslab(RowsWritten, numRecords);
 
             // Match the space to length of records retrieved.
-            using var recordSpace = H5SAdapter.CreateSimple(new Dimension((ulong)numRecords));
+            using var recordSpace = H5SAdapter.CreateSimple(new Dimension(numRecords));
 
             // Configure most parameters for DataSet.WriteChunk and then pass the curried method as an Action<IntPtr> to Converter which only needs to supply the last param.
             Converter.Write(WriteAdaptor(DataSet, Type, recordSpace, fileSpace), recordsChunk);

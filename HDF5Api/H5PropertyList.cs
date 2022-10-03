@@ -14,7 +14,7 @@ public class H5PropertyList : H5Object<H5PropertyList>
     }
       
     // TODO: remove rank
-    public void SetChunk(int rank, [DisallowNull] params ulong[] dims)
+    public void SetChunk(int rank, [DisallowNull] params long[] dims)
     {
         Guard.IsNotNull(dims, nameof(dims));
         Guard.IsGreaterThanOrEqualTo(1, dims.Length, nameof(dims));
@@ -34,8 +34,10 @@ public class H5PropertyList : H5Object<H5PropertyList>
         H5PAdapter.EnableDeflateCompression(this, level);
     }
 
-    public static H5PropertyList Create(PropertyList list)
+    public static H5PropertyList Create([DisallowNull] PropertyList list)
     {
+        Guard.IsNotNull(list);
+
         return list switch
         {
             PropertyList.DataSetCreate => H5PAdapter.Create(DATASET_CREATE),

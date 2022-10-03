@@ -16,8 +16,7 @@ public interface IH5Location : IH5ObjectWithAttributes
     bool GroupPathExists(string path);
     void DeleteGroup(string name);
 
-    H5DataSet CreateDataSet(string name, H5Type typeId, H5Space space,
-        H5PropertyList propertyList);
+    H5DataSet CreateDataSet(string name, H5Type typeId, H5Space space, H5PropertyList propertyList);
     H5DataSet OpenDataSet(string name);
     bool DataSetExists(string name);
     // TODO: DeleteDataSet by name?

@@ -38,7 +38,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5DAdapter.GetSpace(this);
     }
 
-    public void SetExtent([DisallowNull] params ulong[] dims)
+    public void SetExtent([DisallowNull] params long[] dims)
     {
         Guard.IsNotNull(dims);
 

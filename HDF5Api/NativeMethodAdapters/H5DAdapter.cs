@@ -1,4 +1,5 @@
 ﻿using HDF5Api.NativeMethods;
+using System.Linq;
 using static HDF5Api.NativeMethods.H5D;
 
 namespace HDF5Api.NativeMethodAdapters;
@@ -57,9 +58,10 @@ internal static class H5DAdapter
 
         return err > 0;
     }
-    public static void SetExtent(H5DataSet dataSetId, ulong[] dimensions)
+
+    public static void SetExtent(H5DataSet dataSetId, params long[] dimensions)
     {
-        int err = set_extent(dataSetId, dimensions);
+        int err = set_extent(dataSetId, dimensions.Select(d => (ulong)d).ToArray());
 
         err.ThrowIfError(nameof(set_extent));
     }
@@ -71,6 +73,7 @@ internal static class H5DAdapter
         err.ThrowIfError(nameof(write));
     }
 */
+
     public static void Write<T>(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, Span<T> buffer, H5PropertyList? transferPropertyList = null) where T : unmanaged
     {
         int err = write(dataSet, type, memorySpace, fileSpace, transferPropertyList, MemoryMarshal.Cast<T, byte>(buffer));

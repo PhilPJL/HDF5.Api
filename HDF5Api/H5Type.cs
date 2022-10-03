@@ -1,4 +1,4 @@
-﻿using System;
+﻿using CommunityToolkit.Diagnostics;
 using HDF5Api.NativeMethodAdapters;
 using HDF5Api.NativeMethods;
 
@@ -40,22 +40,31 @@ public class H5Type : H5Object<H5Type>
         return new H5Type(nativeHandle, null);
     }
 
-    public H5Type Insert(string name, int offset, H5Type dataTypeId)
+    public H5Type Insert([DisallowNull] string name, int offset, [DisallowNull] H5Type dataType)
     {
-        H5TAdapter.Insert(this, name, new IntPtr(offset), dataTypeId);
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(dataType);
+
+        H5TAdapter.Insert(this, name, new IntPtr(offset), dataType);
         return this;
     }
 
-    public H5Type Insert(string name, IntPtr offset, H5Type dataTypeId)
+    public H5Type Insert([DisallowNull] string name, IntPtr offset, [DisallowNull] H5Type dataType)
     {
-        H5TAdapter.Insert(this, name, offset, dataTypeId);
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(dataType);
+
+        H5TAdapter.Insert(this, name, offset, dataType);
         return this;
     }
 
-    public H5Type Insert<S>(string name, H5Type dataTypeId) where S : struct
+    public H5Type Insert<S>([DisallowNull] string name, [DisallowNull] H5Type dataType) where S : struct
     {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(dataType);
+
         var offset = Marshal.OffsetOf<S>(name);
-        H5TAdapter.Insert(this, name, offset, dataTypeId);
+        H5TAdapter.Insert(this, name, offset, dataType);
         return this;
     }
 

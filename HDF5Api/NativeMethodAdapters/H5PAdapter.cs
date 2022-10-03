@@ -1,4 +1,5 @@
 ﻿using HDF5Api.NativeMethods;
+using System.Linq;
 using static HDF5Api.NativeMethods.H5P;
 
 namespace HDF5Api.NativeMethodAdapters;
@@ -21,9 +22,9 @@ internal static class H5PAdapter
         return new H5PropertyList(h);
     }
 
-    public static void SetChunk(H5PropertyList propertyList, int rank, ulong[] dims)
+    public static void SetChunk(H5PropertyList propertyList, int rank, long[] dims)
     {
-        int err = set_chunk(propertyList, rank, dims);
+        int err = set_chunk(propertyList, rank, dims.Select(d => (ulong)d).ToArray());
 
         err.ThrowIfError(nameof(set_chunk));
     }

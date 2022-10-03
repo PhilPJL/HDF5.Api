@@ -26,7 +26,7 @@ public static class H5AttributeWriter
 /// </remarks>
 public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
 {
-    public int RowsWritten { get; private set; }
+    public long RowsWritten { get; private set; }
     private H5Type Type { get; set; }
     private IH5TypeAdapter<TInput> Converter { get; }
     private Func<TInput, string> GetAttributeName { get; }

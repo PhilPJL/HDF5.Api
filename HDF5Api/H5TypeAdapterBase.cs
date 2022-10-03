@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace HDF5Api;
+﻿namespace HDF5Api;
 
 public abstract class H5TypeAdapterBase
 {

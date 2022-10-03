@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace HDF5Api;
 
@@ -10,5 +9,5 @@ namespace HDF5Api;
 public interface IH5AttributeWriter<in TInput> : IDisposable
 {
     void Write(IEnumerable<TInput> recordsChunk);
-    int RowsWritten { get; }
+    long RowsWritten { get; }
 }

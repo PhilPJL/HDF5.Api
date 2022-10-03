@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CommunityToolkit.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
 using static HDF5Api.NativeMethods.H5S;
 
@@ -24,7 +25,7 @@ internal static class H5SAdapter
     }
 
     //TODO: expose other params
-    public static void SelectHyperSlab(H5Space space, int offset, int count)
+    public static void SelectHyperslab(H5Space space, long offset, long count)
     {
         int err = select_hyperslab(
             space, seloper_t.SET, new[] { (ulong)offset }, null!, new[] { (ulong)count }, null!);
@@ -61,7 +62,6 @@ internal static class H5SAdapter
     }
 }
 
-// TODO: argument validation
 public readonly struct Dimension
 {
     public const ulong MaxLimit = ulong.MaxValue;
@@ -69,9 +69,32 @@ public readonly struct Dimension
     public readonly ulong InitialSize { get; }
     public readonly ulong UpperLimit { get; }
 
+    public Dimension(long initialSize, long? upperLimit = null)
+    {
+        Guard.IsGreaterThanOrEqualTo(initialSize, 0);
+        Guard.IsGreaterThanOrEqualTo(upperLimit ?? 0, 0);
+
+        InitialSize = (ulong)initialSize;
+
+        if (upperLimit == null)
+        {
+            UpperLimit = MaxLimit;
+        }
+        else
+        {
+            UpperLimit = (ulong)upperLimit.Value;
+        }
+    }
+
     public Dimension(ulong initialSize, ulong? upperLimit = null)
     {
         InitialSize = initialSize;
+
         UpperLimit = upperLimit ?? MaxLimit;
     }
 };
+
+public static class DimensionExtensions
+{
+    
+}
