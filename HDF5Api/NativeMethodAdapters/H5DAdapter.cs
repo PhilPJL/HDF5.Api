@@ -61,7 +61,7 @@ internal static class H5DAdapter
 
     public static void SetExtent(H5DataSet dataSetId, params long[] dimensions)
     {
-        int err = set_extent(dataSetId, dimensions.Select(d => (ulong)d).ToArray());
+        int err = set_extent(dataSetId, dimensions.Cast<ulong>().ToArray());
 
         err.ThrowIfError(nameof(set_extent));
     }
@@ -118,18 +118,10 @@ internal static class H5DAdapter
     {
         return list switch
         {
-            PropertyList.Create => GetCreationPropertyList(dataSet),
-            //PropertyList.Mount => throw new NotImplementedException(),
-            PropertyList.Access => throw new NotImplementedException(),
+            PropertyList.Create => H5PAdapter.GetPropertyList(dataSet, get_create_plist),
+            PropertyList.Access => H5PAdapter.GetPropertyList(dataSet, get_access_plist),
             _ => throw new NotImplementedException(),
         };
-
-        static H5PropertyList GetCreationPropertyList(H5DataSet dataSet)
-        {
-            long h = get_create_plist(dataSet);
-            h.ThrowIfInvalidHandleValue(nameof(get_create_plist));
-            return new H5PropertyList(h);
-        }
     }
 }
 

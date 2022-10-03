@@ -117,4 +117,17 @@ internal static class H5GAdapter
         };
     }
 
+    /// <summary>
+    /// Get copy of property list used to create the data-set.
+    /// </summary>
+    /// <param name="group"></param>
+    /// <returns></returns>
+    public static H5PropertyList GetPropertyList(H5Group group, PropertyList list)
+    {
+        return list switch
+        {
+            PropertyList.Create => H5PAdapter.GetPropertyList(group, get_create_plist),
+            _ => throw new NotImplementedException(),
+        };
+    }
 }

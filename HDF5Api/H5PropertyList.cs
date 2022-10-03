@@ -37,7 +37,6 @@ public enum PropertyList
 {
     Create,
     Transfer,
-    Access,
-    Mount
+    Access
 }
 

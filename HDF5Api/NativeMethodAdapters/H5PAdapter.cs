@@ -27,7 +27,7 @@ internal static class H5PAdapter
 
     public static void SetChunk(H5PropertyList propertyList, int rank, long[] dims)
     {
-        int err = set_chunk(propertyList, rank, dims.Select(d => (ulong)d).ToArray());
+        int err = set_chunk(propertyList, rank, dims.Cast<ulong>().ToArray());
 
         err.ThrowIfError(nameof(set_chunk));
     }
@@ -37,5 +37,14 @@ internal static class H5PAdapter
         int err = set_deflate(propertyList, (uint)level);
 
         err.ThrowIfError(nameof(set_deflate));
+    }
+
+    internal static H5PropertyList GetPropertyList<T>(H5Object<T> obj, Func<long, long> get_plist) where T : H5Object<T>
+    {
+        long h = get_plist(obj);
+
+        h.ThrowIfInvalidHandleValue(nameof(get_plist));
+
+        return new H5PropertyList(h);
     }
 }

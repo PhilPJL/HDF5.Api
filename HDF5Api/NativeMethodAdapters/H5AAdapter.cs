@@ -225,5 +225,20 @@ internal static class H5AAdapter
         }
 #endif
     }
+
+    /// <summary>
+    /// Get copy of property list used to create the data-set.
+    /// </summary>
+    /// <param name="attribute"></param>
+    /// <returns></returns>
+    public static H5PropertyList GetPropertyList(H5Attribute attribute, PropertyList list)
+    {
+        return list switch
+        {
+            PropertyList.Create => H5PAdapter.GetPropertyList(attribute, get_create_plist),
+            _ => throw new NotImplementedException(),
+        };
+    }
+
 }
 
