@@ -98,5 +98,16 @@ internal static class H5DAdapter
 
         return new H5Type(h);
     }
+
+    public static H5PropertyList CreatePropertyList(PropertyList list)
+    {
+        return list switch
+        {
+            PropertyList.Create => H5PAdapter.Create(H5P.DATASET_CREATE),
+            PropertyList.Transfer => H5PAdapter.Create(H5P.DATASET_XFER),
+            PropertyList.Access => H5PAdapter.Create(H5P.DATASET_ACCESS),
+            _ => throw new NotImplementedException(),
+        };
+    }
 }
 

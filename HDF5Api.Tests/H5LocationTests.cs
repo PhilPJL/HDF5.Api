@@ -173,7 +173,7 @@ public abstract class H5LocationTests : H5Test
 
         using var type = H5Type.CreateDoubleArrayType(100);
         using var space = H5Space.Create(new Dimension(1, 1));
-        using var propertyList = H5PropertyList.Create(PropertyList.DataSetCreate);
+        using var propertyList = H5DataSet.CreatePropertyList(PropertyList.Create);
         using var ds1 = location.CreateDataSet(ds1Name, type, space, propertyList);
 
         Assert.IsTrue(location.DataSetExists(ds1Name));
@@ -185,7 +185,7 @@ public abstract class H5LocationTests : H5Test
 
         using var type = H5Type.CreateDoubleArrayType(100);
         using var space = H5Space.Create(new Dimension(1, 1));
-        using var propertyList = H5PropertyList.Create(PropertyList.DataSetCreate);
+        using var propertyList = H5DataSet.CreatePropertyList(PropertyList.Create);
 
         using var ds1 = location.CreateDataSet(ds1Name, type, space, propertyList);
         Assert.IsTrue(location.DataSetExists(ds1Name));

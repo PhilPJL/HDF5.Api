@@ -21,6 +21,31 @@ public class H5File : H5Location<H5File>
         return H5FAdapter.GetObjectCount(this, types);
     }
 
+    public string GetName()
+    {
+        return H5FAdapter.GetName(this);
+    }
+
+    public long GetSize()
+    {
+        return H5FAdapter.GetSize(this);
+    }
+
+    public static H5PropertyList CreatePropertyList(PropertyList propertyList)
+    {
+        return H5FAdapter.CreatePropertyList(propertyList);
+    }
+
+    /// <summary>
+    /// Gets a copy of the specified property list used to create the object
+    /// </summary>
+    /// <param name="propertyList"></param>
+    /// <returns></returns>
+    public H5PropertyList GetPropertyList(PropertyList propertyList)
+    {
+        return H5FAdapter.GetPropertyList(this, propertyList);
+    }
+
     /// <summary>
     ///     Open an existing file.  By default opens read-write.
     /// </summary>

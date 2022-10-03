@@ -9,7 +9,7 @@ namespace HDF5Api;
 public static class H5DataSetWriter
 {
     public static IH5DataSetWriter<TInput> CreateOneDimensionalDataSetWriter<TInput>
-        (IH5Location location, string dataSetName, IH5TypeAdapter<TInput> converter, int chunkSize, uint compressionLevel)
+        (IH5Location location, string dataSetName, IH5TypeAdapter<TInput> converter, int chunkSize, int compressionLevel)
     {
         // NOTE: we're only interested in creating a data set currently, not opening an existing one
 

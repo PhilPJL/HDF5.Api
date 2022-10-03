@@ -1,9 +1,12 @@
-﻿namespace HDF5Api.Tests;
+﻿using System.Diagnostics;
+
+namespace HDF5Api.Tests;
 
 [TestClass]
 public class H5FileTests : H5LocationTests
 {
     private const string Path = "test.h5";
+    private const string Path1 = "test1.h5";
 
     #region Create file tests
 
@@ -462,4 +465,38 @@ public class H5FileTests : H5LocationTests
     }
 
     #endregion
+
+    [TestMethod]
+    public void GetNameSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            // Ensure no existing file
+            File.Delete(Path);
+            Assert.IsFalse(File.Exists(Path));
+
+            // Create new file
+            using var file = H5File.Create(Path);
+            Assert.IsTrue(File.Exists(Path));
+
+            Assert.AreEqual(Path, file.GetName());
+        });
+    }
+
+    [TestMethod]
+    public void GetSizeSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            // Ensure no existing file
+            File.Delete(Path);
+            Assert.IsFalse(File.Exists(Path));
+
+            // Create new file
+            using var file = H5File.Create(Path);
+            Assert.IsTrue(File.Exists(Path));
+
+            Assert.AreNotEqual(0, file.GetSize());
+        });
+    }
 }

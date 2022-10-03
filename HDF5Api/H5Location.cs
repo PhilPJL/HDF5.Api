@@ -86,11 +86,14 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// <summary>
     ///     Create a Group in this location
     /// </summary>
-    public H5Group CreateGroup([DisallowNull] string name)
+    public H5Group CreateGroup([DisallowNull] string name,
+        [AllowNull] H5PropertyList? linkCreationPropertyList = null,
+        [AllowNull] H5PropertyList? groupCreationPropertyList = null,
+        [AllowNull] H5PropertyList? groupAccessPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5GAdapter.Create(this, name);
+        return H5GAdapter.Create(this, name, linkCreationPropertyList, groupCreationPropertyList, groupAccessPropertyList);
     }
 
     /// <summary>

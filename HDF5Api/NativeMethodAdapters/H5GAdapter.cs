@@ -14,6 +14,7 @@ internal static class H5GAdapter
 
         err.ThrowIfError(nameof(close));
     }
+
     public static H5Group Create<T>(
         H5Location<T> location, string name,
         H5PropertyList? propListLinkCreation = null,
@@ -105,4 +106,15 @@ internal static class H5GAdapter
         int err = get_info_by_name(location, path, ref ginfo, linkAccessPropertyList);
         return err >= 0;
     }
+
+    public static H5PropertyList CreatePropertyList(PropertyList list)
+    {
+        return list switch
+        {
+            PropertyList.Create => H5PAdapter.Create(H5P.GROUP_CREATE),
+            PropertyList.Access => H5PAdapter.Create(H5P.GROUP_ACCESS),
+            _ => throw new NotImplementedException(),
+        };
+    }
+
 }

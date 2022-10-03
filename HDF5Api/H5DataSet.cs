@@ -109,12 +109,9 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5AAdapter.ListAttributeNames(this);
     }
 
-    /// <summary>
-    /// Get copy of property list used to create the data-set.
-    /// </summary>
-    public H5PropertyList GetCreationPropertyList()
+    public static H5PropertyList CreatePropertyList(PropertyList listType)
     {
-        return H5PAdapter.GetCreationPropertyList(this);
+        return H5DAdapter.CreatePropertyList(listType);
     }
 
     public IEnumerable<T> Read<T>() where T : unmanaged

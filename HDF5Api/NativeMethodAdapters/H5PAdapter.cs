@@ -4,6 +4,9 @@ using static HDF5Api.NativeMethods.H5P;
 
 namespace HDF5Api.NativeMethodAdapters;
 
+/// <summary>
+/// H5 property list native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_p.html"/>
+/// </summary>
 internal static class H5PAdapter
 {
     public static void Close(H5PropertyList propertyList)
@@ -29,9 +32,9 @@ internal static class H5PAdapter
         err.ThrowIfError(nameof(set_chunk));
     }
 
-    public static void EnableDeflateCompression(H5PropertyList propertyList, uint level)
+    public static void EnableDeflateCompression(H5PropertyList propertyList, int level)
     {
-        int err = set_deflate(propertyList, level);
+        int err = set_deflate(propertyList, (uint)level);
 
         err.ThrowIfError(nameof(set_deflate));
     }

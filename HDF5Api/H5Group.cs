@@ -10,4 +10,9 @@ public class H5Group : H5Location<H5Group>
     internal H5Group(long handle) : base(handle, H5GAdapter.Close)
     {
     }
+
+    public static H5PropertyList CreatePropertyList(PropertyList propertyList)
+    {
+        return H5GAdapter.CreatePropertyList(propertyList);
+    }
 }

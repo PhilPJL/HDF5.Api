@@ -16,7 +16,7 @@
 namespace HDF5Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static class H5F
+internal static partial class H5F
 {
     static H5F() { _ = H5.open(); }
 
@@ -520,6 +520,7 @@ internal static class H5F
     public static extern ssize_t get_file_image
         (hid_t file_id, IntPtr buf_ptr, IntPtr buf_len);
 
+#if NETSTANDARD
     /// <summary>
     /// Returns the size of an HDF5 file.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-GetFilesize
@@ -534,6 +535,25 @@ internal static class H5F
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t get_filesize
         (hid_t file_id, ref hsize_t size);
+#endif
+
+#if NET7_0_OR_GREATER
+    /// <summary>
+    /// Returns the size of an HDF5 file.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-GetFilesize
+    /// </summary>
+    /// <param name="file_id">Identifier of a currently-open HDF5
+    /// file</param>
+    /// <param name="size">Size of the file, in bytes.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fget_filesize"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_filesize
+        (hid_t file_id, ref hsize_t size);
+#endif
+
 
     /// <summary>
     /// Retrieves free-space section information for a file.
@@ -708,6 +728,7 @@ internal static class H5F
     public static extern herr_t get_metadata_read_retry_info
         (hid_t file_id, ref retry_info_t info);
 
+#if NETSTANDARD
     /// <summary>
     /// Retrieves name of file to which object belongs.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-GetName
@@ -724,6 +745,26 @@ internal static class H5F
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern ssize_t get_name
         (hid_t obj_id, StringBuilder name, size_t size);
+#endif
+
+#if NET7_0_OR_GREATER
+    /// <summary>
+    /// Retrieves name of file to which object belongs.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-GetName
+    /// </summary>
+    /// <param name="obj_id">Identifier of the object for which the
+    /// associated filename is sought.</param>
+    /// <param name="name">Buffer to contain the returned filename.</param>
+    /// <param name="size">Buffer size, in bytes.</param>
+    /// <returns>Returns the length of the filename if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fget_name"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial ssize_t get_name
+        (hid_t obj_id, Span<byte> name, nint size);
+#endif
+
 
     /// <summary>
     /// Returns the number of open object identifiers for an open file.
