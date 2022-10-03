@@ -3,7 +3,7 @@
 /// <summary>
 ///     Disposable wrapper for safely pinning/releasing objects
 /// </summary>
-public class PinnedObject : Disposable
+internal class PinnedObject : Disposable
 {
     private GCHandle Pinned { get; set; }
 

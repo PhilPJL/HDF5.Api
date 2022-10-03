@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HDF5Api
+﻿namespace HDF5Api
 {
     public abstract class Disposable : IDisposable
     {

@@ -84,8 +84,8 @@ public abstract class H5LocationTests : H5Test
 
     protected static void CreateGroupEmptyNameFails<T>(H5Location<T> location) where T : H5Object<T>
     {
-        Assert.ThrowsException<Hdf5Exception>(() => location.CreateGroup(null!));
-        Assert.ThrowsException<Hdf5Exception>(() => location.CreateGroup(string.Empty));
+        Assert.ThrowsException<ArgumentNullException>(() => location.CreateGroup(null!));
+        Assert.ThrowsException<ArgumentException>(() => location.CreateGroup(string.Empty));
     }
 
     protected static void CreateDuplicateGroupFails<T>(H5Location<T> location) where T : H5Object<T>

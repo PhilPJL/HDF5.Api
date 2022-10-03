@@ -158,7 +158,7 @@ internal static class H5AAdapter
         }
         else
         {
-            var buffer = MemoryOwner<byte>.Allocate(size);
+            var buffer = SpanOwner<byte>.Allocate(size);
             read(attribute, type, buffer.Span);
             return Encoding.ASCII.GetString(buffer.Span);
         }

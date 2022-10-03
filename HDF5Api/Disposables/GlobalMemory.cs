@@ -4,7 +4,7 @@
 /// <summary>
 ///     Disposable wrapper for safe allocation of global memory
 /// </summary>
-public abstract class GlobalMemoryBase : Disposable
+internal abstract class GlobalMemoryBase : Disposable
 {
     public IntPtr IntPtr { get; protected set; }
 
@@ -28,7 +28,7 @@ public abstract class GlobalMemoryBase : Disposable
     }
 }
 
-public class GlobalMemory : GlobalMemoryBase
+internal class GlobalMemory : GlobalMemoryBase
 {
     public GlobalMemory(int size)
     {
@@ -36,7 +36,7 @@ public class GlobalMemory : GlobalMemoryBase
     }
 }
 
-public class StringToGlobalMemoryAnsi : GlobalMemoryBase
+internal class StringToGlobalMemoryAnsi : GlobalMemoryBase
 {
     public StringToGlobalMemoryAnsi(string s)
     {

@@ -42,6 +42,10 @@ public class H5File : H5Location<H5File>
             : H5FAdapter.Create(path);
     }
 
+    /// <summary>
+    /// Create a new H5 file
+    /// </summary>
+    /// <param name="path">Path to the file</param>
     public static H5File Create([DisallowNull] string path)
     {
         Guard.IsNotNullOrWhiteSpace(path);
