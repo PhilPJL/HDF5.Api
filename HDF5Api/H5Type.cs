@@ -15,8 +15,6 @@ public class H5Type : H5Object<H5Type>
 
     private H5Type(long handle, Action<H5Type>? closer) : base(handle, closer) { }
 
-    #region Public Api
-
     public static H5Type GetNativeType<T>() where T : unmanaged
     {
         long nativeHandle = default(T) switch
@@ -31,7 +29,6 @@ public class H5Type : H5Object<H5Type>
             ulong => H5T.NATIVE_UINT64,
             float => H5T.NATIVE_FLOAT,
             double => H5T.NATIVE_DOUBLE,
-
             // TODO: add more mappings as required
 
             _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
@@ -58,13 +55,12 @@ public class H5Type : H5Object<H5Type>
         return this;
     }
 
-    public H5Type Insert<S>([DisallowNull] string name, [DisallowNull] H5Type dataType) where S : struct
+    public H5Type Insert<TS, TP>([DisallowNull] string name) where TS : struct where TP : unmanaged
     {
         Guard.IsNotNullOrWhiteSpace(name);
-        Guard.IsNotNull(dataType);
 
-        var offset = Marshal.OffsetOf<S>(name);
-        H5TAdapter.Insert(this, name, offset, dataType);
+        var offset = Marshal.OffsetOf<TS>(name);
+        H5TAdapter.Insert(this, name, offset, GetNativeType<TP>());
         return this;
     }
 
@@ -78,5 +74,48 @@ public class H5Type : H5Object<H5Type>
         return H5TAdapter.CreateDoubleArrayType(size);
     }
 
-    #endregion
+    public static H5Type CreateCompoundType(int size)
+    {
+        return H5TAdapter.CreateCompoundType(size);
+    }
+
+    /// <summary>
+    ///     Create a Compound type in order to hold an <typeparamref name="T" />
+    /// </summary>
+    public static H5Type CreateCompoundType<T>() where T : struct
+    {
+        int size = Marshal.SizeOf<T>();
+        return CreateCompoundType(size);
+    }
+
+    /// <summary>
+    ///     Create a Compound type in order to hold an <typeparamref name="T" /> plus additional space as defined by
+    ///     <paramref name="extraSpace" />
+    /// </summary>
+    public static H5Type CreateCompoundType<T>(int extraSpace) where T : struct
+    {
+        int size = Marshal.SizeOf<T>() + extraSpace;
+        return CreateCompoundType(size);
+    }
+
+    public static H5Type CreateByteArrayType(int size)
+    {
+        return H5TAdapter.CreateByteArrayType(size);
+    }
+
+    public static H5Type CreateFloatArrayType(int size)
+    {
+        return H5TAdapter.CreateFloatArrayType(size);
+    }
+
+    public static H5Type CreateVariableLengthByteArrayType()
+    {
+        return H5TAdapter.CreateVariableLengthByteArrayType();
+    }
+
+    public static H5Type CreateFixedLengthStringType(int length)
+    {
+        return H5TAdapter.CreateFixedLengthStringType(length);
+    }
+
 }

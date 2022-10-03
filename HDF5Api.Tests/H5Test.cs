@@ -1,4 +1,7 @@
-﻿namespace HDF5Api.Tests;
+﻿using static HDF5Api.Tests.IntervalRecordAdapter;
+using System.Runtime.InteropServices;
+
+namespace HDF5Api.Tests;
 
 [TestClass]
 public abstract class H5Test

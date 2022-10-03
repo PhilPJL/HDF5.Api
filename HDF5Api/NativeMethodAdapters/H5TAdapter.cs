@@ -1,4 +1,5 @@
-﻿using static HDF5Api.NativeMethods.H5T;
+﻿using System.Linq;
+using static HDF5Api.NativeMethods.H5T;
 
 namespace HDF5Api.NativeMethodAdapters;
 
@@ -42,9 +43,9 @@ internal static class H5TAdapter
         return CreateCompoundType(size);
     }
 
-    public static H5Type CreateByteArrayType(params ulong[] dims)
+    public static H5Type CreateByteArrayType(params long[] dims)
     {
-        long h = array_create(NATIVE_B8, (uint)dims.Length, dims);
+        long h = array_create(NATIVE_B8, (uint)dims.Length, dims.Cast<ulong>().ToArray());
         h.ThrowIfInvalidHandleValue(nameof(array_create));
         return new H5Type(h);
     }

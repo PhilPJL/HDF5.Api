@@ -1,7 +1,4 @@
-﻿using HDF5Api.NativeMethodAdapters;
-using HDF5Api.NativeMethods;
-
-namespace HDF5Api;
+﻿namespace HDF5Api;
 
 /// <summary>
 ///     Factory class for creating data-set writers.
@@ -9,15 +6,13 @@ namespace HDF5Api;
 public static class H5DataSetWriter
 {
     public static IH5DataSetWriter<TInput> CreateOneDimensionalDataSetWriter<TInput>
-        (IH5Location location, string dataSetName, IH5TypeAdapter<TInput> converter, int chunkSize, int compressionLevel)
+        (IH5Location location, string dataSetName, IH5TypeAdapter<TInput> converter, int chunkSize, int compressionLevel = 0)
     {
-        // NOTE: we're only interested in creating a data set currently, not opening an existing one
-
         // Single dimension (rank 1), unlimited length, chunk size.
-        using var memorySpace = H5SAdapter.CreateSimple(chunkSize);
+        using var memorySpace = H5Space.CreateSimple(chunkSize);
 
         // Create a dataset-creation property list
-        using var propertyList = H5PAdapter.Create(H5P.DATASET_CREATE);
+        using var propertyList = H5DataSet.CreatePropertyList(PropertyList.Create);
 
         // Enable chunking. From the user guide: "HDF5 requires the use of chunking when defining extendable datasets."
         propertyList.SetChunk(1, chunkSize);

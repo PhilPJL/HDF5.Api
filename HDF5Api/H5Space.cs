@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CommunityToolkit.Diagnostics;
 using HDF5Api.NativeMethodAdapters;
 
@@ -42,5 +43,10 @@ public class H5Space : H5Object<H5Space>
         Guard.IsNotNull(dimensions);
 
         return H5SAdapter.CreateSimple(dimensions);
+    }
+
+    public static H5Space CreateSimple(params long[] dimensions)
+    {
+        return Create(dimensions.Select(d => new Dimension(d)).ToArray());
     }
 }

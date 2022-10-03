@@ -14,7 +14,17 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     {
     }
 
-    public void Write<T>([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] T[] buffer) where T : unmanaged
+    public void Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] IntPtr buffer) 
+    {
+        Guard.IsNotNull(type);
+        Guard.IsNotNull(memorySpace);
+        Guard.IsNotNull(fileSpace);
+        Guard.IsNotNull(buffer);
+
+        H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
+    }
+
+/*    public void Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] T[] buffer) where T : unmanaged
     {
         Guard.IsNotNull(type);
         Guard.IsNotNull(memorySpace);
@@ -23,15 +33,15 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
         H5DAdapter.Write<T>(this, type, memorySpace, fileSpace, buffer);
     }
-
-    public void Write<T>([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, Span<T> buffer) where T : unmanaged
+*/
+/*    public void Write<T>([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, Span<T> buffer) where T : unmanaged
     {
         Guard.IsNotNull(type);
         Guard.IsNotNull(memorySpace);
         Guard.IsNotNull(fileSpace);
 
         H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
-    }
+    }*/
 
     public H5Space GetSpace()
     {
@@ -121,6 +131,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
     public IEnumerable<T> Read<T>() where T : unmanaged
     {
+        // TODO: move this check into separate method
         using var space = GetSpace();
         using var type = GetH5Type();
         long count = space.GetSimpleExtentNPoints();

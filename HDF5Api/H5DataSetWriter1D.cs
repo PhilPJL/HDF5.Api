@@ -1,7 +1,5 @@
-﻿using System;
+﻿using HDF5Api.NativeMethodAdapters;
 using System.Collections.Generic;
-using System.Linq;
-using HDF5Api.NativeMethodAdapters;
 
 namespace HDF5Api;
 
@@ -66,16 +64,16 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
             using var recordSpace = H5SAdapter.CreateSimple(numRecords);
 
             // Configure most parameters for DataSet.WriteChunk and then pass the curried method as an Action<IntPtr> to Converter which only needs to supply the last param.
-            Converter.Write(WriteAdaptor(DataSet, Type, recordSpace, fileSpace), recordsChunk);
+            Converter.Write(WriteAdapter(DataSet, Type, recordSpace, fileSpace), recordsChunk);
 
             RowsWritten += numRecords;
         }
 
         // Curry dataSet.Write to an Action<IntPtr>
-        static Action<IntPtr> WriteAdaptor(H5DataSet dataSet, H5Type type, H5Space recordSpace, H5Space fileSpace)
+        static Action<IntPtr> WriteAdapter(H5DataSet dataSet, H5Type type, H5Space recordSpace, H5Space fileSpace)
         {
             // TODO: change to Span<byte>
-            return buffer => { }; // dataSet.Write(type, recordSpace, fileSpace, buffer);
+            return buffer => dataSet.Write(type, recordSpace, fileSpace, buffer);
         }
     }
 }
