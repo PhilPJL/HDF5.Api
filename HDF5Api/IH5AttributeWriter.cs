@@ -6,8 +6,8 @@ namespace HDF5Api;
 ///     Interface that needs to be implemented by an AttributeWriter.
 /// </summary>
 /// <typeparam name="TInput"></typeparam>
-public interface IH5AttributeWriter<in TInput> : IDisposable
+public interface IH5AttributeWriter<TInput> : IDisposable
 {
-    void Write(IEnumerable<TInput> recordsChunk);
+    void Write(ICollection<TInput> recordsChunk);
     long RowsWritten { get; }
 }

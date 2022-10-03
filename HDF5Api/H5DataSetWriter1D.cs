@@ -50,12 +50,12 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
     /// <summary>
     ///     Write a collection of <typeparamref name="TInput" /> to the DataSet.
     /// </summary>
-    public void Write(IEnumerable<TInput> recordsChunk)
+    public void Write(ICollection<TInput> recordsChunk)
     {
-        int numRecords = recordsChunk.Count();
+        int numRecords = recordsChunk.Count;
 
         // Extend the dataset to accept this chunk
-        DataSet.SetExtent(new[] { RowsWritten + numRecords });
+        DataSet.SetExtent(RowsWritten + numRecords);
 
         // Move the hyperslab window
         using (var fileSpace = DataSet.GetSpace())
@@ -63,7 +63,7 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
             fileSpace.SelectHyperslab(RowsWritten, numRecords);
 
             // Match the space to length of records retrieved.
-            using var recordSpace = H5SAdapter.CreateSimple(new Dimension(numRecords));
+            using var recordSpace = H5SAdapter.CreateSimple(numRecords);
 
             // Configure most parameters for DataSet.WriteChunk and then pass the curried method as an Action<IntPtr> to Converter which only needs to supply the last param.
             Converter.Write(WriteAdaptor(DataSet, Type, recordSpace, fileSpace), recordsChunk);
@@ -72,7 +72,7 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
         }
 
         // Curry dataSet.Write to an Action<IntPtr>
-        Action<IntPtr> WriteAdaptor(H5DataSet dataSet, H5Type type, H5Space recordSpace, H5Space fileSpace)
+        static Action<IntPtr> WriteAdaptor(H5DataSet dataSet, H5Type type, H5Space recordSpace, H5Space fileSpace)
         {
             // TODO: change to Span<byte>
             return buffer => { }; // dataSet.Write(type, recordSpace, fileSpace, buffer);

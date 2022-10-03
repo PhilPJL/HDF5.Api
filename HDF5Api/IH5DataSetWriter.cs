@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace HDF5Api;
 
@@ -7,8 +6,8 @@ namespace HDF5Api;
 ///     Interface that needs to be implemented by an IH5DataSetWriter.
 /// </summary>
 /// <typeparam name="TInput"></typeparam>
-public interface IH5DataSetWriter<in TInput> : IDisposable
+public interface IH5DataSetWriter<TInput> : IDisposable
 {
-    void Write(IEnumerable<TInput> recordsChunk);
+    void Write(ICollection<TInput> recordsChunk);
     long RowsWritten { get; }
 }

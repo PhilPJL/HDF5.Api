@@ -46,7 +46,7 @@ public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
         GetAttributeName = getAttributeName;
     }
 
-    public void Write(IEnumerable<TInput> recordsChunk)
+    public void Write(ICollection<TInput> recordsChunk)
     {
         // Single dimension (rank 1), unlimited length, chunk size.
         using var memorySpace = H5SAdapter.CreateSimple(new Dimension(1));
@@ -58,7 +58,9 @@ public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
             // Create with the name specified by the GetAttributeName function.
             using var attribute =
                 Location.CreateAttribute(GetAttributeName(record), Type, memorySpace, properyList);
-            Converter.Write(WriteAdaptor(attribute, Type), Enumerable.Repeat(record, 1));
+
+            // TODO: use Span<TInput>
+            Converter.Write(WriteAdaptor(attribute, Type), new TInput[] { record });
         }
 
         // Curry attribute.Write to an Action<IntPtr>

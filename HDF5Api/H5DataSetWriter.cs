@@ -1,5 +1,4 @@
-﻿
-using HDF5Api.NativeMethodAdapters;
+﻿using HDF5Api.NativeMethodAdapters;
 using HDF5Api.NativeMethods;
 
 namespace HDF5Api;
