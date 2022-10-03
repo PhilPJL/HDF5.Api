@@ -7,4 +7,11 @@ namespace System.Diagnostics.CodeAnalysis
     {
     }
 }
+namespace System.Diagnostics.CodeAnalysis
+{
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, Inherited = false)]
+    internal class AllowNull : Attribute
+    {
+    }
+}
 #endif

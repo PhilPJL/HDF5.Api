@@ -28,7 +28,7 @@ public static class H5Global
         uint is_ts = 0;
         int err = is_library_threadsafe(ref is_ts);
 
-        err.ThrowIfError("is_library_threadsafe");
+        err.ThrowIfError(nameof(is_library_threadsafe));
 
         return is_ts != 0;
     }

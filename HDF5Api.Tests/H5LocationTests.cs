@@ -1,5 +1,4 @@
-﻿
-using HDF5Api.NativeMethodAdapters;
+﻿using HDF5Api.NativeMethodAdapters;
 
 namespace HDF5Api.Tests;
 
@@ -193,7 +192,6 @@ public abstract class H5LocationTests : H5Test
 
         using var ds2 = location.OpenDataSet(ds1Name);
     }
-
 
     #endregion
 }

@@ -75,7 +75,7 @@ internal static class H5TAdapter
         long h = copy(C_S1);
         h.ThrowIfInvalidHandleValue(nameof(copy));
         int err = set_size(h, new ssize_t(length));
-        err.ThrowIfError("H5T.set_size");
+        err.ThrowIfError(nameof(set_size));
         return new H5Type(h);
     }
 

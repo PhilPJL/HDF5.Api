@@ -14,13 +14,22 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     {
     }
 
-    public void Write<T>(H5Type type, H5Space memorySpace, H5Space fileSpace, T[] buffer) where T : unmanaged
+    public void Write<T>([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] T[] buffer) where T : unmanaged
     {
+        Guard.IsNotNull(type);
+        Guard.IsNotNull(memorySpace);
+        Guard.IsNotNull(fileSpace);
+        Guard.IsNotNull(buffer);
+
         H5DAdapter.Write<T>(this, type, memorySpace, fileSpace, buffer);
     }
 
-    public void Write<T>(H5Type type, H5Space memorySpace, H5Space fileSpace, Span<T> buffer) where T : unmanaged
+    public void Write<T>([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, Span<T> buffer) where T : unmanaged
     {
+        Guard.IsNotNull(type);
+        Guard.IsNotNull(memorySpace);
+        Guard.IsNotNull(fileSpace);
+
         H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
     }
 
@@ -29,8 +38,10 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5DAdapter.GetSpace(this);
     }
 
-    public void SetExtent(ulong[] dims)
+    public void SetExtent([DisallowNull] params ulong[] dims)
     {
+        Guard.IsNotNull(dims);
+
         H5DAdapter.SetExtent(this, dims);
     }
 
