@@ -49,7 +49,7 @@ public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
     public void Write(ICollection<TInput> recordsChunk)
     {
         // Single dimension (rank 1), unlimited length, chunk size.
-        using var memorySpace = H5SAdapter.CreateSimple(new Dimension(1));
+        using var memorySpace = H5SAdapter.CreateSimple(1);
         using var properyList = H5PAdapter.Create(H5P.ATTRIBUTE_CREATE);
 
         foreach (var record in recordsChunk)

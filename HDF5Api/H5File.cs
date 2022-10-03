@@ -35,7 +35,7 @@ public class H5File : H5Location<H5File>
     /// <summary>
     ///     Open an existing file (by default read-write) or create new.
     /// </summary>
-    public static H5File OpenOrCreate([DisallowNull] string path, bool readOnly = false,
+    public static H5File CreateOrOpen([DisallowNull] string path, bool readOnly = false,
         [AllowNull] H5PropertyList? fileCreationPropertyList = null,
         [AllowNull] H5PropertyList? fileAccessPropertyList = null)
     {

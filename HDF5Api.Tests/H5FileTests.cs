@@ -8,7 +8,7 @@ public class H5FileTests : H5LocationTests
     #region Create file tests
 
     [TestMethod]
-    public void OpenHandleTest()
+    public void CreateFileDanglingHandleTest()
     {
         H5File? file = null;
 
@@ -27,22 +27,6 @@ public class H5FileTests : H5LocationTests
     }
 
     [TestMethod]
-    public void CreateFileSucceeds()
-    {
-        HandleCheck(() =>
-        {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file
-            using (H5File.Create(Path)) { }
-
-            Assert.IsTrue(File.Exists(Path));
-        });
-    }
-
-    [TestMethod]
     public void CreateFileOverwriteExistingSucceeds()
     {
         HandleCheck(() =>
@@ -53,18 +37,34 @@ public class H5FileTests : H5LocationTests
 
             // Create new file
             using (H5File.Create(Path)) { }
-
             Assert.IsTrue(File.Exists(Path));
 
             // Create new file - overwrite existing
             using (H5File.Create(Path)) { }
-
             Assert.IsTrue(File.Exists(Path));
         });
     }
 
     [TestMethod]
-    public void CreateFileOverwriteExistingThrows()
+    public void CreateFileThrowsIfAlreadyExists()
+    {
+        HandleCheck(() =>
+        {
+            // Ensure no existing file
+            File.Delete(Path);
+            Assert.IsFalse(File.Exists(Path));
+
+            // Create new file
+            using (H5File.Create(Path)) { }
+            Assert.IsTrue(File.Exists(Path));
+
+            // Create and throw if exists
+            Assert.ThrowsException<Hdf5Exception>(() => H5File.Create(Path, true));
+        });
+    }
+
+    [TestMethod]
+    public void CreateFileOverwriteOpenFileThrows()
     {
         HandleCheck(() =>
         {
@@ -80,6 +80,40 @@ public class H5FileTests : H5LocationTests
                 // Try to create new file and overwrite existing
                 Assert.ThrowsException<Hdf5Exception>(() => H5File.Create(Path));
             }
+        });
+    }
+
+    [TestMethod]
+    public void CreateOrOpenNewFileSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            // Ensure no existing file
+            File.Delete(Path);
+            Assert.IsFalse(File.Exists(Path));
+
+            // Create new file
+            using (H5File.CreateOrOpen(Path)) { }
+            Assert.IsTrue(File.Exists(Path));
+        });
+    }
+
+    [TestMethod]
+    public void CreateOrOpenExistingFileSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            // Ensure no existing file
+            File.Delete(Path);
+            Assert.IsFalse(File.Exists(Path));
+
+            // Create new file
+            using (H5File.CreateOrOpen(Path)) { }
+            Assert.IsTrue(File.Exists(Path));
+
+            // Create new file
+            using (H5File.CreateOrOpen(Path)) { }
+            Assert.IsTrue(File.Exists(Path));
         });
     }
 

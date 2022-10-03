@@ -81,6 +81,36 @@ public class H5AttributeTests : H5Test
         });
     }
 
+    [TestMethod]
+    public void ReadInvalidAttributeTypeFails()
+    {
+        HandleCheck(() =>
+        {
+            // Ensure no existing file
+            File.Delete(Path);
+            Assert.IsFalse(File.Exists(Path));
+
+            // Create new file
+            using var file = H5File.Create(Path);
+            Assert.IsTrue(File.Exists(Path));
+
+            // Create group
+            using var group = file.CreateGroup("group");
+
+            group.CreateAndWriteAttribute("int", 1);
+            group.CreateAndWriteAttribute("string", "short");
+
+            string s1 = group.ReadStringAttribute("string");
+            Assert.AreEqual("short", s1);
+
+            int i1 = group.ReadAttribute<int>("int");
+            Assert.AreEqual(1, i1);
+
+            Assert.ThrowsException<Hdf5Exception>(() => group.ReadStringAttribute("int"));
+            Assert.ThrowsException<Hdf5Exception>(() => group.ReadAttribute<int>("string"));
+        });
+    }
+
     // Helper methods
     internal static void CreateIterateAttributesSucceeds(IH5ObjectWithAttributes objectWithAttributes)
     {

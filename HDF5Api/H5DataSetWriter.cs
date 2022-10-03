@@ -14,7 +14,7 @@ public static class H5DataSetWriter
         // NOTE: we're only interested in creating a data set currently, not opening an existing one
 
         // Single dimension (rank 1), unlimited length, chunk size.
-        using var memorySpace = H5SAdapter.CreateSimple(new Dimension(chunkSize));
+        using var memorySpace = H5SAdapter.CreateSimple(chunkSize);
 
         // Create a dataset-creation property list
         using var propertyList = H5PAdapter.Create(H5P.DATASET_CREATE);

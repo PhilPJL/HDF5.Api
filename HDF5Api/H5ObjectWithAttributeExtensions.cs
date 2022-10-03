@@ -16,7 +16,7 @@ public static class H5ObjectWithAttributeExtensions
         Guard.IsNotNull(type);
 
         // Single dimension (rank 1), unlimited length, chunk size.
-        using var memorySpace = H5SAdapter.CreateSimple(new Dimension(1));
+        using var memorySpace = H5SAdapter.CreateSimple(1);
 
         // Create the attribute-creation property list (TODO: is this required or can I use default?)
         using var propertyList = H5PAdapter.Create(H5P.ATTRIBUTE_CREATE);
