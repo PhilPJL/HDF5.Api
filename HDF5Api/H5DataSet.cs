@@ -114,6 +114,11 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5DAdapter.CreatePropertyList(listType);
     }
 
+    public H5PropertyList GetPropertyList(PropertyList listType)
+    {
+        return H5DAdapter.GetPropertyList(this, listType);
+    }
+
     public IEnumerable<T> Read<T>() where T : unmanaged
     {
         using var space = GetSpace();

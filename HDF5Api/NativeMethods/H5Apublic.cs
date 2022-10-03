@@ -69,6 +69,7 @@ internal static partial class H5A
         (hid_t location_id, IntPtr attr_name, ref info_t ainfo,
         IntPtr op_data);
 
+#if NETSTANDARD
     /// <summary>
     /// Closes the specified attribute.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Close
@@ -80,6 +81,21 @@ internal static partial class H5A
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t close(hid_t attr_id);
+#endif
+
+#if NET7_0_OR_GREATER
+    /// <summary>
+    /// Closes the specified attribute.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Close
+    /// </summary>
+    /// <param name="attr_id">Attribute to release access to.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aclose"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t close(hid_t attr_id);
+#endif
 
     /// <summary>
     /// Creates an attribute attached to a specified object.
@@ -100,6 +116,7 @@ internal static partial class H5A
         (hid_t loc_id, byte[] attr_name, hid_t type_id, hid_t space_id,
         hid_t acpl_id = H5P.DEFAULT, hid_t aapl_id = H5P.DEFAULT);
 
+#if NETSTANDARD
     /// <summary>
     /// Creates an attribute attached to a specified object.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Create2
@@ -118,6 +135,29 @@ internal static partial class H5A
     public static extern hid_t create
         (hid_t loc_id, string attr_name, hid_t type_id, hid_t space_id,
         hid_t acpl_id = H5P.DEFAULT, hid_t aapl_id = H5P.DEFAULT);
+#endif
+
+#if NET7_0_OR_GREATER
+    /// <summary>
+    /// Creates an attribute attached to a specified object.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Create2
+    /// </summary>
+    /// <param name="loc_id">Location or object identifier</param>
+    /// <param name="attr_name">Attribute name</param>
+    /// <param name="type_id">Attribute datatype identifier</param>
+    /// <param name="space_id">Attribute dataspace identifier</param>
+    /// <param name="acpl_id">Attribute creation property list identifier</param>
+    /// <param name="aapl_id">Attribute access property list identifier</param>
+    /// <returns>Returns an attribute identifier if successful; otherwise
+    /// returns a negative value.</returns>
+    /// <remarks>ASCII strings ONLY!</remarks>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Acreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t create
+        (hid_t loc_id, string attr_name, hid_t type_id, hid_t space_id,
+        hid_t acpl_id = H5P.DEFAULT, hid_t aapl_id = H5P.DEFAULT);
+#endif
 
     /// <summary>
     /// Creates an attribute attached to a specified object.

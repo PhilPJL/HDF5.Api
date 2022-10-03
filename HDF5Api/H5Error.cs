@@ -2,7 +2,7 @@
 
 namespace HDF5Api;
 
-public static partial class H5Error
+public static class H5Error
 {
     /// <summary>
     ///     Stop HDF printing errors to the console

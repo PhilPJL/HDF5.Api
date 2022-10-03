@@ -1,6 +1,6 @@
-﻿namespace HDF5Api.Disposables;
+﻿#if NETSTANDARD
+namespace HDF5Api.Disposables;
 
-#if NETSTANDARD
 /// <summary>
 ///     Disposable wrapper for safe allocation of global memory
 /// </summary>

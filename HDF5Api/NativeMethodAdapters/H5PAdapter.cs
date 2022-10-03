@@ -38,16 +38,4 @@ internal static class H5PAdapter
 
         err.ThrowIfError(nameof(set_deflate));
     }
-
-    /// <summary>
-    /// Get copy of property list used to create the data-set.
-    /// </summary>
-    /// <param name="dataSet"></param>
-    /// <returns></returns>
-    public static H5PropertyList GetCreationPropertyList(H5DataSet dataSet)
-    {
-        long h = H5D.get_create_plist(dataSet);
-        h.ThrowIfInvalidHandleValue(nameof(H5D.get_create_plist));
-        return new H5PropertyList(h);
-    }
 }

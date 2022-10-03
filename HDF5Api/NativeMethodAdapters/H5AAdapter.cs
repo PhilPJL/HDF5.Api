@@ -1,10 +1,13 @@
 ﻿using CommunityToolkit.Diagnostics;
-using System.Collections.Generic;
-
-using HDF5Api.NativeMethods;
-using static HDF5Api.NativeMethods.H5A;
-using CommunityToolkit.HighPerformance.Buffers;
+#if NETSTANDARD
 using HDF5Api.Disposables;
+#endif
+#if NET7_0_OR_GREATER
+using CommunityToolkit.HighPerformance.Buffers;
+#endif
+using HDF5Api.NativeMethods;
+using System.Collections.Generic;
+using static HDF5Api.NativeMethods.H5A;
 
 namespace HDF5Api.NativeMethodAdapters;
 
@@ -200,9 +203,18 @@ internal static class H5AAdapter
         }
 
 #if NET7_0_OR_GREATER
-        using var buf = SpanOwner<T>.Allocate(size);
-        read(attribute, type, MemoryMarshal.AsBytes(buf.Span));
-        return buf.Span[0];
+        if (size < 256)
+        {
+            Span<T> buf = stackalloc T[size];
+            read(attribute, type, MemoryMarshal.AsBytes(buf));
+            return buf[0];
+        }
+        else
+        {
+            using var buf = SpanOwner<T>.Allocate(size);
+            read(attribute, type, MemoryMarshal.AsBytes(buf.Span));
+            return buf.Span[0];
+        }
 #else
         unsafe
         {

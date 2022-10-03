@@ -109,5 +109,28 @@ internal static class H5DAdapter
             _ => throw new NotImplementedException(),
         };
     }
+
+    /// <summary>
+    /// Get copy of property list used to create the data-set.
+    /// </summary>
+    /// <param name="dataSet"></param>
+    /// <returns></returns>
+    public static H5PropertyList GetPropertyList(H5DataSet dataSet, PropertyList list)
+    {
+        return list switch
+        {
+            PropertyList.Create => GetCreationPropertyList(dataSet),
+            //PropertyList.Mount => throw new NotImplementedException(),
+            PropertyList.Access => throw new NotImplementedException(),
+            _ => throw new NotImplementedException(),
+        };
+
+        static H5PropertyList GetCreationPropertyList(H5DataSet dataSet)
+        {
+            long h = get_create_plist(dataSet);
+            h.ThrowIfInvalidHandleValue(nameof(get_create_plist));
+            return new H5PropertyList(h);
+        }
+    }
 }
 

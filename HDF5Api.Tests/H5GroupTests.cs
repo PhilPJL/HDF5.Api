@@ -386,5 +386,4 @@ public class H5GroupTests : H5LocationTests
             }
         });
     }
-
 }

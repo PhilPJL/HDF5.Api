@@ -43,7 +43,7 @@ internal abstract class H5DLLImporter
                 Instance = new H5UnixDllImporter(Constants.DLLFileName);
                 break;
             default:
-                throw new NotImplementedException(); ;
+                throw new NotImplementedException();
         }
     }
 

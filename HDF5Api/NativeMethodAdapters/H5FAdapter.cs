@@ -92,7 +92,7 @@ internal static class H5FAdapter
         return list switch
         {
             PropertyList.Create => H5PAdapter.Create(H5P.FILE_CREATE),
-            PropertyList.Mount => H5PAdapter.Create(H5P.FILE_MOUNT),
+            //PropertyList.Mount => H5PAdapter.Create(H5P.FILE_MOUNT),
             PropertyList.Access => H5PAdapter.Create(H5P.FILE_ACCESS),
             _ => throw new NotImplementedException(),
         };
@@ -103,7 +103,7 @@ internal static class H5FAdapter
         return list switch
         {
             PropertyList.Create => throw new NotImplementedException(),
-            PropertyList.Mount => throw new NotImplementedException(),
+            //PropertyList.Mount => throw new NotImplementedException(),
             PropertyList.Access => throw new NotImplementedException(),
             _ => throw new NotImplementedException(),
         };
