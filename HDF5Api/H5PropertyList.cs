@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5Api.NativeMethodAdapters;
-using System.Diagnostics.CodeAnalysis;
+using static HDF5Api.NativeMethods.H5P;
 
 namespace HDF5Api;
 
@@ -34,9 +34,22 @@ public class H5PropertyList : H5Object<H5PropertyList>
         H5PAdapter.EnableDeflateCompression(this, level);
     }
 
-    //public static H5PropertyList Create(long handle)
-    //{
-    //    return H5PropertyListNativeMethods.Create();
-    //}
+    public static H5PropertyList Create(PropertyList list)
+    {
+        return list switch
+        {
+            PropertyList.DataSetCreate => H5PAdapter.Create(DATASET_CREATE),
+            PropertyList.DataSetTransfer => H5PAdapter.Create(DATASET_XFER),
+            PropertyList.DataSetAccess => H5PAdapter.Create(DATASET_ACCESS),
+            _ => throw new NotImplementedException(),
+        };
+    }
+}
+
+public enum PropertyList
+{
+    DataSetCreate,
+    DataSetTransfer,
+    DataSetAccess
 }
 

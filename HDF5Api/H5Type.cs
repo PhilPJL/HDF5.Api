@@ -64,5 +64,10 @@ public class H5Type : H5Object<H5Type>
         return H5TAdapter.GetClass(this);
     }
 
+    public static H5Type CreateDoubleArrayType(int size)
+    {
+        return H5TAdapter.CreateDoubleArrayType(size);
+    }
+
     #endregion
 }

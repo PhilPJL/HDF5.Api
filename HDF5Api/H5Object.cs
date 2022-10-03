@@ -83,6 +83,3 @@ public class H5Object<T> : Disposable where T : H5Object<T>
 
     #endregion
 }
-
-
-

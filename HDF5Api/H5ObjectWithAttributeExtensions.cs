@@ -38,8 +38,7 @@ public static class H5ObjectWithAttributeExtensions
         value ??= string.Empty;
 
         maxLength = maxLength <= 0 ? value.Length : Math.Min(value.Length, maxLength);
-
-
+        
 #pragma warning disable IDE0057 // Use range operator
         string subString = value.Length > maxLength ? value.Substring(0, maxLength) : value;
 #pragma warning restore IDE0057 // Use range operator

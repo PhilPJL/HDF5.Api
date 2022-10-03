@@ -39,7 +39,7 @@ public static class H5Handle
     {
         foreach (var kvp in Handles)
         {
-            Debug.WriteLine(kvp.Value);
+            Debug.WriteLine($"Handle open{Environment.NewLine}{kvp.Value}");
         }
     }
 }

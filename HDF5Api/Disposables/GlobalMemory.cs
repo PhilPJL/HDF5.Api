@@ -1,11 +1,9 @@
 ﻿namespace HDF5Api.Disposables;
 
+#if NETSTANDARD
 /// <summary>
 ///     Disposable wrapper for safe allocation of global memory
 /// </summary>
-/// <remarks>
-///     TODO: investigate various SafeHandle types available in .NET
-/// </remarks>
 public abstract class GlobalMemoryBase : Disposable
 {
     public IntPtr IntPtr { get; protected set; }
@@ -45,3 +43,4 @@ public class StringToGlobalMemoryAnsi : GlobalMemoryBase
         IntPtr = Marshal.StringToHGlobalAnsi(s);
     }
 }
+#endif

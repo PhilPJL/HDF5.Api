@@ -10,8 +10,6 @@ public class H5Attribute : H5Object<H5Attribute>
     {
     }
 
-    #region Public Api
-
     public H5Space GetSpace()
     {
         return H5AAdapter.GetSpace(this);
@@ -42,6 +40,4 @@ public class H5Attribute : H5Object<H5Attribute>
     {
         H5AAdapter.Write(this, type, buffer);
     }
-
-    #endregion
 }

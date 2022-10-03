@@ -1,6 +1,5 @@
 ﻿
 using HDF5Api.NativeMethodAdapters;
-using HDF5Api.NativeMethods;
 
 namespace HDF5Api.Tests;
 
@@ -173,9 +172,9 @@ public abstract class H5LocationTests : H5Test
     {
         const string ds1Name = "ds1";
 
-        using var type = H5TAdapter.CreateDoubleArrayType(100);
+        using var type = H5Type.CreateDoubleArrayType(100);
         using var space = H5Space.Create(new Dimension(1, 1));
-        using var propertyList = H5PAdapter.Create(H5P.DATASET_CREATE);
+        using var propertyList = H5PropertyList.Create(PropertyList.DataSetCreate);
         using var ds1 = location.CreateDataSet(ds1Name, type, space, propertyList);
 
         Assert.IsTrue(location.DataSetExists(ds1Name));
@@ -185,14 +184,12 @@ public abstract class H5LocationTests : H5Test
     {
         const string ds1Name = "ds1";
 
-        using var type = H5TAdapter.CreateDoubleArrayType(100);
+        using var type = H5Type.CreateDoubleArrayType(100);
         using var space = H5Space.Create(new Dimension(1, 1));
-        using var propertyList = H5PAdapter.Create(H5P.DATASET_CREATE);
-        {
-            using var ds1 = location.CreateDataSet(ds1Name, type, space, propertyList);
+        using var propertyList = H5PropertyList.Create(PropertyList.DataSetCreate);
 
-            Assert.IsTrue(location.DataSetExists(ds1Name));
-        }
+        using var ds1 = location.CreateDataSet(ds1Name, type, space, propertyList);
+        Assert.IsTrue(location.DataSetExists(ds1Name));
 
         using var ds2 = location.OpenDataSet(ds1Name);
     }
