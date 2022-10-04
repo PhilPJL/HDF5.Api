@@ -76,6 +76,7 @@ internal static partial class H5P
     public delegate herr_t iterate_t
         (hid_t id, string name, IntPtr iter_data);
 
+#if NETSTANDARD
     /// <summary>
     /// Adds a path to the list of paths that will be searched in the
     /// destination file for a matching committed datatype.
@@ -3406,4 +3407,5 @@ internal static partial class H5P
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t unregister(hid_t cls, string name);
+#endif
 }

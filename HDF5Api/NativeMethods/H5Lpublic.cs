@@ -16,7 +16,7 @@
 namespace HDF5Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static class H5L
+internal static partial class H5L
 {
     static H5L() { _ = H5.open(); }
 
@@ -385,6 +385,7 @@ internal static class H5L
     string child_file_name, string child_object_name,
     ref uint acc_flags, hid_t fapl_id, IntPtr op_data);
 
+#if NETSTANDARD
     /// <summary>
     /// Copies a link from one location to another.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5L.html#Link-Copy
@@ -1228,4 +1229,5 @@ internal static class H5L
         (hid_t loc_id, string group_name, H5.index_t idx_type,
         H5.iter_order_t order, iterate_t op, IntPtr op_data,
         hid_t lapl_id = H5P.DEFAULT);
+#endif
 }

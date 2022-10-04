@@ -129,6 +129,7 @@ internal static partial class H5E
         H5E_WALK_DOWNWARD = 1
     }
 
+#if NETSTANDARD
     /// <summary>
     /// Determines type of error stack.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5E.html#Error-AutoIsV2
@@ -418,4 +419,5 @@ internal static partial class H5E
     public static extern herr_t walk
         (hid_t estack_id, direction_t direction, walk_t func,
         IntPtr client_data);
+#endif
 }

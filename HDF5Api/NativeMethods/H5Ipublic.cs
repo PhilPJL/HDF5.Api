@@ -111,6 +111,7 @@ internal static class H5I
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int search_func_t(IntPtr obj, hid_t id, IntPtr key);
 
+#if NETSTANDARD
     /// <summary>
     /// Deletes all identifiers of the given type.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5I.html#Identify-ClearType
@@ -379,4 +380,5 @@ internal static class H5I
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern htri_t type_exists(type_t type);
+#endif
 }

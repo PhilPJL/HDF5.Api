@@ -50,13 +50,7 @@ internal static class H5DAdapter
 
     public static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
     {
-        location.AssertHasHandleType(HandleType.File, HandleType.Group);
-
-        int err = H5L.exists(location, name, linkAccessPropertyList);
-
-        err.ThrowIfError(nameof(H5L.exists));
-
-        return err > 0;
+        return H5LAdapter.Exists(location, name, linkAccessPropertyList);
     }
 
     public static void SetExtent(H5DataSet dataSetId, params long[] dimensions)

@@ -16,7 +16,7 @@
 namespace HDF5Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static class H5G
+internal static partial class H5G
 {
     static H5G() { _ = H5.open(); }
 
@@ -69,6 +69,7 @@ internal static class H5G
         public hbool_t mounted;
     }
 
+#if NETSTANDARD
     /// <summary>
     /// Closes the specified group.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5G.html#Group-Close
@@ -311,4 +312,5 @@ internal static class H5G
         CharSet = CharSet.Ansi),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t refresh(hid_t group_id);
+#endif
 }

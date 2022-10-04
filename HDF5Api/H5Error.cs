@@ -1,4 +1,4 @@
-﻿using HDF5Api.NativeMethods;
+﻿using HDF5Api.NativeMethodAdapters;
 
 namespace HDF5Api;
 
@@ -9,7 +9,6 @@ public static class H5Error
     /// </summary>
     public static void SetAutoOff()
     {
-        int err = H5E.set_auto(H5E.DEFAULT, null!, IntPtr.Zero);
-        err.ThrowIfError(nameof(H5E.set_auto));
+        H5EAdapter.SetAutoOff();
     }
 }

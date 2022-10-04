@@ -19,6 +19,7 @@ internal static class H5DO
 {
     static H5DO() { _ = H5.open(); }
 
+#if NETSTANDARD
     /// <summary>
     /// Reads a raw data chunk directly from a dataset in a file into a buffer.
     /// See https://support.hdfgroup.org/HDF5/doc/HL/RM_HDF5Optimized.html#H5DOread_chunk
@@ -80,5 +81,5 @@ internal static class H5DO
     public static extern herr_t append
         (hid_t dset_id, hid_t dxpl_id, uint axis,
         size_t num_elem, hid_t memtype, IntPtr buf);
-
+#endif
 }
