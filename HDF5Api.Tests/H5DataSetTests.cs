@@ -143,9 +143,9 @@ public class H5DataSetTests : H5Test
             using var intervalRecordWriter = H5DataSetWriter
                 .CreateOneDimensionalDataSetWriter(file, "IntervalRecords", IntervalRecordAdapter.Default, 10, 5);
 
-            for(int i = 0; i < 10000; i++)
+            for(int i = 0; i < 1000; i++)
             {
-                intervalRecordWriter.Write(Enumerable.Repeat(new IntervalRecord(), 5).ToArray());
+                intervalRecordWriter.Write(Enumerable.Repeat(new IntervalRecord(), 50).ToArray());
             }
 
             Debug.WriteLine($"Compressed={file.GetSize()}");
@@ -168,9 +168,9 @@ public class H5DataSetTests : H5Test
             using var intervalRecordWriter = H5DataSetWriter
                 .CreateOneDimensionalDataSetWriter(file, "IntervalRecords", IntervalRecordAdapter.Default, 10, 0);
 
-            for(int i = 0; i < 10000; i++)
+            for(int i = 0; i < 1000; i++)
             {
-                intervalRecordWriter.Write(Enumerable.Repeat(new IntervalRecord(), 5).ToArray());
+                intervalRecordWriter.Write(Enumerable.Repeat(new IntervalRecord(), 50).ToArray());
             }
 
             Debug.WriteLine($"Uncompressed={file.GetSize()}");

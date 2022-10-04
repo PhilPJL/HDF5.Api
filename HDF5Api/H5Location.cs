@@ -178,14 +178,13 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         int Callback(long groupId, IntPtr intPtrName, ref NativeMethods.H5L.info_t info, IntPtr _)
         {
             string? name = Marshal.PtrToStringAnsi(intPtrName);
+            Guard.IsNotNull(name);
 
             NativeMethods.H5O.info_t oinfo = default;
             int err1 = NativeMethods.H5O.get_info_by_name(groupId, name, ref oinfo);
             err1.ThrowIfError(nameof(NativeMethods.H5O.get_info_by_name));
 
-            // TODO: nullability - converting to "(unknown)" isn't great
-
-            names.Add((name ?? "(unknown)", oinfo.type == NativeMethods.H5O.type_t.GROUP));
+            names.Add((name, oinfo.type == NativeMethods.H5O.type_t.GROUP));
             return 0;
         }
     }

@@ -81,21 +81,6 @@ internal static partial class H5A
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t close(hid_t attr_id);
-#endif
-
-#if NET7_0_OR_GREATER
-    /// <summary>
-    /// Closes the specified attribute.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Close
-    /// </summary>
-    /// <param name="attr_id">Attribute to release access to.</param>
-    /// <returns>Returns a non-negative value if successful; otherwise
-    /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aclose"),
-    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t close(hid_t attr_id);
-#endif
 
     /// <summary>
     /// Creates an attribute attached to a specified object.
@@ -116,7 +101,6 @@ internal static partial class H5A
         (hid_t loc_id, byte[] attr_name, hid_t type_id, hid_t space_id,
         hid_t acpl_id = H5P.DEFAULT, hid_t aapl_id = H5P.DEFAULT);
 
-#if NETSTANDARD
     /// <summary>
     /// Creates an attribute attached to a specified object.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Create2
@@ -135,29 +119,6 @@ internal static partial class H5A
     public static extern hid_t create
         (hid_t loc_id, string attr_name, hid_t type_id, hid_t space_id,
         hid_t acpl_id = H5P.DEFAULT, hid_t aapl_id = H5P.DEFAULT);
-#endif
-
-#if NET7_0_OR_GREATER
-    /// <summary>
-    /// Creates an attribute attached to a specified object.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Create2
-    /// </summary>
-    /// <param name="loc_id">Location or object identifier</param>
-    /// <param name="attr_name">Attribute name</param>
-    /// <param name="type_id">Attribute datatype identifier</param>
-    /// <param name="space_id">Attribute dataspace identifier</param>
-    /// <param name="acpl_id">Attribute creation property list identifier</param>
-    /// <param name="aapl_id">Attribute access property list identifier</param>
-    /// <returns>Returns an attribute identifier if successful; otherwise
-    /// returns a negative value.</returns>
-    /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Acreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
-    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t create
-        (hid_t loc_id, string attr_name, hid_t type_id, hid_t space_id,
-        hid_t acpl_id = H5P.DEFAULT, hid_t aapl_id = H5P.DEFAULT);
-#endif
 
     /// <summary>
     /// Creates an attribute attached to a specified object.
@@ -223,7 +184,6 @@ internal static partial class H5A
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t delete(hid_t loc_id, byte[] name);
 
-#if NETSTANDARD
     /// <summary>
     /// Deletes an attribute from a specified location.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Delete
@@ -239,24 +199,6 @@ internal static partial class H5A
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t delete(hid_t loc_id, string name);
-#endif
-
-#if NET7_0_OR_GREATER
-    /// <summary>
-    /// Deletes an attribute from a specified location.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Delete
-    /// </summary>
-    /// <param name="loc_id">Identifier of the dataset, group, or named
-    /// datatype to have the attribute deleted from.</param>
-    /// <param name="name">Name of the attribute to delete.</param>
-    /// <returns>Returns a non-negative value if successful; otherwise
-    /// returns a negative value.</returns>
-    /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Adelete", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
-    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t delete(hid_t loc_id, string name);
-#endif
 
     /// <summary>
     /// Deletes an attribute from an object according to index order.
@@ -356,7 +298,6 @@ internal static partial class H5A
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern htri_t exists(hid_t obj_id, byte[] attr_name);
 
-#if NETSTANDARD
     /// <summary>
     /// Determines whether an attribute with a given name exists on an object.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Exists
@@ -372,24 +313,6 @@ internal static partial class H5A
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern htri_t exists(hid_t obj_id, string attr_name);
-#endif
-
-#if NET7_0_OR_GREATER
-    /// <summary>
-    /// Determines whether an attribute with a given name exists on an object.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Exists
-    /// </summary>
-    /// <param name="obj_id">Object identifier</param>
-    /// <param name="attr_name">Attribute name</param>
-    /// <returns>When successful, returns a positive value, for
-    /// <code>TRUE</code>, or 0 (zero), for <code>FALSE</code>. Otherwise
-    /// returns a negative value.</returns>
-    /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aexists", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
-    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial htri_t exists(hid_t obj_id, string attr_name);
-#endif
 
     /// <summary>
     /// Determines whether an attribute with a given name exists on an object.
@@ -634,7 +557,6 @@ internal static partial class H5A
         H5.index_t idx_type, H5.iter_order_t order, hsize_t n,
         [In][Out] StringBuilder name, size_t size, hid_t lapl_id = H5P.DEFAULT);
 
-
     /// <summary>
     /// Gets an attribute name, by attribute index position.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-GetNameByIdx
@@ -793,7 +715,6 @@ internal static partial class H5A
     public static extern hid_t open
         (hid_t obj_id, byte[] attr_name, hid_t aapl_id = H5P.DEFAULT);
 
-#if NETSTANDARD
     /// <summary>
     /// Opens an attribute for an object specified by object identifier
     /// and attribute name.
@@ -812,27 +733,6 @@ internal static partial class H5A
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t open
         (hid_t obj_id, string attr_name, hid_t aapl_id = H5P.DEFAULT);
-#endif
-
-#if NET7_0_OR_GREATER
-    /// <summary>
-    /// Opens an attribute for an object specified by object identifier
-    /// and attribute name.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Open
-    /// </summary>
-    /// <param name="obj_id">Identifer for object to which attribute is
-    /// attached</param>
-    /// <param name="attr_name">Name of attribute to open</param>
-    /// <param name="aapl_id">Attribute access property list</param>
-    /// <returns>Returns an attribute identifier if successful; otherwise
-    /// returns a negative value.</returns>
-    /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aopen", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
-    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial hid_t open
-        (hid_t obj_id, string attr_name, hid_t aapl_id = H5P.DEFAULT);
-#endif
 
     /// <summary>
     /// Opens an attribute for an object specified by attribute index
@@ -926,7 +826,6 @@ internal static partial class H5A
         (hid_t loc_id, string obj_name, string attr_name,
         hid_t aapl_id = H5P.DEFAULT, hid_t lapl_id = H5P.DEFAULT);
 
-#if NETSTANDARD
     /// <summary>
     /// Reads an attribute.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Read
@@ -942,25 +841,6 @@ internal static partial class H5A
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern unsafe herr_t read
         (hid_t attr_id, hid_t type_id, IntPtr buf);
-#endif
-
-#if NET7_0_OR_GREATER
-    /// <summary>
-    /// Reads an attribute.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Read
-    /// </summary>
-    /// <param name="attr_id">Identifier of an attribute to read.</param>
-    /// <param name="type_id"> Identifier of the attribute datatype
-    /// (in memory).</param>
-    /// <param name="buf">Buffer for data to be read.</param>
-    /// <returns>Returns a non-negative value if successful; otherwise
-    /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread"),
-    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t read
-        (hid_t attr_id, hid_t type_id, Span<byte> buf);
-#endif
 
     /// <summary>
     /// Renames an attribute.
@@ -1049,4 +929,5 @@ internal static partial class H5A
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t write
         (hid_t attr_id, hid_t mem_type_id, IntPtr buf);
+#endif
 }

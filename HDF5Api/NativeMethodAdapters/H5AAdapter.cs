@@ -83,11 +83,10 @@ internal static class H5AAdapter
         int Callback(long id, IntPtr intPtrName, ref info_t info, IntPtr _)
         {
             string? name = Marshal.PtrToStringAnsi(intPtrName);
-
             Guard.IsNotNull(name);
 
             // TODO: use return info?
-            var __ = GetInfoByName(h5Object, ".", name, linkAccessPropertyList);
+            //var info = GetInfoByName(h5Object, ".", name, linkAccessPropertyList);
 
             names.Add(name);
             return 0;
