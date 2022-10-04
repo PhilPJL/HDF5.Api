@@ -1,5 +1,4 @@
-﻿using HDF5Api.NativeMethods;
-using System.Linq;
+﻿using System.Linq;
 using static HDF5Api.NativeMethods.H5P;
 
 namespace HDF5Api.NativeMethodAdapters;

@@ -45,7 +45,7 @@ internal static class H5TAdapter
 
     public static H5Type CreateByteArrayType(params long[] dims)
     {
-        long h = array_create(NATIVE_B8, (uint)dims.Length, dims.Cast<ulong>().ToArray());
+        long h = array_create(NATIVE_B8, (uint)dims.Length, dims.Select(d => (ulong)d).ToArray());
         h.ThrowIfInvalidHandleValue(nameof(array_create));
         return new H5Type(h);
     }
