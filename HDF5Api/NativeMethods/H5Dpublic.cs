@@ -235,23 +235,6 @@ internal static partial class H5D
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t close(hid_t dset_id);
-#endif
-
-#if NET7_0_OR_GREATER
-    /// <summary>
-    /// Closes the specified dataset.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Close
-    /// </summary>
-    /// <param name="dset_id">Identifier of the dataset to close access to.
-    /// </param>
-    /// <returns>Returns a non-negative value if successful; otherwise
-    /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dclose"),
-    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t close(hid_t dset_id);
-#endif
-
 
     /// <summary>
     /// Creates a new dataset and links it into the file.
@@ -813,7 +796,6 @@ internal static partial class H5D
     public static extern herr_t vlen_reclaim
         (hid_t type_id, hid_t space_id, hid_t plist_id, IntPtr buf);
 
-#if true //NETSTANDARD
     /// <summary>
     /// Writes raw data from a buffer to a dataset.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Write
@@ -834,29 +816,7 @@ internal static partial class H5D
     public static extern herr_t write
         (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id,
         hid_t file_space_id, hid_t plist_id, IntPtr buf);
-#endif
 
-#if false //NET7_0_OR_GREATER
-    /// <summary>
-    /// Writes raw data from a buffer to a dataset.
-    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Write
-    /// </summary>
-    /// <param name="dset_id">Identifier of the dataset to write to.</param>
-    /// <param name="mem_type_id">Identifier of the memory datatype.</param>
-    /// <param name="mem_space_id">Identifier of the memory dataspace.</param>
-    /// <param name="file_space_id">Identifier of the dataset's dataspace
-    /// in the file.</param>
-    /// <param name="plist_id">Identifier of a transfer property list for
-    /// this I/O operation.</param>
-    /// <param name="buf">Buffer with data to be written to the file.</param>
-    /// <returns>Returns a non-negative value if successful; otherwise
-    /// returns a negative value.</returns>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dwrite"), SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial herr_t write
-        (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id,
-        hid_t file_space_id, hid_t plist_id, Span<byte> buf);
-#endif
 
     /// <summary>
     /// Writes a raw data chunk from a buffer directly to a dataset.
@@ -878,4 +838,5 @@ internal static partial class H5D
     public static extern herr_t write_chunk
         (hid_t dset_id, hid_t dxpl_id, uint32_t filter_mask,
         ref hsize_t offset, size_t data_size, IntPtr buf);
+#endif
 }
