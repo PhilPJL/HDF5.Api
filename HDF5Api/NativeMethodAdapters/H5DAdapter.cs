@@ -61,7 +61,7 @@ internal static class H5DAdapter
 
     public static void SetExtent(H5DataSet dataSetId, params long[] dimensions)
     {
-        int err = set_extent(dataSetId, dimensions.Cast<ulong>().ToArray());
+        int err = set_extent(dataSetId, dimensions.Select(d => (ulong)d).ToArray());
 
         err.ThrowIfError(nameof(set_extent));
     }

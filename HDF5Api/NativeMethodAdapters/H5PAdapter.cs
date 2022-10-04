@@ -27,7 +27,7 @@ internal static class H5PAdapter
 
     public static void SetChunk(H5PropertyList propertyList, int rank, long[] dims)
     {
-        int err = set_chunk(propertyList, rank, dims.Cast<ulong>().ToArray());
+        int err = set_chunk(propertyList, rank, dims.Select(d => (ulong)d).ToArray());
 
         err.ThrowIfError(nameof(set_chunk));
     }
