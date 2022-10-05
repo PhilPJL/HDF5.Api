@@ -3,7 +3,8 @@
 namespace HDF5Api;
 
 /// <summary>
-///     Wrapper for H5G (Group) API.
+///     <para>.NET wrapper for H5G (Group) API.</para>
+///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_g.html"/>
 /// </summary>
 public class H5Group : H5Location<H5Group>
 {

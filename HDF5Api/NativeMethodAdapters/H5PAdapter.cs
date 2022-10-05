@@ -38,6 +38,15 @@ internal static class H5PAdapter
         err.ThrowIfError(nameof(set_deflate));
     }
 
+    public static bool AreEqual(H5PropertyList propertyList1, H5PropertyList propertyList2)
+    {
+        int err = equal(propertyList1, propertyList2);
+
+        err.ThrowIfError(nameof(equal));
+
+        return err != 0;
+    }
+
     internal static H5PropertyList GetPropertyList<T>(H5Object<T> obj, Func<long, long> get_plist) where T : H5Object<T>
     {
         long h = get_plist(obj);

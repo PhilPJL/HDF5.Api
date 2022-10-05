@@ -58,7 +58,9 @@ public class H5AttributeWriter<TInput> : Disposable, IH5AttributeWriter<TInput>
                 Location.CreateAttribute(GetAttributeName(record), Type, memorySpace, properyList);
 
             // TODO: use Span<TInput>
-            Converter.Write(WriteAdaptor(attribute, Type), new TInput[] { record });
+            Converter.Write(WriteAdaptor(attribute, Type), new [] { record });
+ 
+            RowsWritten += 1;
         }
 
         // Curry attribute.Write to an Action<IntPtr>

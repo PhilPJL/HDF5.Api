@@ -6,7 +6,7 @@ using HDF5Api.NativeMethodAdapters;
 namespace HDF5Api;
 
 /// <summary>
-///     <para>.NET friendly wrapper for H5F (File) API.</para>
+///     <para>.NET wrapper for H5F (File) API.</para>
 ///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_f.html"/>
 /// </summary>
 public class H5File : H5Location<H5File>

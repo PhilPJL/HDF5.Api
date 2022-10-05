@@ -53,6 +53,19 @@ internal static partial class H5P
     public static partial hid_t create(hid_t cls_id);
 
     /// <summary>
+    /// Compares two property lists or classes for equality.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-Equal
+    /// </summary>
+    /// <param name="id1">First property object to be compared</param>
+    /// <param name="id2">Second property object to be compared</param>
+    /// <returns>Returns 1 if equal; 0 if unequal. Returns a negative value
+    /// on error.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pequal"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial htri_t equal(hid_t id1, hid_t id2);
+
+    /// <summary>
     /// Sets the size of the chunks used to store a chunked layout dataset.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetChunk
     /// </summary>

@@ -15,7 +15,7 @@ public class H5DataSetTests : H5Test
         using var propertyList = H5DataSet.CreatePropertyList(PropertyListType.Create);
 
         // Enable chunking. From the user guide: "HDF5 requires the use of chunking when defining extendable datasets."
-        propertyList.SetChunk(1, chunkSize);
+        propertyList.SetChunk(chunkSize);
 
         using var type = H5Type.GetNativeType<long>();
 

@@ -6,7 +6,8 @@ using HDF5Api.NativeMethodAdapters;
 namespace HDF5Api;
 
 /// <summary>
-///     .NET wrapper for the H5D (DataSet) API: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_d.html"/>
+///     <para>.NET wrapper for H5D (DataSet) API.</para>
+///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_d.html"/>
 /// </summary>
 public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 {

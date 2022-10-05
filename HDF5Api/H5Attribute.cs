@@ -2,7 +2,8 @@
 namespace HDF5Api;
 
 /// <summary>
-///     .NET class for the H5A (Attribute) API: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
+///     <para>.NET wrapper for H5A (Attribute) API.</para>
+///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
 /// </summary>
 public class H5Attribute : H5Object<H5Attribute>
 {
@@ -46,7 +47,7 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AAdapter.GetPropertyList(this, listType);
     }
 
-    public H5PropertyList CreatePropertyList(PropertyListType listType)
+    public static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
         return H5AAdapter.CreatePropertyList(listType);
     }

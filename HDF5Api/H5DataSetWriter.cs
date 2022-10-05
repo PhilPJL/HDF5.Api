@@ -15,7 +15,7 @@ public static class H5DataSetWriter
         using var propertyList = H5DataSet.CreatePropertyList(PropertyListType.Create);
 
         // Enable chunking. From the user guide: "HDF5 requires the use of chunking when defining extendable datasets."
-        propertyList.SetChunk(1, chunkSize);
+        propertyList.SetChunk(chunkSize);
 
         if (compressionLevel > 0)
         {

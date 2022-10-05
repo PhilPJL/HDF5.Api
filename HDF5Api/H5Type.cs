@@ -4,7 +4,8 @@ using HDF5Api.NativeMethodAdapters;
 namespace HDF5Api;
 
 /// <summary>
-///     Wrapper for H5T (Type) API.
+///     <para>.NET wrapper for H5T (Type) API.</para>
+///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_t.html"/>
 /// </summary>
 public class H5Type : H5Object<H5Type>
 {

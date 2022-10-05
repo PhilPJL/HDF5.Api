@@ -6,7 +6,8 @@ using HDF5Api.NativeMethodAdapters;
 namespace HDF5Api;
 
 /// <summary>
-///     Wrapper for H5S (Space) API.
+///     <para>.NET wrapper for H5S (Space) API.</para>
+///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_s.html"/>
 /// </summary>
 public class H5Space : H5Object<H5Space>
 {
