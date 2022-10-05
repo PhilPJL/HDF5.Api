@@ -13,7 +13,7 @@ public abstract class H5TypeAdapter<TInput> : H5TypeAdapterBase, IH5TypeAdapter<
 {
     public abstract H5Type GetH5Type();
 
-    public abstract void Write(Action<IntPtr> write, ICollection<TInput> inputRecords);
+    public abstract void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords);
 }
 
 /// <summary>
@@ -29,7 +29,7 @@ public abstract class H5TypeAdapter<TInput, TOutput> : H5TypeAdapter<TInput>
 {
     protected abstract TOutput Convert(TInput source);
 
-    public override void Write(Action<IntPtr> write, ICollection<TInput> inputRecords)
+    public override void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords)
     {
         // convert input to Array of struct
         var records = inputRecords.Select(Convert).ToArray();

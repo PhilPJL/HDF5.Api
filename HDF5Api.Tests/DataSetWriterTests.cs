@@ -21,13 +21,13 @@ public class DataSetWriterTests : H5Test
             using var file = H5File.Create(Path);
             Assert.IsTrue(File.Exists(Path));
 
-            using var intervalRecordWriter = H5DataSetWriter
-                .CreateOneDimensionalDataSetWriter(file, "IntervalRecords", TestRecordAdapter.Default, 10, 5);
+            using var writer = H5DataSetWriter
+                .CreateOneDimensionalDataSetWriter(file, "TestRecords", TestRecordAdapter.Default, 10, 5);
 
-            for (int i = 0; i < 1000; i++)
-            {
-                intervalRecordWriter.Write(Enumerable.Repeat(new TestRecord(), 50).ToArray());
-            }
+            Enumerable.Range(0, 50000)
+                .Select(i => new TestRecord { Id = i })
+                .Buffer(50)
+                .ForEach(b => writer.Write(b));
 
             Debug.WriteLine($"Compressed={file.GetSize()}");
         });
@@ -46,13 +46,13 @@ public class DataSetWriterTests : H5Test
             using var file = H5File.Create(Path1);
             Assert.IsTrue(File.Exists(Path1));
 
-            using var intervalRecordWriter = H5DataSetWriter
-                .CreateOneDimensionalDataSetWriter(file, "IntervalRecords", TestRecordAdapter.Default, 10, 0);
+            using var writer = H5DataSetWriter
+                .CreateOneDimensionalDataSetWriter(file, "TestRecords", TestRecordAdapter.Default, 10, 0);
 
-            for (int i = 0; i < 1000; i++)
-            {
-                intervalRecordWriter.Write(Enumerable.Repeat(new TestRecord(), 50).ToArray());
-            }
+            Enumerable.Range(0, 50000)
+                .Select(i => new TestRecord { Id = i })
+                .Buffer(50)
+                .ForEach(b => writer.Write(b));
 
             Debug.WriteLine($"Uncompressed={file.GetSize()}");
         });

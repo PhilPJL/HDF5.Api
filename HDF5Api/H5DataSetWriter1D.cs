@@ -1,5 +1,6 @@
 ﻿using HDF5Api.NativeMethodAdapters;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HDF5Api;
 
@@ -48,9 +49,9 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
     /// <summary>
     ///     Write a collection of <typeparamref name="TInput" /> to the DataSet.
     /// </summary>
-    public void Write(ICollection<TInput> recordsChunk)
+    public void Write(IEnumerable<TInput> recordsChunk)
     {
-        int numRecords = recordsChunk.Count;
+        int numRecords = recordsChunk.Count();
 
         // Extend the dataset to accept this chunk
         DataSet.SetExtent(RowsWritten + numRecords);

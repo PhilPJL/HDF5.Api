@@ -8,6 +8,6 @@ namespace HDF5Api;
 /// <typeparam name="TInput"></typeparam>
 public interface IH5DataSetWriter<TInput> : IDisposable
 {
-    void Write(ICollection<TInput> recordsChunk);
+    void Write(IEnumerable<TInput> recordsChunk);
     long RowsWritten { get; }
 }

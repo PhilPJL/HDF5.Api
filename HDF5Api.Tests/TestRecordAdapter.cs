@@ -13,6 +13,7 @@ public sealed class TestRecordAdapter : H5TypeAdapter<TestRecord, TestRecordAdap
     {
         return new STestRecord
         {
+            Id = source.Id,
             ShortProperty = source.ShortProperty,
             IntProperty = source.IntProperty,
             LongProperty = source.LongProperty,
@@ -28,6 +29,7 @@ public sealed class TestRecordAdapter : H5TypeAdapter<TestRecord, TestRecordAdap
     {
         return H5Type
             .CreateCompoundType<STestRecord>()
+            .Insert<STestRecord, int>(nameof(STestRecord.Id))
             .Insert<STestRecord, short>(nameof(STestRecord.ShortProperty))
             .Insert<STestRecord, int>(nameof(STestRecord.IntProperty))
             .Insert<STestRecord, long>(nameof(STestRecord.LongProperty))
@@ -42,6 +44,8 @@ public sealed class TestRecordAdapter : H5TypeAdapter<TestRecord, TestRecordAdap
     [StructLayout(LayoutKind.Sequential)]
     public struct STestRecord
     {
+        public int Id;
+
         public short ShortProperty;
         public int IntProperty;
         public long LongProperty;
@@ -57,6 +61,7 @@ public sealed class TestRecordAdapter : H5TypeAdapter<TestRecord, TestRecordAdap
 
 public class TestRecord
 {
+    public int Id { get; set; }
     public short ShortProperty { get; set; }
     public int IntProperty { get; set; }
     public long LongProperty { get; set; }

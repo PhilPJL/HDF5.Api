@@ -9,5 +9,5 @@ namespace HDF5Api;
 public interface IH5TypeAdapter<TInput>
 {
     H5Type GetH5Type();
-    void Write(Action<IntPtr> write, ICollection<TInput> inputRecords);
+    void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords);
 }
