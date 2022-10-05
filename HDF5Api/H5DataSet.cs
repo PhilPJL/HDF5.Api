@@ -139,7 +139,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         var cls = type.GetClass();
         if (cls != H5Class.Compound)
         {
-            throw new Hdf5Exception($"DataSet is of class {cls} when expecting {NativeMethods.H5T.class_t.COMPOUND}.");
+            throw new Hdf5Exception($"DataSet is of class {cls} when expecting {H5Class.Compound}.");
         }
 
         long size = (long)H5DAdapter.GetStorageSize(this);

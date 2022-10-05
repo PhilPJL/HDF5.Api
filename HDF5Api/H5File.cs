@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System.IO;
 
-using HDF5Api.NativeMethods;
 using HDF5Api.NativeMethodAdapters;
 
 namespace HDF5Api;
@@ -84,16 +83,4 @@ public class H5File : H5Location<H5File>
 
         return H5FAdapter.Create(path, failIfExists, fileCreationPropertyList, fileAccessPropertyList);
     }
-}
-
-[Flags]
-public enum H5ObjectTypes : uint
-{
-    All = H5F.OBJ_ALL,
-    Attribute = H5F.OBJ_ATTR,
-    DataSet = H5F.OBJ_DATASET,
-    DataType = H5F.OBJ_DATATYPE,
-    File = H5F.OBJ_FILE,
-    Group = H5F.OBJ_GROUP,
-    Local = H5F.OBJ_LOCAL
 }

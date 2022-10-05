@@ -1,4 +1,5 @@
-﻿using static HDF5Api.NativeMethods.H5;
+﻿using HDF5Api.NativeMethods;
+using static HDF5Api.NativeMethods.H5;
 
 namespace HDF5Api;
 
@@ -32,4 +33,16 @@ public static class H5Global
 
         return is_ts != 0;
     }
+}
+
+[Flags]
+public enum H5ObjectTypes : uint
+{
+    All = H5F.OBJ_ALL,
+    Attribute = H5F.OBJ_ATTR,
+    DataSet = H5F.OBJ_DATASET,
+    DataType = H5F.OBJ_DATATYPE,
+    File = H5F.OBJ_FILE,
+    Group = H5F.OBJ_GROUP,
+    Local = H5F.OBJ_LOCAL
 }

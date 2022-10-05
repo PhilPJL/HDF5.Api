@@ -94,7 +94,7 @@ internal static class H5AAdapter
     }
 
     // TODO: make public?
-    private static info_t GetInfoByName<T>(H5Object<T> h5Object,
+    public static info_t GetInfoByName<T>(H5Object<T> h5Object,
         string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
     {
         info_t info = default;
@@ -103,7 +103,8 @@ internal static class H5AAdapter
         return info;
     }
 
-    internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
+    // TODO: Span<> variant
+    public static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
     {
         int err = write(attribute, type, buffer);
 
@@ -239,5 +240,13 @@ internal static class H5AAdapter
         };
     }
 
+    public static H5PropertyList CreatePropertyList(PropertyList list)
+    {
+        return list switch
+        {
+            PropertyList.Create => H5PAdapter.Create(H5P.ATTRIBUTE_CREATE),
+            _ => throw new NotImplementedException(),
+        };
+    }
 }
 

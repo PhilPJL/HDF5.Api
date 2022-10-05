@@ -40,4 +40,14 @@ public class H5Attribute : H5Object<H5Attribute>
     {
         H5AAdapter.Write(this, type, buffer);
     }
+
+    public H5PropertyList GetPropertyList(PropertyList list)
+    {
+        return H5AAdapter.GetPropertyList(this, list);
+    }
+
+    public H5PropertyList CreatePropertyList(PropertyList list)
+    {
+        return H5AAdapter.CreatePropertyList(list);
+    }
 }

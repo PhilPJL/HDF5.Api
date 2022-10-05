@@ -1,6 +1,4 @@
 ﻿using HDF5Api.Disposables;
-
-using HDF5Api.NativeMethods;
 using HDF5Api.NativeMethodAdapters;
 using CommunityToolkit.Diagnostics;
 
@@ -19,7 +17,7 @@ public static class H5ObjectWithAttributeExtensions
         using var memorySpace = H5SAdapter.CreateSimple(1);
 
         // Create the attribute-creation property list (TODO: is this required or can I use default?)
-        using var propertyList = H5PAdapter.Create(H5P.ATTRIBUTE_CREATE);
+        using var propertyList = H5AAdapter.CreatePropertyList(PropertyList.Create);
 
         // Create an attribute
         using var attribute = owa.CreateAttribute(name, type, memorySpace, propertyList);

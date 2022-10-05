@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5Api.NativeMethodAdapters;
-using HDF5Api.NativeMethods;
 
 namespace HDF5Api;
 
@@ -17,22 +16,7 @@ public class H5Type : H5Object<H5Type>
 
     public static H5Type GetNativeType<T>() where T : unmanaged
     {
-        long nativeHandle = default(T) switch
-        {
-            //            char => H5T.NATIVE_CHAR,
-
-            short => H5T.NATIVE_INT16,
-            ushort => H5T.NATIVE_USHORT,
-            int => H5T.NATIVE_INT32,
-            uint => H5T.NATIVE_UINT32,
-            long => H5T.NATIVE_INT64,
-            ulong => H5T.NATIVE_UINT64,
-            float => H5T.NATIVE_FLOAT,
-            double => H5T.NATIVE_DOUBLE,
-            // TODO: add more mappings as required
-
-            _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
-        };
+        long nativeHandle = H5TAdapter.GetNativeType<T>();
 
         return new H5Type(nativeHandle, null);
     }

@@ -98,8 +98,3 @@ public readonly struct Dimension
         UpperLimit = upperLimit ?? MaxLimit;
     }
 };
-
-public static class DimensionExtensions
-{
-    
-}

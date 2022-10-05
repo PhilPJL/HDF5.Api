@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using HDF5Api.NativeMethods;
+using System.Linq;
 using static HDF5Api.NativeMethods.H5T;
 
 namespace HDF5Api.NativeMethodAdapters;
@@ -97,6 +98,26 @@ internal static class H5TAdapter
         int err = is_variable_str(typeId);
         err.ThrowIfError(nameof(is_variable_str));
         return err > 0;
+    }
+
+    public static long GetNativeType<T>() where T : unmanaged
+    {
+        return default(T) switch
+        {
+            //            char => H5T.NATIVE_CHAR,
+
+            short => H5T.NATIVE_INT16,
+            ushort => H5T.NATIVE_USHORT,
+            int => H5T.NATIVE_INT32,
+            uint => H5T.NATIVE_UINT32,
+            long => H5T.NATIVE_INT64,
+            ulong => H5T.NATIVE_UINT64,
+            float => H5T.NATIVE_FLOAT,
+            double => H5T.NATIVE_DOUBLE,
+            // TODO: add more mappings as required
+
+            _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
+        };       
     }
 }
 
