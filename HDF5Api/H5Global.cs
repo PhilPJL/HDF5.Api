@@ -1,4 +1,5 @@
-﻿using HDF5Api.NativeMethods;
+﻿using CommunityToolkit.Diagnostics;
+using HDF5Api.NativeMethods;
 using static HDF5Api.NativeMethods.H5;
 
 namespace HDF5Api;
@@ -45,4 +46,53 @@ public enum H5ObjectTypes : uint
     File = H5F.OBJ_FILE,
     Group = H5F.OBJ_GROUP,
     Local = H5F.OBJ_LOCAL
+}
+
+public readonly struct Dimension
+{
+    public const ulong MaxLimit = ulong.MaxValue;
+
+    public readonly ulong InitialSize { get; }
+    public readonly ulong UpperLimit { get; }
+
+    public Dimension(long initialSize, long? upperLimit = null)
+    {
+        Guard.IsGreaterThanOrEqualTo(initialSize, 0);
+        Guard.IsGreaterThanOrEqualTo(upperLimit ?? 0, 0);
+
+        InitialSize = (ulong)initialSize;
+
+        if (upperLimit == null)
+        {
+            UpperLimit = MaxLimit;
+        }
+        else
+        {
+            UpperLimit = (ulong)upperLimit.Value;
+        }
+    }
+
+    public Dimension(ulong initialSize, ulong? upperLimit = null)
+    {
+        InitialSize = initialSize;
+
+        UpperLimit = upperLimit ?? MaxLimit;
+    }
+};
+
+public enum H5Class
+{
+    None = -1,
+    Integer = 0,
+    Float = 1,
+    Time = 2,
+    String = 3,
+    BitField = 4,
+    Opaque = 5,
+    Compound = 6,
+    Reference = 7,
+    Enum = 8,
+    VariableLength = 9,
+    Array = 10,
+    NClasses
 }

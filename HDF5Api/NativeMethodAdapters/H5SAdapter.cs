@@ -66,35 +66,3 @@ internal static class H5SAdapter
         return Enumerable.Zip(dims, maxDims, (f, s) => new Dimension(f, s)).ToList();
     }
 }
-
-public readonly struct Dimension
-{
-    public const ulong MaxLimit = ulong.MaxValue;
-
-    public readonly ulong InitialSize { get; }
-    public readonly ulong UpperLimit { get; }
-
-    public Dimension(long initialSize, long? upperLimit = null)
-    {
-        Guard.IsGreaterThanOrEqualTo(initialSize, 0);
-        Guard.IsGreaterThanOrEqualTo(upperLimit ?? 0, 0);
-
-        InitialSize = (ulong)initialSize;
-
-        if (upperLimit == null)
-        {
-            UpperLimit = MaxLimit;
-        }
-        else
-        {
-            UpperLimit = (ulong)upperLimit.Value;
-        }
-    }
-
-    public Dimension(ulong initialSize, ulong? upperLimit = null)
-    {
-        InitialSize = initialSize;
-
-        UpperLimit = upperLimit ?? MaxLimit;
-    }
-};

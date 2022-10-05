@@ -120,20 +120,3 @@ internal static class H5TAdapter
         };       
     }
 }
-
-public enum H5Class
-{
-    None = -1,
-    Integer = 0,
-    Float = 1,
-    Time = 2,
-    String = 3,
-    BitField = 4,
-    Opaque = 5,
-    Compound = 6,
-    Reference = 7,
-    Enum = 8,
-    VariableLength = 9,
-    Array = 10,
-    NClasses 
-}
