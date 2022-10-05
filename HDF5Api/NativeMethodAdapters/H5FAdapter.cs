@@ -87,23 +87,22 @@ internal static class H5FAdapter
 #endif
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyList list)
+    public static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
-        return list switch
+        return listType switch
         {
-            PropertyList.Create => H5PAdapter.Create(H5P.FILE_CREATE),
-            //PropertyList.Mount => H5PAdapter.Create(H5P.FILE_MOUNT),
-            PropertyList.Access => H5PAdapter.Create(H5P.FILE_ACCESS),
+            PropertyListType.Create => H5PAdapter.Create(H5P.FILE_CREATE),
+            PropertyListType.Access => H5PAdapter.Create(H5P.FILE_ACCESS),
             _ => throw new NotImplementedException(),
         };
     }
 
-    public static H5PropertyList GetPropertyList(H5File file, PropertyList list)
+    public static H5PropertyList GetPropertyList(H5File file, PropertyListType listType)
     {
-        return list switch
+        return listType switch
         {
-            PropertyList.Create => H5PAdapter.GetPropertyList(file, get_create_plist),
-            PropertyList.Access => H5PAdapter.GetPropertyList(file, get_access_plist),
+            PropertyListType.Create => H5PAdapter.GetPropertyList(file, get_create_plist),
+            PropertyListType.Access => H5PAdapter.GetPropertyList(file, get_access_plist),
             _ => throw new NotImplementedException(),
         };
     }

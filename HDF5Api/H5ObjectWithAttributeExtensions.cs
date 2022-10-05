@@ -16,11 +16,8 @@ public static class H5ObjectWithAttributeExtensions
         // Single dimension (rank 1), unlimited length, chunk size.
         using var memorySpace = H5SAdapter.CreateSimple(1);
 
-        // Create the attribute-creation property list (TODO: is this required or can I use default?)
-        using var propertyList = H5AAdapter.CreatePropertyList(PropertyList.Create);
-
         // Create an attribute
-        using var attribute = owa.CreateAttribute(name, type, memorySpace, propertyList);
+        using var attribute = owa.CreateAttribute(name, type, memorySpace);
         attribute.Write(type, buffer);
     }
 

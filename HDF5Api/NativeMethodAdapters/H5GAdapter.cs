@@ -105,12 +105,12 @@ internal static class H5GAdapter
         return err >= 0;
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyList list)
+    public static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
-        return list switch
+        return listType switch
         {
-            PropertyList.Create => H5PAdapter.Create(H5P.GROUP_CREATE),
-            PropertyList.Access => H5PAdapter.Create(H5P.GROUP_ACCESS),
+            PropertyListType.Create => H5PAdapter.Create(H5P.GROUP_CREATE),
+            PropertyListType.Access => H5PAdapter.Create(H5P.GROUP_ACCESS),
             _ => throw new NotImplementedException(),
         };
     }
@@ -120,11 +120,11 @@ internal static class H5GAdapter
     /// </summary>
     /// <param name="group"></param>
     /// <returns></returns>
-    public static H5PropertyList GetPropertyList(H5Group group, PropertyList list)
+    public static H5PropertyList GetPropertyList(H5Group group, PropertyListType listType)
     {
-        return list switch
+        return listType switch
         {
-            PropertyList.Create => H5PAdapter.GetPropertyList(group, get_create_plist),
+            PropertyListType.Create => H5PAdapter.GetPropertyList(group, get_create_plist),
             _ => throw new NotImplementedException(),
         };
     }

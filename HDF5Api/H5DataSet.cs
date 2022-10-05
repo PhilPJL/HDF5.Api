@@ -70,13 +70,14 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5AAdapter.Open(this, name);
     }
 
-    public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space, H5PropertyList? creationPropertyList = null)
+    public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space, 
+        H5PropertyList? creationPropertyList = null, H5PropertyList? accessPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
 
-        return H5AAdapter.Create(this, name, type, space, creationPropertyList);
+        return H5AAdapter.Create(this, name, type, space, creationPropertyList, accessPropertyList);
     }
 
     public void DeleteAttribute([DisallowNull] string name)
@@ -119,12 +120,12 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5AAdapter.ListAttributeNames(this);
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyList listType)
+    public static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
         return H5DAdapter.CreatePropertyList(listType);
     }
 
-    public H5PropertyList GetPropertyList(PropertyList listType)
+    public H5PropertyList GetPropertyList(PropertyListType listType)
     {
         return H5DAdapter.GetPropertyList(this, listType);
     }

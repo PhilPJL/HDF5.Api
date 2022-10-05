@@ -12,7 +12,7 @@ public static class H5DataSetWriter
         using var memorySpace = H5Space.CreateSimple(chunkSize);
 
         // Create a dataset-creation property list
-        using var propertyList = H5DataSet.CreatePropertyList(PropertyList.Create);
+        using var propertyList = H5DataSet.CreatePropertyList(PropertyListType.Create);
 
         // Enable chunking. From the user guide: "HDF5 requires the use of chunking when defining extendable datasets."
         propertyList.SetChunk(1, chunkSize);

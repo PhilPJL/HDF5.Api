@@ -33,7 +33,7 @@ public class H5PropertyList : H5Object<H5PropertyList>
     }
 }
 
-public enum PropertyList
+public enum PropertyListType
 {
     Create,
     Access

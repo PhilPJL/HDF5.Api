@@ -30,19 +30,19 @@ public class H5File : H5Location<H5File>
         return H5FAdapter.GetSize(this);
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyList propertyList)
+    public static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
-        return H5FAdapter.CreatePropertyList(propertyList);
+        return H5FAdapter.CreatePropertyList(listType);
     }
 
     /// <summary>
     /// Gets a copy of the specified property list used to create the object
     /// </summary>
-    /// <param name="propertyList"></param>
+    /// <param name="listType"></param>
     /// <returns></returns>
-    public H5PropertyList GetPropertyList(PropertyList propertyList)
+    public H5PropertyList GetPropertyList(PropertyListType listType)
     {
-        return H5FAdapter.GetPropertyList(this, propertyList);
+        return H5FAdapter.GetPropertyList(this, listType);
     }
 
     /// <summary>

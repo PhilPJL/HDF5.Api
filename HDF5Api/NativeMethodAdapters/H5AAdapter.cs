@@ -24,7 +24,8 @@ internal static class H5AAdapter
     }
 
     public static H5Attribute Create<T>(H5Object<T> h5Object, string name, H5Type type, H5Space space,
-        H5PropertyList? creationPropertyList = null, H5PropertyList? accessPropertyList = null) where T : H5Object<T>
+        H5PropertyList? creationPropertyList = null, H5PropertyList? accessPropertyList = null) 
+        where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
@@ -35,7 +36,8 @@ internal static class H5AAdapter
         return new H5Attribute(h);
     }
 
-    public static H5Attribute Open<T>(H5Object<T> h5Object, string name, H5PropertyList? attributeAccessPropertyList = default) where T : H5Object<T>
+    public static H5Attribute Open<T>(H5Object<T> h5Object, string name, H5PropertyList? attributeAccessPropertyList = default) 
+        where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
@@ -85,9 +87,6 @@ internal static class H5AAdapter
             string? name = Marshal.PtrToStringAnsi(intPtrName);
             Guard.IsNotNull(name);
 
-            // TODO: use return info?
-            //var info = GetInfoByName(h5Object, ".", name, linkAccessPropertyList);
-
             names.Add(name);
             return 0;
         }
@@ -95,7 +94,8 @@ internal static class H5AAdapter
 
     // TODO: make public?
     public static info_t GetInfoByName<T>(H5Object<T> h5Object,
-        string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
+        string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null) 
+        where T : H5Object<T>
     {
         info_t info = default;
         int err = get_info_by_name(h5Object, objectName, attributeName, ref info, linkAccessPropertyList);
@@ -231,20 +231,20 @@ internal static class H5AAdapter
     /// </summary>
     /// <param name="attribute"></param>
     /// <returns></returns>
-    public static H5PropertyList GetPropertyList(H5Attribute attribute, PropertyList list)
+    public static H5PropertyList GetPropertyList(H5Attribute attribute, PropertyListType listType)
     {
-        return list switch
+        return listType switch
         {
-            PropertyList.Create => H5PAdapter.GetPropertyList(attribute, get_create_plist),
+            PropertyListType.Create => H5PAdapter.GetPropertyList(attribute, get_create_plist),
             _ => throw new NotImplementedException(),
         };
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyList list)
+    public static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
-        return list switch
+        return listType switch
         {
-            PropertyList.Create => H5PAdapter.Create(H5P.ATTRIBUTE_CREATE),
+            PropertyListType.Create => H5PAdapter.Create(H5P.ATTRIBUTE_CREATE),
             _ => throw new NotImplementedException(),
         };
     }

@@ -92,12 +92,12 @@ internal static class H5DAdapter
         return new H5Type(h);
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyList list)
+    public static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
-        return list switch
+        return listType switch
         {
-            PropertyList.Create => H5PAdapter.Create(H5P.DATASET_CREATE),
-            PropertyList.Access => H5PAdapter.Create(H5P.DATASET_ACCESS),
+            PropertyListType.Create => H5PAdapter.Create(H5P.DATASET_CREATE),
+            PropertyListType.Access => H5PAdapter.Create(H5P.DATASET_ACCESS),
             _ => throw new NotImplementedException(),
         };
     }
@@ -107,12 +107,12 @@ internal static class H5DAdapter
     /// </summary>
     /// <param name="dataSet"></param>
     /// <returns></returns>
-    public static H5PropertyList GetPropertyList(H5DataSet dataSet, PropertyList list)
+    public static H5PropertyList GetPropertyList(H5DataSet dataSet, PropertyListType listType)
     {
-        return list switch
+        return listType switch
         {
-            PropertyList.Create => H5PAdapter.GetPropertyList(dataSet, get_create_plist),
-            PropertyList.Access => H5PAdapter.GetPropertyList(dataSet, get_access_plist),
+            PropertyListType.Create => H5PAdapter.GetPropertyList(dataSet, get_create_plist),
+            PropertyListType.Access => H5PAdapter.GetPropertyList(dataSet, get_access_plist),
             _ => throw new NotImplementedException(),
         };
     }

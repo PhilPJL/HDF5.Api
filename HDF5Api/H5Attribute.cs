@@ -41,13 +41,13 @@ public class H5Attribute : H5Object<H5Attribute>
         H5AAdapter.Write(this, type, buffer);
     }
 
-    public H5PropertyList GetPropertyList(PropertyList list)
+    public H5PropertyList GetPropertyList(PropertyListType listType)
     {
-        return H5AAdapter.GetPropertyList(this, list);
+        return H5AAdapter.GetPropertyList(this, listType);
     }
 
-    public H5PropertyList CreatePropertyList(PropertyList list)
+    public H5PropertyList CreatePropertyList(PropertyListType listType)
     {
-        return H5AAdapter.CreatePropertyList(list);
+        return H5AAdapter.CreatePropertyList(listType);
     }
 }
