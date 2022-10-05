@@ -72,13 +72,13 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     }
 
     public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space, 
-        H5PropertyList? creationPropertyList = null, H5PropertyList? accessPropertyList = null)
+        H5PropertyList? creationPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
 
-        return H5AAdapter.Create(this, name, type, space, creationPropertyList, accessPropertyList);
+        return H5AAdapter.Create(this, name, type, space, creationPropertyList);
     }
 
     public void DeleteAttribute([DisallowNull] string name)
@@ -99,7 +99,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return this.ReadAttribute<H5DataSet, T>(name);
+        return H5ObjectWithAttributeExtensions.ReadAttribute<H5DataSet, T>(this, name);
     }
 
     public string ReadStringAttribute([DisallowNull] string name)

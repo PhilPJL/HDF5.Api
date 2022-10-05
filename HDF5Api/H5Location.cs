@@ -20,7 +20,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     ///     Create an Attribute for this location
     /// </summary>
     public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space, 
-        [AllowNull] H5PropertyList? creationPropertyList = null, H5PropertyList? accessPropertyList = null)
+        [AllowNull] H5PropertyList? creationPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
@@ -31,7 +31,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
             throw new Hdf5Exception($"Attribute {name} already exists");
         }
 
-        return H5AAdapter.Create(this, name, type, space, creationPropertyList, accessPropertyList);
+        return H5AAdapter.Create(this, name, type, space, creationPropertyList);
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return this.ReadAttribute<T, TA>(name);
+        return H5ObjectWithAttributeExtensions.ReadAttribute<T, TA>(this, name);
     }
 
     public string ReadStringAttribute([DisallowNull] string name)

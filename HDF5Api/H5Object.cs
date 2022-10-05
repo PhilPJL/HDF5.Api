@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HDF5Api;
+﻿namespace HDF5Api;
 
 /// <summary>
 ///     Base class for H5 object types.

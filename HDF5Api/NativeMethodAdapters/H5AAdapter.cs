@@ -24,24 +24,24 @@ internal static class H5AAdapter
     }
 
     public static H5Attribute Create<T>(H5Object<T> h5Object, string name, H5Type type, H5Space space,
-        H5PropertyList? creationPropertyList = null, H5PropertyList? accessPropertyList = null) 
+        H5PropertyList? creationPropertyList = null) 
         where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        var h = create(h5Object, name, type, space, creationPropertyList, accessPropertyList);
+        var h = create(h5Object, name, type, space, creationPropertyList);
 
         h.ThrowIfInvalidHandleValue(nameof(create));
 
         return new H5Attribute(h);
     }
 
-    public static H5Attribute Open<T>(H5Object<T> h5Object, string name, H5PropertyList? attributeAccessPropertyList = default) 
+    public static H5Attribute Open<T>(H5Object<T> h5Object, string name) 
         where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        long h = open(h5Object, name, attributeAccessPropertyList);
+        long h = open(h5Object, name);
 
         h.ThrowIfInvalidHandleValue(nameof(open));
 
@@ -92,7 +92,6 @@ internal static class H5AAdapter
         }
     }
 
-    // TODO: make public?
     public static info_t GetInfoByName<T>(H5Object<T> h5Object,
         string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null) 
         where T : H5Object<T>
