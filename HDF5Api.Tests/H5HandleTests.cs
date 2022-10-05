@@ -19,7 +19,9 @@ public class H5HandleTests : H5Test
             HandleCheck(() => file = H5File.Create(Path), 1);
             Assert.IsTrue(File.Exists(Path));
 
+#if DEBUG
             H5Handle.DumpOpenHandles();
+#endif
             
             // Now dispose
             file?.Dispose();

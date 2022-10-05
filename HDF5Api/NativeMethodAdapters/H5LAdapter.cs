@@ -16,5 +16,7 @@ internal static class H5LAdapter
 
         return err > 0;
     }
+
+    // TODO: delete, iterate
 }
 

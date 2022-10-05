@@ -35,6 +35,7 @@ public static class H5Handle
         OpenHandleCount--;
     }
 
+#if DEBUG
     public static void DumpOpenHandles()
     {
         foreach (var kvp in Handles)
@@ -42,6 +43,7 @@ public static class H5Handle
             Debug.WriteLine($"Handle open{Environment.NewLine}{kvp.Value}");
         }
     }
+#endif
 }
 
 internal enum HandleType
