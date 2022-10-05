@@ -16,7 +16,7 @@
 namespace HDF5Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static class H5Z
+internal static partial class H5Z
 {
     static H5Z() { _ = H5.open(); }
 
@@ -177,6 +177,7 @@ internal static class H5Z
         public func_t filter;
     }
 
+#if NETSTANDARD
     /// <summary>
     /// Determines whether a filter is available.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5Z.html#Compression-FilterAvail
@@ -228,4 +229,5 @@ internal static class H5Z
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t unregister(filter_t filter);
+#endif
 }

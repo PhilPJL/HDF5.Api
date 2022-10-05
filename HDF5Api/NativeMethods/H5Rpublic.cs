@@ -16,7 +16,7 @@
 namespace HDF5Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static class H5R
+internal static partial class H5R
 {
     static H5R() { _ = H5.open(); }
 
@@ -47,6 +47,7 @@ internal static class H5R
 
     public const int DSET_REG_REF_BUF_SIZE = sizeof(haddr_t) + 4;
 
+#if NETSTANDARD
     /// <summary>
     /// Creates a reference.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5R.html#Reference-Create
@@ -192,4 +193,5 @@ internal static class H5R
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t get_region
         (hid_t loc_id, type_t ref_type, IntPtr refer);
+#endif
 }

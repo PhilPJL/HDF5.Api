@@ -470,6 +470,7 @@ internal static partial class H5T
     size_t nelmts, size_t buf_stride, size_t bkg_stride, IntPtr buf,
     IntPtr bkg, hid_t dset_xfer_plist = H5P.DEFAULT);
 
+#if NETSTANDARD
     /// <summary>
     /// Creates an array datatype object.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-ArrayCreate2
@@ -1494,4 +1495,5 @@ internal static partial class H5T
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t vlen_create(hid_t base_type_id);
+#endif
 }

@@ -16,7 +16,7 @@
 namespace HDF5Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static class H5
+internal static partial class H5
 {
     static H5()
     {
@@ -116,6 +116,7 @@ internal static class H5
         public hsize_t heap_size;
     }
 
+#if NETSTANDARD
     /// <summary>
     /// Allocates memory that will later be freed internally by the HDF5
     /// Library.
@@ -308,4 +309,5 @@ internal static class H5
     public static extern herr_t set_free_list_limits
         (int reg_global_lim, int reg_list_lim, int arr_global_lim,
         int arr_list_lim, int blk_global_lim, int blk_list_lim);
+#endif
 }

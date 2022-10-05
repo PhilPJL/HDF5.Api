@@ -180,9 +180,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
             string? name = Marshal.PtrToStringAnsi(intPtrName);
             Guard.IsNotNull(name);
 
-            NativeMethods.H5O.info_t oinfo = default;
-            int err1 = NativeMethods.H5O.get_info_by_name(groupId, name, ref oinfo);
-            err1.ThrowIfError(nameof(NativeMethods.H5O.get_info_by_name));
+            var oinfo = H5OAdapter.GetInfoByName(groupId, name);
 
             names.Add((name, oinfo.type == NativeMethods.H5O.type_t.GROUP));
             return 0;

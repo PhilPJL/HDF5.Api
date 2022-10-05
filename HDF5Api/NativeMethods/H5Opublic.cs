@@ -16,7 +16,7 @@
 namespace HDF5Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static class H5O
+internal static partial class H5O
 {
     static H5O() { _ = H5.open(); }
 
@@ -322,6 +322,7 @@ internal static class H5O
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate mcdt_search_ret_t mcdt_search_cb_t(IntPtr op_data);
 
+#if NETSTANDARD
     /// <summary>
     /// Determines if an HDF5 object (dataset, group, committed datatype)
     /// has had flushes of metadata entries disabled.
@@ -900,4 +901,5 @@ internal static class H5O
         (hid_t loc_id, string obj_name, H5.index_t idx_type,
         H5.iter_order_t order, iterate_t op, IntPtr op_data,
         hid_t lapl_id = H5P.DEFAULT);
+#endif
 }

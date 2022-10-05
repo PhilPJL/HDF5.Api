@@ -17,6 +17,17 @@ internal static class H5LAdapter
         return err > 0;
     }
 
-    // TODO: delete, iterate
+    public static void Delete<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList = null)
+        where T : H5Object<T>
+
+    {
+        location.AssertHasHandleType(HandleType.File, HandleType.Group);
+
+        int err = delete(location, name, linkAccessPropertyList);
+
+        err.ThrowIfError(nameof(H5L.delete));    
+    }
+
+    // TODO: iterate
 }
 

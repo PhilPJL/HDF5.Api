@@ -15,7 +15,7 @@
 
 namespace HDF5Api.NativeMethods;
 
-internal static class H5DO
+internal static partial class H5DO
 {
     static H5DO() { _ = H5.open(); }
 

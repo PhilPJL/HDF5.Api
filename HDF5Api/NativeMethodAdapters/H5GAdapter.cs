@@ -45,9 +45,7 @@ internal static class H5GAdapter
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
-        int err = H5L.delete(location, path, propListLinkAccess);
-
-        err.ThrowIfError(nameof(H5L.delete));
+        H5LAdapter.Delete(location, path, propListLinkAccess);
     }
 
     /// <summary>

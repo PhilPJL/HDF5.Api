@@ -16,7 +16,7 @@
 namespace HDF5Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static class H5S
+internal static partial class H5S
 {
     static H5S() { _ = H5.open(); }
 
@@ -147,6 +147,7 @@ internal static class H5S
         N
     }
 
+#if NETSTANDARD
     /// <summary>
     /// Releases and terminates access to a dataspace.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5S.html#Dataspace-Close
@@ -665,4 +666,5 @@ internal static class H5S
         (hid_t space_id, int rank,
         [MarshalAs(UnmanagedType.LPArray)] hsize_t[] current_size,
         [MarshalAs(UnmanagedType.LPArray)] hsize_t[] maximum_size);
+#endif
 }

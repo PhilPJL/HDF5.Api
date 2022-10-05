@@ -16,7 +16,7 @@
 namespace HDF5Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static class H5PL
+internal static partial class H5PL
 {
     static H5PL() { _ = H5.open(); }
 
@@ -31,6 +31,7 @@ internal static class H5PL
 
     public const int ALL_PLUGIN = 0xffff;
 
+#if NETSTANDARD
     /// <summary>
     /// Append a plugin path to the plugin search path.
     /// See https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5PL.html#Plugin-Append
@@ -148,4 +149,5 @@ internal static class H5PL
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t size(ref uint32_t listsize);
+#endif
 }
