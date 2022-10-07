@@ -12,7 +12,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HDF5Api", "HDF5Api\HDF5Api.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HDF5Api.Tests.x86", "HDF5Api.Tests\HDF5Api.Tests.x86.csproj", "{AA7E55F6-0993-4D48-B38D-D641543CA04C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HDF5Api.Tests.x64", "HDF5Api.Tests.x64\HDF5Api.Tests.x64.csproj", "{02DF7949-D154-464C-A85D-48CC06EA2364}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HDF5Api.Tests.x64", "HDF5Api.Tests.x64\HDF5Api.Tests.x64.csproj", "{02DF7949-D154-464C-A85D-48CC06EA2364}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HDF5.Api.Benchmark", "HDF5.Api.Benchmark\HDF5.Api.Benchmark.csproj", "{9B2FEA33-FC25-415C-AF7A-68B935FB8C14}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,10 @@ Global
 		{02DF7949-D154-464C-A85D-48CC06EA2364}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02DF7949-D154-464C-A85D-48CC06EA2364}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02DF7949-D154-464C-A85D-48CC06EA2364}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B2FEA33-FC25-415C-AF7A-68B935FB8C14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B2FEA33-FC25-415C-AF7A-68B935FB8C14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B2FEA33-FC25-415C-AF7A-68B935FB8C14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B2FEA33-FC25-415C-AF7A-68B935FB8C14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -39,6 +39,38 @@ namespace HDF5Api.NativeMethods
     public static class Control
     {
         public static string? NativeProviderPath { get; set; }
+
+        public static string Describe()
+        {
+            var versionAttribute = typeof(Control).GetTypeInfo().Assembly.GetCustomAttribute(typeof(AssemblyInformationalVersionAttribute)) as AssemblyInformationalVersionAttribute;
+
+            var sb = new StringBuilder();
+            sb.AppendLine("Math.NET Numerics Configuration:");
+            sb.AppendLine($"Version {versionAttribute?.InformationalVersion}");
+#if NET7_0
+            sb.AppendLine("Built for .NET 7.0");
+#elif NETSTANDARD2_0
+            sb.AppendLine("Built for .NET Standard 2.0");
+#endif
+            // This would also work in .NET 4.0, but we don't want the dependency just for that.
+            sb.AppendLine($"Operating System: {RuntimeInformation.OSDescription}");
+            sb.AppendLine($"Operating System Architecture: {RuntimeInformation.OSArchitecture}");
+            sb.AppendLine($"Framework: {RuntimeInformation.FrameworkDescription}");
+            sb.AppendLine($"Process Architecture: {RuntimeInformation.ProcessArchitecture}");
+
+            var processorArchitecture = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
+            if (!string.IsNullOrEmpty(processorArchitecture))
+            {
+                sb.AppendLine($"Processor Architecture: {processorArchitecture}");
+            }
+            var processorId = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER");
+            if (!string.IsNullOrEmpty(processorId))
+            {
+                sb.AppendLine($"Processor Identifier: {processorId}");
+            }
+
+            return sb.ToString();
+        }
     }
 
     internal enum ProcArchitecture

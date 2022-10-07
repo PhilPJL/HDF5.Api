@@ -76,7 +76,6 @@ public static class H5ObjectWithAttributeExtensions
     {
         Guard.IsNotNull(h5Object);
         Guard.IsNotNullOrWhiteSpace(name);
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.DataSet, HandleType.Group);
 
         using var attribute = H5AAdapter.Open(h5Object, name);
 
@@ -88,7 +87,6 @@ public static class H5ObjectWithAttributeExtensions
     {
         Guard.IsNotNull(h5Object);
         Guard.IsNotNullOrWhiteSpace(name);
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.DataSet, HandleType.Group);
 
         using var attribute = H5AAdapter.Open(h5Object, name);
 
@@ -100,7 +98,6 @@ public static class H5ObjectWithAttributeExtensions
     {
         Guard.IsNotNull(h5Object);
         Guard.IsNotNullOrWhiteSpace(name);
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.DataSet, HandleType.Group);
 
         using var attribute = H5AAdapter.Open(h5Object, name);
 
