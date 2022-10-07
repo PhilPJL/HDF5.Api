@@ -17,11 +17,6 @@ namespace HDF5Api.NativeMethods;
 
 internal static class Constants
 {
-    public const string DLLFileName = "hdf5.dll";
-
-    public const string HLDLLFileName = "hdf5_hl.dll";
-
-    public const string DLL32bitPath = "bin32";
-
-    public const string DLL64bitPath = "bin64";
+    public const string DLLFileName = "hdf5";
+    public const string HLDLLFileName = "hdf5_hl";
 }

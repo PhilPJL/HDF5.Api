@@ -13,70 +13,45 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+// TODO: combine with NativeProviderLoader from MathNet
+
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+
 namespace HDF5Api.NativeMethods;
 
-internal delegate T Converter<T>(IntPtr address);
-
-/// <summary>
-/// Helper class used to fetch public variables (e.g. native type values)
-/// exported by the HDF5 DLL
-/// </summary>
 internal abstract class H5DLLImporter
 {
     public static readonly H5DLLImporter Instance;
 
     static H5DLLImporter()
     {
-        _ = H5.open();
+        if (H5.open() < 0)
+            throw new Exception("Could not initialize HDF5 library.");
 
-        switch (Environment.OSVersion.Platform)
-        {
-            case PlatformID.Win32NT:
-            case PlatformID.Win32S:
-            case PlatformID.Win32Windows:
-            case PlatformID.WinCE:
-                Instance = new H5WindowsDLLImporter(Constants.DLLFileName);
-                break;
-            case PlatformID.Xbox:
-            case PlatformID.MacOSX:
-            case PlatformID.Unix:
-                Instance = new H5UnixDllImporter(Constants.DLLFileName);
-                break;
-            default:
-                throw new NotImplementedException();
-        }
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            Instance = new H5LinuxDllImporter(Constants.DLLFileName);
+
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            Instance = new H5MacDllImporter(Constants.DLLFileName);
+
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            Instance = new H5WindowsDLLImporter(Constants.DLLFileName);
+
+        else
+            throw new PlatformNotSupportedException();
     }
 
-    protected abstract IntPtr _GetAddress(string varName);
+    protected abstract IntPtr InternalGetAddress(string varName);
 
     public IntPtr GetAddress(string varName)
     {
-        var address = _GetAddress(varName);
+        var address = this.InternalGetAddress(varName);
         if (address == IntPtr.Zero)
             throw new Exception(string.Format("The export with name \"{0}\" doesn't exist.", varName));
         return address;
     }
-
-    public bool GetAddress(string varName, out IntPtr address)
-    {
-        address = _GetAddress(varName);
-        return (address == IntPtr.Zero);
-    }
-
-    /*public bool GetValue<T>(
-        string          varName,
-        ref T           value,
-        Func<IntPtr, T> converter
-        )
-    {
-        IntPtr address;
-        if (!this.GetAddress(varName, out address))
-            return false;
-        value = converter(address);
-        return true;
-
-        //return (T) Marshal.PtrToStructure(address,typeof(T));
-    }*/
 
     public unsafe hid_t GetHid(string varName)
     {
@@ -84,95 +59,142 @@ internal abstract class H5DLLImporter
     }
 }
 
-#region Windows Importer
 internal class H5WindowsDLLImporter : H5DLLImporter
 {
-    [DllImport("kernel32.dll", SetLastError = true)]
+    [DllImport("kernel32.dll")]
     internal static extern IntPtr GetModuleHandle(string lpszLib);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    internal static extern IntPtr GetProcAddress
-        (IntPtr hModule, string procName);
+    [DllImport("kernel32.dll")]
+    internal static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    internal static extern IntPtr LoadLibrary(string lpszLib);
-
-    private readonly IntPtr hLib;
+    private IntPtr _handle;
 
     public H5WindowsDLLImporter(string libName)
     {
-        hLib = GetModuleHandle(libName);
-        if (hLib == IntPtr.Zero)  // the library hasn't been loaded
-        {
-            hLib = LoadLibrary(libName);
-            if (hLib == IntPtr.Zero)
-            {
-                try
-                {
-                    Marshal.ThrowExceptionForHR(Marshal.GetLastWin32Error());
-                }
-                catch (Exception e)
-                {
-                    throw new Exception(string.Format("Couldn't load library \"{0}\"", libName), e);
-                }
-            }
-        }
+        _handle = GetModuleHandle(libName);
+
+        if (_handle == IntPtr.Zero)
+            throw new DllNotFoundException(libName);
     }
 
-    protected override IntPtr _GetAddress(string varName)
+    protected override IntPtr InternalGetAddress(string varName)
     {
-        return GetProcAddress(hLib, varName);
+        return GetProcAddress(_handle, varName);
     }
 }
-#endregion
 
-internal class H5UnixDllImporter : H5DLLImporter
+internal class H5LinuxDllImporter : H5DLLImporter
 {
-
-    [DllImport("libdl.so")]
+    [DllImport("libdl.so.2")]
     protected static extern IntPtr dlopen(string filename, int flags);
 
-    [DllImport("libdl.so")]
+    [DllImport("libdl.so.2")]
     protected static extern IntPtr dlsym(IntPtr handle, string symbol);
 
-    [DllImport("libdl.so")]
+    [DllImport("libdl.so.2")]
     protected static extern IntPtr dlerror();
 
-    private readonly IntPtr hLib;
+    private const int RTLD_NOW = 2;
+    private IntPtr _handle;
 
-    public H5UnixDllImporter(string libName)
+    // The library is already loaded, otherwise H5.open() above would not have been called successfully.
+    // However, to get the lib handle for the symbols, we need to "reopen" it using the correct path.
+    public H5LinuxDllImporter(string libName)
     {
-        if (libName == "hdf5.dll")
-        {
-            libName = "/usr/lib/libhdf5.so";
+        var fileName = $"lib{libName}.so";
 
-        }
-        if (libName == "hdf5_hd.dll")
-        {
-            libName = "/usr/lib/libhdf5_hl.so";
-        }
+        var filePath = File
+            .ReadAllText("/proc/self/maps")
+            .Split('\n')
+            .Where(line => line.Contains(fileName))
+            .FirstOrDefault()?
+            .Split(' ')
+            .LastOrDefault();
 
+        if (filePath == null)
+            throw new FileNotFoundException(fileName);
 
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException(filePath);
 
-        hLib = dlopen(libName, RTLD_NOW);
-        if (hLib == IntPtr.Zero)
-        {
-            throw new ArgumentException(
-                string.Format(
-                    "Unable to load unmanaged module \"{0}\"",
-                    libName));
-        }
+        _handle = dlopen(filePath, RTLD_NOW);
+
+        if (_handle == IntPtr.Zero)
+            throw new DllNotFoundException(libName);
     }
 
-    const int RTLD_NOW = 2; // for dlopen's flags
-    protected override IntPtr _GetAddress(string varName)
+    protected override IntPtr InternalGetAddress(string varName)
     {
-        var address = dlsym(hLib, varName);
+        var address = dlsym(_handle, varName);
         var errPtr = dlerror();
+
         if (errPtr != IntPtr.Zero)
-        {
             throw new Exception("dlsym: " + Marshal.PtrToStringAnsi(errPtr));
-        }
+
+        return address;
+    }
+}
+
+internal class H5MacDllImporter : H5DLLImporter
+{
+    [DllImport("libdl.dylib")]
+    protected static extern IntPtr dlopen(string filename, int flags);
+
+    [DllImport("libdl.dylib")]
+    protected static extern IntPtr dlsym(IntPtr handle, string symbol);
+
+    [DllImport("libdl.dylib")]
+    protected static extern IntPtr dlerror();
+
+    private const int RTLD_NOW = 2;
+    private IntPtr _handle;
+
+    // The library is already loaded, otherwise H5.open() above would not have been called successfully.
+    // However, to get the lib handle for the symbols, we need to "reopen" it using the correct path.
+    public H5MacDllImporter(string libName)
+    {
+        var fileName = $"lib{libName}.dylib";
+
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "vmmap",
+                Arguments = $"-wide {Process.GetCurrentProcess().Id}",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            }
+        };
+
+        process.Start();
+
+        var filePath = process.StandardOutput.ReadToEnd()
+            .Split('\n')
+            .Where(line => line.Contains(fileName))
+            .FirstOrDefault()?
+            .Split(' ')
+            .LastOrDefault();
+
+        if (filePath == null)
+            throw new FileNotFoundException(fileName);
+
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException(filePath);
+
+        _handle = dlopen(filePath, RTLD_NOW);
+
+        if (_handle == IntPtr.Zero)
+            throw new DllNotFoundException(libName);
+    }
+
+    protected override IntPtr InternalGetAddress(string varName)
+    {
+        var address = dlsym(_handle, varName);
+        var errPtr = dlerror();
+
+        if (errPtr != IntPtr.Zero)
+            throw new Exception("dlsym: " + Marshal.PtrToStringAnsi(errPtr));
 
         return address;
     }
