@@ -67,11 +67,11 @@ internal abstract class H5DLLImporter
 
 internal class H5WindowsDLLImporter : H5DLLImporter
 {
-    [DllImport("kernel32.dll")]
-    internal static extern IntPtr GetModuleHandle(string lpszLib);
+    [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
+    internal static extern IntPtr GetModuleHandle([MarshalAs(UnmanagedType.LPWStr)] string lpszLib);
 
-    [DllImport("kernel32.dll")]
-    internal static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+    [DllImport("kernel32", EntryPoint = "GetProcAddress", CharSet = CharSet.Ansi, SetLastError = true)]
+    internal static extern IntPtr GetProcAddress(IntPtr hModule, [MarshalAs(UnmanagedType.LPStr)] string procName);
 
     private IntPtr _handle;
 
