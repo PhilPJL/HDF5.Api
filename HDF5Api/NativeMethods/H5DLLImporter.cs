@@ -13,16 +13,21 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// TODO: combine with NativeProviderLoader from MathNet
-
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
 namespace HDF5Api.NativeMethods;
 
+// NOTE: native module loading now done using NativeProviderLoader from MathNet
+// H5DLLImporter used to load addresses of native H5 variables
+// If not supporting .NET framework we can use NativeLibrary.GetSymbol instead.
+// TODO: combine?
+
 internal abstract class H5DLLImporter
 {
+    // Instance is used to get the address of named native H5 variables, e.g.
+    // H5DLLImporter.Instance.GetHid("H5P_CLS_ROOT_ID_g")
     public static readonly H5DLLImporter Instance;
 
     static H5DLLImporter()

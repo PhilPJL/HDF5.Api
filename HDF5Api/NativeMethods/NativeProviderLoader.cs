@@ -96,11 +96,7 @@ namespace HDF5Api.NativeMethods
             IsUnix = IsLinux || IsMac;
             IsWindows = !IsUnix;
 
-            Extension = IsWindows
-                ? ".dll"
-                : IsLinux
-                    ? ".so"
-                    : ".dylib";
+            Extension = IsWindows ? ".dll" : IsLinux ? ".so" : ".dylib";
 
             ProcArchitecture = Environment.Is64BitProcess
                 ? arm
@@ -187,26 +183,29 @@ namespace HDF5Api.NativeMethods
             {
                 return ProcArchitecture switch
                 {
-                    ProcArchitecture.X64 => TryLoadFile(directory, "runtimes/win-x64/native", fileName)
-                                                || TryLoadFile(directory, "win-x64/native", fileName)
-                                                || TryLoadFile(directory, "win-x64", fileName)
-                                                || TryLoadFile(directory, "x64", fileName)
-                                                || TryLoadFile(directory, string.Empty, fileName),
+                    ProcArchitecture.X64 =>
+                        TryLoadFile(directory, "runtimes/win-x64/native", fileName)
+                        || TryLoadFile(directory, "win-x64/native", fileName)
+                        || TryLoadFile(directory, "win-x64", fileName)
+                        || TryLoadFile(directory, "x64", fileName)
+                        || TryLoadFile(directory, string.Empty, fileName),
                     ProcArchitecture.X86 => TryLoadFile(directory, "runtimes/win-x86/native", fileName)
-                                                || TryLoadFile(directory, "win-x86/native", fileName)
-                                                || TryLoadFile(directory, "win-x86", fileName)
-                                                || TryLoadFile(directory, "x86", fileName)
-                                                || TryLoadFile(directory, string.Empty, fileName),
-                    ProcArchitecture.Arm64 => TryLoadFile(directory, "runtimes/win-arm64/native", fileName)
-                                                || TryLoadFile(directory, "win-arm64/native", fileName)
-                                                || TryLoadFile(directory, "win-arm64", fileName)
-                                                || TryLoadFile(directory, "arm64", fileName)
-                                                || TryLoadFile(directory, string.Empty, fileName),
-                    ProcArchitecture.Arm => TryLoadFile(directory, "runtimes/win-arm/native", fileName)
-                                                || TryLoadFile(directory, "win-arm/native", fileName)
-                                                || TryLoadFile(directory, "win-arm", fileName)
-                                                || TryLoadFile(directory, "arm", fileName)
-                                                || TryLoadFile(directory, string.Empty, fileName),
+                        || TryLoadFile(directory, "win-x86/native", fileName)
+                        || TryLoadFile(directory, "win-x86", fileName)
+                        || TryLoadFile(directory, "x86", fileName)
+                        || TryLoadFile(directory, string.Empty, fileName),
+                    ProcArchitecture.Arm64 => 
+                        TryLoadFile(directory, "runtimes/win-arm64/native", fileName)
+                        || TryLoadFile(directory, "win-arm64/native", fileName)
+                        || TryLoadFile(directory, "win-arm64", fileName)
+                        || TryLoadFile(directory, "arm64", fileName)
+                        || TryLoadFile(directory, string.Empty, fileName),
+                    ProcArchitecture.Arm => 
+                        TryLoadFile(directory, "runtimes/win-arm/native", fileName)
+                        || TryLoadFile(directory, "win-arm/native", fileName)
+                        || TryLoadFile(directory, "win-arm", fileName)
+                        || TryLoadFile(directory, "arm", fileName)
+                        || TryLoadFile(directory, string.Empty, fileName),
                     _ => TryLoadFile(directory, string.Empty, fileName),
                 };
             }
@@ -215,26 +214,30 @@ namespace HDF5Api.NativeMethods
             {
                 return ProcArchitecture switch
                 {
-                    ProcArchitecture.X64 => TryLoadFile(directory, "runtimes/linux-x64/native", fileName)
-                                                || TryLoadFile(directory, "linux-x64/native", fileName)
-                                                || TryLoadFile(directory, "linux-x64", fileName)
-                                                || TryLoadFile(directory, "x64", fileName)
-                                                || TryLoadFile(directory, string.Empty, fileName),
-                    ProcArchitecture.X86 => TryLoadFile(directory, "runtimes/linux-x86/native", fileName)
-                                                || TryLoadFile(directory, "linux-x86/native", fileName)
-                                                || TryLoadFile(directory, "linux-x86", fileName)
-                                                || TryLoadFile(directory, "x86", fileName)
-                                                || TryLoadFile(directory, string.Empty, fileName),
-                    ProcArchitecture.Arm64 => TryLoadFile(directory, "runtimes/linux-arm64/native", fileName)
-                                                || TryLoadFile(directory, "linux-arm64/native", fileName)
-                                                || TryLoadFile(directory, "linux-arm64", fileName)
-                                                || TryLoadFile(directory, "arm64", fileName)
-                                                || TryLoadFile(directory, string.Empty, fileName),
-                    ProcArchitecture.Arm => TryLoadFile(directory, "runtimes/linux-arm/native", fileName)
-                                                || TryLoadFile(directory, "linux-arm/native", fileName)
-                                                || TryLoadFile(directory, "linux-arm", fileName)
-                                                || TryLoadFile(directory, "arm", fileName)
-                                                || TryLoadFile(directory, string.Empty, fileName),
+                    ProcArchitecture.X64 => 
+                        TryLoadFile(directory, "runtimes/linux-x64/native", fileName)
+                        || TryLoadFile(directory, "linux-x64/native", fileName)
+                        || TryLoadFile(directory, "linux-x64", fileName)
+                        || TryLoadFile(directory, "x64", fileName)
+                        || TryLoadFile(directory, string.Empty, fileName),
+                    ProcArchitecture.X86 => 
+                        TryLoadFile(directory, "runtimes/linux-x86/native", fileName)
+                        || TryLoadFile(directory, "linux-x86/native", fileName)
+                        || TryLoadFile(directory, "linux-x86", fileName)
+                        || TryLoadFile(directory, "x86", fileName)
+                        || TryLoadFile(directory, string.Empty, fileName),
+                    ProcArchitecture.Arm64 => 
+                        TryLoadFile(directory, "runtimes/linux-arm64/native", fileName)
+                        || TryLoadFile(directory, "linux-arm64/native", fileName)
+                        || TryLoadFile(directory, "linux-arm64", fileName)
+                        || TryLoadFile(directory, "arm64", fileName)
+                        || TryLoadFile(directory, string.Empty, fileName),
+                    ProcArchitecture.Arm => 
+                        TryLoadFile(directory, "runtimes/linux-arm/native", fileName)
+                        || TryLoadFile(directory, "linux-arm/native", fileName)
+                        || TryLoadFile(directory, "linux-arm", fileName)
+                        || TryLoadFile(directory, "arm", fileName)
+                        || TryLoadFile(directory, string.Empty, fileName),
                     _ => TryLoadFile(directory, string.Empty, fileName),
                 };
             }
@@ -243,30 +246,36 @@ namespace HDF5Api.NativeMethods
             {
                 return ProcArchitecture switch
                 {
-                    ProcArchitecture.X64 => TryLoadFile(directory, "runtimes/osx-x64/native", fileName)
-                                                || TryLoadFile(directory, "osx-x64/native", fileName)
-                                                || TryLoadFile(directory, "osx-x64", fileName)
-                                                || TryLoadFile(directory, "x64", fileName)
-                                                || TryLoadFile(directory, string.Empty, fileName),
-                    ProcArchitecture.Arm64 => TryLoadFile(directory, "runtimes/osx-arm64/native", fileName)
-                                                || TryLoadFile(directory, "osx-arm64/native", fileName)
-                                                || TryLoadFile(directory, "osx-arm64", fileName)
-                                                || TryLoadFile(directory, "arm64", fileName)
-                                                || TryLoadFile(directory, string.Empty, fileName),
+                    ProcArchitecture.X64 => 
+                        TryLoadFile(directory, "runtimes/osx-x64/native", fileName)
+                        || TryLoadFile(directory, "osx-x64/native", fileName)
+                        || TryLoadFile(directory, "osx-x64", fileName)
+                        || TryLoadFile(directory, "x64", fileName)
+                        || TryLoadFile(directory, string.Empty, fileName),
+                    ProcArchitecture.Arm64 => 
+                        TryLoadFile(directory, "runtimes/osx-arm64/native", fileName)
+                        || TryLoadFile(directory, "osx-arm64/native", fileName)
+                        || TryLoadFile(directory, "osx-arm64", fileName)
+                        || TryLoadFile(directory, "arm64", fileName)
+                        || TryLoadFile(directory, string.Empty, fileName),
                     _ => TryLoadFile(directory, string.Empty, fileName),
                 };
             }
 
             return ProcArchitecture switch
             {
-                ProcArchitecture.X64 => TryLoadFile(directory, "x64", fileName)
-                                        || TryLoadFile(directory, string.Empty, fileName),
-                ProcArchitecture.X86 => TryLoadFile(directory, "x86", fileName)
-                                        || TryLoadFile(directory, string.Empty, fileName),
-                ProcArchitecture.Arm64 => TryLoadFile(directory, "arm64", fileName)
-                                        || TryLoadFile(directory, string.Empty, fileName),
-                ProcArchitecture.Arm => TryLoadFile(directory, "arm", fileName)
-                                        || TryLoadFile(directory, string.Empty, fileName),
+                ProcArchitecture.X64 => 
+                    TryLoadFile(directory, "x64", fileName)
+                    || TryLoadFile(directory, string.Empty, fileName),
+                ProcArchitecture.X86 => 
+                    TryLoadFile(directory, "x86", fileName)
+                    || TryLoadFile(directory, string.Empty, fileName),
+                ProcArchitecture.Arm64 => 
+                    TryLoadFile(directory, "arm64", fileName)
+                    || TryLoadFile(directory, string.Empty, fileName),
+                ProcArchitecture.Arm => 
+                    TryLoadFile(directory, "arm", fileName)
+                    || TryLoadFile(directory, string.Empty, fileName),
                 _ => TryLoadFile(directory, string.Empty, fileName),
             };
         }
