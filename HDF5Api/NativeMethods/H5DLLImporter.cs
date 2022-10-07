@@ -20,9 +20,10 @@ using System.Linq;
 namespace HDF5Api.NativeMethods;
 
 // NOTE: native module loading now done using NativeProviderLoader from MathNet
-// H5DLLImporter used to load addresses of native H5 variables
-// If not supporting .NET framework we can use NativeLibrary.GetSymbol instead.
-// TODO: combine?
+// H5DLLImporter used to load addresses of native H5 variables but if
+// we dropped support for .NET framework we could use NativeLibrary.GetSymbol instead.
+
+// TODO: combine functionality from H5DLLImporter with NativeProviderLoader?
 
 internal abstract class H5DLLImporter
 {
