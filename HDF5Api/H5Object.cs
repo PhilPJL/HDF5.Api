@@ -72,13 +72,12 @@ public class H5Object<T> : Disposable where T : H5Object<T>
     {
         handle.ThrowIfInvalidHandleValue();
 
-        // TODO: move >> 56 to enum
-        var type = handle >> 56;
+        var type = handle & (long)HandleType.Mask;
 
         // ReSharper disable once LoopCanBeConvertedToQuery
         foreach (var t in types)
         {
-            if ((int)t == type) { return; }
+            if ((long)t == type) { return; }
         }
 
         throw new Hdf5Exception($"Handle type {type} is not valid at this point.");

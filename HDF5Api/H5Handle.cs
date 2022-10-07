@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace HDF5Api;
@@ -46,14 +44,16 @@ public static class H5Handle
 #endif
 }
 
-internal enum HandleType
+internal enum HandleType : long
 {
-    File = 1,
-    Group = 2,
-    Type = 3,
-    Space = 4,
-    DataSet = 5,
-    Attribute = 6,
+    File = 1L << 56,
+    Group = 2L << 56,
+    Type = 3L << 56,
+    Space = 4L << 56,
+    DataSet = 5L << 56,
+    Attribute = 6L << 56,
 
-    PropertyList = 10
+    PropertyList = 10L << 56,
+
+    Mask = 0x7fL << 56
 }
