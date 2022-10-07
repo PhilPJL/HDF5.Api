@@ -8,7 +8,7 @@ namespace HDF5Api;
 /// </summary>
 public class H5PropertyList : H5Object<H5PropertyList>
 {
-    internal H5PropertyList(long handle) : base(handle, H5PAdapter.Close)
+    internal H5PropertyList(long handle) : base(handle, HandleType.PropertyList, H5PAdapter.Close)
     {
     }
       

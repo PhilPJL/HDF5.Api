@@ -7,7 +7,7 @@ namespace HDF5Api;
 /// </summary>
 public class H5Attribute : H5Object<H5Attribute>
 {
-    internal H5Attribute(long handle) : base(handle, H5AAdapter.Close)
+    internal H5Attribute(long handle) : base(handle, HandleType.Attribute, H5AAdapter.Close)
     {
     }
 

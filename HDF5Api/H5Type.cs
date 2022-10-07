@@ -9,11 +9,11 @@ namespace HDF5Api;
 /// </summary>
 public class H5Type : H5Object<H5Type>
 {
-    internal H5Type(long handle) : base(handle, H5TAdapter.Close)
+    internal H5Type(long handle) : base(handle, HandleType.Type, H5TAdapter.Close)
     {
     }
 
-    private H5Type(long handle, Action<H5Type>? closer) : base(handle, closer) { }
+    private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
 
     public static H5Type GetNativeType<T>() where T : unmanaged
     {

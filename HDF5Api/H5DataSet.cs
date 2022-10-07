@@ -11,7 +11,7 @@ namespace HDF5Api;
 /// </summary>
 public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 {
-    internal H5DataSet(long handle) : base(handle, H5DAdapter.Close)
+    internal H5DataSet(long handle) : base(handle, HandleType.DataSet, H5DAdapter.Close)
     {
     }
 

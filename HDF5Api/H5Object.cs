@@ -12,8 +12,12 @@ public class H5Object<T> : Disposable where T : H5Object<T>
 
     private readonly Action<T>? _closeHandle;
 
-    internal H5Object(long handle, Action<T>? closeHandle)
+    internal H5Object(long handle, HandleType handleType, Action<T>? closeHandle)
     {
+#if DEBUG
+        AssertHasHandleType(handle, handleType);
+#endif
+
         handle.ThrowIfDefaultOrInvalidHandleValue();
 
         _handle = handle;
@@ -64,11 +68,12 @@ public class H5Object<T> : Disposable where T : H5Object<T>
         return h5object._handle;
     }
 
-    internal void AssertHasHandleType(params HandleType[] types)
+    private static void AssertHasHandleType(long handle, params HandleType[] types)
     {
-        _handle.ThrowIfInvalidHandleValue();
+        handle.ThrowIfInvalidHandleValue();
 
-        var type = _handle >> 56;
+        // TODO: move >> 56 to enum
+        var type = handle >> 56;
 
         // ReSharper disable once LoopCanBeConvertedToQuery
         foreach (var t in types)
@@ -77,6 +82,12 @@ public class H5Object<T> : Disposable where T : H5Object<T>
         }
 
         throw new Hdf5Exception($"Handle type {type} is not valid at this point.");
+
+    }
+
+    internal void AssertHasHandleType(params HandleType[] types)
+    {
+        AssertHasHandleType(_handle, types);
     }
 
     #endregion

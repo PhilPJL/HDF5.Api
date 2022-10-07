@@ -8,7 +8,7 @@ namespace HDF5Api;
 /// </summary>
 public class H5Group : H5Location<H5Group>
 {
-    internal H5Group(long handle) : base(handle, H5GAdapter.Close)
+    internal H5Group(long handle) : base(handle, HandleType.Group, H5GAdapter.Close)
     {
     }
 

@@ -11,7 +11,7 @@ namespace HDF5Api;
 /// </summary>
 public class H5File : H5Location<H5File>
 {
-    internal H5File(long handle) : base(handle, H5FAdapter.Close)
+    internal H5File(long handle) : base(handle, HandleType.File, H5FAdapter.Close)
     {
     }
 
