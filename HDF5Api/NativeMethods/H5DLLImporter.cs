@@ -66,7 +66,7 @@ internal abstract class H5DLLImporter
 
     public unsafe hid_t GetHid(string varName)
     {
-        return *(hid_t*)this.GetAddress(varName);
+        return *(hid_t*)GetAddress(varName);
     }
 }
 
