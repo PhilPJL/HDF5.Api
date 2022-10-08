@@ -32,5 +32,23 @@ internal static partial class H5E
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t set_auto
         (hid_t estack_id, auto_t func, IntPtr client_data);
+
+    /// <summary>
+    /// Walks the specified error stack, calling the specified function.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5E.html#Error-Walk2
+    /// </summary>
+    /// <param name="estack_id">Error stack identifier.</param>
+    /// <param name="direction">Direction in which the error stack is to be
+    /// walked.</param>
+    /// <param name="func">Function to be called for each error encountered.</param>
+    /// <param name="client_data">Data to be passed with
+    /// <paramref name="func"/>.</param>
+    /// <returns></returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Ewalk2"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t walk
+        (hid_t estack_id, direction_t direction, walk_t func,
+        IntPtr client_data);
 #endif
 }

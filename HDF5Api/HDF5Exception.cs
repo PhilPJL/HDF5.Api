@@ -1,5 +1,5 @@
-﻿using System;
-using System.Globalization;
+﻿using HDF5Api.NativeMethodAdapters;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace HDF5Api;
@@ -9,27 +9,32 @@ public sealed class Hdf5Exception : Exception
 {
     public Hdf5Exception()
     {
+        Errors = H5EAdapter.WalkStack();
     }
 
     public Hdf5Exception(string message) : base(message)
     {
-    }
-
-    public Hdf5Exception(string message, Exception inner) : base(message, inner)
-    {
+        Errors = H5EAdapter.WalkStack();
     }
 
     private Hdf5Exception(SerializationInfo info, StreamingContext context) : base(info, context)
     {
+        // TODO: serialize Errors
     }
 
-    public static Hdf5Exception Create(string function, int err)
-    {
-        return new Hdf5Exception(string.Format(CultureInfo.InvariantCulture, "Error calling: {0}. err:{1}", function, err));
-    }
+    public ICollection<H5ErrorInfo> Errors { get; } = Array.Empty<H5ErrorInfo>();
 
-    public static Hdf5Exception Create(string function, long err)
+    public override string ToString()
     {
-        return new Hdf5Exception(string.Format(CultureInfo.InvariantCulture, "Error calling: {0}. err:{1}", function, err));
+        var sb = new StringBuilder();
+
+        sb.AppendLine(Message);
+
+        foreach (var error in Errors)
+        {
+            sb.Append(error.ToString());
+        }
+
+        return base.ToString();
     }
 }

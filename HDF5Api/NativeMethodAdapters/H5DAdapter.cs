@@ -13,7 +13,7 @@ internal static class H5DAdapter
     {
         int err = close(dataSet);
 
-        err.ThrowIfError(nameof(close));
+        err.ThrowIfError();
     }
 
     public static ulong GetStorageSize(H5DataSet dataSetId)
@@ -32,7 +32,7 @@ internal static class H5DAdapter
         long h = create(location, name, type, space,
             linkCreationPropertyList, dataSetCreationPropertyList, accessCreationPropertyList);
 
-        h.ThrowIfInvalidHandleValue(nameof(create));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5DataSet(h);
     }
@@ -43,7 +43,7 @@ internal static class H5DAdapter
 
         long h = open(location, name, dataSetAccessPropertyList);
 
-        h.ThrowIfInvalidHandleValue(nameof(open));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5DataSet(h);
     }
@@ -57,14 +57,14 @@ internal static class H5DAdapter
     {
         int err = set_extent(dataSetId, dimensions.Select(d => (ulong)d).ToArray());
 
-        err.ThrowIfError(nameof(set_extent));
+        err.ThrowIfError();
     }
 
     internal static void Write(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, IntPtr buffer, H5PropertyList? transferPropertyList = null) 
     {
         int err = write(dataSet, type, memorySpace, fileSpace, transferPropertyList, buffer);
 
-        err.ThrowIfError(nameof(write));
+        err.ThrowIfError();
     }
 
 /*    public static void Write<T>(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, Span<T> buffer, H5PropertyList? transferPropertyList = null) where T : unmanaged
@@ -78,7 +78,7 @@ internal static class H5DAdapter
     {
         long h = get_space(dataSet);
 
-        h.ThrowIfInvalidHandleValue(nameof(get_space));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5Space(h);
     }
@@ -87,7 +87,7 @@ internal static class H5DAdapter
     {
         long h = get_type(dataSet);
 
-        h.ThrowIfInvalidHandleValue(nameof(get_type));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5Type(h);
     }

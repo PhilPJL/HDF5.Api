@@ -12,7 +12,7 @@ internal static class H5LAdapter
 
         int err = exists(location, name, linkAccessPropertyList);
 
-        err.ThrowIfError(nameof(H5L.exists));
+        err.ThrowIfError();
 
         return err > 0;
     }
@@ -25,7 +25,7 @@ internal static class H5LAdapter
 
         int err = delete(location, name, linkAccessPropertyList);
 
-        err.ThrowIfError(nameof(H5L.delete));    
+        err.ThrowIfError();    
     }
 
     // TODO: iterate

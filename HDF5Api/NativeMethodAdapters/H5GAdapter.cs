@@ -12,7 +12,7 @@ internal static class H5GAdapter
     {
         int err = close(attribute);
 
-        err.ThrowIfError(nameof(close));
+        err.ThrowIfError();
     }
 
     public static H5Group Create<T>(
@@ -25,7 +25,7 @@ internal static class H5GAdapter
 
         long h = create(location, name, propListLinkCreation, propListGroupCreation, propListGroupAccess);
 
-        h.ThrowIfInvalidHandleValue(nameof(create));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5Group(h);
     }
@@ -36,7 +36,7 @@ internal static class H5GAdapter
 
         long h = open(location, name, propListGroupAccess);
 
-        h.ThrowIfInvalidHandleValue(nameof(open));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5Group(h);
     }
@@ -66,7 +66,7 @@ internal static class H5GAdapter
         // NOTE: H5L.exists can only check for a direct child of locationId
         int err = H5L.exists(location, name, linkAccessPropertyList);
 
-        err.ThrowIfError(nameof(H5L.exists));
+        err.ThrowIfError();
 
         return err > 0;
 

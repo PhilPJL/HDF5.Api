@@ -11,7 +11,7 @@ internal static class H5SAdapter
     {
         int err = close(attribute);
 
-        err.ThrowIfError(nameof(close));
+        err.ThrowIfError();
     }
 
     public static H5Space CreateSimple(params Dimension[] dimensions)
@@ -20,7 +20,7 @@ internal static class H5SAdapter
             dimensions.Select(d => d.InitialSize).ToArray(),
             dimensions.Select(d => d.UpperLimit).ToArray());
 
-        h.ThrowIfInvalidHandleValue(nameof(create_simple));
+        h.ThrowIfInvalidHandleValue();
         return new H5Space(h);
     }
 
@@ -35,13 +35,13 @@ internal static class H5SAdapter
         int err = select_hyperslab(
             space, seloper_t.SET, new[] { (ulong)offset }, null!, new[] { (ulong)count }, null!);
 
-        err.ThrowIfError(nameof(select_hyperslab));
+        err.ThrowIfError();
     }
 
     public static long GetSimpleExtentNPoints(H5Space space)
     {
         long v = get_simple_extent_npoints(space);
-        v.ThrowIfError(nameof(get_simple_extent_npoints));
+        v.ThrowIfError();
         return v;
     }
 
@@ -49,7 +49,7 @@ internal static class H5SAdapter
     {
         int rank = get_simple_extent_ndims(space);
 
-        rank.ThrowIfError(nameof(get_simple_extent_ndims));
+        rank.ThrowIfError();
 
         return rank;
     }
@@ -61,7 +61,7 @@ internal static class H5SAdapter
         var maxDims = new ulong[rank];
 
         int err = get_simple_extent_dims(space, dims, maxDims);
-        err.ThrowIfError(nameof(get_simple_extent_dims));
+        err.ThrowIfError();
 
         return Enumerable.Zip(dims, maxDims, (f, s) => new Dimension(f, s)).ToList();
     }

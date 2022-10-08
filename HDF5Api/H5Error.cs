@@ -15,4 +15,9 @@ public static class H5Error
     {
         H5EAdapter.SetAutoOff();
     }
+
+    public static void WalkStack()
+    {
+        H5EAdapter.WalkStack();
+    }
 }

@@ -12,14 +12,14 @@ internal static class H5PAdapter
     {
         int err = close(propertyList);
 
-        err.ThrowIfError(nameof(close));
+        err.ThrowIfError();
     }
 
     public static H5PropertyList Create(long classId)
     {
         long h = create(classId);
 
-        h.ThrowIfInvalidHandleValue(nameof(create));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5PropertyList(h);
     }
@@ -28,21 +28,21 @@ internal static class H5PAdapter
     {
         int err = set_chunk(propertyList, rank, dims.Select(d => (ulong)d).ToArray());
 
-        err.ThrowIfError(nameof(set_chunk));
+        err.ThrowIfError();
     }
 
     public static void EnableDeflateCompression(H5PropertyList propertyList, int level)
     {
         int err = set_deflate(propertyList, (uint)level);
 
-        err.ThrowIfError(nameof(set_deflate));
+        err.ThrowIfError();
     }
 
     public static bool AreEqual(H5PropertyList propertyList1, H5PropertyList propertyList2)
     {
         int err = equal(propertyList1, propertyList2);
 
-        err.ThrowIfError(nameof(equal));
+        err.ThrowIfError();
 
         return err != 0;
     }
@@ -51,7 +51,7 @@ internal static class H5PAdapter
     {
         long h = get_plist(obj);
 
-        h.ThrowIfInvalidHandleValue(nameof(get_plist));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5PropertyList(h);
     }

@@ -8,7 +8,7 @@ internal static class H5OAdapter
     {
         info_t oinfo = default;
         int err1 = get_info_by_name(locationId, name, ref oinfo);
-        err1.ThrowIfError(nameof(get_info_by_name));
+        err1.ThrowIfError();
         return oinfo;
     }
 

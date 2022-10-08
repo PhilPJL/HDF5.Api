@@ -20,7 +20,7 @@ internal static class H5AAdapter
     {
         int err = close(attribute);
 
-        err.ThrowIfError(nameof(close));
+        err.ThrowIfError();
     }
 
     public static H5Attribute Create<T>(H5Object<T> h5Object, string name, H5Type type, H5Space space,
@@ -31,7 +31,7 @@ internal static class H5AAdapter
 
         var h = create(h5Object, name, type, space, creationPropertyList);
 
-        h.ThrowIfInvalidHandleValue(nameof(create));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5Attribute(h);
     }
@@ -43,7 +43,7 @@ internal static class H5AAdapter
 
         long h = open(h5Object, name);
 
-        h.ThrowIfInvalidHandleValue(nameof(open));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5Attribute(h);
     }
@@ -54,7 +54,7 @@ internal static class H5AAdapter
 
         int err = delete(h5Object, name);
 
-        err.ThrowIfError(nameof(delete));
+        err.ThrowIfError();
     }
 
     public static bool Exists<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
@@ -63,7 +63,7 @@ internal static class H5AAdapter
 
         int err = exists(h5Object, name);
 
-        err.ThrowIfError(nameof(exists));
+        err.ThrowIfError();
         return err > 0;
     }
 
@@ -78,7 +78,7 @@ internal static class H5AAdapter
         int err = iterate(h5Object,
             H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
 
-        err.ThrowIfError(nameof(iterate));
+        err.ThrowIfError();
 
         return names;
 
@@ -98,7 +98,7 @@ internal static class H5AAdapter
     {
         info_t info = default;
         int err = get_info_by_name(h5Object, objectName, attributeName, ref info, linkAccessPropertyList);
-        err.ThrowIfError(nameof(get_info_by_name));
+        err.ThrowIfError();
         return info;
     }
 
@@ -107,14 +107,14 @@ internal static class H5AAdapter
     {
         int err = write(attribute, type, buffer);
 
-        err.ThrowIfError(nameof(write));
+        err.ThrowIfError();
     }
 
     public static H5Space GetSpace(H5Attribute attribute)
     {
         var space = get_space(attribute);
 
-        space.ThrowIfError(nameof(get_space));
+        space.ThrowIfError();
 
         return new H5Space(space);
     }
@@ -127,7 +127,7 @@ internal static class H5AAdapter
     public static H5Type GetType(H5Attribute attribute)
     {
         long typeHandle = get_type(attribute);
-        typeHandle.ThrowIfInvalidHandleValue(nameof(get_type));
+        typeHandle.ThrowIfInvalidHandleValue();
         return new H5Type(typeHandle);
     }
 
@@ -219,7 +219,7 @@ internal static class H5AAdapter
         {
             T result = default;
             int err = read(attribute, type, new IntPtr(&result));
-            err.ThrowIfError(nameof(read));
+            err.ThrowIfError();
             return result;
         }
 #endif

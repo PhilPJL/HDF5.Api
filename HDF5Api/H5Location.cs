@@ -173,7 +173,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         var names = new List<(string name, bool isGroup)>();
 
         int err = NativeMethods.H5L.iterate(handle, NativeMethods.H5.index_t.NAME, NativeMethods.H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
-        err.ThrowIfError(nameof(NativeMethods.H5L.iterate));
+        err.ThrowIfError();
 
         return names;
 

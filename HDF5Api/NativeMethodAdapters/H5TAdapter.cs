@@ -10,7 +10,7 @@ internal static class H5TAdapter
     {
         int err = close(type);
 
-        err.ThrowIfError(nameof(close));
+        err.ThrowIfError();
     }
 
     public static H5Class GetClass(H5Type typeId)
@@ -21,7 +21,7 @@ internal static class H5TAdapter
     public static H5Type CreateCompoundType(int size)
     {
         long h = create((class_t)H5Class.Compound, new ssize_t(size));
-        h.ThrowIfInvalidHandleValue(nameof(create));
+        h.ThrowIfInvalidHandleValue();
         return new H5Type(h);
     }
 
@@ -47,56 +47,56 @@ internal static class H5TAdapter
     public static H5Type CreateByteArrayType(params long[] dims)
     {
         long h = array_create(NATIVE_B8, (uint)dims.Length, dims.Select(d => (ulong)d).ToArray());
-        h.ThrowIfInvalidHandleValue(nameof(array_create));
+        h.ThrowIfInvalidHandleValue();
         return new H5Type(h);
     }
 
     public static H5Type CreateDoubleArrayType(int size)
     {
         long h = array_create(NATIVE_DOUBLE, 1, new[] { (ulong)size });
-        h.ThrowIfInvalidHandleValue(nameof(array_create));
+        h.ThrowIfInvalidHandleValue();
         return new H5Type(h);
     }
 
     public static H5Type CreateFloatArrayType(int size)
     {
         long h = array_create(NATIVE_FLOAT, 1, new[] { (ulong)size });
-        h.ThrowIfInvalidHandleValue(nameof(array_create));
+        h.ThrowIfInvalidHandleValue();
         return new H5Type(h);
     }
 
     public static H5Type CreateVariableLengthByteArrayType()
     {
         long h = vlen_create(NATIVE_B8);
-        h.ThrowIfInvalidHandleValue(nameof(vlen_create));
+        h.ThrowIfInvalidHandleValue();
         return new H5Type(h);
     }
 
     public static H5Type CreateFixedLengthStringType(int length)
     {
         long h = copy(C_S1);
-        h.ThrowIfInvalidHandleValue(nameof(copy));
+        h.ThrowIfInvalidHandleValue();
         int err = set_size(h, new ssize_t(length));
-        err.ThrowIfError(nameof(set_size));
+        err.ThrowIfError();
         return new H5Type(h);
     }
 
     public static void Insert(H5Type typeId, string name, ssize_t offset, long nativeTypeId)
     {
         int err = insert(typeId, name, offset, nativeTypeId);
-        err.ThrowIfError(nameof(insert));
+        err.ThrowIfError();
     }
 
     public static void Insert(H5Type typeId, string name, ssize_t offset, H5Type dataTypeId)
     {
         int err = insert(typeId, name, offset, dataTypeId);
-        err.ThrowIfError(nameof(insert));
+        err.ThrowIfError();
     }
 
     public static bool IsVariableLengthString(H5Type typeId)
     {
         int err = is_variable_str(typeId);
-        err.ThrowIfError(nameof(is_variable_str));
+        err.ThrowIfError();
         return err > 0;
     }
 

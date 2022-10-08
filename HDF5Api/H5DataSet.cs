@@ -139,6 +139,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         long count = space.GetSimpleExtentNPoints();
 
         var cls = type.GetClass();
+
         if (cls != H5Class.Compound)
         {
             throw new Hdf5Exception($"DataSet is of class {cls} when expecting {H5Class.Compound}.");
@@ -161,7 +162,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
             {
                 // TODO: use native H5DDataSetNativeMethods
                 int err = NativeMethods.H5D.read(this, type, space, space, 0, new IntPtr(ptr));
-                err.ThrowIfError(nameof(NativeMethods.H5D.read));
+                err.ThrowIfError();
                 return result;
             }
         }

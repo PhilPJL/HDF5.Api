@@ -18,7 +18,7 @@ public class H5Object<T> : Disposable where T : H5Object<T>
         AssertHasHandleType(handle, handleType);
 #endif
 
-        handle.ThrowIfDefaultOrInvalidHandleValue();
+        handle.ThrowIfDefaultOrInvalidHandleValue($"Constructing {handleType}");
 
         _handle = handle;
         _closeHandle = closeHandle;

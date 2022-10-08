@@ -13,14 +13,14 @@ internal static class H5FAdapter
     {
         int err = close(file);
 
-        err.ThrowIfError(nameof(close));
+        err.ThrowIfError();
     }
 
     public static H5File Create(string path, bool failIfExists = false, H5PropertyList? fileCreationPropertyList = null, H5PropertyList? fileAccessPropertyList = null)
     {
         long h = create(path, failIfExists ? ACC_EXCL : ACC_TRUNC, fileCreationPropertyList, fileAccessPropertyList);
 
-        h.ThrowIfInvalidHandleValue(nameof(create));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5File(h);
     }
@@ -29,14 +29,14 @@ internal static class H5FAdapter
     {
         int err = flush(file, flushGlobal ? scope_t.GLOBAL : scope_t.LOCAL);
 
-        err.ThrowIfError(nameof(flush));
+        err.ThrowIfError();
     }
 
     public static string GetName(H5File file)
     {
 #if NET7_0_OR_GREATER
         int length = (int)get_name(file, new Span<byte>(), 0);
-        length.ThrowIfError(nameof(get_name));
+        length.ThrowIfError();
         if (length > 261)
         {
             throw new PathTooLongException();
@@ -47,12 +47,12 @@ internal static class H5FAdapter
         }
         Span<byte> buffer = stackalloc byte[length + 1];
         var err = (int)get_name(file, buffer, length + 1);
-        err.ThrowIfError(nameof(get_name));
+        err.ThrowIfError();
         // remove trailing \0
         return Encoding.ASCII.GetString(buffer.Slice(0, length));
 #else
         int length = (int)get_name(file, null!, new IntPtr(0));
-        length.ThrowIfError(nameof(get_name));
+        length.ThrowIfError();
         if (length > 261)
         {
             throw new PathTooLongException();
@@ -63,7 +63,7 @@ internal static class H5FAdapter
         }
         var name = new StringBuilder(length + 1);
         var err = get_name(file, name, new IntPtr(length + 1));
-        ((int)err).ThrowIfError(nameof(get_name));
+        ((int)err).ThrowIfError();
         return name.ToString();
 #endif
     }
@@ -72,7 +72,7 @@ internal static class H5FAdapter
     {
         ulong size = 0;
         int err = get_filesize(file, ref size);
-        err.ThrowIfError(nameof(get_filesize));
+        err.ThrowIfError();
         return (long)size;
     }
 
@@ -109,7 +109,7 @@ internal static class H5FAdapter
     {
         long h = open(path, readOnly ? ACC_RDONLY : ACC_RDWR, fileAccessPropertyList);
 
-        h.ThrowIfInvalidHandleValue(nameof(open));
+        h.ThrowIfInvalidHandleValue();
 
         return new H5File(h);
     }
