@@ -9,20 +9,20 @@ public sealed class Hdf5Exception : Exception
 {
     public Hdf5Exception()
     {
-        Errors = H5EAdapter.WalkStack();
+        H5Errors = H5EAdapter.WalkStack();
     }
 
     public Hdf5Exception(string message) : base(message)
     {
-        Errors = H5EAdapter.WalkStack();
+        H5Errors = H5EAdapter.WalkStack();
     }
 
     private Hdf5Exception(SerializationInfo info, StreamingContext context) : base(info, context)
     {
-        // TODO: serialize Errors
+        // TODO: serialize H5Errors
     }
 
-    public ICollection<H5ErrorInfo> Errors { get; } = Array.Empty<H5ErrorInfo>();
+    public ICollection<H5ErrorInfo> H5Errors { get; } = Array.Empty<H5ErrorInfo>();
 
     public override string ToString()
     {
@@ -30,11 +30,11 @@ public sealed class Hdf5Exception : Exception
 
         sb.AppendLine(Message);
 
-        foreach (var error in Errors)
+        foreach (var error in H5Errors)
         {
-            sb.Append(error.ToString());
+            sb.AppendLine(error.ToString());
         }
 
-        return base.ToString();
+        return sb.ToString();
     }
 }

@@ -27,11 +27,6 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
 
-        if (AttributeExists(name))
-        {
-            throw new Hdf5Exception($"Attribute {name} already exists");
-        }
-
         return H5AAdapter.Create(this, name, type, space, creationPropertyList);
     }
 
