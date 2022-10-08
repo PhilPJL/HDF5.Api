@@ -32,7 +32,7 @@ public sealed class Hdf5Exception : Exception
 
         foreach (var error in H5Errors)
         {
-            sb.AppendLine(error.ToString());
+            sb.Append(error.ToString());
         }
 
         return sb.ToString();

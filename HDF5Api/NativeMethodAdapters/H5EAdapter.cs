@@ -46,4 +46,18 @@ public record struct H5ErrorInfo
     string FunctionName,
     string Filename,
     string Description
-);
+)
+{
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine(nameof(H5ErrorInfo));
+        sb.AppendLine("{");
+        sb.AppendLine($"\t{nameof(LineNumber)} = {LineNumber}");
+        sb.AppendLine($"\t{nameof(FunctionName)} = {FunctionName}");
+        sb.AppendLine($"\t{nameof(Filename)} = '{Filename}'");
+        sb.AppendLine($"\t{nameof(Description)} = '{Description}'");
+        sb.AppendLine("}");
+        return sb.ToString();
+    }
+}
