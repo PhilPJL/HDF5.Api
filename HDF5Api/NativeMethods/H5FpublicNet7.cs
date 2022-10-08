@@ -53,6 +53,21 @@ internal static partial class H5F
         hid_t create_plist = H5P.DEFAULT, hid_t access_plist = H5P.DEFAULT);
 
     /// <summary>
+    /// Flushes all buffers associated with a file to disk.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-Flush
+    /// </summary>
+    /// <param name="object_id">Identifier of object used to identify the
+    /// file.</param>
+    /// <param name="scope">Specifies the scope of the flushing
+    /// action.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fflush"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t flush(hid_t object_id, scope_t scope);
+
+    /// <summary>
     /// Returns a file access property list identifier.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-GetAccessPlist
     /// </summary>

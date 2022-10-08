@@ -15,6 +15,11 @@ public class H5File : H5Location<H5File>
     {
     }
 
+    public void Flush(bool flushGlobal = false)
+    {
+        H5FAdapter.Flush(this, flushGlobal);
+    }
+
     public long GetObjectCount(H5ObjectTypes types = H5ObjectTypes.All)
     {
         return H5FAdapter.GetObjectCount(this, types);

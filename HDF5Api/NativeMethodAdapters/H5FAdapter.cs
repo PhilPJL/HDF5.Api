@@ -25,13 +25,11 @@ internal static class H5FAdapter
         return new H5File(h);
     }
 
-    public static H5File Open(string path, bool readOnly, H5PropertyList? fileAccessPropertyList = null)
+    public static void Flush(H5File file, bool flushGlobal)
     {
-        long h = open(path, readOnly ? ACC_RDONLY : ACC_RDWR, fileAccessPropertyList);
+        int err = flush(file, flushGlobal ? scope_t.GLOBAL : scope_t.LOCAL);
 
-        h.ThrowIfInvalidHandleValue(nameof(open));
-
-        return new H5File(h);
+        err.ThrowIfError(nameof(flush));
     }
 
     public static string GetName(H5File file)
@@ -105,5 +103,14 @@ internal static class H5FAdapter
             PropertyListType.Access => H5PAdapter.GetPropertyList(file, get_access_plist),
             _ => throw new NotImplementedException(),
         };
+    }
+
+    public static H5File Open(string path, bool readOnly, H5PropertyList? fileAccessPropertyList = null)
+    {
+        long h = open(path, readOnly ? ACC_RDONLY : ACC_RDWR, fileAccessPropertyList);
+
+        h.ThrowIfInvalidHandleValue(nameof(open));
+
+        return new H5File(h);
     }
 }

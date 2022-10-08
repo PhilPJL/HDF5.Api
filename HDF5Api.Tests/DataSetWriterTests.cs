@@ -57,5 +57,4 @@ public class DataSetWriterTests : H5Test
             Debug.WriteLine($"Uncompressed={file.GetSize()}");
         });
     }
-
 }
