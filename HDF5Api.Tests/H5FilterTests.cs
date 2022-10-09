@@ -1,7 +1,7 @@
 ﻿namespace HDF5Api.Tests;
 
 [TestClass]
-public class H5FilterTest : H5Test
+public class H5FilterTests : H5Test
 {
     [TestMethod]
     public void IsSZipAvailable()

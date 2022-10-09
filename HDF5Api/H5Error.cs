@@ -1,4 +1,5 @@
-﻿using HDF5Api.NativeMethodAdapters;
+﻿using System.Collections.Generic;
+using HDF5Api.NativeMethodAdapters;
 
 namespace HDF5Api;
 
@@ -16,8 +17,8 @@ public static class H5Error
         H5EAdapter.SetAutoOff();
     }
 
-    public static void WalkStack()
+    public static ICollection<H5ErrorInfo> WalkStack()
     {
-        H5EAdapter.WalkStack();
+        return H5EAdapter.WalkStack();
     }
 }

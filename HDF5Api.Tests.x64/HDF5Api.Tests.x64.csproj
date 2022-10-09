@@ -16,6 +16,7 @@
     <Compile Include="..\HDF5Api.Tests\H5AttributeTests.cs" Link="H5AttributeTests.cs" />
     <Compile Include="..\HDF5Api.Tests\H5DataSetTests.cs" Link="H5DataSetTests.cs" />
     <Compile Include="..\HDF5Api.Tests\H5FileTests.cs" Link="H5FileTests.cs" />
+    <Compile Include="..\HDF5Api.Tests\H5FilterTests.cs" Link="H5FilterTests.cs" />
     <Compile Include="..\HDF5Api.Tests\H5GlobalTests.cs" Link="H5GlobalTests.cs" />
     <Compile Include="..\HDF5Api.Tests\H5GroupTests.cs" Link="H5GroupTests.cs" />
     <Compile Include="..\HDF5Api.Tests\H5HandleTests.cs" Link="H5HandleTests.cs" />

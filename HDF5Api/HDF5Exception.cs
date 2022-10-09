@@ -9,12 +9,12 @@ public sealed class Hdf5Exception : Exception
 {
     public Hdf5Exception()
     {
-        H5Errors = H5EAdapter.WalkStack();
+        H5Errors = H5Error.WalkStack();
     }
 
     public Hdf5Exception(string message) : base(message)
     {
-        H5Errors = H5EAdapter.WalkStack();
+        H5Errors = H5Error.WalkStack();
     }
 
     private Hdf5Exception(SerializationInfo info, StreamingContext context) : base(info, context)

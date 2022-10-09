@@ -499,4 +499,22 @@ public class H5FileTests : H5LocationTests
             Assert.AreNotEqual(0, file.Size);
         });
     }
+
+    [TestMethod]
+    public void FlushSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            // Ensure no existing file
+            File.Delete(Path);
+            Assert.IsFalse(File.Exists(Path));
+
+            // Create new file
+            using var file = H5File.Create(Path);
+            Assert.IsTrue(File.Exists(Path));
+
+            file.CreateAndWriteAttribute("test", "1111111111111111111111111111111111");
+            file.Flush();
+        });
+    }
 }
