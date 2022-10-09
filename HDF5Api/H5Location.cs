@@ -80,6 +80,11 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         return H5AAdapter.ListAttributeNames(this);
     }
 
+    public int GetNumberOfAttributes()
+    {
+        return (int)H5OAdapter.GetInfo(this).num_attrs;
+    }
+
     /// <summary>
     ///     Create a Group in this location
     /// </summary>

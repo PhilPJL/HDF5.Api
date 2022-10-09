@@ -4,7 +4,7 @@ namespace HDF5Api.NativeMethodAdapters;
 
 internal static class H5OAdapter
 {
-    public static info_t GetInfoByName(long locationId, string name)
+    internal static info_t GetInfoByName(long locationId, string name)
     {
         info_t oinfo = default;
         int err1 = get_info_by_name(locationId, name, ref oinfo);
@@ -12,10 +12,20 @@ internal static class H5OAdapter
         return oinfo;
     }
 
-    public static info_t GetInfoByName<T>(H5Object<T> location, string name) where T : H5Object<T>
+    public static info_t GetInfoByName<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
-        location.AssertHasHandleType(HandleType.File, HandleType.Group);
+        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        return GetInfoByName((long)location, name);
+        return GetInfoByName((long)h5Object, name);
+    }
+
+    public static info_t GetInfo<T>(H5Object<T> h5Object) where T : H5Object<T>
+    {
+        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+
+        info_t oinfo = default;
+        int err = get_info(h5Object, ref oinfo);
+        err.ThrowIfError();
+        return oinfo;
     }
 }

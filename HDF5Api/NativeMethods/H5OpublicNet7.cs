@@ -20,6 +20,20 @@ internal static partial class H5O
 {
 #if NET7_0_OR_GREATER
     /// <summary>
+    /// Retrieves the metadata for an object specified by an identifier.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5O.html#Object-GetInfo
+    /// </summary>
+    /// <param name="loc_id">Identifier for object of type specified by
+    /// <code>H5O.type_t</code></param>
+    /// <param name="oinfo">Buffer in which to return object information</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Oget_info1",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_info(hid_t loc_id, ref info_t oinfo);
+
+    /// <summary>
     /// Retrieves the metadata for an object, identifying the object by
     /// location and relative name.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5O.html#Object-GetInfoByName

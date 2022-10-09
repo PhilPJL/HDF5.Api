@@ -67,7 +67,7 @@ internal static class H5AAdapter
         return err > 0;
     }
 
-    public static IEnumerable<string> ListAttributeNames<T>(H5Object<T> h5Object, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
+    public static IEnumerable<string> ListAttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 

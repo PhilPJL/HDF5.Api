@@ -167,4 +167,9 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
             }
         }
     }
+
+    public int GetNumberOfAttributes()
+    {
+        return (int)H5OAdapter.GetInfo(this).num_attrs;
+    }
 }

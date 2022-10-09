@@ -49,14 +49,13 @@ internal abstract class H5DLLImporter
 #endif
     }
 
-    private readonly IntPtr _handle;
-    protected IntPtr ModuleHandle => _handle;
+    protected IntPtr ModuleHandle { get; private set; }
 
     protected H5DLLImporter()
     {
-        _handle = NativeProviderLoader.TryGetHandle(Constants.DLLFileName);
+        ModuleHandle = NativeProviderLoader.TryGetHandle(Constants.DLLFileName);
 
-        if (_handle == IntPtr.Zero)
+        if (ModuleHandle == IntPtr.Zero)
             throw new DllNotFoundException(Constants.DLLFileName);
     }
 

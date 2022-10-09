@@ -14,4 +14,6 @@ public interface IH5ObjectWithAttributes
     DateTime ReadDateTimeAttribute(string name);
 
     IEnumerable<string> ListAttributeNames();
+
+    int GetNumberOfAttributes();
 }
