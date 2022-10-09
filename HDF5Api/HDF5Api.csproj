@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<LangVersion>latest</LangVersion>
-		<TargetFrameworks>net7.0;netstandard2.0;</TargetFrameworks>
-		<PlatformTarget>AnyCPU</PlatformTarget>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <TargetFrameworks>net7.0;netstandard2.0;</TargetFrameworks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
@@ -13,39 +13,35 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>HDF5.Api</Title>
-    <Version>0.1.3-alpha</Version>
+    <Version>0.1.7-alpha</Version>
   </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-	  <WarningLevel>7</WarningLevel>
-	</PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <WarningLevel>7</WarningLevel>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-	  <WarningLevel>7</WarningLevel>
-	</PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <WarningLevel>7</WarningLevel>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Diagnostics" Version="8.0.0" />
-		<PackageReference Include="CommunityToolkit.HighPerformance" Version="8.0.0" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.0.0" />
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.0.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
-	<ItemGroup>
-	  <None Update="runtimes\win-x64\native\hdf5.dll">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="runtimes\win-x64\native\hdf5_hl.dll">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="runtimes\win-x86\native\hdf5.dll">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="runtimes\win-x86\native\hdf5_hl.dll">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
+  <ItemGroup>
+    <Content Include="runtimes\win-x64\native\*"
+             CopyToOutputDirectory="Always"
+             Pack="true"
+             PackagePath="runtimes\win-x64\native" />
 
+    <Content Include="runtimes\win-x86\native\*"
+             CopyToOutputDirectory="Always"
+             Pack="true"
+             PackagePath="runtimes\win-x86\native" />
+  </ItemGroup>
 </Project>

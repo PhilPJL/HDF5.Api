@@ -13,30 +13,36 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+using System.Diagnostics;
+
 namespace HDF5Api.NativeMethods;
 
 // NOTE: native module loading now done using NativeProviderLoader from MathNet
 
 internal abstract class H5DLLImporter
 {
-    public static readonly H5DLLImporter Instance;
+    private static H5DLLImporter? _instance;
+    public static H5DLLImporter Instance => _instance ??= Initialise();
 
-    static H5DLLImporter()
+    private static H5DLLImporter Initialise()
     {
+        if (_instance != null)
+            return _instance;
+
         if (H5.open() < 0)
             throw new Exception("Could not initialize HDF5 library.");
 
 #if NET5_0_OR_GREATER
-        Instance = new H5NativeImporter();
+        return new H5NativeImporter();
 #else
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            Instance = new H5LinuxDllImporter();
+            return new H5LinuxDllImporter();
 
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            Instance = new H5MacDllImporter();
+            return new H5MacDllImporter();
 
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            Instance = new H5WindowsDLLImporter();
+            return new H5WindowsDLLImporter();
 
         else
             throw new PlatformNotSupportedException();
@@ -74,6 +80,11 @@ internal abstract class H5DLLImporter
 
 internal class H5NativeImporter : H5DLLImporter
 {
+    public H5NativeImporter ()
+	{
+        Debug.WriteLine("Init: H5NativeImporter");
+	}
+
     protected override IntPtr InternalGetAddress(string varName)
     {
         if (NativeLibrary.TryGetExport(ModuleHandle, varName, out nint address))
@@ -89,6 +100,11 @@ internal class H5NativeImporter : H5DLLImporter
 
 internal class H5WindowsDLLImporter : H5DLLImporter
 {
+    public H5WindowsDLLImporter()
+    {
+        Debug.WriteLine("Init: H5WindowsDLLImporter");
+    }
+
     [DllImport("kernel32", EntryPoint = "GetProcAddress", CharSet = CharSet.Ansi, SetLastError = true)]
     internal static extern IntPtr GetProcAddress(IntPtr hModule, [MarshalAs(UnmanagedType.LPStr)] string procName);
 
