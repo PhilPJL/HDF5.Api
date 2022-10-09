@@ -13,7 +13,7 @@ public interface IH5ObjectWithAttributes
     string ReadStringAttribute(string name);
     DateTime ReadDateTimeAttribute(string name);
 
-    IEnumerable<string> ListAttributeNames();
+    IEnumerable<string> AttributeNames { get; }
 
-    int GetNumberOfAttributes();
+    int NumberOfAttributes { get; }
 }

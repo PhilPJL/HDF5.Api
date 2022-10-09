@@ -172,11 +172,11 @@ public class H5AttributeTests : H5Test
             "double"
         };
 
-        var attributeNames = objectWithAttributes.ListAttributeNames();
+        var attributeNames = objectWithAttributes.AttributeNames;
 
         Assert.IsTrue(!names.Except(attributeNames).Any());
         Assert.IsTrue(!attributeNames.Except(names).Any());
-        Assert.AreEqual(11, objectWithAttributes.GetNumberOfAttributes());
+        Assert.AreEqual(11, objectWithAttributes.NumberOfAttributes);
     }
 
     internal static void CreateWriteReadDeleteAttributesSucceeds(IH5ObjectWithAttributes location)
@@ -194,7 +194,7 @@ public class H5AttributeTests : H5Test
         CreateWriteReadDeleteStringAttribute("1234567890", 5);
         CreateWriteReadDeleteDateTimeAttribute(DateTime.UtcNow);
         CreateWriteReadDeleteStringAttribute(new string('A', 1000));
-        Assert.AreEqual(0, location.GetNumberOfAttributes());
+        Assert.AreEqual(0, location.NumberOfAttributes);
 
         void CreateWriteReadDeleteDateTimeAttribute(DateTime value)
         {

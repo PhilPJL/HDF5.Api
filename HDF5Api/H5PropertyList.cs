@@ -30,11 +30,15 @@ public class H5PropertyList : H5Object<H5PropertyList>
     /// <param name="level"></param>
     public void EnableDeflateCompression(int level)
     {
+        Guard.IsBetweenOrEqualTo(level, 0, 9);
+
         H5PAdapter.EnableDeflateCompression(this, level);
     }
 
-    public bool IsEqualTo(H5PropertyList other)
+    public bool IsEqualTo([DisallowNull] H5PropertyList other)
     {
+        Guard.IsNotNull(other);
+
         return H5PAdapter.AreEqual(this, other);
     }
 }

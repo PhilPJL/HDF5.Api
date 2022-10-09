@@ -13,7 +13,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>HDF5.Api</Title>
-    <Version>0.1.7-alpha</Version>
+    <Version>0.1.8-alpha</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
@@ -34,14 +34,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="runtimes\win-x64\native\*"
-             CopyToOutputDirectory="Always"
-             Pack="true"
-             PackagePath="runtimes\win-x64\native" />
-
-    <Content Include="runtimes\win-x86\native\*"
-             CopyToOutputDirectory="Always"
-             Pack="true"
-             PackagePath="runtimes\win-x86\native" />
+    <Content Include="runtimes\win-x64\native\*" CopyToOutputDirectory="Always" Pack="true" PackagePath="runtimes\win-x64\native" />
+    <Content Include="runtimes\win-x86\native\*" CopyToOutputDirectory="Always" Pack="true" PackagePath="runtimes\win-x86\native" />
   </ItemGroup>
+
 </Project>

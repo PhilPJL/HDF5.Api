@@ -19,6 +19,16 @@ namespace HDF5Api.NativeMethods;
 internal static partial class H5Z
 {
 #if NET7_0_OR_GREATER
-    // TODO
+    /// <summary>
+    /// Determines whether a filter is available.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5Z.html#Compression-FilterAvail
+    /// </summary>
+    /// <param name="filter">Filter identifier.</param>
+    /// <returns>Returns a Boolean value if successful;
+    /// otherwise returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Zfilter_avail"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial htri_t filter_avail(filter_t filter);
 #endif
 }

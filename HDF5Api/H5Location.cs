@@ -12,7 +12,7 @@ namespace HDF5Api;
 /// </remarks>
 public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Object<T>
 {
-    internal H5Location(long handle, HandleType handleType, Action<T>? closeHandle) 
+    internal H5Location(long handle, HandleType handleType, Action<T>? closeHandle)
         : base(handle, handleType, closeHandle)
     {
     }
@@ -20,7 +20,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// <summary>
     ///     Create an Attribute for this location
     /// </summary>
-    public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space, 
+    public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space,
         [AllowNull] H5PropertyList? creationPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -75,15 +75,9 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         return H5ObjectWithAttributeExtensions.ReadDateTimeAttribute(this, name);
     }
 
-    public IEnumerable<string> ListAttributeNames()
-    {
-        return H5AAdapter.ListAttributeNames(this);
-    }
+    public IEnumerable<string> AttributeNames => H5AAdapter.ListAttributeNames(this);
 
-    public int GetNumberOfAttributes()
-    {
-        return (int)H5OAdapter.GetInfo(this).num_attrs;
-    }
+    public int NumberOfAttributes => (int)H5OAdapter.GetInfo(this).num_attrs;
 
     /// <summary>
     ///     Create a Group in this location

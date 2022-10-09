@@ -479,7 +479,7 @@ public class H5FileTests : H5LocationTests
             using var file = H5File.Create(Path);
             Assert.IsTrue(File.Exists(Path));
 
-            Assert.AreEqual(Path, file.GetName());
+            Assert.AreEqual(Path, file.Name);
         });
     }
 
@@ -496,7 +496,7 @@ public class H5FileTests : H5LocationTests
             using var file = H5File.Create(Path);
             Assert.IsTrue(File.Exists(Path));
 
-            Assert.AreNotEqual(0, file.GetSize());
+            Assert.AreNotEqual(0, file.Size);
         });
     }
 }

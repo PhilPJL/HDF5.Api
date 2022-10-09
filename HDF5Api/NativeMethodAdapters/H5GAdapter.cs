@@ -63,12 +63,8 @@ internal static class H5GAdapter
             throw new Hdf5Exception($"Only simple group names are allowed, not '{name}'.");
         }
 
-        // NOTE: H5L.exists can only check for a direct child of locationId
-        int err = H5L.exists(location, name, linkAccessPropertyList);
-
-        err.ThrowIfError();
-
-        return err > 0;
+        // H5L.exists can only check for a direct child of locationId
+        return H5LAdapter.Exists(location, name, linkAccessPropertyList);
 
         static bool IsSimpleName(string name)
         {

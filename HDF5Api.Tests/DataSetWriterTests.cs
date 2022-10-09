@@ -29,7 +29,7 @@ public class DataSetWriterTests : H5Test
                 .Buffer(50)
                 .ForEach(b => writer.Write(b));
 
-            Debug.WriteLine($"Compressed={file.GetSize()}");
+            Debug.WriteLine($"Compressed={file.Size}");
         });
     }
 
@@ -54,7 +54,7 @@ public class DataSetWriterTests : H5Test
                 .Buffer(50)
                 .ForEach(b => writer.Write(b));
 
-            Debug.WriteLine($"Uncompressed={file.GetSize()}");
+            Debug.WriteLine($"Uncompressed={file.Size}");
         });
     }
 }

@@ -25,15 +25,9 @@ public class H5File : H5Location<H5File>
         return H5FAdapter.GetObjectCount(this, types);
     }
 
-    public string GetName()
-    {
-        return H5FAdapter.GetName(this);
-    }
+    public string Name => H5FAdapter.GetName(this);
 
-    public long GetSize()
-    {
-        return H5FAdapter.GetSize(this);
-    }
+    public long Size => H5FAdapter.GetSize(this);
 
     public static H5PropertyList CreatePropertyList(PropertyListType listType)
     {

@@ -116,10 +116,9 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5ObjectWithAttributeExtensions.ReadDateTimeAttribute(this, name);
     }
 
-    public IEnumerable<string> ListAttributeNames()
-    {
-        return H5AAdapter.ListAttributeNames(this);
-    }
+    public IEnumerable<string> AttributeNames => H5AAdapter.ListAttributeNames(this);
+
+    public int NumberOfAttributes => (int)H5OAdapter.GetInfo(this).num_attrs;
 
     public static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
@@ -166,10 +165,5 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
                 return result;
             }
         }
-    }
-
-    public int GetNumberOfAttributes()
-    {
-        return (int)H5OAdapter.GetInfo(this).num_attrs;
     }
 }
