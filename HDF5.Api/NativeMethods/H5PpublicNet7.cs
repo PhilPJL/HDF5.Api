@@ -14,14 +14,14 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 using off_t = System.IntPtr;
-using prp_close_func_t = HDF5Api.NativeMethods.H5P.prp_cb1_t;
-using prp_copy_func_t = HDF5Api.NativeMethods.H5P.prp_cb1_t;
-using prp_create_func_t = HDF5Api.NativeMethods.H5P.prp_cb1_t;
-using prp_delete_func_t = HDF5Api.NativeMethods.H5P.prp_cb2_t;
-using prp_get_func_t = HDF5Api.NativeMethods.H5P.prp_cb2_t;
-using prp_set_func_t = HDF5Api.NativeMethods.H5P.prp_cb2_t;
+using prp_close_func_t = HDF5.Api.NativeMethods.H5P.prp_cb1_t;
+using prp_copy_func_t = HDF5.Api.NativeMethods.H5P.prp_cb1_t;
+using prp_create_func_t = HDF5.Api.NativeMethods.H5P.prp_cb1_t;
+using prp_delete_func_t = HDF5.Api.NativeMethods.H5P.prp_cb2_t;
+using prp_get_func_t = HDF5.Api.NativeMethods.H5P.prp_cb2_t;
+using prp_set_func_t = HDF5.Api.NativeMethods.H5P.prp_cb2_t;
 
-namespace HDF5Api.NativeMethods;
+namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
 internal static partial class H5P

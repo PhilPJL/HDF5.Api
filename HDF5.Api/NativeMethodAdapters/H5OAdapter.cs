@@ -1,6 +1,6 @@
-﻿using static HDF5Api.NativeMethods.H5O;
+﻿using static HDF5.Api.NativeMethods.H5O;
 
-namespace HDF5Api.NativeMethodAdapters;
+namespace HDF5.Api.NativeMethodAdapters;
 
 internal static class H5OAdapter
 {

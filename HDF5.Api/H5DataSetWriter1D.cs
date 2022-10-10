@@ -1,8 +1,8 @@
-﻿using HDF5Api.NativeMethodAdapters;
+﻿using HDF5.Api.NativeMethodAdapters;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 /// <summary>
 ///     Implementation of a chunked, extensible, 1D data-set writer

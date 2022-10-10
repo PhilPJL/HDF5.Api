@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Diagnostics;
-using HDF5Api.NativeMethods;
-using static HDF5Api.NativeMethods.H5;
+using HDF5.Api.NativeMethods;
+using static HDF5.Api.NativeMethods.H5;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 /// <summary>
 ///     Wrapper for H5 (Global) API.

@@ -1,15 +1,15 @@
 ﻿using CommunityToolkit.Diagnostics;
 #if NETSTANDARD
-using HDF5Api.Disposables;
+using HDF5.Api.Disposables;
 #endif
 #if NET7_0_OR_GREATER
 using CommunityToolkit.HighPerformance.Buffers;
 #endif
-using HDF5Api.NativeMethods;
+using HDF5.Api.NativeMethods;
 using System.Collections.Generic;
-using static HDF5Api.NativeMethods.H5A;
+using static HDF5.Api.NativeMethods.H5A;
 
-namespace HDF5Api.NativeMethodAdapters;
+namespace HDF5.Api.NativeMethodAdapters;
 
 /// <summary>
 /// H5 attribute native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>

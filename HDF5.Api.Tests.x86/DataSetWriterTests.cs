@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace HDF5Api.Tests;
+namespace HDF5.Api.Tests;
 
 [TestClass]
 public class DataSetWriterTests : H5Test

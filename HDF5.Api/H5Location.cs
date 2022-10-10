@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using CommunityToolkit.Diagnostics;
-using HDF5Api.NativeMethodAdapters;
+using HDF5.Api.NativeMethodAdapters;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 /// <summary>
 ///     Intermediate base class for H5File and H5Group.

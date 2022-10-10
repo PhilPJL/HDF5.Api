@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 /// <summary>
 ///     Interface that needs to be implemented by an AttributeWriter.

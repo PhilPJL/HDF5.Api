@@ -1,5 +1,5 @@
-﻿using HDF5Api.NativeMethodAdapters;
-namespace HDF5Api;
+﻿using HDF5.Api.NativeMethodAdapters;
+namespace HDF5.Api;
 
 /// <summary>
 ///     <para>.NET wrapper for H5A (Attribute) API.</para>

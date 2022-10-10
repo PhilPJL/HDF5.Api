@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 public interface IH5ObjectWithAttributes
 {

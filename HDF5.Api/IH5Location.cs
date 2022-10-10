@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 /// <summary>
 ///     Operations that can be carried out on a location (group or file)

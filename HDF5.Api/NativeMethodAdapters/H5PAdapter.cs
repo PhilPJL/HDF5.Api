@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System.Linq;
-using static HDF5Api.NativeMethods.H5P;
+using static HDF5.Api.NativeMethods.H5P;
 
-namespace HDF5Api.NativeMethodAdapters;
+namespace HDF5.Api.NativeMethodAdapters;
 
 /// <summary>
 /// H5 property list native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_p.html"/>

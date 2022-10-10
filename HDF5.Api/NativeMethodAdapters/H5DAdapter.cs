@@ -1,8 +1,8 @@
-﻿using HDF5Api.NativeMethods;
+﻿using HDF5.Api.NativeMethods;
 using System.Linq;
-using static HDF5Api.NativeMethods.H5D;
+using static HDF5.Api.NativeMethods.H5D;
 
-namespace HDF5Api.NativeMethodAdapters;
+namespace HDF5.Api.NativeMethodAdapters;
 
 /// <summary>
 /// H5 data-set native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_d.html"/>

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using HDF5Api.NativeMethodAdapters;
-using HDF5Api.NativeMethods;
+using HDF5.Api.NativeMethodAdapters;
+using HDF5.Api.NativeMethods;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 public static class H5AttributeWriter
 {

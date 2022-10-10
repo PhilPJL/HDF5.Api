@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using static HDF5Api.NativeMethods.H5E;
+using static HDF5.Api.NativeMethods.H5E;
 
-namespace HDF5Api.NativeMethodAdapters;
+namespace HDF5.Api.NativeMethodAdapters;
 
 internal static class H5EAdapter
 {

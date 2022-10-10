@@ -34,7 +34,7 @@ using System.Threading;
 
 // ReSharper disable InconsistentNaming
 
-namespace HDF5Api.NativeMethods
+namespace HDF5.Api.NativeMethods
 {
     public static class Control
     {

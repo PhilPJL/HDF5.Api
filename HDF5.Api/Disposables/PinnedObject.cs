@@ -1,4 +1,4 @@
-﻿namespace HDF5Api.Disposables;
+﻿namespace HDF5.Api.Disposables;
 
 /// <summary>
 ///     Disposable wrapper for safely pinning/releasing objects

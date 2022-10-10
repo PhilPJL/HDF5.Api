@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
-using static HDF5Api.NativeMethods.H5Z;
+using static HDF5.Api.NativeMethods.H5Z;
 
-namespace HDF5Api.NativeMethodAdapters;
+namespace HDF5.Api.NativeMethodAdapters;
 
 internal static class H5ZAdapter
 {

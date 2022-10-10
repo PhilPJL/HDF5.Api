@@ -15,7 +15,7 @@
 
 using System.Diagnostics;
 
-namespace HDF5Api.NativeMethods;
+namespace HDF5.Api.NativeMethods;
 
 // NOTE: native module loading now done using NativeProviderLoader from MathNet
 

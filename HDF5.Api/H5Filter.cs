@@ -1,7 +1,7 @@
-﻿using HDF5Api.NativeMethodAdapters;
-using static HDF5Api.NativeMethods.H5Z;
+﻿using HDF5.Api.NativeMethodAdapters;
+using static HDF5.Api.NativeMethods.H5Z;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 public static class H5Filter
 {

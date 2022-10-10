@@ -1,6 +1,6 @@
-﻿using HDF5Api.NativeMethodAdapters;
+﻿using HDF5.Api.NativeMethodAdapters;
 
-namespace HDF5Api.Tests;
+namespace HDF5.Api.Tests;
 
 [TestClass]
 public class H5DataSetTests : H5Test

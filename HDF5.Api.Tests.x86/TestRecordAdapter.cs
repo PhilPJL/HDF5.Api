@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace HDF5Api.Tests;
+namespace HDF5.Api.Tests;
 
 /// <summary>
 ///     A type converter for <see cref="TestRecord" />.

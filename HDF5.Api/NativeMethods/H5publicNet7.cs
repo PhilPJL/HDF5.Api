@@ -13,7 +13,7 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-namespace HDF5Api.NativeMethods;
+namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
 internal static partial class H5

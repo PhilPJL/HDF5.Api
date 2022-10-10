@@ -1,4 +1,4 @@
-﻿namespace HDF5Api.Tests;
+﻿namespace HDF5.Api.Tests;
 
 [TestClass]
 public class AttributeWriterTests : H5Test

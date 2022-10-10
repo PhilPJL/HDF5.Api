@@ -1,8 +1,8 @@
-﻿using HDF5Api.NativeMethodAdapters;
+﻿using HDF5.Api.NativeMethodAdapters;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 [Serializable]
 public sealed class Hdf5Exception : Exception

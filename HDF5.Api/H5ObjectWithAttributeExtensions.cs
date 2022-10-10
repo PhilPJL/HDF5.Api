@@ -1,8 +1,8 @@
-﻿using HDF5Api.Disposables;
-using HDF5Api.NativeMethodAdapters;
+﻿using HDF5.Api.Disposables;
+using HDF5.Api.NativeMethodAdapters;
 using CommunityToolkit.Diagnostics;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 public static class H5ObjectWithAttributeExtensions
 {

@@ -3,8 +3,8 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using HDF5Api;
-using HDF5Api.NativeMethods;
+using HDF5.Api;
+using HDF5.Api.NativeMethods;
 
 namespace Benchmark
 {

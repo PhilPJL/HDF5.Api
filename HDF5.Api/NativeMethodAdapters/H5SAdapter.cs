@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
-using static HDF5Api.NativeMethods.H5S;
+using static HDF5.Api.NativeMethods.H5S;
 
-namespace HDF5Api.NativeMethodAdapters;
+namespace HDF5.Api.NativeMethodAdapters;
 
 internal static class H5SAdapter
 {

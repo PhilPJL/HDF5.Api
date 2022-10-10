@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using static HDF5Api.NativeMethods.H5T;
+using static HDF5.Api.NativeMethods.H5T;
 
-namespace HDF5Api.NativeMethodAdapters;
+namespace HDF5.Api.NativeMethodAdapters;
 
 internal static class H5TAdapter
 {

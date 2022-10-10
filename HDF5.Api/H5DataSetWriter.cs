@@ -1,4 +1,4 @@
-﻿namespace HDF5Api;
+﻿namespace HDF5.Api;
 
 /// <summary>
 ///     Factory class for creating data-set writers.

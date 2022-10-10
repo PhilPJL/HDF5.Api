@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 public static class H5Handle
 {

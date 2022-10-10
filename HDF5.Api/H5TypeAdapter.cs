@@ -1,8 +1,8 @@
-﻿using HDF5Api.Disposables;
+﻿using HDF5.Api.Disposables;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HDF5Api;
+namespace HDF5.Api;
 
 /// <summary>
 ///     Base class for implementing a custom adaptor/converter to format an instance of a C# type into a blittable struct

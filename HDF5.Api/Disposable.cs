@@ -1,4 +1,4 @@
-﻿namespace HDF5Api
+﻿namespace HDF5.Api
 {
     public abstract class Disposable : IDisposable
     {

@@ -1,7 +1,7 @@
-﻿using HDF5Api.NativeMethods;
-using static HDF5Api.NativeMethods.H5L;
+﻿using HDF5.Api.NativeMethods;
+using static HDF5.Api.NativeMethods.H5L;
 
-namespace HDF5Api.NativeMethodAdapters;
+namespace HDF5.Api.NativeMethodAdapters;
 
 internal static class H5LAdapter
 {
