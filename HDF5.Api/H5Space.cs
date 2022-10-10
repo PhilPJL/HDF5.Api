@@ -11,9 +11,7 @@ namespace HDF5.Api;
 /// </summary>
 public class H5Space : H5Object<H5Space>
 {
-    internal H5Space(long handle) : base(handle, HandleType.Space, H5SAdapter.Close)
-    {
-    }
+    internal H5Space(long handle) : base(handle, HandleType.Space, H5SAdapter.Close) { }
 
     #region Public Api
 

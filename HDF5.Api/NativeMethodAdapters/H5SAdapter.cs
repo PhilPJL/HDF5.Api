@@ -31,6 +31,14 @@ internal static class H5SAdapter
         return CreateSimple(dimensions.Select(d => new Dimension(d)).ToArray());
     }
 
+    internal static H5Space CreateScalar()
+    {
+        long h = create(class_t.SCALAR);
+
+        h.ThrowIfInvalidHandleValue();
+        return new H5Space(h);
+    }
+
     //TODO: expose other params
     internal static void SelectHyperslab(H5Space space, long offset, long count)
     {

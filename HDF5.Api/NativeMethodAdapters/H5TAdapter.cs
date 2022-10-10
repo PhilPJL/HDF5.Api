@@ -114,18 +114,22 @@ internal static class H5TAdapter
         return default(T) switch
         {
             //            char => H5T.NATIVE_CHAR,
+            bool => NATIVE_B8,
+            byte => NATIVE_B8,
 
             short => NATIVE_INT16,
-            ushort => NATIVE_USHORT,
             int => NATIVE_INT32,
-            uint => NATIVE_UINT32,
             long => NATIVE_INT64,
+            
+            ushort => NATIVE_USHORT,
+            uint => NATIVE_UINT32,
             ulong => NATIVE_UINT64,
+            
             float => NATIVE_FLOAT,
             double => NATIVE_DOUBLE,
             // TODO: add more mappings as required
 
             _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
-        };
+        }; ;
     }
 }

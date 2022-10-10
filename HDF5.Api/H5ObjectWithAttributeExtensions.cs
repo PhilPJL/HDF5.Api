@@ -1,7 +1,8 @@
-﻿using HDF5.Api.Disposables;
-using HDF5.Api.NativeMethodAdapters;
+﻿using HDF5.Api.NativeMethodAdapters;
 using CommunityToolkit.Diagnostics;
-using System.Runtime.CompilerServices;
+#if NETSTANDARD
+using HDF5.Api.Disposables;
+#endif
 #if NET7_0_OR_GREATER
 using CommunityToolkit.HighPerformance.Buffers;
 #endif
@@ -41,8 +42,7 @@ public static class H5ObjectWithAttributeExtensions
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
 
-        // Single dimension (rank 1), unlimited length, chunk size.
-        using var memorySpace = H5SAdapter.CreateSimple(1);
+        using var memorySpace = H5SAdapter.CreateScalar();
 
         // TODO: variable length
         // TODO: create if not exist

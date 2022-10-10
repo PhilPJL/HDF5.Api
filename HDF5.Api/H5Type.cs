@@ -9,9 +9,7 @@ namespace HDF5.Api;
 /// </summary>
 public class H5Type : H5Object<H5Type>
 {
-    internal H5Type(long handle) : base(handle, HandleType.Type, H5TAdapter.Close)
-    {
-    }
+    internal H5Type(long handle) : base(handle, HandleType.Type, H5TAdapter.Close) { }
 
     private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
 
@@ -26,7 +24,7 @@ public class H5Type : H5Object<H5Type>
     {
         Guard.IsNotNull(type1);
         Guard.IsNotNull(type2);
-        
+
         return H5TAdapter.AreEqual(type1, type2);
     }
 
@@ -117,5 +115,4 @@ public class H5Type : H5Object<H5Type>
     {
         return H5TAdapter.CreateFixedLengthStringType(length);
     }
-
 }

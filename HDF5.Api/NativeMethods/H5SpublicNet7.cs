@@ -32,6 +32,18 @@ internal static partial class H5S
     public static partial herr_t close(hid_t space_id);
 
     /// <summary>
+    /// Creates a new dataspace of a specified type.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5S.html#Dataspace-Create
+    /// </summary>
+    /// <param name="type">Type of dataspace to be created.</param>
+    /// <returns>Returns a dataspace identifier if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Screate"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t create(class_t type);
+
+    /// <summary>
     /// Creates a new simple dataspace and opens it for access.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5S.html#Dataspace-CreateSimple
     /// </summary>
