@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HDF5Api\HDF5.Api.csproj" />
+    <ProjectReference Include="..\HDF5.Api\HDF5.Api.csproj" />
   </ItemGroup>
 
 </Project>
