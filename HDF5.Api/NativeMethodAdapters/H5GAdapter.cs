@@ -8,14 +8,14 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// </summary>
 internal static class H5GAdapter
 {
-    public static void Close(H5Group attribute)
+    internal static void Close(H5Group attribute)
     {
         int err = close(attribute);
 
         err.ThrowIfError();
     }
 
-    public static H5Group Create<T>(
+    internal static H5Group Create<T>(
         H5Location<T> location, string name,
         H5PropertyList? propListLinkCreation = null,
         H5PropertyList? propListGroupCreation = null,
@@ -30,7 +30,7 @@ internal static class H5GAdapter
         return new H5Group(h);
     }
 
-    public static H5Group Open<T>(H5Location<T> location, string name, H5PropertyList? propListGroupAccess = null) where T : H5Object<T>
+    internal static H5Group Open<T>(H5Location<T> location, string name, H5PropertyList? propListGroupAccess = null) where T : H5Object<T>
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
@@ -41,7 +41,7 @@ internal static class H5GAdapter
         return new H5Group(h);
     }
 
-    public static void Delete<T>(H5Location<T> location, string path, H5PropertyList? propListLinkAccess = null) where T : H5Object<T>
+    internal static void Delete<T>(H5Location<T> location, string path, H5PropertyList? propListLinkAccess = null) where T : H5Object<T>
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
@@ -54,7 +54,7 @@ internal static class H5GAdapter
     /// <param name="location">A file or group id</param>
     /// <param name="name">A simple object name, e.g. 'group' not 'group/sub-group'.</param>
     /// <param name="linkAccessPropertyList"></param>
-    public static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
+    internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
@@ -92,7 +92,7 @@ internal static class H5GAdapter
     /// <param name="location">A file or group id</param>
     /// <param name="path">e.g. /group/sub-group/sub-sub-group</param>
     /// <param name="linkAccessPropertyList"></param>
-    public static bool PathExists<T>(H5Location<T> location, string path, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
+    internal static bool PathExists<T>(H5Location<T> location, string path, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
@@ -101,13 +101,13 @@ internal static class H5GAdapter
         return err >= 0;
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyListType listType)
+    internal static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
         return listType switch
         {
             PropertyListType.Create => H5PAdapter.Create(H5P.GROUP_CREATE),
             PropertyListType.Access => H5PAdapter.Create(H5P.GROUP_ACCESS),
-            _ => throw new NotImplementedException(),
+            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
         };
     }
 
@@ -116,12 +116,12 @@ internal static class H5GAdapter
     /// </summary>
     /// <param name="group"></param>
     /// <returns></returns>
-    public static H5PropertyList GetPropertyList(H5Group group, PropertyListType listType)
+    internal static H5PropertyList GetPropertyList(H5Group group, PropertyListType listType)
     {
         return listType switch
         {
             PropertyListType.Create => H5PAdapter.GetPropertyList(group, get_create_plist),
-            _ => throw new NotImplementedException(),
+            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
         };
     }
 }

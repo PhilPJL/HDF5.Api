@@ -1,11 +1,13 @@
-﻿using System.ComponentModel;
-using static HDF5.Api.NativeMethods.H5Z;
+﻿using static HDF5.Api.NativeMethods.H5Z;
 
 namespace HDF5.Api.NativeMethodAdapters;
 
+/// <summary>
+/// H5 property list native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_z.html"/>
+/// </summary>
 internal static class H5ZAdapter
 {
-    public static bool IsFilterAvailable(FilterType filterType)
+    internal static bool IsFilterAvailable(FilterType filterType)
     {
         switch (filterType)
         {

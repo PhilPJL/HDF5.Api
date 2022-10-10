@@ -1,10 +1,12 @@
-﻿using CommunityToolkit.Diagnostics;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using static HDF5.Api.NativeMethods.H5S;
 
 namespace HDF5.Api.NativeMethodAdapters;
 
+/// <summary>
+/// H5 property list native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_s.html"/>
+/// </summary>
 internal static class H5SAdapter
 {
     public static void Close(H5Space attribute)
@@ -14,7 +16,7 @@ internal static class H5SAdapter
         err.ThrowIfError();
     }
 
-    public static H5Space CreateSimple(params Dimension[] dimensions)
+    internal static H5Space CreateSimple(params Dimension[] dimensions)
     {
         long h = create_simple(dimensions.Length,
             dimensions.Select(d => d.InitialSize).ToArray(),
@@ -24,13 +26,13 @@ internal static class H5SAdapter
         return new H5Space(h);
     }
 
-    public static H5Space CreateSimple(params long[] dimensions)
+    internal static H5Space CreateSimple(params long[] dimensions)
     {
         return CreateSimple(dimensions.Select(d => new Dimension(d)).ToArray());
     }
-    
+
     //TODO: expose other params
-    public static void SelectHyperslab(H5Space space, long offset, long count)
+    internal static void SelectHyperslab(H5Space space, long offset, long count)
     {
         int err = select_hyperslab(
             space, seloper_t.SET, new[] { (ulong)offset }, null!, new[] { (ulong)count }, null!);
@@ -38,14 +40,14 @@ internal static class H5SAdapter
         err.ThrowIfError();
     }
 
-    public static long GetSimpleExtentNPoints(H5Space space)
+    internal static long GetSimpleExtentNPoints(H5Space space)
     {
         long v = get_simple_extent_npoints(space);
         v.ThrowIfError();
         return v;
     }
 
-    public static int GetSimpleExtentNDims(H5Space space)
+    internal static int GetSimpleExtentNDims(H5Space space)
     {
         int rank = get_simple_extent_ndims(space);
 
@@ -54,7 +56,7 @@ internal static class H5SAdapter
         return rank;
     }
 
-    public static IReadOnlyList<Dimension> GetSimpleExtentDims(H5Space space)
+    internal static IReadOnlyList<Dimension> GetSimpleExtentDims(H5Space space)
     {
         var rank = GetSimpleExtentNDims(space);
         var dims = new ulong[rank];

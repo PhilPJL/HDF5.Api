@@ -2,6 +2,9 @@
 
 namespace HDF5.Api.NativeMethodAdapters;
 
+/// <summary>
+/// H5 group native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_o.html"/>
+/// </summary>
 internal static class H5OAdapter
 {
     internal static info_t GetInfoByName(long locationId, string name)
@@ -12,14 +15,14 @@ internal static class H5OAdapter
         return oinfo;
     }
 
-    public static info_t GetInfoByName<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
+    internal static info_t GetInfoByName<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
         return GetInfoByName((long)h5Object, name);
     }
 
-    public static info_t GetInfo<T>(H5Object<T> h5Object) where T : H5Object<T>
+    internal static info_t GetInfo<T>(H5Object<T> h5Object) where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 

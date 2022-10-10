@@ -2,6 +2,7 @@
 global using System.Diagnostics.CodeAnalysis;
 global using System.Runtime.CompilerServices;
 global using System.Runtime.InteropServices;
+global using System.ComponentModel;
 #if NET7_0_OR_GREATER
 global using System.Runtime.InteropServices.Marshalling;
 #endif

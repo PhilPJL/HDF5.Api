@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Diagnostics;
-using System.Linq;
+﻿using System.Linq;
 using static HDF5.Api.NativeMethods.H5P;
 
 namespace HDF5.Api.NativeMethodAdapters;
@@ -9,14 +8,14 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// </summary>
 internal static class H5PAdapter
 {
-    public static void Close(H5PropertyList propertyList)
+    internal static void Close(H5PropertyList propertyList)
     {
         int err = close(propertyList);
 
         err.ThrowIfError();
     }
 
-    public static H5PropertyList Create(long classId)
+    internal static H5PropertyList Create(long classId)
     {
         long h = create(classId);
 
@@ -25,21 +24,21 @@ internal static class H5PAdapter
         return new H5PropertyList(h);
     }
 
-    public static void SetChunk(H5PropertyList propertyList, int rank, long[] dims)
+    internal static void SetChunk(H5PropertyList propertyList, int rank, long[] dims)
     {
         int err = set_chunk(propertyList, rank, dims.Select(d => (ulong)d).ToArray());
 
         err.ThrowIfError();
     }
 
-    public static void EnableDeflateCompression(H5PropertyList propertyList, int level)
+    internal static void EnableDeflateCompression(H5PropertyList propertyList, int level)
     {
         int err = set_deflate(propertyList, (uint)level);
 
         err.ThrowIfError();
     }
 
-    public static bool AreEqual(H5PropertyList propertyList1, H5PropertyList propertyList2)
+    internal static bool AreEqual(H5PropertyList propertyList1, H5PropertyList propertyList2)
     {
         int err = equal(propertyList1, propertyList2);
 

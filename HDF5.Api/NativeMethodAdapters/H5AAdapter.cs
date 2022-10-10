@@ -100,7 +100,7 @@ internal static class H5AAdapter
         return listType switch
         {
             PropertyListType.Create => H5PAdapter.GetPropertyList(attribute, get_create_plist),
-            _ => throw new NotImplementedException(),
+            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
         };
     }
 
@@ -109,7 +109,7 @@ internal static class H5AAdapter
         return listType switch
         {
             PropertyListType.Create => H5PAdapter.Create(H5P.ATTRIBUTE_CREATE),
-            _ => throw new NotImplementedException(),
+            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
         };
     }
 
