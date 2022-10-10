@@ -31,6 +31,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="runtime.win7-x64.vcruntime140" Version="14.0.24406.1" />
   </ItemGroup>
 
   <ItemGroup>
