@@ -362,6 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-/HDF5Test/ConnectionStrings.config
-/HDF5Test/Configuration.config
-/PulseData/ConnectionStrings.config
+
