@@ -50,7 +50,7 @@ public enum H5ObjectTypes : uint
 
 public readonly struct Dimension
 {
-    public const ulong MaxLimit = ulong.MaxValue;
+    public const ulong Unlimited = ulong.MaxValue;
 
     public readonly ulong InitialSize { get; }
     public readonly ulong UpperLimit { get; }
@@ -58,13 +58,17 @@ public readonly struct Dimension
     public Dimension(long initialSize, long? upperLimit = null)
     {
         Guard.IsGreaterThanOrEqualTo(initialSize, 0);
-        Guard.IsGreaterThanOrEqualTo(upperLimit ?? 0, 0);
+
+        if (upperLimit.HasValue)
+        {
+            Guard.IsGreaterThanOrEqualTo(upperLimit.Value, initialSize);
+        }
 
         InitialSize = (ulong)initialSize;
 
         if (upperLimit == null)
         {
-            UpperLimit = MaxLimit;
+            UpperLimit = Unlimited;
         }
         else
         {
@@ -72,11 +76,16 @@ public readonly struct Dimension
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="initialSize"></param>
+    /// <param name="upperLimit">If null then no upper limit.</param>
     public Dimension(ulong initialSize, ulong? upperLimit = null)
     {
         InitialSize = initialSize;
 
-        UpperLimit = upperLimit ?? MaxLimit;
+        UpperLimit = upperLimit ?? Unlimited;
     }
 };
 

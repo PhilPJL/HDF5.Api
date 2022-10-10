@@ -46,8 +46,13 @@ public class H5Space : H5Object<H5Space>
         return H5SAdapter.CreateSimple(dimensions);
     }
 
-    public static H5Space CreateSimple(params long[] dimensions)
+    public static H5Space Create(params long[] dimensions)
     {
         return Create(dimensions.Select(d => new Dimension(d)).ToArray());
+    }
+
+    public static H5Space Create(params (long initialSize, long upperLimit)[] dimensions)
+    {
+        return Create(dimensions.Select(d => new Dimension(d.initialSize, d.upperLimit)).ToArray());
     }
 }

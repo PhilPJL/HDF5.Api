@@ -8,6 +8,13 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// </summary>
 internal static class H5TAdapter
 {
+    internal static bool AreEqual(H5Type type1, H5Type type2)
+    {
+        int err = equal(type1, type2);
+        err.ThrowIfError();
+        return err > 0;
+    }
+
     internal static void Close(H5Type type)
     {
         int err = close(type);

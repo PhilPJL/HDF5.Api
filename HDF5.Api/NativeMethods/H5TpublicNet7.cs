@@ -74,6 +74,22 @@ internal static partial class H5T
     public static partial hid_t create(class_t cls, size_t size);
 
     /// <summary>
+    /// Determines whether two datatype identifiers refer to the same
+    /// datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Equal
+    /// </summary>
+    /// <param name="type_id1">Identifier of datatype to compare.</param>
+    /// <param name="type_id2">Identifier of datatype to compare.</param>
+    /// <returns>When successful, returns a positive value, for
+    /// <code>TRUE</code>, if the datatype has been committed, or 0 (zero),
+    /// for <code>FALSE</code>, if the datatype has not been committed.
+    /// Otherwise returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tequal"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial htri_t equal(hid_t type_id1, hid_t type_id2);
+
+    /// <summary>
     /// Returns the datatype class identifier.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-GetClass
     /// </summary>

@@ -9,7 +9,7 @@ public static class H5DataSetWriter
         (IH5Location location, string dataSetName, IH5TypeAdapter<TInput> converter, int chunkSize, int compressionLevel = 0)
     {
         // Single dimension (rank 1), unlimited length, chunk size.
-        using var memorySpace = H5Space.CreateSimple(chunkSize);
+        using var memorySpace = H5Space.Create(chunkSize);
 
         // Create a dataset-creation property list
         using var propertyList = H5DataSet.CreatePropertyList(PropertyListType.Create);

@@ -15,6 +15,21 @@ public class H5Type : H5Object<H5Type>
 
     private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
 
+    public bool IsEqualTo([DisallowNull] H5Type other)
+    {
+        Guard.IsNotNull(other);
+
+        return H5TAdapter.AreEqual(this, other);
+    }
+
+    public static bool AreEqual([DisallowNull] H5Type type1, [DisallowNull] H5Type type2)
+    {
+        Guard.IsNotNull(type1);
+        Guard.IsNotNull(type2);
+        
+        return H5TAdapter.AreEqual(type1, type2);
+    }
+
     public static H5Type GetNativeType<T>() where T : unmanaged
     {
         long nativeHandle = H5TAdapter.GetNativeType<T>();
