@@ -22,4 +22,6 @@
     <ProjectReference Include="..\HDF5.Api\HDF5.Api.csproj" />
   </ItemGroup>
 
+  <Import Project="..\HDF5.Api.Tests\HDF5.Api.Tests.Shared.projitems" Label="Shared" />
+
 </Project>

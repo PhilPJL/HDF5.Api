@@ -11,25 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\HDF5.Api.Tests.x86\AttributeWriterTests.cs" Link="AttributeWriterTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\DataSetWriterTests.cs" Link="DataSetWriterTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5AttributeTests.cs" Link="H5AttributeTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5DataSetTests.cs" Link="H5DataSetTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5FileTests.cs" Link="H5FileTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5FilterTests.cs" Link="H5FilterTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5GlobalTests.cs" Link="H5GlobalTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5GroupTests.cs" Link="H5GroupTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5HandleTests.cs" Link="H5HandleTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5LocationTests.cs" Link="H5LocationTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5ObjectTests.cs" Link="H5ObjectTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5PropertyListTests.cs" Link="H5PropertyListTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5SpaceTests.cs" Link="H5SpaceTests.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\H5Test.cs" Link="H5Test.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\TestRecordAdapter.cs" Link="TestRecordAdapter.cs" />
-    <Compile Include="..\HDF5.Api.Tests.x86\Usings.cs" Link="Usings.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
@@ -40,5 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HDF5.Api\HDF5.Api.csproj" />
   </ItemGroup>
+
+  <Import Project="..\HDF5.Api.Tests\HDF5.Api.Tests.Shared.projitems" Label="Shared" />
 
 </Project>

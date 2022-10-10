@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>442905fb-35d7-48c4-9bff-2a897074cea2</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>HDF5.Api.Tests.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DataSetWriterTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5AttributeTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5DataSetTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5FileTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5FilterTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5GlobalTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5GroupTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5HandleTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5LocationTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5ObjectTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5PropertyListTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5SpaceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestRecordAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Usings.cs" />
+  </ItemGroup>
+</Project>

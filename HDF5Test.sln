@@ -16,6 +16,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HDF5.Api.Tests.x86", "HDF5.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HDF5.Api.Tests.x64", "HDF5.Api.Tests.x64\HDF5.Api.Tests.x64.csproj", "{4A7E98D6-2A0D-4A34-8B83-D43785CACD29}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HDF5.Api.Tests", "HDF5.Api.Tests\HDF5.Api.Tests.shproj", "{442905FB-35D7-48C4-9BFF-2A897074CEA2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,10 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AD691E7D-210F-4D45-AFAC-C9532FBA9311}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		HDF5.Api.Tests\HDF5.Api.Tests.Shared.projitems*{442905fb-35d7-48c4-9bff-2a897074cea2}*SharedItemsImports = 13
+		HDF5.Api.Tests\HDF5.Api.Tests.Shared.projitems*{4a7e98d6-2a0d-4a34-8b83-d43785cacd29}*SharedItemsImports = 5
+		HDF5.Api.Tests\HDF5.Api.Tests.Shared.projitems*{bffd38d8-173f-4ff9-afb4-2f76ee26d092}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
