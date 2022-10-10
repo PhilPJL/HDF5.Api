@@ -36,10 +36,19 @@ public class H5Attribute : H5Object<H5Attribute>
         return DateTime.FromOADate(Read<double>());
     }
 
-    // TODO: expose public Write<T> etc as per Read
-    internal void Write(H5Type type, IntPtr buffer)
+    public void Write(string value)
     {
-        H5AAdapter.Write(this, type, buffer);
+        H5AAdapter.Write(this,  value);
+    }
+
+    public void Write<T>(T value) where T : unmanaged
+    {
+        H5AAdapter.Write(this,  value);
+    }
+
+    public void Write(DateTime value)
+    {
+        H5AAdapter.Write(this, value);
     }
 
     public H5PropertyList GetPropertyList(PropertyListType listType)

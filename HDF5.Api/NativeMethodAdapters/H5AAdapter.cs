@@ -16,14 +16,14 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// </summary>
 internal static class H5AAdapter
 {
-    public static void Close(H5Attribute attribute)
+    internal static void Close(H5Attribute attribute)
     {
         int err = close(attribute);
 
         err.ThrowIfError();
     }
 
-    public static H5Attribute Create<T>(H5Object<T> h5Object, string name, H5Type type, H5Space space,
+    internal static H5Attribute Create<T>(H5Object<T> h5Object, string name, H5Type type, H5Space space,
         H5PropertyList? creationPropertyList = null) 
         where T : H5Object<T>
     {
@@ -36,19 +36,7 @@ internal static class H5AAdapter
         return new H5Attribute(h);
     }
 
-    public static H5Attribute Open<T>(H5Object<T> h5Object, string name) 
-        where T : H5Object<T>
-    {
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
-
-        long h = open(h5Object, name);
-
-        h.ThrowIfInvalidHandleValue();
-
-        return new H5Attribute(h);
-    }
-
-    public static void Delete<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
+    internal static void Delete<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
@@ -57,7 +45,7 @@ internal static class H5AAdapter
         err.ThrowIfError();
     }
 
-    public static bool Exists<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
+    internal static bool Exists<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
@@ -67,7 +55,7 @@ internal static class H5AAdapter
         return err > 0;
     }
 
-    public static IEnumerable<string> ListAttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
+    internal static IEnumerable<string> ListAttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
@@ -92,7 +80,7 @@ internal static class H5AAdapter
         }
     }
 
-    public static info_t GetInfoByName<T>(H5Object<T> h5Object,
+    internal static info_t GetInfoByName<T>(H5Object<T> h5Object,
         string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null) 
         where T : H5Object<T>
     {
@@ -102,15 +90,30 @@ internal static class H5AAdapter
         return info;
     }
 
-    // TODO: Span<> variant
-    public static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
+    /// <summary>
+    /// Get copy of property list used to create the data-set.
+    /// </summary>
+    /// <param name="attribute"></param>
+    /// <returns></returns>
+    internal static H5PropertyList GetPropertyList(H5Attribute attribute, PropertyListType listType)
     {
-        int err = write(attribute, type, buffer);
-
-        err.ThrowIfError();
+        return listType switch
+        {
+            PropertyListType.Create => H5PAdapter.GetPropertyList(attribute, get_create_plist),
+            _ => throw new NotImplementedException(),
+        };
     }
 
-    public static H5Space GetSpace(H5Attribute attribute)
+    internal static H5PropertyList CreatePropertyList(PropertyListType listType)
+    {
+        return listType switch
+        {
+            PropertyListType.Create => H5PAdapter.Create(H5P.ATTRIBUTE_CREATE),
+            _ => throw new NotImplementedException(),
+        };
+    }
+
+    internal static H5Space GetSpace(H5Attribute attribute)
     {
         var space = get_space(attribute);
 
@@ -119,19 +122,31 @@ internal static class H5AAdapter
         return new H5Space(space);
     }
 
-    public static int GetStorageSize(H5Attribute attribute)
+    internal static int GetStorageSize(H5Attribute attribute)
     {
         return (int)get_storage_size(attribute);
     }
 
-    public static H5Type GetType(H5Attribute attribute)
+    internal static H5Type GetType(H5Attribute attribute)
     {
         long typeHandle = get_type(attribute);
         typeHandle.ThrowIfInvalidHandleValue();
         return new H5Type(typeHandle);
     }
 
-    public static string ReadString(H5Attribute attribute)
+    internal static H5Attribute Open<T>(H5Object<T> h5Object, string name)
+        where T : H5Object<T>
+    {
+        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+
+        long h = open(h5Object, name);
+
+        h.ThrowIfInvalidHandleValue();
+
+        return new H5Attribute(h);
+    }
+
+    internal static string ReadString(H5Attribute attribute)
     {
         using var type = attribute.GetH5Type();
         using var space = attribute.GetSpace();
@@ -171,7 +186,7 @@ internal static class H5AAdapter
 #endif
     }
 
-    public static T Read<T>(H5Attribute attribute) where T : unmanaged
+    internal static T Read<T>(H5Attribute attribute) where T : unmanaged
     {
         using var type = attribute.GetH5Type();
         using var space = attribute.GetSpace();
@@ -225,27 +240,37 @@ internal static class H5AAdapter
 #endif
     }
 
-    /// <summary>
-    /// Get copy of property list used to create the data-set.
-    /// </summary>
-    /// <param name="attribute"></param>
-    /// <returns></returns>
-    public static H5PropertyList GetPropertyList(H5Attribute attribute, PropertyListType listType)
+#if NETSTANDARD
+    internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
     {
-        return listType switch
-        {
-            PropertyListType.Create => H5PAdapter.GetPropertyList(attribute, get_create_plist),
-            _ => throw new NotImplementedException(),
-        };
+        int err = write(attribute, type, buffer);
+
+        err.ThrowIfError();
+    }
+#endif
+
+#if NET7_0_OR_GREATER
+    internal static void Write(H5Attribute attribute, H5Type type, Span<byte> buffer)
+    {
+        int err = write(attribute, type, buffer);
+
+        err.ThrowIfError();
+    }
+#endif
+
+    internal static void Write(H5Attribute h5Attribute, string value)
+    {
+        throw new NotImplementedException();
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyListType listType)
+    internal static void Write(H5Attribute h5Attribute, DateTime value)
     {
-        return listType switch
-        {
-            PropertyListType.Create => H5PAdapter.Create(H5P.ATTRIBUTE_CREATE),
-            _ => throw new NotImplementedException(),
-        };
+        throw new NotImplementedException();
+    }
+
+    internal static void Write<T>(H5Attribute h5Attribute, T value) where T : unmanaged
+    {
+        throw new NotImplementedException();
     }
 }
 

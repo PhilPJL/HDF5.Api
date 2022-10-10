@@ -3,6 +3,7 @@
 public abstract class H5TypeAdapterBase
 {
     internal static readonly ASCIIEncoding Ascii = new();
+    internal static readonly UTF8Encoding UTF8 = new();
 
     /// <summary>
     ///     Helper method to copy fixed/max length string
