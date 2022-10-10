@@ -314,12 +314,16 @@ namespace HDF5Api.NativeMethods
 
         internal static IntPtr TryGetHandle(string fileName)
         {
-            if (string.IsNullOrEmpty(Path.GetExtension(fileName)))
+            if (!NativeHandles.Value.TryGetValue(fileName, out IntPtr libraryHandle))
             {
-                fileName = Path.ChangeExtension(fileName, Extension);
+                if (string.IsNullOrEmpty(Path.GetExtension(fileName)))
+                {
+                    fileName = Path.ChangeExtension(fileName, Extension);
+                    NativeHandles.Value.TryGetValue(fileName, out libraryHandle);
+                }
             }
 
-            return NativeHandles.Value.TryGetValue(fileName, out IntPtr libraryHandle) ? libraryHandle : IntPtr.Zero;
+            return libraryHandle;
         }
 
         /// <summary>
