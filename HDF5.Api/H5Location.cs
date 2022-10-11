@@ -58,24 +58,27 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5ObjectWithAttributeExtensions.ReadAttribute<T, TA>(this, name);
+        using var attribute = H5AAdapter.Open(this, name);
+        return H5AAdapter.Read<TA>(attribute);
     }
 
     public string ReadStringAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5ObjectWithAttributeExtensions.ReadStringAttribute(this, name);
+        using var attribute = H5AAdapter.Open(this, name);
+        return H5AAdapter.ReadString(attribute);
     }
 
     public DateTime ReadDateTimeAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5ObjectWithAttributeExtensions.ReadDateTimeAttribute(this, name);
+        using var attribute = H5AAdapter.Open(this, name);
+        return H5AAdapter.ReadDateTime(attribute);
     }
 
-    public IEnumerable<string> AttributeNames => H5AAdapter.ListAttributeNames(this);
+    public IEnumerable<string> AttributeNames => H5AAdapter.AttributeNames(this);
 
     public int NumberOfAttributes => (int)H5OAdapter.GetInfo(this).num_attrs;
 

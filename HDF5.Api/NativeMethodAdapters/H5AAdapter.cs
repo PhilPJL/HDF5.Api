@@ -55,7 +55,7 @@ internal static class H5AAdapter
         return err > 0;
     }
 
-    internal static IEnumerable<string> ListAttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
+    internal static IEnumerable<string> AttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
@@ -72,10 +72,36 @@ internal static class H5AAdapter
 
         int Callback(long id, IntPtr intPtrName, ref info_t info, IntPtr _)
         {
-            string? name = Marshal.PtrToStringAnsi(intPtrName);
-            Guard.IsNotNull(name);
+            string? name = null;
 
-            names.Add(name);
+            switch (info.cset)
+            {
+                case H5T.cset_t.ASCII:
+                    name = Marshal.PtrToStringAnsi(intPtrName);
+                    break;
+                case H5T.cset_t.UTF8:
+#if NETSTANDARD
+                    // TODO: does this work for UTF8?
+                    name = Marshal.PtrToStringAuto(intPtrName);
+#endif
+#if NET7_0_OR_GREATER
+                    name = Marshal.PtrToStringUTF8(intPtrName);
+#endif
+                    break;
+                default:
+                    break;
+            }
+
+#if DEBUG
+            // TODO: throw in release builds?
+            Guard.IsNotNull(name);
+#endif
+
+            if (name != null)
+            {
+                names.Add(name);
+            }
+
             return 0;
         }
     }
@@ -144,6 +170,11 @@ internal static class H5AAdapter
         h.ThrowIfInvalidHandleValue();
 
         return new H5Attribute(h);
+    }
+
+    internal static DateTime ReadDateTime(H5Attribute attribute)
+    {
+        return DateTime.FromOADate(Read<double>(attribute));
     }
 
     internal static string ReadString(H5Attribute attribute)
@@ -240,16 +271,26 @@ internal static class H5AAdapter
 #endif
     }
 
-#if NETSTANDARD
-    internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
-    {
-        int err = write(attribute, type, buffer);
-
-        err.ThrowIfError();
-    }
-#endif
-
 #if NET7_0_OR_GREATER
+    internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
+    {
+        var size = Marshal.SizeOf<T>();
+
+        using var type = attribute.GetH5Type();
+
+        if (size < 256)
+        {
+            Span<T> buffer = stackalloc T[1] { value };
+            Write(attribute, type, MemoryMarshal.Cast<T, byte>(buffer));
+        }
+        else
+        {
+            using var buffer = SpanOwner<T>.Allocate(size);
+            buffer.Span[0] = value;
+            Write(attribute, type, MemoryMarshal.Cast<T, byte>(buffer.Span));
+        }
+    }
+
     internal static void Write(H5Attribute attribute, H5Type type, Span<byte> buffer)
     {
         int err = write(attribute, type, buffer);
@@ -258,19 +299,58 @@ internal static class H5AAdapter
     }
 #endif
 
-    internal static void Write(H5Attribute h5Attribute, string value)
+#if NETSTANDARD
+    internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
     {
-        throw new NotImplementedException();
+        using var pinned = new PinnedObject(value);
+        using var type = attribute.GetH5Type();
+
+        Write(attribute, type, pinned);
     }
 
-    internal static void Write(H5Attribute h5Attribute, DateTime value)
+    internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
     {
-        throw new NotImplementedException();
+        int err = write(attribute, type, buffer);
+
+        err.ThrowIfError();
+    }
+#endif
+
+    // TODO: fixed/variable
+    // TODO: ascii/UTF8
+    // TODO: zero length string?
+    internal static void Write(H5Attribute attribute, string value, int maxLength = 0)
+    {
+        value ??= string.Empty;
+
+        maxLength = maxLength <= 0 ? value.Length : Math.Min(value.Length, maxLength);
+
+        // TODO: variable length string
+
+#pragma warning disable IDE0057 // Use range operator
+        string subString = value.Length > maxLength ? value.Substring(0, maxLength) : value;
+#pragma warning restore IDE0057 // Use range operator
+
+        // TODO: confirm type matches
+        using var typeId = attribute.GetH5Type();
+
+#if NETSTANDARD
+        // TODO: encoding UTF8?
+        byte[] sourceBytes = H5TypeAdapterBase.Ascii.GetBytes(subString);
+        using var pinned = new PinnedObject(sourceBytes);
+        Write(attribute, typeId, pinned);
+#endif
+
+#if NET7_0_OR_GREATER
+        // TODO: encoding UTF8?
+        var span = H5TypeAdapterBase.Ascii.GetBytes(value).AsSpan();
+        Write(attribute, typeId, span);
+#endif
     }
 
-    internal static void Write<T>(H5Attribute h5Attribute, T value) where T : unmanaged
+    internal static void Write(H5Attribute attribute, DateTime value)
     {
-        throw new NotImplementedException();
+        Write(attribute, value.ToOADate());
     }
 }
 

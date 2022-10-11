@@ -33,7 +33,7 @@ public class H5Attribute : H5Object<H5Attribute>
 
     public DateTime ReadDateTime()
     {
-        return DateTime.FromOADate(Read<double>());
+        return H5AAdapter.ReadDateTime(this);
     }
 
     public void Write(string value)
