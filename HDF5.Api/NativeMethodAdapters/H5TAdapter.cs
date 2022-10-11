@@ -132,4 +132,12 @@ internal static class H5TAdapter
             _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
         }; ;
     }
-}
+/*
+    internal static void Commit(H5Type h5Type, string name)
+    {
+        int err = commit(typeId, name);
+        err.ThrowIfError();
+        return err > 0;
+
+    }
+*/}

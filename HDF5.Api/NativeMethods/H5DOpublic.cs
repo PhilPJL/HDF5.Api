@@ -17,7 +17,11 @@ namespace HDF5.Api.NativeMethods;
 
 internal static partial class H5DO
 {
-    static H5DO() { _ = H5.open(); }
+    static H5DO()
+    {
+        _ = H5.open();
+        NativeProviderLoader.TryLoad(Constants.HLDLLFileName, null);
+    }
 
 #if NETSTANDARD
     /// <summary>
