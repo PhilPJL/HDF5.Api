@@ -9,7 +9,7 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// </summary>
 internal static class H5EAdapter
 {
-    internal static void SetAutoOff()
+    internal static void DisableErrorPrinting()
     {
         int err = set_auto(DEFAULT, null!, IntPtr.Zero);
         err.ThrowIfError();

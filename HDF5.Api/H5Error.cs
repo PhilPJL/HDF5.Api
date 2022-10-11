@@ -14,7 +14,7 @@ public static class H5Error
     /// </summary>
     public static void SetAutoOff()
     {
-        H5EAdapter.SetAutoOff();
+        H5EAdapter.DisableErrorPrinting();
     }
 
     public static ICollection<H5ErrorInfo> WalkStack()
@@ -23,7 +23,11 @@ public static class H5Error
     }
 }
 
-public record struct H5ErrorInfo
+public 
+#if NET7_0_OR_GREATER
+readonly 
+#endif
+record struct H5ErrorInfo
 (
     int Number,
     int LineNumber,

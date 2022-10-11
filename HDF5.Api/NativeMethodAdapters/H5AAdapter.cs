@@ -24,7 +24,7 @@ internal static class H5AAdapter
     }
 
     internal static H5Attribute Create<T>(H5Object<T> h5Object, string name, H5Type type, H5Space space,
-        H5PropertyList? creationPropertyList = null) 
+        H5PropertyList? creationPropertyList = null)
         where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
@@ -106,7 +106,7 @@ internal static class H5AAdapter
         }
     }
 
-    internal static info_t GetInfoByName<T>(H5Object<T> h5Object,
+    /*internal static info_t GetInfoByName<T>(H5Object<T> h5Object,
         string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null) 
         where T : H5Object<T>
     {
@@ -114,7 +114,7 @@ internal static class H5AAdapter
         int err = get_info_by_name(h5Object, objectName, attributeName, ref info, linkAccessPropertyList);
         err.ThrowIfError();
         return info;
-    }
+    }*/
 
     /// <summary>
     /// Get copy of property list used to create the data-set.
@@ -202,18 +202,21 @@ internal static class H5AAdapter
         {
             Span<byte> buffer = stackalloc byte[size];
             read(attribute, type, buffer);
-            return Encoding.ASCII.GetString(buffer);
+            // TODO: Ascii/UTF8
+            return Encoding.ASCII.GetString(buffer).TrimEnd('\0');
         }
         else
         {
             var buffer = SpanOwner<byte>.Allocate(size);
             read(attribute, type, buffer.Span);
-            return Encoding.ASCII.GetString(buffer.Span);
+            // TODO: Ascii/UTF8
+            return Encoding.ASCII.GetString(buffer.Span).TrimEnd('\0');
         }
 #else
         using var buffer = new GlobalMemory(size + 1);
         read(attribute, type, buffer.IntPtr);
-        return Marshal.PtrToStringAnsi(buffer.IntPtr, (int)size);
+        // TODO: Ascii/UTF8
+        return Marshal.PtrToStringAnsi(buffer.IntPtr, size);
 #endif
     }
 

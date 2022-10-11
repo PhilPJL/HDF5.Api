@@ -26,7 +26,7 @@ public partial class H5Test
         Assert.IsTrue(majnum == 1);
         Assert.IsTrue(minnum >= 8);
 
-        if ((minnum == 8 && relnum >= 16) || majnum >= 10)
+        if (minnum >= 8)
         {
             uint is_ts = 0;
             Assert.IsTrue(H5.is_library_threadsafe(ref is_ts) >= 0);

@@ -182,21 +182,22 @@ public class H5AttributeTests : H5Test
     internal static void CreateWriteReadDeleteAttributesSucceeds(IH5ObjectWithAttributes location)
     {
         // Create attributes
-        CreateWriteReadDeleteAttribute((short)15);
-        CreateWriteReadDeleteAttribute((ushort)15);
-        CreateWriteReadDeleteAttribute(15);
-        CreateWriteReadDeleteAttribute(15u);
-        CreateWriteReadDeleteAttribute(15L);
-        CreateWriteReadDeleteAttribute(15uL);
-        CreateWriteReadDeleteAttribute(1.5f);
-        CreateWriteReadDeleteAttribute(1.5123d);
-        CreateWriteReadDeleteStringAttribute("1234567890");
-        CreateWriteReadDeleteStringAttribute("1234567890", 5);
-        CreateWriteReadDeleteDateTimeAttribute(DateTime.UtcNow);
-        CreateWriteReadDeleteStringAttribute(new string('A', 1000));
+        CreateWriteReadUpdateDeleteAttribute((short)15, (short)99);
+        CreateWriteReadUpdateDeleteAttribute((ushort)15, (ushort)77);
+        CreateWriteReadUpdateDeleteAttribute(15, 1234);
+        CreateWriteReadUpdateDeleteAttribute(15u, 4567u);
+        CreateWriteReadUpdateDeleteAttribute(15L, long.MaxValue);
+        CreateWriteReadUpdateDeleteAttribute(15uL, ulong.MaxValue);
+        CreateWriteReadUpdateDeleteAttribute(1.5f, 123.456);
+        CreateWriteReadUpdateDeleteAttribute(1.5123d, double.MaxValue);
+        CreateWriteReadUpdateDeleteStringAttribute("1234567890", "ABCDEFGH");
+        CreateWriteReadUpdateDeleteStringAttribute("1234567890", "ABCDEFGH", 5);
+        CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddMinutes(5));
+        CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddYears(5));
+        CreateWriteReadUpdateDeleteStringAttribute(new string('A', 1000), new string('B', 500));
         Assert.AreEqual(0, location.NumberOfAttributes);
 
-        void CreateWriteReadDeleteDateTimeAttribute(DateTime value)
+        void CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime value, DateTime newValue)
         {
             const string name = "dtDateTime";
 
@@ -207,11 +208,17 @@ public class H5AttributeTests : H5Test
             // There is some loss of precision since we're storing DateTime as a double
             Assert.IsTrue(Math.Abs((value - readValue).TotalMilliseconds) < 1);
 
+            using var a = location.OpenAttribute(name);
+            a.Write(newValue);
+
+            var readValue2 = location.ReadDateTimeAttribute(name);
+            Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
+
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
         }
 
-        void CreateWriteReadDeleteStringAttribute(string value, int maxLength = 0)
+        void CreateWriteReadUpdateDeleteStringAttribute(string value, string newValue, int maxLength = 0)
         {
             const string name = "dtString";
 
@@ -243,11 +250,24 @@ public class H5AttributeTests : H5Test
                 Assert.AreEqual(value, readValue2);
             }
 
+            a.Write(newValue);
+
+            string readValue3 = location.ReadStringAttribute(name);
+            if (maxLength != 0)
+            {
+                Assert.AreEqual(maxLength, readValue3.Length);
+                Assert.IsTrue(newValue.StartsWith(readValue3, StringComparison.Ordinal));
+            }
+            else
+            {
+                Assert.AreEqual(value, readValue);
+            }
+
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
         }
 
-        void CreateWriteReadDeleteAttribute<T>(T value) where T : unmanaged
+        void CreateWriteReadUpdateDeleteAttribute<T>(T value, T newValue) where T : unmanaged
         {
             string name = $"dt{typeof(T).Name}";
 
@@ -260,6 +280,10 @@ public class H5AttributeTests : H5Test
             using var a = location.OpenAttribute(name);
             T readValue2 = location.ReadAttribute<T>(name);
             Assert.AreEqual(value, readValue2);
+
+            a.Write(newValue);
+            T readValue3 = location.ReadAttribute<T>(name);
+            Assert.AreEqual(newValue, readValue3);
 
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));

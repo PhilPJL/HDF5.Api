@@ -183,7 +183,7 @@ public abstract class H5LocationTests : H5Test
         const string ds1Name = "ds1";
 
         using var type = H5Type.CreateDoubleArrayType(100);
-        using var space = H5Space.Create(new Dimension(1, 1));
+        using var space = H5Space.Create((1, 1)); // use value tuple variant
 
         using var ds1 = location.CreateDataSet(ds1Name, type, space);
         Assert.IsTrue(location.DataSetExists(ds1Name));

@@ -26,39 +26,6 @@ class Utilities
     }
 
     /// <summary>
-    /// Create a temporary HDF5 file IN MEMORY and return a file handle.
-    /// </summary>
-    public static hid_t H5TempFile(H5F.libver_t version =
-        H5F.libver_t.LATEST)
-    {
-        hid_t fapl = H5P.create(H5P.FILE_ACCESS);
-        if (fapl < 0)
-        {
-            throw new ApplicationException("H5P.create failed.");
-        }
-        if (H5P.set_libver_bounds(fapl, version) < 0)
-        {
-            throw new ApplicationException("H5P.set_libver_bounds failed.");
-        }
-        // use the core VFD, 64K increments, no backing store
-        if (H5P.set_fapl_core(fapl, new IntPtr(65536), 0) < 0)
-        {
-            throw new ApplicationException("H5P.set_fapl_core failed.");
-        }
-        string fname = Path.GetTempFileName();
-        hid_t file = H5F.create(fname, H5F.ACC_TRUNC, H5P.DEFAULT, fapl);
-        if (file < 0)
-        {
-            throw new ApplicationException("H5F.create failed.");
-        }
-        if (H5P.close(fapl) < 0)
-        {
-            throw new ApplicationException("H5P.close failed.");
-        }
-        return file;
-    }
-
-    /// <summary>
     /// Create a temporary HDF5 file IN MEMORY and return its name and
     /// a file handle.
     /// </summary>

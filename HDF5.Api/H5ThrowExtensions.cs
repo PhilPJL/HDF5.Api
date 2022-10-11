@@ -1,6 +1,4 @@
-﻿using HDF5.Api.NativeMethodAdapters;
-
-namespace HDF5.Api;
+﻿namespace HDF5.Api;
 
 public static class H5ThrowExtensions
 {
