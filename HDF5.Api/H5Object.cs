@@ -56,16 +56,16 @@ public class H5Object<T> : Disposable where T : H5Object<T>
         _handle = H5Handle.InvalidHandleValue;
     }
 
-    public static implicit operator long(H5Object<T>? h5object)
+    public static implicit operator long(H5Object<T>? h5Object)
     {
-        if (h5object == null)
+        if (h5Object == null)
         {
             // To allow passing null as default value which then gets converted to 0.
             return H5Handle.DefaultHandleValue;
         }
 
-        h5object._handle.ThrowIfInvalidHandleValue();
-        return h5object._handle;
+        h5Object._handle.ThrowIfInvalidHandleValue();
+        return h5Object._handle;
     }
 
     private static void AssertHasHandleType(long handle, params HandleType[] types)

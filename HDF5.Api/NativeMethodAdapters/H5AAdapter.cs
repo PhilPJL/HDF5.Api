@@ -183,16 +183,17 @@ internal static class H5AAdapter
         using var space = attribute.GetSpace();
 
         var count = space.GetSimpleExtentNPoints();
+        var ndims = space.GetSimpleExtentNDims();
 
-        if (count != 1)
+        if (count != 1 || ndims != 0)
         {
-            throw new Hdf5Exception("Attribute contains an array type (not supported).");
+            throw new Hdf5Exception("Attribute is not scalar.");
         }
 
         var cls = type.GetClass();
         if (cls != H5Class.String)
         {
-            throw new Hdf5Exception($"Attribute is of class {cls} when expecting STRING.");
+            throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{H5Class.String}'.");
         }
 
         var size = GetStorageSize(attribute);
@@ -224,10 +225,12 @@ internal static class H5AAdapter
         using var space = attribute.GetSpace();
 
         long count = space.GetSimpleExtentNPoints();
+        var ndims = space.GetSimpleExtentNDims();
 
-        if (count != 1)
+        // TODO: understand npoints/ndims better
+        if (count != 1 || ndims != 0)
         {
-            throw new Hdf5Exception("Attribute contains an array type (not supported).");
+            throw new Hdf5Exception("Attribute is not scalar.");
         }
 
         var cls = type.GetClass();

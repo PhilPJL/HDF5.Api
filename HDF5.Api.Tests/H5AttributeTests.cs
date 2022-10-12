@@ -7,6 +7,18 @@ public class H5AttributeTests : H5Test
 {
     private const string Path = "test.h5";
 
+/*    [TestMethod]
+    public void Test()
+    {
+        HandleCheck(() =>
+        {
+            using var file = H5File.Open(@"D:\TeraViewTestFiles\C123456CE123.tprj");
+            using var grp = file.OpenGroup("TerapulseDocument");
+            using var att = grp.OpenAttribute("ClassName");
+            Debug.WriteLine(att.ReadString());
+        });
+    }
+*/
     [TestMethod]
     public void CreateDuplicateAttributeNameThrows()
     {
