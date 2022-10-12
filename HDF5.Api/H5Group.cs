@@ -26,4 +26,6 @@ public class H5Group : H5Location<H5Group>
     {
         return H5GAdapter.GetPropertyList(this, listType);
     }
+
+    public string Name => H5IAdapter.GetName(this);
 }

@@ -32,7 +32,7 @@ internal static class H5LAdapter
         err.ThrowIfError();
     }
 
-    private static IEnumerable<string> GetChildNames<T>(H5Location<T> location, NativeMethods.H5O.type_t type)
+    private static IEnumerable<string> GetNames<T>(H5Location<T> location, NativeMethods.H5O.type_t type)
         where T : H5Object<T>
     {
         ulong idx = 0;
@@ -65,12 +65,12 @@ internal static class H5LAdapter
     }
 
     internal static IEnumerable<string> GetGroupNames<T>(H5Location<T> location)
-        where T : H5Object<T> => GetChildNames(location, NativeMethods.H5O.type_t.GROUP);
+        where T : H5Object<T> => GetNames(location, NativeMethods.H5O.type_t.GROUP);
 
     internal static IEnumerable<string> GetDataSetNames<T>(H5Location<T> location)
-        where T : H5Object<T> => GetChildNames(location, NativeMethods.H5O.type_t.DATASET);
+        where T : H5Object<T> => GetNames(location, NativeMethods.H5O.type_t.DATASET);
 
     internal static IEnumerable<string> GetNamedDataTypeNames<T>(H5Location<T> location)
-        where T : H5Object<T> => GetChildNames(location, NativeMethods.H5O.type_t.NAMED_DATATYPE);
+        where T : H5Object<T> => GetNames(location, NativeMethods.H5O.type_t.NAMED_DATATYPE);
 }
 

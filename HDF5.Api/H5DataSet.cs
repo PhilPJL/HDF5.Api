@@ -56,6 +56,8 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5DAdapter.GetType(this);
     }
 
+    public string GetName => H5IAdapter.GetName(this);
+
     public H5Space GetSpace()
     {
         return H5DAdapter.GetSpace(this);
