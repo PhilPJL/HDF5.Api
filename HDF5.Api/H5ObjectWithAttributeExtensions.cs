@@ -1,11 +1,5 @@
 ﻿using HDF5.Api.NativeMethodAdapters;
 using CommunityToolkit.Diagnostics;
-#if NETSTANDARD
-using HDF5.Api.Disposables;
-#endif
-#if NET7_0_OR_GREATER
-using CommunityToolkit.HighPerformance.Buffers;
-#endif
 
 namespace HDF5.Api;
 

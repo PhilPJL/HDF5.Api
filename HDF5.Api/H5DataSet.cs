@@ -15,61 +15,14 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     {
     }
 
-    public void Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] IntPtr buffer) 
-    {
-        Guard.IsNotNull(type);
-        Guard.IsNotNull(memorySpace);
-        Guard.IsNotNull(fileSpace);
-        Guard.IsNotNull(buffer);
-
-        H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
-    }
-
-/*    public void Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] T[] buffer) where T : unmanaged
-    {
-        Guard.IsNotNull(type);
-        Guard.IsNotNull(memorySpace);
-        Guard.IsNotNull(fileSpace);
-        Guard.IsNotNull(buffer);
-
-        H5DAdapter.Write<T>(this, type, memorySpace, fileSpace, buffer);
-    }
-*/
-/*    public void Write<T>([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, Span<T> buffer) where T : unmanaged
-    {
-        Guard.IsNotNull(type);
-        Guard.IsNotNull(memorySpace);
-        Guard.IsNotNull(fileSpace);
-
-        H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
-    }*/
-
-    public H5Space GetSpace()
-    {
-        return H5DAdapter.GetSpace(this);
-    }
-
-    public void SetExtent([DisallowNull] params long[] dims)
-    {
-        Guard.IsNotNull(dims);
-
-        H5DAdapter.SetExtent(this, dims);
-    }
-
-    public H5Type GetH5Type()
-    {
-        return H5DAdapter.GetType(this);
-    }
-
-    /// <summary>
-    ///     Open an existing Attribute for this dataset
-    /// </summary>
-    public H5Attribute OpenAttribute([DisallowNull] string name)
+    public bool AttributeExists([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5AAdapter.Open(this, name);
+        return H5AAdapter.Exists(this, name);
     }
+
+    public IEnumerable<string> AttributeNames => H5AAdapter.AttributeNames(this);
 
     public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space, 
         H5PropertyList? creationPropertyList = null)
@@ -81,6 +34,11 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5AAdapter.Create(this, name, type, space, creationPropertyList);
     }
 
+    public static H5PropertyList CreatePropertyList(PropertyListType listType)
+    {
+        return H5DAdapter.CreatePropertyList(listType);
+    }
+
     public void DeleteAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -88,11 +46,31 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         H5AAdapter.Delete(this, name);
     }
 
-    public bool AttributeExists([DisallowNull] string name)
+    public H5PropertyList GetPropertyList(PropertyListType listType)
+    {
+        return H5DAdapter.GetPropertyList(this, listType);
+    }
+
+    public H5Type GetH5Type()
+    {
+        return H5DAdapter.GetType(this);
+    }
+
+    public H5Space GetSpace()
+    {
+        return H5DAdapter.GetSpace(this);
+    }
+
+    public int NumberOfAttributes => (int)H5OAdapter.GetInfo(this).num_attrs;
+
+    /// <summary>
+    ///     Open an existing Attribute for this dataset
+    /// </summary>
+    public H5Attribute OpenAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5AAdapter.Exists(this, name);
+        return H5AAdapter.Open(this, name);
     }
 
     public T ReadAttribute<T>([DisallowNull] string name) where T : unmanaged
@@ -117,20 +95,6 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
         using var attribute = H5AAdapter.Open(this, name);
         return H5AAdapter.ReadDateTime(attribute);
-    }
-
-    public IEnumerable<string> AttributeNames => H5AAdapter.AttributeNames(this);
-
-    public int NumberOfAttributes => (int)H5OAdapter.GetInfo(this).num_attrs;
-
-    public static H5PropertyList CreatePropertyList(PropertyListType listType)
-    {
-        return H5DAdapter.CreatePropertyList(listType);
-    }
-
-    public H5PropertyList GetPropertyList(PropertyListType listType)
-    {
-        return H5DAdapter.GetPropertyList(this, listType);
     }
 
     public IEnumerable<T> Read<T>() where T : unmanaged
@@ -169,4 +133,40 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
             }
         }
     }
+
+    public void SetExtent([DisallowNull] params long[] dims)
+    {
+        Guard.IsNotNull(dims);
+
+        H5DAdapter.SetExtent(this, dims);
+    }
+
+    public void Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] IntPtr buffer)
+    {
+        Guard.IsNotNull(type);
+        Guard.IsNotNull(memorySpace);
+        Guard.IsNotNull(fileSpace);
+        Guard.IsNotNull(buffer);
+
+        H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
+    }
+
+    /*    public void Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] T[] buffer) where T : unmanaged
+        {
+            Guard.IsNotNull(type);
+            Guard.IsNotNull(memorySpace);
+            Guard.IsNotNull(fileSpace);
+            Guard.IsNotNull(buffer);
+
+            H5DAdapter.Write<T>(this, type, memorySpace, fileSpace, buffer);
+        }
+    */
+    /*    public void Write<T>([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, Span<T> buffer) where T : unmanaged
+        {
+            Guard.IsNotNull(type);
+            Guard.IsNotNull(memorySpace);
+            Guard.IsNotNull(fileSpace);
+
+            H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
+        }*/
 }

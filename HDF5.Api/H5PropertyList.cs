@@ -12,7 +12,6 @@ public class H5PropertyList : H5Object<H5PropertyList>
     {
     }
       
-    // TODO: remove rank
     public void SetChunk([DisallowNull] params long[] dims)
     {
         Guard.IsNotNull(dims, nameof(dims));

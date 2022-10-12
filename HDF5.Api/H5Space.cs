@@ -13,8 +13,6 @@ public class H5Space : H5Object<H5Space>
 {
     internal H5Space(long handle) : base(handle, HandleType.Space, H5SAdapter.Close) { }
 
-    #region Public Api
-
     public void SelectHyperslab(long offset, long count)
     {
         H5SAdapter.SelectHyperslab(this, offset, count);
@@ -34,8 +32,6 @@ public class H5Space : H5Object<H5Space>
     {
         return H5SAdapter.GetSimpleExtentDims(this);
     }
-
-    #endregion
 
     public static H5Space Create([DisallowNull] params Dimension[] dimensions)
     {
