@@ -48,8 +48,7 @@ internal static class H5FAdapter
         Span<byte> buffer = stackalloc byte[length + 1];
         var err = (int)get_name(file, buffer, length + 1);
         err.ThrowIfError();
-        // remove trailing \0
-        return Encoding.ASCII.GetString(buffer.Slice(0, length));
+        return Encoding.UTF8.GetString(buffer).TrimEnd('\0');
 #else
         int length = (int)get_name(file, null!, new IntPtr(0));
         length.ThrowIfError();

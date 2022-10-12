@@ -202,15 +202,13 @@ internal static class H5AAdapter
         {
             Span<byte> buffer = stackalloc byte[size];
             read(attribute, type, buffer);
-            // TODO: Ascii/UTF8
-            return Encoding.ASCII.GetString(buffer).TrimEnd('\0');
+            return Encoding.UTF8.GetString(buffer).TrimEnd('\0');
         }
         else
         {
             var buffer = SpanOwner<byte>.Allocate(size);
             read(attribute, type, buffer.Span);
-            // TODO: Ascii/UTF8
-            return Encoding.ASCII.GetString(buffer.Span).TrimEnd('\0');
+            return Encoding.UTF8.GetString(buffer.Span).TrimEnd('\0');
         }
 #else
         using var buffer = new GlobalMemory(size + 1);
