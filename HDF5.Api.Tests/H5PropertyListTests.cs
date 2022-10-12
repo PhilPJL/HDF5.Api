@@ -1,4 +1,6 @@
-﻿namespace HDF5.Api.Tests;
+﻿using System.ComponentModel;
+
+namespace HDF5.Api.Tests;
 
 [TestClass]
 public class H5PropertyListTests : H5Test
@@ -23,14 +25,16 @@ public class H5PropertyListTests : H5Test
             using var fpc2 = H5File.CreatePropertyList(PropertyListType.Create);
             Assert.IsTrue(fpc1.IsEqualTo(fpc2));
 
+            // TODO: why doesn't this work?
             //using var fpa1 = file.GetPropertyList(PropertyListType.Access);
             //using var fpa2 = H5File.CreatePropertyList(PropertyListType.Access);
             //Assert.IsTrue(fpa1.IsEqualTo(fpa2));
         });
     }
 
+    // TODO: doesn't work - ask HDF Group
 /*    [TestMethod]
-    public void FileCreateNonDefaultPropertyList()
+    public void FileAccessDefaultPropertyList()
     {
         HandleCheck(() =>
         {
@@ -38,23 +42,61 @@ public class H5PropertyListTests : H5Test
             File.Delete(Path);
             Assert.IsFalse(File.Exists(Path));
 
-            using var pl = H5File.CreatePropertyList(PropertyListType.Create);
-            pl.ReadAttribute
+            using var fpa1 = H5File.CreatePropertyList(PropertyListType.Access);
+
             // Create new file with default property lists
-            using var file = H5File.Create(Path);
+            using var file = H5File.Create(Path, true, null, fpa1);
             Assert.IsTrue(File.Exists(Path));
 
-            // Is create list the same as default?
-            using var fpc1 = file.GetPropertyList(PropertyListType.Create);
-            using var fpc2 = H5File.CreatePropertyList(PropertyListType.Create);
-            Assert.IsTrue(fpc1.IsEqualTo(fpc2));
-
-            //using var fpa1 = file.GetPropertyList(PropertyListType.Access);
-            //using var fpa2 = H5File.CreatePropertyList(PropertyListType.Access);
-            //Assert.IsTrue(fpa1.IsEqualTo(fpa2));
+            using var fpa2 = file.GetPropertyList(PropertyListType.Access);
+            Assert.IsTrue(fpa1.IsEqualTo(fpa2));
         });
     }
 */
+
+    [TestMethod]
+    public void FileCreateOrGetPropertyListWithInvalidEnumThrows()
+    {
+        HandleCheck(() =>
+        {
+            // Ensure no existing file
+            File.Delete(Path);
+            Assert.IsFalse(File.Exists(Path));
+
+            // Create new file with default property lists
+            using var file = H5File.Create(Path);
+            Assert.IsTrue(File.Exists(Path));
+            Assert.ThrowsException<InvalidEnumArgumentException>(() => file.GetPropertyList(PropertyListType.None));
+            Assert.ThrowsException<InvalidEnumArgumentException>(() => H5File.CreatePropertyList(PropertyListType.None));
+        });
+    }
+
+    /*    [TestMethod]
+        public void FileCreateNonDefaultPropertyList()
+        {
+            HandleCheck(() =>
+            {
+                // Ensure no existing file
+                File.Delete(Path);
+                Assert.IsFalse(File.Exists(Path));
+
+                using var pl = H5File.CreatePropertyList(PropertyListType.Create);
+                pl.ReadAttribute
+                // Create new file with default property lists
+                using var file = H5File.Create(Path);
+                Assert.IsTrue(File.Exists(Path));
+
+                // Is create list the same as default?
+                using var fpc1 = file.GetPropertyList(PropertyListType.Create);
+                using var fpc2 = H5File.CreatePropertyList(PropertyListType.Create);
+                Assert.IsTrue(fpc1.IsEqualTo(fpc2));
+
+                //using var fpa1 = file.GetPropertyList(PropertyListType.Access);
+                //using var fpa2 = H5File.CreatePropertyList(PropertyListType.Access);
+                //Assert.IsTrue(fpa1.IsEqualTo(fpa2));
+            });
+        }
+    */
     [TestMethod]
     public void PropertyListHelpersTest()
     {
@@ -73,6 +115,7 @@ public class H5PropertyListTests : H5Test
             using var fpc2 = H5File.CreatePropertyList(PropertyListType.Create);
             Assert.IsTrue(fpc1.IsEqualTo(fpc2));
 
+            // TODO: why doesn't this work?
             //using var fpa1 = file.GetPropertyList(PropertyListType.Access);
             //using var fpa2 = H5File.CreatePropertyList(PropertyListType.Access);
             //Assert.IsTrue(fpa1.IsEqualTo(fpa2));
@@ -101,4 +144,26 @@ public class H5PropertyListTests : H5Test
             Assert.IsTrue(apc11.IsEqualTo(apc12));
         });
     }
+
+    [TestMethod]
+    public void GroupCreateOrGetPropertyListWithInvalidEnumThrows()
+    {
+        HandleCheck(() =>
+        {
+            // Ensure no existing file
+            File.Delete(Path);
+            Assert.IsFalse(File.Exists(Path));
+
+            // Create new file with default property lists
+            using var file = H5File.Create(Path);
+            Assert.IsTrue(File.Exists(Path));
+
+            // group 
+            using var group = file.CreateGroup("group");
+            Assert.ThrowsException<InvalidEnumArgumentException>(() => group.GetPropertyList(PropertyListType.None));
+            Assert.ThrowsException<InvalidEnumArgumentException>(() => H5Group.CreatePropertyList(PropertyListType.None));
+        });
+    }
+
+    // TODO: data set property lists
 }

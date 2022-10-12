@@ -70,5 +70,4 @@ public class TestRecord
     public ulong ULongProperty { get; set; }
     public float FloatProperty { get; set; }
     public double DoubleProperty { get; set; }
-
 }

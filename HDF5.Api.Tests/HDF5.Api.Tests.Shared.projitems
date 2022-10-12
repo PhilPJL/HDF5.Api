@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DataSetWriterTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GeneralTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)H5AttributeTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)H5DataSetTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)H5FileTests.cs" />

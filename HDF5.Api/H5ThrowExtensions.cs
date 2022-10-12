@@ -1,6 +1,6 @@
 ﻿namespace HDF5.Api;
 
-public static class H5ThrowExtensions
+internal static class H5ThrowExtensions
 {
     public static void ThrowIfInvalidHandleValue(this long handle, [CallerMemberName] string? methodName = null)
     {

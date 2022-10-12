@@ -11,6 +11,11 @@ public class H5Attribute : H5Object<H5Attribute>
     {
     }
 
+    public static H5PropertyList CreatePropertyList(PropertyListType listType)
+    {
+        return H5AAdapter.CreatePropertyList(listType);
+    }
+
     public H5Space GetSpace()
     {
         return H5AAdapter.GetSpace(this);
@@ -19,6 +24,11 @@ public class H5Attribute : H5Object<H5Attribute>
     public H5Type GetH5Type()
     {
         return H5AAdapter.GetType(this);
+    }
+
+    public H5PropertyList GetPropertyList(PropertyListType listType)
+    {
+        return H5AAdapter.GetPropertyList(this, listType);
     }
 
     public string ReadString()
@@ -49,15 +59,5 @@ public class H5Attribute : H5Object<H5Attribute>
     public void Write(DateTime value)
     {
         H5AAdapter.Write(this, value);
-    }
-
-    public H5PropertyList GetPropertyList(PropertyListType listType)
-    {
-        return H5AAdapter.GetPropertyList(this, listType);
-    }
-
-    public static H5PropertyList CreatePropertyList(PropertyListType listType)
-    {
-        return H5AAdapter.CreatePropertyList(listType);
     }
 }
