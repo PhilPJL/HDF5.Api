@@ -79,6 +79,9 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     }
 
     public IEnumerable<string> AttributeNames => H5AAdapter.AttributeNames(this);
+    public IEnumerable<string> GroupNames => H5LAdapter.GetGroupNames(this);
+    public IEnumerable<string> DataSetNames => H5LAdapter.GetDataSetNames(this);
+    public IEnumerable<string> NamedDataTypeNames => H5LAdapter.GetNamedDataTypeNames(this);
 
     public int NumberOfAttributes => (int)H5OAdapter.GetInfo(this).num_attrs;
 
@@ -153,36 +156,5 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         Guard.IsNotNullOrWhiteSpace(name);
 
         return H5DAdapter.Exists(this, name);
-    }
-
-    /// <summary>
-    ///     Enumerate the names of child objects (groups, data-sets) in this location
-    /// </summary>
-    public IEnumerable<(string name, bool isGroup)> GetChildNames()
-    {
-        return GetChildNames(this);
-    }
-
-    private static IEnumerable<(string name, bool isGroup)> GetChildNames(H5Location<T> handle)
-    {
-        ulong idx = 0;
-
-        var names = new List<(string name, bool isGroup)>();
-
-        int err = NativeMethods.H5L.iterate(handle, NativeMethods.H5.index_t.NAME, NativeMethods.H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
-        err.ThrowIfError();
-
-        return names;
-
-        int Callback(long groupId, IntPtr intPtrName, ref NativeMethods.H5L.info_t info, IntPtr _)
-        {
-            string? name = Marshal.PtrToStringAnsi(intPtrName);
-            Guard.IsNotNull(name);
-
-            var oinfo = H5OAdapter.GetInfoByName(groupId, name);
-
-            names.Add((name, oinfo.type == NativeMethods.H5O.type_t.GROUP));
-            return 0;
-        }
     }
 }

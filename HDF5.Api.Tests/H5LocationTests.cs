@@ -137,8 +137,8 @@ public abstract class H5LocationTests : H5Test
 
     protected static void GetChildGroupsSucceeds<T>(H5Location<T> location) where T : H5Object<T>
     {
-        var children = location.GetChildNames();
-        Assert.IsTrue(!children.Any());
+        var groupNames = location.GroupNames;
+        Assert.IsTrue(!groupNames.Any());
 
         // Create group
         const string grp1Name = "grp1";
@@ -155,13 +155,12 @@ public abstract class H5LocationTests : H5Test
         using var group10 = location.CreateGroup(grp10Name);
         Assert.IsTrue(location.GroupExists(grp10Name));
 
-        children = location.GetChildNames();
-        Assert.IsTrue(children.Count() == 3);
+        groupNames = location.GroupNames;
+        Assert.IsTrue(groupNames.Count() == 3);
 
-        Assert.IsTrue(children.All(c => c.isGroup));
-        Assert.IsTrue(children.Any(c => c.name == grp1Name));
-        Assert.IsTrue(children.Any(c => c.name == grp2Name));
-        Assert.IsTrue(children.Any(c => c.name == grp10Name));
+        Assert.IsTrue(groupNames.Any(c => c == grp1Name));
+        Assert.IsTrue(groupNames.Any(c => c == grp2Name));
+        Assert.IsTrue(groupNames.Any(c => c == grp10Name));
     }
     #endregion
 

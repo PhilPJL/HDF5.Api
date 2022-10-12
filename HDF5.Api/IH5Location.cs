@@ -22,7 +22,8 @@ public interface IH5Location : IH5ObjectWithAttributes
     H5DataSet CreateDataSet(string name, H5Type typeId, H5Space space, H5PropertyList propertyList);
     H5DataSet OpenDataSet(string name);
     bool DataSetExists(string name);
-    // TODO: DeleteDataSet by name?
 
-    IEnumerable<(string name, bool isGroup)> GetChildNames();
+    IEnumerable<string> GroupNames { get; }
+    IEnumerable<string> DataSetNames { get; }
+    IEnumerable<string> NamedDataTypeNames { get; }
 }
