@@ -20,7 +20,10 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// <summary>
     ///     Create an Attribute for this location
     /// </summary>
-    public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space,
+    public H5Attribute CreateAttribute(
+        [DisallowNull] string name, 
+        [DisallowNull] H5Type type, 
+        [DisallowNull] H5Space space,
         [AllowNull] H5PropertyList? creationPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);

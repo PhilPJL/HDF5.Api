@@ -23,11 +23,14 @@ internal static class H5AAdapter
         err.ThrowIfError();
     }
 
-    internal static H5Attribute Create<T>(H5Object<T> h5Object, string name, H5Type type, H5Space space,
-        H5PropertyList? creationPropertyList = null)
-        where T : H5Object<T>
+    internal static H5Attribute Create<T>(
+        H5Object<T> h5Object,
+        string name,
+        H5Type type,
+        H5Space space,
+        H5PropertyList? creationPropertyList = null) where T : H5Object<T>
     {
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasWithAttributesHandleType();
 
         var h = create(h5Object, name, type, space, creationPropertyList);
 
@@ -38,7 +41,7 @@ internal static class H5AAdapter
 
     internal static void Delete<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasWithAttributesHandleType();
 
         int err = delete(h5Object, name);
 
@@ -47,7 +50,7 @@ internal static class H5AAdapter
 
     internal static bool Exists<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasWithAttributesHandleType();
 
         int err = exists(h5Object, name);
 
@@ -57,7 +60,7 @@ internal static class H5AAdapter
 
     internal static IEnumerable<string> GetAttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
     {
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasWithAttributesHandleType();
 
         ulong idx = 0;
 
@@ -117,7 +120,7 @@ internal static class H5AAdapter
     }*/
 
     /// <summary>
-    /// Get copy of property list used to create the data-set.
+    /// Get copy of property list used to create the attribute.
     /// </summary>
     /// <param name="attribute"></param>
     /// <returns></returns>
@@ -163,7 +166,7 @@ internal static class H5AAdapter
     internal static H5Attribute Open<T>(H5Object<T> h5Object, string name)
         where T : H5Object<T>
     {
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasWithAttributesHandleType();
 
         long h = open(h5Object, name);
 
@@ -369,6 +372,26 @@ internal static class H5AAdapter
     internal static void Write(H5Attribute attribute, DateTime value)
     {
         Write(attribute, value.ToOADate());
+    }
+
+    internal static H5Attribute CreateStringAttribute<T>(
+        H5Object<T> h5Object, string name, int length, bool isAscii, H5PropertyList? creationPropertyList) where T : H5Object<T>
+    {
+        h5Object.AssertHasWithAttributesHandleType();
+
+        bool isFixedLength = length != 0;
+
+        using var type = isFixedLength
+            ? H5TAdapter.CreateFixedLengthStringType(length)
+            : H5TAdapter.CreateVariableLengthStringType();
+
+        if (isAscii) { type.SetASCII(); } else { type.SetUTF8(); }
+
+        // TODO: padding
+        // TODO: ASCII/UTF8
+
+        using var memorySpace = H5SAdapter.CreateScalar();
+        return Create(h5Object, name, type, memorySpace, creationPropertyList);
     }
 }
 

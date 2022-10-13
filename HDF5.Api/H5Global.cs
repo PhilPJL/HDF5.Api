@@ -112,3 +112,10 @@ public enum H5Class
     Array = 10,
     NClasses
 }
+
+public enum StringPadding
+{
+    Space = H5T.str_t.SPACEPAD,
+    NullPad = H5T.str_t.NULLPAD,
+    NullTerminate = H5T.str_t.NULLTERM
+}

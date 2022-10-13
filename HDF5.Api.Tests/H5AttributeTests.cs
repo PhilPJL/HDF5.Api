@@ -5,19 +5,46 @@ namespace HDF5.Api.Tests;
 [TestClass]
 public class H5AttributeTests : H5Test
 {
-    private const string Path = "test.h5";
+    private const string Path = "testx.h5";
 
-/*    [TestMethod]
-    public void Test()
+    /*    [TestMethod]
+        public void Test()
+        {
+            HandleCheck(() =>
+            {
+                using var file = H5File.Open(@"D:\TeraViewTestFiles\C123456CE123.tprj");
+                using var grp = file.OpenGroup("TerapulseDocument");
+                using var att = grp.OpenAttribute("ClassName");
+                Debug.WriteLine(att.ReadString());
+            });
+        }*/
+
+    [TestMethod]
+    public void Attributes()
     {
         HandleCheck(() =>
         {
-            using var file = H5File.Open(@"D:\TeraViewTestFiles\C123456CE123.tprj");
-            using var grp = file.OpenGroup("TerapulseDocument");
-            using var att = grp.OpenAttribute("ClassName");
-            Debug.WriteLine(att.ReadString());
+            // Ensure no existing file
+            File.Delete(Path);
+            Assert.IsFalse(File.Exists(Path));
+
+            // Create new file
+            using var file = H5File.Create(Path);
+            Assert.IsTrue(File.Exists(Path));
+
+            //using var a1 = H5Attribute.CreateStringAttribute(file, "variable_ascii", 0, true);
+            //a1.Write("123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789");
+
+            //using var a2 = H5Attribute.CreateStringAttribute(file, "variable_utf8", 0);
+            //a2.Write("123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789");
+
+            using var a3 = H5Attribute.CreateStringAttribute(file, "fixed_ascii", 32, true);
+            a3.Write("12345678912345678912");
+
+            using var a4 = H5Attribute.CreateStringAttribute(file, "fixed_utf8", 100);
+            a4.Write("1234567891234567891234567891234567891234567891234567891234567891234567");
         });
-    }*/
+    }
 
     [TestMethod]
     public void CreateDuplicateAttributeNameThrows()

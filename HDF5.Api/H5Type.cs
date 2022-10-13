@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5.Api.NativeMethodAdapters;
+using HDF5.Api.NativeMethods;
 
 namespace HDF5.Api;
 
@@ -126,5 +127,20 @@ public class H5Type : H5Object<H5Type>
     public static H5Type CreateFixedLengthStringType(int length)
     {
         return H5TAdapter.CreateFixedLengthStringType(length);
+    }
+
+    internal void SetASCII()
+    {
+        H5TAdapter.SetASCII(this);
+    }
+
+    internal void SetUTF8()
+    {
+        H5TAdapter.SetUTF8(this);
+    }
+
+    internal void SetPadding(StringPadding padding)
+    {
+        H5TAdapter.SetPadding(this, padding);
     }
 }

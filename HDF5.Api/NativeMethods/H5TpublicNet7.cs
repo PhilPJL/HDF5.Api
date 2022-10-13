@@ -119,7 +119,6 @@ internal static partial class H5T
     public static partial herr_t insert
         (hid_t dtype_id, string name, size_t offset, hid_t field_id);
 
-
     /// <summary>
     /// Determines whether datatype is a variable-length string.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-IsVariableString
@@ -131,6 +130,19 @@ internal static partial class H5T
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial htri_t is_variable_str(hid_t dtype_id);
+
+    /// <summary>
+    /// Sets character set to be used in a string or character datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-SetCset
+    /// </summary>
+    /// <param name="dtype_id">Identifier of datatype to modify.</param>
+    /// <param name="cset">Character set type.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tset_cset"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t set_cset(hid_t dtype_id, cset_t cset);
 
     /// <summary>
     /// Sets the total size for a datatype.
@@ -145,6 +157,19 @@ internal static partial class H5T
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t set_size(hid_t dtype_id, size_t size);
+
+    /// <summary>
+    /// Defines the type of padding used for character strings.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-SetStrpad
+    /// </summary>
+    /// <param name="dtype_id">Identifier of datatype to modify.</param>
+    /// <param name="strpad">String padding type.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tset_strpad"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t set_strpad(hid_t dtype_id, str_t strpad);
 
     /// <summary>
     /// Creates a new variable-length array datatype.

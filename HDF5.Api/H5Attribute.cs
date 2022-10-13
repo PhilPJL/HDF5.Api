@@ -1,4 +1,5 @@
-﻿using HDF5.Api.NativeMethodAdapters;
+﻿using CommunityToolkit.Diagnostics;
+using HDF5.Api.NativeMethodAdapters;
 namespace HDF5.Api;
 
 /// <summary>
@@ -48,16 +49,29 @@ public class H5Attribute : H5Object<H5Attribute>
 
     public void Write(string value)
     {
-        H5AAdapter.Write(this,  value);
+        H5AAdapter.Write(this, value);
     }
 
     public void Write<T>(T value) where T : unmanaged
     {
-        H5AAdapter.Write(this,  value);
+        H5AAdapter.Write(this, value);
     }
 
     public void Write(DateTime value)
     {
         H5AAdapter.Write(this, value);
+    }
+
+    public static H5Attribute CreateStringAttribute<T>(
+        H5Object<T> h5Object,
+        string name,
+        int length = 0,
+        bool isAscii = false,
+        [AllowNull] H5PropertyList? creationPropertyList = null) where T : H5Object<T>
+    {
+        Guard.IsGreaterThanOrEqualTo(length, 0);
+        h5Object.AssertHasHandleType(HandleType.File, HandleType.DataSet, HandleType.Group);
+
+        return H5AAdapter.CreateStringAttribute(h5Object, name, length, isAscii, creationPropertyList);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using HDF5.Api.NativeMethods;
+using System.Linq;
 using static HDF5.Api.NativeMethods.H5T;
 
 namespace HDF5.Api.NativeMethodAdapters;
@@ -22,9 +23,21 @@ internal static class H5TAdapter
         err.ThrowIfError();
     }
 
-    internal static H5Class GetClass(H5Type typeId)
+    internal static H5Class GetClass(H5Type type)
     {
-        return (H5Class)get_class(typeId);
+        return (H5Class)get_class(type);
+    }
+
+    internal static void SetASCII(H5Type type)
+    {
+        int err = set_cset(type, cset_t.ASCII);
+        err.ThrowIfError();
+    }
+
+    internal static void SetUTF8(H5Type type)
+    {
+        int err = set_cset(type, cset_t.UTF8);
+        err.ThrowIfError();
     }
 
     internal static H5Type CreateCompoundType(int size)
@@ -90,6 +103,13 @@ internal static class H5TAdapter
         return new H5Type(h);
     }
 
+    internal static H5Type CreateVariableLengthStringType()
+    {
+        long h = create(class_t.STRING, VARIABLE);
+        h.ThrowIfInvalidHandleValue();
+        return new H5Type(h);
+    }
+
     internal static void Insert(H5Type typeId, string name, ssize_t offset, long nativeTypeId)
     {
         int err = insert(typeId, name, offset, nativeTypeId);
@@ -132,12 +152,20 @@ internal static class H5TAdapter
             _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
         }; ;
     }
-/*
-    internal static void Commit(H5Type h5Type, string name)
-    {
-        int err = commit(typeId, name);
-        err.ThrowIfError();
-        return err > 0;
 
+    internal static void SetPadding(H5Type h5Type, StringPadding padding)
+    {
+        int err = set_strpad(h5Type, (str_t)padding);
+        err.ThrowIfError();
     }
-*/}
+
+    /*
+   internal static void Commit(H5Type h5Type, string name)
+   {
+       int err = commit(typeId, name);
+       err.ThrowIfError();
+       return err > 0;
+
+   }
+*/
+}
