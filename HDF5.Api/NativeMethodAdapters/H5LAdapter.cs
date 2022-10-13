@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System.Collections.Generic;
+using System.Linq;
 using static HDF5.Api.NativeMethods.H5L;
 
 namespace HDF5.Api.NativeMethodAdapters;
@@ -32,12 +33,12 @@ internal static class H5LAdapter
         err.ThrowIfError();
     }
 
-    private static IEnumerable<string> GetNames<T>(H5Location<T> location, NativeMethods.H5O.type_t type)
+    private static IEnumerable<(string name, H5ObjectType type)> GetMembers<T>(H5Location<T> location, NativeMethods.H5O.type_t type)
         where T : H5Object<T>
     {
         ulong idx = 0;
 
-        var names = new List<string>();
+        var names = new List<(string, H5ObjectType)>();
 
         int err = iterate(location, NativeMethods.H5.index_t.NAME, NativeMethods.H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
         err.ThrowIfError();
@@ -54,9 +55,9 @@ internal static class H5LAdapter
             {
                 var oinfo = H5OAdapter.GetInfoByName(locationId, name);
 
-                if (oinfo.type == type)
+                if (oinfo.type == type || type == NativeMethods.H5O.type_t.UNKNOWN)
                 {
-                    names.Add(name.Trim('\0'));
+                    names.Add((name.Trim('\0'), (H5ObjectType)oinfo.type));
                 }
             }
 
@@ -65,12 +66,15 @@ internal static class H5LAdapter
     }
 
     internal static IEnumerable<string> GetGroupNames<T>(H5Location<T> location)
-        where T : H5Object<T> => GetNames(location, NativeMethods.H5O.type_t.GROUP);
+        where T : H5Object<T> => GetMembers(location, NativeMethods.H5O.type_t.GROUP).Select(m => m.name);
 
     internal static IEnumerable<string> GetDataSetNames<T>(H5Location<T> location)
-        where T : H5Object<T> => GetNames(location, NativeMethods.H5O.type_t.DATASET);
+        where T : H5Object<T> => GetMembers(location, NativeMethods.H5O.type_t.DATASET).Select(m => m.name);
 
     internal static IEnumerable<string> GetNamedDataTypeNames<T>(H5Location<T> location)
-        where T : H5Object<T> => GetNames(location, NativeMethods.H5O.type_t.NAMED_DATATYPE);
+        where T : H5Object<T> => GetMembers(location, NativeMethods.H5O.type_t.NAMED_DATATYPE).Select(m => m.name);
+
+    internal static IEnumerable<(string name, H5ObjectType type)> GetMembers<T>(H5Location<T> location)
+        where T : H5Object<T> => GetMembers(location, NativeMethods.H5O.type_t.UNKNOWN);
 }
 

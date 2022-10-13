@@ -37,7 +37,7 @@ public static class H5Global
 }
 
 [Flags]
-public enum H5ObjectTypes : uint
+public enum H5FObjectType : uint
 {
     All = H5F.OBJ_ALL,
     Attribute = H5F.OBJ_ATTR,
@@ -46,6 +46,13 @@ public enum H5ObjectTypes : uint
     File = H5F.OBJ_FILE,
     Group = H5F.OBJ_GROUP,
     Local = H5F.OBJ_LOCAL
+}
+
+public enum H5ObjectType
+{
+    Group = H5O.type_t.GROUP,
+    DataSet = H5O.type_t.DATASET,
+    NamedDataType = H5O.type_t.NAMED_DATATYPE
 }
 
 public readonly struct Dimension

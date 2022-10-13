@@ -15,27 +15,47 @@ public class H5File : H5Location<H5File>
     {
     }
 
+    /// <summary>
+    /// Flush the file to disk.
+    /// </summary>
+    /// <param name="flushGlobal"></param>
     public void Flush(bool flushGlobal = false)
     {
         H5FAdapter.Flush(this, flushGlobal);
     }
 
-    public long GetObjectCount(H5ObjectTypes types = H5ObjectTypes.All)
+    /// <summary>
+    /// Returns the number of open objects by type.
+    /// </summary>
+    /// <param name="types"></param>
+    /// <returns></returns>
+    public long GetObjectCount(H5FObjectType types = H5FObjectType.All)
     {
         return H5FAdapter.GetObjectCount(this, types);
     }
 
+    /// <summary>
+    /// The filename.
+    /// </summary>
     public string Name => H5FAdapter.GetName(this);
 
+    /// <summary>
+    /// Size of the file in bytes.
+    /// </summary>
     public long Size => H5FAdapter.GetSize(this);
 
+    /// <summary>
+    /// Creates a <see cref="H5PropertyList"/> of the required type.
+    /// </summary>
+    /// <param name="listType"></param>
+    /// <returns></returns>
     public static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
         return H5FAdapter.CreatePropertyList(listType);
     }
 
     /// <summary>
-    /// Gets a copy of the specified property list used to create the object
+    /// Gets a copy of the specified <see cref="H5PropertyList"/> used to create the object.
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>
@@ -45,9 +65,13 @@ public class H5File : H5Location<H5File>
     }
 
     /// <summary>
-    ///     Open an existing file.  By default opens read-write.
+    ///     Opens an existing file.
     /// </summary>
-    public static H5File Open([DisallowNull] string path, bool readOnly = false, 
+    /// <param name="path">Path to the file.</param>
+    /// <param name="readOnly">Open the file in read-only mode.  Defaults to read-write.</param>
+    public static H5File Open(
+        [DisallowNull] string path, 
+        bool readOnly = false, 
         [AllowNull] H5PropertyList? fileAccessPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(path);
@@ -56,9 +80,13 @@ public class H5File : H5Location<H5File>
     }
 
     /// <summary>
-    ///     Open an existing file (by default read-write) or create new.
+    ///     Opens an existing file or creates a new one if the file does not exist.
     /// </summary>
-    public static H5File CreateOrOpen([DisallowNull] string path, bool readOnly = false,
+    /// <param name="path">Path to the file.</param>
+    /// <param name="readOnly">Open the file in read-only mode.  Defaults to read-write.</param>
+    public static H5File CreateOrOpen(
+        [DisallowNull] string path, 
+        bool readOnly = false,
         [AllowNull] H5PropertyList? fileCreationPropertyList = null,
         [AllowNull] H5PropertyList? fileAccessPropertyList = null)
     {
@@ -70,10 +98,13 @@ public class H5File : H5Location<H5File>
     }
 
     /// <summary>
-    /// Create a new H5 file
+    /// Attempts to create a new <see cref="H5File"/>.  
+    /// By default an existing file will be truncated.
     /// </summary>
-    /// <param name="path">Path of the file</param>
-    public static H5File Create([DisallowNull] string path, 
+    /// <param name="path">Path tp the file</param>
+    /// <param name="failIfExists">Fail if the file being created already exists.</param>
+    public static H5File Create(
+        [DisallowNull] string path, 
         bool failIfExists = false, 
         [AllowNull] H5PropertyList? fileCreationPropertyList = null, 
         [AllowNull] H5PropertyList? fileAccessPropertyList = null)

@@ -75,7 +75,7 @@ internal static class H5FAdapter
         return (long)size;
     }
 
-    internal static long GetObjectCount(H5File file, H5ObjectTypes types = H5ObjectTypes.All)
+    internal static long GetObjectCount(H5File file, H5FObjectType types)
     {
 #if NET7_0_OR_GREATER
         return get_obj_count(file, (uint)types);
