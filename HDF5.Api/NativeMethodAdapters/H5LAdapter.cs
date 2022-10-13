@@ -56,7 +56,7 @@ internal static class H5LAdapter
 
                 if (oinfo.type == type)
                 {
-                    names.Add(name);
+                    names.Add(name.Trim('\0'));
                 }
             }
 

@@ -76,7 +76,7 @@ internal static partial class H5S
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial int get_simple_extent_dims
-        (hid_t space_id, hsize_t[] dims, hsize_t[] maxdims);
+        (hid_t space_id, Span<hsize_t> dims, Span<hsize_t> maxdims);
 
     /// <summary>
     /// Determines the dimensionality of a dataspace.

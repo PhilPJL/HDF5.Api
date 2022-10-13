@@ -1,4 +1,6 @@
-﻿using HDF5.Api.NativeMethods;
+﻿using CommunityToolkit.HighPerformance.Buffers;
+using HDF5.Api.NativeMethods;
+using System.Collections.Generic;
 using System.Linq;
 using static HDF5.Api.NativeMethods.H5D;
 
@@ -36,6 +38,58 @@ internal static class H5DAdapter
 
         return new H5DataSet(h);
     }
+
+    public static IEnumerable<T> Read<T>(H5DataSet dataSet) 
+        where T : unmanaged 
+    {
+        // TODO: move this check into separate method
+        using var space = dataSet.GetSpace();
+        using var type = dataSet.GetH5Type();
+        long count = space.GetSimpleExtentNPoints();
+
+        var cls = type.GetClass();
+
+        if (cls != H5Class.Compound)
+        {
+            throw new Hdf5Exception($"DataSet is of class {cls} when expecting {H5Class.Compound}.");
+        }
+
+        long size = (long)GetStorageSize(dataSet);
+
+        if (size != count * Marshal.SizeOf<T>())
+        {
+            throw new Hdf5Exception(
+                $"Attribute storage size is {size}, which does not match the expected size for {count} items of type {typeof(T).Name} of {count * Marshal.SizeOf<T>()}.");
+        }
+
+#if NET7_0_OR_GREATER
+        if (size < 256)
+        {
+            Span<T> buf = stackalloc T[(int)count];
+            read(dataSet, type, space, space, 0, MemoryMarshal.AsBytes(buf));
+            return buf.ToArray();
+        }
+        else
+        {
+            using var buf = SpanOwner<T>.Allocate((int)count);
+            read(dataSet, type, space, space, 0, MemoryMarshal.AsBytes(buf.Span));
+            return buf.Span.ToArray();
+        }
+#else
+        unsafe
+        {
+            var result = new T[count];
+            fixed (T* ptr = result)
+            {
+                int err = H5D.read(dataSet, type, space, space, 0, new IntPtr(ptr));
+                err.ThrowIfError();
+                return result;
+            }
+        }
+#endif
+    }
+
+
 
     internal static H5DataSet Open<T>(H5Location<T> location, string name, H5PropertyList? dataSetAccessPropertyList = null) where T : H5Object<T>
     {

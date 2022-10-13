@@ -32,7 +32,7 @@ public static class H5ObjectWithAttributeExtensions
         [DisallowNull] this IH5ObjectWithAttributes owa, 
         [DisallowNull] string name, 
         [DisallowNull] string value, 
-        int maxLength = 0,
+        int fixedLength = 0,
         H5PropertyList? creationPropertyList = null)
     {
         Guard.IsNotNull(owa);
@@ -41,18 +41,22 @@ public static class H5ObjectWithAttributeExtensions
 
         value ??= string.Empty;
 
-        maxLength = maxLength <= 0 ? value.Length : Math.Min(value.Length, maxLength);
+        fixedLength = fixedLength <= 0 ? value.Length : Math.Min(value.Length, fixedLength);
 
-        // TODO: variable length string
-
+        // TODO: truncate or throw?
 #pragma warning disable IDE0057 // Use range operator
-        string subString = value.Length > maxLength ? value.Substring(0, maxLength) : value;
+        string subString = value.Length > fixedLength ? value.Substring(0, fixedLength) : value;
 #pragma warning restore IDE0057 // Use range operator
 
+        // TODO: can we create a zero length string?
         // can't create a zero length string type so use a length of 1 minimum
-        using var type = H5TAdapter.CreateFixedLengthStringType(subString.Length < 1 ? 1 : subString.Length);
+        using var type = H5TAdapter.CreateFixedLengthStringType(fixedLength);
+        // TODO: padding
+        // TODO: ASCII/UTF8
+
         using var memorySpace = H5SAdapter.CreateScalar();
         using var attribute = owa.CreateAttribute(name, type, memorySpace, creationPropertyList);
+
         H5AAdapter.Write(attribute, subString);
     }
 }

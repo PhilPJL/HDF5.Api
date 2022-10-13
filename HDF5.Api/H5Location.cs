@@ -78,7 +78,9 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         return H5AAdapter.ReadDateTime(attribute);
     }
 
-    public IEnumerable<string> AttributeNames => H5AAdapter.AttributeNames(this);
+    // TODO: public IEnumerable<string> Attributes => ... etc ?
+
+    public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
     public IEnumerable<string> GroupNames => H5LAdapter.GetGroupNames(this);
     public IEnumerable<string> DataSetNames => H5LAdapter.GetDataSetNames(this);
     public IEnumerable<string> NamedDataTypeNames => H5LAdapter.GetNamedDataTypeNames(this);

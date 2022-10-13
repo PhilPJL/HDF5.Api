@@ -152,7 +152,7 @@ internal static partial class H5D
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t read
         (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id,
-        hid_t file_space_id, hid_t plist_id, IntPtr buf);
+        hid_t file_space_id, hid_t plist_id, Span<byte> buf);
 
     /// <summary>
     /// Changes the sizes of a dataset’s dimensions.

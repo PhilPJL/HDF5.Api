@@ -22,7 +22,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5AAdapter.Exists(this, name);
     }
 
-    public IEnumerable<string> AttributeNames => H5AAdapter.AttributeNames(this);
+    public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
 
     public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space, 
         H5PropertyList? creationPropertyList = null)
@@ -101,39 +101,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
     public IEnumerable<T> Read<T>() where T : unmanaged
     {
-        // TODO: move this check into separate method
-        using var space = GetSpace();
-        using var type = GetH5Type();
-        long count = space.GetSimpleExtentNPoints();
-
-        var cls = type.GetClass();
-
-        if (cls != H5Class.Compound)
-        {
-            throw new Hdf5Exception($"DataSet is of class {cls} when expecting {H5Class.Compound}.");
-        }
-
-        long size = (long)H5DAdapter.GetStorageSize(this);
-
-        if (size != count * Marshal.SizeOf<T>())
-        {
-            throw new Hdf5Exception(
-                $"Attribute storage size is {size}, which does not match the expected size for {count} items of type {typeof(T).Name} of {count * Marshal.SizeOf<T>()}.");
-        }
-
-        // TODO: move into adapter
-        // TODO: create .NET7 Span<T> variant
-        unsafe
-        {
-            var result = new T[count];
-            fixed (T* ptr = result)
-            {
-                // TODO: use native H5DDataSetNativeMethods
-                int err = NativeMethods.H5D.read(this, type, space, space, 0, new IntPtr(ptr));
-                err.ThrowIfError();
-                return result;
-            }
-        }
+        return H5DAdapter.Read<T>(this);
     }
 
     public void SetExtent([DisallowNull] params long[] dims)

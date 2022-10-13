@@ -33,9 +33,17 @@ public class H5Space : H5Object<H5Space>
         return H5SAdapter.GetSimpleExtentDims(this);
     }
 
+    public static H5Space CreateScalar()
+    {
+        return H5SAdapter.CreateScalar();
+    }
+
     public static H5Space Create([DisallowNull] params Dimension[] dimensions)
     {
         Guard.IsNotNull(dimensions);
+
+        // TODO: >=1 ?
+        // TOOD: or ==0 -> CreateScalar()?
 
         return H5SAdapter.CreateSimple(dimensions);
     }

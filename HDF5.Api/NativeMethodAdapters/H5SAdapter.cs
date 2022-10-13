@@ -67,12 +67,35 @@ internal static class H5SAdapter
     internal static IReadOnlyList<Dimension> GetSimpleExtentDims(H5Space space)
     {
         var rank = GetSimpleExtentNDims(space);
+
+        if(rank == 0)
+        {
+            return Array.Empty<Dimension>();
+        }
+
+#if NET7_0_OR_GREATER
+        // Assuming rank < 120-ish
+        Span<ulong> dims = stackalloc ulong[rank];
+        Span<ulong> maxDims = stackalloc ulong[rank];
+
+        int err = get_simple_extent_dims(space, dims, maxDims);
+        err.ThrowIfError();
+
+        var dimensions = new List<Dimension>();
+        for(int i= 0; i < rank; i++)
+        {
+            dimensions.Add(new Dimension(dims[i], maxDims[i]));
+        }
+        return dimensions;
+#endif
+
+#if NETSTANDARD
         var dims = new ulong[rank];
         var maxDims = new ulong[rank];
 
         int err = get_simple_extent_dims(space, dims, maxDims);
         err.ThrowIfError();
-
         return Enumerable.Zip(dims, maxDims, (f, s) => new Dimension(f, s)).ToList();
+#endif
     }
 }

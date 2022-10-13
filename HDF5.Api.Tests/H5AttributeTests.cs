@@ -17,8 +17,8 @@ public class H5AttributeTests : H5Test
             using var att = grp.OpenAttribute("ClassName");
             Debug.WriteLine(att.ReadString());
         });
-    }
-*/
+    }*/
+
     [TestMethod]
     public void CreateDuplicateAttributeNameThrows()
     {

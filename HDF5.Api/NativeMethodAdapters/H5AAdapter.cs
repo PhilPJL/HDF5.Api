@@ -55,7 +55,7 @@ internal static class H5AAdapter
         return err > 0;
     }
 
-    internal static IEnumerable<string> AttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
+    internal static IEnumerable<string> GetAttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
@@ -99,7 +99,7 @@ internal static class H5AAdapter
 
             if (name != null)
             {
-                names.Add(name);
+                names.Add(name.Trim('\0'));
             }
 
             return 0;
@@ -180,12 +180,17 @@ internal static class H5AAdapter
     internal static string ReadString(H5Attribute attribute)
     {
         using var type = attribute.GetH5Type();
+
         using var space = attribute.GetSpace();
 
         var count = space.GetSimpleExtentNPoints();
-        var ndims = space.GetSimpleExtentNDims();
+        var dims = space.GetSimpleExtentDims();
 
-        if (count != 1 || ndims != 0)
+        // TODO: handle dims.Count > 0 where NPoints=1
+        // TODO: generalise to NPoints >= 0
+        // TODO: handle fixed/variable length string
+
+        if (count != 1 || dims.Count != 0)
         {
             throw new Hdf5Exception("Attribute is not scalar.");
         }
@@ -195,6 +200,8 @@ internal static class H5AAdapter
         {
             throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{H5Class.String}'.");
         }
+
+        bool isVariableLength = type.IsVariableLengthString();
 
         var size = GetStorageSize(attribute);
 
@@ -214,6 +221,7 @@ internal static class H5AAdapter
 #else
         using var buffer = new GlobalMemory(size + 1);
         read(attribute, type, buffer.IntPtr);
+
         // TODO: Ascii/UTF8
         return Marshal.PtrToStringAnsi(buffer.IntPtr, size);
 #endif
@@ -225,10 +233,12 @@ internal static class H5AAdapter
         using var space = attribute.GetSpace();
 
         long count = space.GetSimpleExtentNPoints();
-        var ndims = space.GetSimpleExtentNDims();
+        var dims = space.GetSimpleExtentDims();
 
-        // TODO: understand npoints/ndims better
-        if (count != 1 || ndims != 0)
+        // TODO: handle dims.Count > 0 where NPoints=1
+        // TODO: generalise to NPoints >= 0
+
+        if (count != 1 || dims.Count != 0)
         {
             throw new Hdf5Exception("Attribute is not scalar.");
         }
@@ -325,6 +335,10 @@ internal static class H5AAdapter
     // TODO: zero length string?
     internal static void Write(H5Attribute attribute, string value, int maxLength = 0)
     {
+        // TODO: UTF8/Ascii
+        // TODO: fixed/variable length
+        // TODO: zero length string (EMPTY)
+
         value ??= string.Empty;
 
         maxLength = maxLength <= 0 ? value.Length : Math.Min(value.Length, maxLength);

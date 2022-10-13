@@ -69,6 +69,11 @@ public class H5Type : H5Object<H5Type>
         return this;
     }
 
+    public bool IsVariableLengthString()
+    {
+        return H5TAdapter.IsVariableLengthString(this);
+    }
+
     public H5Class GetClass()
     {
         return H5TAdapter.GetClass(this);
