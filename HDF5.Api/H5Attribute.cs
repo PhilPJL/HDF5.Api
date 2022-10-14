@@ -74,6 +74,7 @@ public class H5Attribute : H5Object<H5Attribute>
     {
         Guard.IsNotNull(h5Object);
         Guard.IsGreaterThanOrEqualTo(length, 0);
+        
         h5Object.AssertHasWithAttributesHandleType();
 
         return H5AAdapter.CreateStringAttribute(h5Object, name, length, characterSet, padding, creationPropertyList);

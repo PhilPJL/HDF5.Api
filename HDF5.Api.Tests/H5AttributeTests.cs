@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics;
+using System.IO;
 
 namespace HDF5.Api.Tests;
 
 [TestClass]
 public class H5AttributeTests : H5Test
 {
-    private const string Path = "testx.h5";
+    private const string Path = "test.h5";
 
     /*    [TestMethod]
         public void Test()
@@ -28,8 +29,6 @@ public class H5AttributeTests : H5Test
     [DataRow("utf8_space.h5", CharacterSet.Utf8, StringPadding.Space)]
     public void FixedLengthStringAttributes(string path, CharacterSet characterSet, StringPadding padding)
     {
-        Debug.WriteLine($"{path}, {characterSet}, {padding}.");
-
         HandleCheck(() =>
         {
             // Ensure no existing file
@@ -47,7 +46,7 @@ public class H5AttributeTests : H5Test
             {
                 // NOTE that this Unicode string is 107 characters long but requires 321 bytes of storage.
                 // HDF5 fixed length storage indicates the number of bytes not the number of characters.
-                Test(file, "fixed_200", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 500, characterSet, padding);
+                Test(file, "fixed_500", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 500, characterSet, padding);
             }
 
             static void Test(H5File file, string name, string value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)

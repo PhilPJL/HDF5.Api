@@ -75,34 +75,16 @@ internal static class H5AAdapter
 
         int Callback(long id, IntPtr intPtrName, ref info_t info, IntPtr _)
         {
-            string? name = null;
-
-            switch (info.cset)
+            if(info.cset != H5T.cset_t.ASCII)
             {
-                case H5T.cset_t.ASCII:
-                    name = Marshal.PtrToStringAnsi(intPtrName);
-                    break;
-                case H5T.cset_t.UTF8:
-#if NETSTANDARD
-                    // TODO: does this work for UTF8?
-                    name = Marshal.PtrToStringAuto(intPtrName);
-#endif
-#if NET7_0_OR_GREATER
-                    name = Marshal.PtrToStringUTF8(intPtrName);
-#endif
-                    break;
-                default:
-                    break;
+                throw new InvalidEnumArgumentException($"Unexpected character set {info.cset} when enumerating attribute names.");
             }
 
-#if DEBUG
-            // TODO: throw in release builds?
-            Guard.IsNotNull(name);
-#endif
+            string? name = Marshal.PtrToStringAnsi(intPtrName);
 
             if (name != null)
             {
-                names.Add(name.Trim('\0'));
+                names.Add(name);
             }
 
             return 0;
