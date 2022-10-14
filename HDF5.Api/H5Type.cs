@@ -143,4 +143,9 @@ public class H5Type : H5Object<H5Type>
     {
         H5TAdapter.SetPadding(this, padding);
     }
+
+    internal void SetSize(int size) 
+    {
+        H5TAdapter.SetSize(this, size);
+    }
 }

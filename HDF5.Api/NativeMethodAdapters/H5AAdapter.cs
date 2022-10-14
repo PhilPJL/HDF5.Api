@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Diagnostics;
-#if NETSTANDARD
+﻿#if NETSTANDARD
 using HDF5.Api.Disposables;
 #endif
 #if NET7_0_OR_GREATER
@@ -75,7 +74,7 @@ internal static class H5AAdapter
 
         int Callback(long id, IntPtr intPtrName, ref info_t info, IntPtr _)
         {
-            if(info.cset != H5T.cset_t.ASCII)
+            if (info.cset != H5T.cset_t.ASCII)
             {
                 throw new InvalidEnumArgumentException($"Unexpected character set {info.cset} when enumerating attribute names.");
             }
@@ -165,7 +164,6 @@ internal static class H5AAdapter
     internal static string ReadString(H5Attribute attribute)
     {
         using var type = attribute.GetH5Type();
-
         using var space = attribute.GetSpace();
 
         var count = space.GetSimpleExtentNPoints();
@@ -186,35 +184,35 @@ internal static class H5AAdapter
             throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{H5Class.String}'.");
         }
 
-        var cset = type.GetCharacterSet();
-        bool isVariableLength = type.IsVariableLengthString();
 
-        var size = GetStorageSize(attribute);
+        int storageSize = attribute.StorageSize;
+        var characterSet = type.GetCharacterSet();
+        //bool isVariableLength = type.IsVariableLengthString();
 
 #if NET7_0_OR_GREATER
-        using var spanOwner = SpanOwner<byte>.Allocate(size);
+        using var spanOwner = SpanOwner<byte>.Allocate(storageSize);
         var buffer = spanOwner.Span;
         int err = read(attribute, type, buffer);
         err.ThrowIfError();
 
         var nullTerminatorIndex = MemoryExtensions.IndexOf(spanOwner.Span, (byte)0);
-        nullTerminatorIndex = nullTerminatorIndex == -1 ? size : nullTerminatorIndex;
+        nullTerminatorIndex = nullTerminatorIndex == -1 ? storageSize : nullTerminatorIndex;
         return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
 #else
         unsafe
         {
-            using var buffer = new GlobalMemory(size + 1);
+            using var buffer = new GlobalMemory(storageSize + 1);
             int err = read(attribute, type, buffer.IntPtr);
             err.ThrowIfError();
 
-            Span<byte> bytes = new Span<byte>(buffer.IntPtr.ToPointer(), size + 1);
+            Span<byte> bytes = new Span<byte>(buffer.IntPtr.ToPointer(), storageSize + 1);
             var nullIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
             if (nullIndex >= 0)
             {
                 return Encoding.UTF8.GetString((byte*)buffer.IntPtr.ToPointer(), nullIndex);
             }
 
-            return Encoding.UTF8.GetString((byte*)buffer.IntPtr.ToPointer(), size);
+            return Encoding.UTF8.GetString((byte*)buffer.IntPtr.ToPointer(), storageSize);
         }
 #endif
     }
@@ -308,10 +306,15 @@ internal static class H5AAdapter
 #if NETSTANDARD
     internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
     {
-        using var pinned = new PinnedObject(value);
-        using var type = attribute.GetH5Type();
+        unsafe
+        {
+            void* p = &value;
+            {
+                using var type = attribute.GetH5Type();
 
-        Write(attribute, type, pinned);
+                Write(attribute, type, new IntPtr(p));
+            }
+        }
     }
 
     internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
@@ -322,51 +325,62 @@ internal static class H5AAdapter
     }
 #endif
 
-    // TODO: fixed/variable
-    // TODO: ascii/UTF8
-    // TODO: zero length string?
     internal static void WriteString(H5Attribute attribute, string value)
     {
-        // TODO: UTF8/Ascii
-        // TODO: fixed/variable length
-
-        // TODO: variable length string
-
         using var type = attribute.GetH5Type();
-        int storageSize = attribute.StorageSize;
+        using var space = attribute.GetSpace();
+
+        var count = space.GetSimpleExtentNPoints();
+        var dims = space.GetSimpleExtentDims();
+
+        if (count != 1 || dims.Count != 0)
+        {
+            throw new Hdf5Exception("Attribute is not scalar.");
+        }
+
+        var cls = type.GetClass();
+        if (cls != H5Class.String)
+        {
+            throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{H5Class.String}'.");
+        }
+
         var characterSet = type.GetCharacterSet();
+        bool isVariableLength = type.IsVariableLengthString();
 
-        byte[] bytes;
-
-        switch (characterSet)
+        var bytes = characterSet switch
         {
-            case CharacterSet.Ascii:
-                {
-                    bytes = Encoding.ASCII.GetBytes(value);
-                }
-                break;
-            case CharacterSet.Utf8:
-                {
-                    bytes = Encoding.UTF8.GetBytes(value);
-                }
-                break;
-            default:
-                throw new InvalidEnumArgumentException($"Unknown CharacterSet:{characterSet}.");
-        }
+            CharacterSet.Ascii => Encoding.ASCII.GetBytes(value + '\0'),
+            CharacterSet.Utf8 => Encoding.UTF8.GetBytes(value + '\0'),
+            _ => throw new InvalidEnumArgumentException($"Unknown CharacterSet:{characterSet}."),
+        };
 
-        if(bytes.Length > storageSize)
+        if (isVariableLength)
         {
-            throw new ArgumentOutOfRangeException($"The supplied string value is requires more storage than the allocated fixed storage size of '{storageSize}' bytes.");
+            //type.SetSize(bytes.Length);
         }
+        else
+        {
+            int storageSize = attribute.StorageSize;
+
+            if (bytes.Length > storageSize)
+            {
+                throw new ArgumentOutOfRangeException($"The string requires {bytes.Length} storage which than the allocated fixed storage size of {storageSize} bytes.");
+            }
 
 #if NETSTANDARD
-        using var pinned = new PinnedObject(bytes);
-        Write(attribute, type, pinned);
+            unsafe
+            {
+                fixed (void* fixedBytes = bytes)
+                {
+                    Write(attribute, type, new IntPtr(fixedBytes));
+                }
+            }
 #endif
 
 #if NET7_0_OR_GREATER
-        Write(attribute, type, bytes.AsSpan());
+            Write(attribute, type, bytes.AsSpan());
 #endif
+        }
     }
 
     internal static void Write(H5Attribute attribute, DateTime value)

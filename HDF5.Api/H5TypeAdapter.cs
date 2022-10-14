@@ -37,6 +37,13 @@ public abstract class H5TypeAdapter<TInput, TOutput> : H5TypeAdapter<TInput>
         using var pinnedRecords = new PinnedObject(records);
         // write to HDF5
         write(pinnedRecords);
+        //unsafe
+        //{
+        //    void* fixedRecords = &records[0];
+        //    {
+        //        write(new IntPtr(fixedRecords));
+        //    }
+        //}
     }
 }
 

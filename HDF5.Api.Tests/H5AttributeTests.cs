@@ -59,6 +59,46 @@ public class H5AttributeTests : H5Test
         });
     }
 
+    [Ignore]
+    [TestMethod]
+    [DataRow("v_ascii_nullterm.h5", CharacterSet.Ascii, StringPadding.NullTerminate)]
+    [DataRow("v_ascii_nullpad.h5", CharacterSet.Ascii, StringPadding.NullPad)]
+    [DataRow("v_ascii_nullspace.h5", CharacterSet.Ascii, StringPadding.Space)]
+    [DataRow("v_utf8_nullterm.h5", CharacterSet.Utf8, StringPadding.NullTerminate)]
+    [DataRow("v_utf8_nullpad.h5", CharacterSet.Utf8, StringPadding.NullPad)]
+    [DataRow("v_utf8_space.h5", CharacterSet.Utf8, StringPadding.Space)]
+    public void VariableLengthStringAttributes(string path, CharacterSet characterSet, StringPadding padding)
+    {
+        HandleCheck(() =>
+        {
+            // Ensure no existing file
+            File.Delete(path);
+            Assert.IsFalse(File.Exists(path));
+
+            // Create new file
+            using var file = H5File.Create(path);
+            Assert.IsTrue(File.Exists(path));
+
+            Test(file, "variable_empty", "", 0, characterSet, padding);
+            Test(file, "variable_short", "12345678912345678912", 0, characterSet, padding);
+
+            if (characterSet == CharacterSet.Utf8)
+            {
+                // NOTE that this Unicode string is 107 characters long but requires 321 bytes of storage.
+                // HDF5 fixed length storage indicates the number of bytes not the number of characters.
+                Test(file, "variable_long", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 0, characterSet, padding);
+            }
+
+            static void Test(H5File file, string name, string value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+            {
+                using var attribute = file.CreateStringAttribute(name, fixedStorageLength, characterSet, padding);
+                attribute.Write(value);
+                var r = attribute.ReadString();
+                Assert.AreEqual(value, r);
+            }
+        });
+    }
+
     [TestMethod]
     public void CreateDuplicateAttributeNameThrows()
     {
@@ -242,7 +282,7 @@ public class H5AttributeTests : H5Test
         CreateWriteReadUpdateDeleteAttribute(15uL, ulong.MaxValue);
         CreateWriteReadUpdateDeleteAttribute(1.5f, 123.456);
         CreateWriteReadUpdateDeleteAttribute(1.5123d, double.MaxValue);
-        CreateWriteReadUpdateDeleteStringAttribute("1234567890", "ABCDEFGH", 10);
+        CreateWriteReadUpdateDeleteStringAttribute("1234567890", "ABCDEFGH", 11);
         CreateWriteReadUpdateDeleteStringAttribute("", "ABCDEFGH", 10);
         CreateWriteReadUpdateDeleteStringAttribute("abcdefghijklmnopqrstuvwzyz", "", 27);
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddMinutes(5));

@@ -1,5 +1,4 @@
-﻿using HDF5.Api.NativeMethods;
-using System.Linq;
+﻿using System.Linq;
 using static HDF5.Api.NativeMethods.H5T;
 
 namespace HDF5.Api.NativeMethodAdapters;
@@ -110,7 +109,6 @@ internal static class H5TAdapter
     internal static H5Type CreateVariableLengthStringType()
     {
         long h = create(class_t.STRING, VARIABLE);
-        h.ThrowIfInvalidHandleValue();
         return new H5Type(h);
     }
 
@@ -160,6 +158,12 @@ internal static class H5TAdapter
     internal static void SetPadding(H5Type h5Type, StringPadding padding)
     {
         int err = set_strpad(h5Type, (str_t)padding);
+        err.ThrowIfError();
+    }
+
+    internal static void SetSize(H5Type h5Type, int size)
+    {
+        int err = set_size(h5Type, new IntPtr(size));
         err.ThrowIfError();
     }
 
