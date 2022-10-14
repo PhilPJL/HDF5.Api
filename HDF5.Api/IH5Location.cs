@@ -30,4 +30,7 @@ public interface IH5Location : IH5ObjectWithAttributes
     IEnumerable<string> GroupNames { get; }
     IEnumerable<string> DataSetNames { get; }
     IEnumerable<string> NamedDataTypeNames { get; }
+
+    // TODO: move to IH5ObjectWithAttributes?
+    IEnumerable<(string name, H5ObjectType type)> Members { get; }
 }

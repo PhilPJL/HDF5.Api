@@ -12,11 +12,6 @@ public class H5Attribute : H5Object<H5Attribute>
     {
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyListType listType)
-    {
-        return H5AAdapter.CreatePropertyList(listType);
-    }
-
     public H5Space GetSpace()
     {
         return H5AAdapter.GetSpace(this);
@@ -62,16 +57,22 @@ public class H5Attribute : H5Object<H5Attribute>
         H5AAdapter.Write(this, value);
     }
 
+    public static H5PropertyList CreatePropertyList(PropertyListType listType)
+    {
+        return H5AAdapter.CreatePropertyList(listType);
+    }
+
     public static H5Attribute CreateStringAttribute<T>(
         H5Object<T> h5Object,
         string name,
         int length = 0,
-        bool isAscii = false,
+        CharacterSet characterSet = CharacterSet.Ascii,
+        StringPadding padding = StringPadding.NullTerminate,
         [AllowNull] H5PropertyList? creationPropertyList = null) where T : H5Object<T>
     {
         Guard.IsGreaterThanOrEqualTo(length, 0);
         h5Object.AssertHasHandleType(HandleType.File, HandleType.DataSet, HandleType.Group);
 
-        return H5AAdapter.CreateStringAttribute(h5Object, name, length, isAscii, creationPropertyList);
+        return H5AAdapter.CreateStringAttribute(h5Object, name, length, characterSet, padding, creationPropertyList);
     }
 }

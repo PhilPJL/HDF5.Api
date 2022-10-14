@@ -129,14 +129,9 @@ public class H5Type : H5Object<H5Type>
         return H5TAdapter.CreateFixedLengthStringType(length);
     }
 
-    internal void SetASCII()
+    internal void SetCharacterSet(CharacterSet cset)
     {
-        H5TAdapter.SetASCII(this);
-    }
-
-    internal void SetUTF8()
-    {
-        H5TAdapter.SetUTF8(this);
+        H5TAdapter.SetCharacterSet(this, cset);
     }
 
     internal void SetPadding(StringPadding padding)

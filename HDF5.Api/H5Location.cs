@@ -33,6 +33,18 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         return H5AAdapter.Create(this, name, type, space, creationPropertyList);
     }
 
+    // TODO: add padding/cset etc
+    public H5Attribute CreateStringAttribute(
+        [DisallowNull] string name, 
+        int fixedLength = 0,
+        [AllowNull] H5PropertyList? creationPropertyList = null)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        // TODO: add more params
+        return H5AAdapter.CreateStringAttribute(this, name, fixedLength, CharacterSet.Ascii, StringPadding.NullTerminate, creationPropertyList);
+    }
+
     /// <summary>
     ///     Open an existing Attribute for this location
     /// </summary>

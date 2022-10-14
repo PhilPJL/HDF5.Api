@@ -513,7 +513,7 @@ public class H5FileTests : H5LocationTests
             using var file = H5File.Create(Path);
             Assert.IsTrue(File.Exists(Path));
 
-            file.CreateAndWriteAttribute("test", "1111111111111111111111111111111111");
+            file.CreateAndWriteAttribute("test", "1111111111111111111111111111111111", 50);
             file.Flush();
         });
     }

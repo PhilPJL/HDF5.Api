@@ -28,17 +28,14 @@ internal static class H5TAdapter
         return (H5Class)get_class(type);
     }
 
-    internal static void SetASCII(H5Type type)
+    internal static void SetCharacterSet(H5Type type, CharacterSet cset)
     {
-        int err = set_cset(type, cset_t.ASCII);
+        int err = set_cset(type, (cset_t)cset);
         err.ThrowIfError();
     }
 
-    internal static void SetUTF8(H5Type type)
-    {
-        int err = set_cset(type, cset_t.UTF8);
-        err.ThrowIfError();
-    }
+    internal static void SetUTF8(H5Type type) => SetCharacterSet(type, CharacterSet.Utf8);
+    internal static void SetAscii(H5Type type) => SetCharacterSet(type, CharacterSet.Ascii);
 
     internal static H5Type CreateCompoundType(int size)
     {

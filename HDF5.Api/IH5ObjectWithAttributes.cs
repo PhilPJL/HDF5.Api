@@ -15,5 +15,7 @@ public interface IH5ObjectWithAttributes
 
     IEnumerable<string> AttributeNames { get; }
 
+    H5Attribute CreateStringAttribute(string name, int fixedLength, H5PropertyList? creationPropertyList = null);
+
     int NumberOfAttributes { get; }
 }

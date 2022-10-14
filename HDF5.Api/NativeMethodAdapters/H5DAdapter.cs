@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.HighPerformance.Buffers;
+﻿#if NET7_0_OR_GREATER
+using CommunityToolkit.HighPerformance.Buffers;
+#endif
 using HDF5.Api.NativeMethods;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,8 +30,7 @@ internal static class H5DAdapter
         H5PropertyList? dataSetCreationPropertyList = null,
         H5PropertyList? accessCreationPropertyList = null) where T : H5Object<T>
     {
-        // TODO: is this check necessary?
-        location.AssertHasHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasLocationHandleType();
 
         long h = create(location, name, type, space,
             linkCreationPropertyList, dataSetCreationPropertyList, accessCreationPropertyList);
@@ -89,11 +90,9 @@ internal static class H5DAdapter
 #endif
     }
 
-
-
     internal static H5DataSet Open<T>(H5Location<T> location, string name, H5PropertyList? dataSetAccessPropertyList = null) where T : H5Object<T>
     {
-        location.AssertHasHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasLocationHandleType();
 
         long h = open(location, name, dataSetAccessPropertyList);
 

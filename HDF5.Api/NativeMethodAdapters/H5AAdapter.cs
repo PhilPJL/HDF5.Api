@@ -109,15 +109,15 @@ internal static class H5AAdapter
         }
     }
 
-    /*internal static info_t GetInfoByName<T>(H5Object<T> h5Object,
-        string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null) 
+    internal static info_t GetInfoByName<T>(H5Object<T> h5Object,
+        string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null)
         where T : H5Object<T>
     {
         info_t info = default;
         int err = get_info_by_name(h5Object, objectName, attributeName, ref info, linkAccessPropertyList);
         err.ThrowIfError();
         return info;
-    }*/
+    }
 
     /// <summary>
     /// Get copy of property list used to create the attribute.
@@ -226,7 +226,7 @@ internal static class H5AAdapter
         read(attribute, type, buffer.IntPtr);
 
         // TODO: Ascii/UTF8
-        return Marshal.PtrToStringAnsi(buffer.IntPtr, size);
+        return Marshal.PtrToStringAnsi(buffer.IntPtr, size).TrimEnd('\0');
 #endif
     }
 
@@ -375,20 +375,17 @@ internal static class H5AAdapter
     }
 
     internal static H5Attribute CreateStringAttribute<T>(
-        H5Object<T> h5Object, string name, int length, bool isAscii, H5PropertyList? creationPropertyList) where T : H5Object<T>
+        H5Object<T> h5Object, string name, int fixedLength, 
+        CharacterSet cset, StringPadding padding, H5PropertyList? creationPropertyList) where T : H5Object<T>
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        bool isFixedLength = length != 0;
-
-        using var type = isFixedLength
-            ? H5TAdapter.CreateFixedLengthStringType(length)
+        using var type = fixedLength != 0
+            ? H5TAdapter.CreateFixedLengthStringType(fixedLength)
             : H5TAdapter.CreateVariableLengthStringType();
 
-        if (isAscii) { type.SetASCII(); } else { type.SetUTF8(); }
-
-        // TODO: padding
-        // TODO: ASCII/UTF8
+        type.SetCharacterSet(cset);
+        type.SetPadding(padding);
 
         using var memorySpace = H5SAdapter.CreateScalar();
         return Create(h5Object, name, type, memorySpace, creationPropertyList);

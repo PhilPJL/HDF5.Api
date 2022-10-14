@@ -119,3 +119,9 @@ public enum StringPadding
     NullPad = H5T.str_t.NULLPAD,
     NullTerminate = H5T.str_t.NULLTERM
 }
+
+public enum CharacterSet
+{
+    Ascii = H5T.cset_t.ASCII,
+    Utf8 = H5T.cset_t.UTF8
+}

@@ -40,13 +40,13 @@ record struct H5ErrorInfo
     {
         var sb = new StringBuilder();
         sb.AppendLine(nameof(H5ErrorInfo));
-        sb.AppendLine("{");
+        sb.AppendLine("[");
         sb.AppendLine($"\t{nameof(Number)} = {Number}");
+        sb.AppendLine($"\t{nameof(Description)} = '{Description}'");
         sb.AppendLine($"\t{nameof(LineNumber)} = {LineNumber}");
         sb.AppendLine($"\t{nameof(FunctionName)} = {FunctionName}");
         sb.AppendLine($"\t{nameof(Filename)} = '{Filename}'");
-        sb.AppendLine($"\t{nameof(Description)} = '{Description}'");
-        sb.AppendLine("}");
+        sb.AppendLine("]");
         return sb.ToString();
     }
 }

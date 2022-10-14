@@ -24,14 +24,25 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
     public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
 
-    public H5Attribute CreateAttribute([DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space, 
-        H5PropertyList? creationPropertyList = null)
+    public H5Attribute CreateAttribute(
+        [DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space,
+        [AllowNull] H5PropertyList? creationPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
 
         return H5AAdapter.Create(this, name, type, space, creationPropertyList);
+    }
+
+    // TODO: add padding/cset etc
+    public H5Attribute CreateStringAttribute(
+        [DisallowNull] string name, int fixedLength, [AllowNull] H5PropertyList? creationPropertyList = null)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        // TODO: add more params
+        return H5AAdapter.CreateStringAttribute(this, name, fixedLength, CharacterSet.Ascii, StringPadding.NullTerminate, creationPropertyList);
     }
 
     public static H5PropertyList CreatePropertyList(PropertyListType listType)

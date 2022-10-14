@@ -38,11 +38,33 @@ public class H5AttributeTests : H5Test
             //using var a2 = H5Attribute.CreateStringAttribute(file, "variable_utf8", 0);
             //a2.Write("123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789");
 
-            using var a3 = H5Attribute.CreateStringAttribute(file, "fixed_ascii", 32, true);
+            using var a3 = H5Attribute.CreateStringAttribute(file, "fixed_ascii_nullterm", 32, CharacterSet.Ascii);
             a3.Write("12345678912345678912");
+            Debug.WriteLine(a3.ReadString());
 
-            using var a4 = H5Attribute.CreateStringAttribute(file, "fixed_utf8", 100);
+            using var a4 = H5Attribute.CreateStringAttribute(file, "fixed_utf8_nullterm", 100, CharacterSet.Utf8);
             a4.Write("1234567891234567891234567891234567891234567891234567891234567891234567");
+            Debug.WriteLine(a4.ReadString());
+
+            using var a5 = H5Attribute.CreateStringAttribute(file, "fixed_ascii_nullpad", 32, CharacterSet.Ascii, StringPadding.NullPad);
+            a5.Write("12345678912345678912");
+            Debug.WriteLine(a5.ReadString());
+
+            using var a6 = H5Attribute.CreateStringAttribute(file, "fixed_utf8_nullpad", 100, CharacterSet.Utf8, StringPadding.NullPad);
+            a6.Write("1234567891234567891234567891234567891234567891234567891234567891234567");
+            Debug.WriteLine(a6.ReadString());
+
+            using var a7 = H5Attribute.CreateStringAttribute(file, "fixed_ascii_spacepad", 32, CharacterSet.Ascii, StringPadding.Space);
+            a7.Write("12345678912345678912");
+            Debug.WriteLine(a7.ReadString());
+
+            using var a8 = H5Attribute.CreateStringAttribute(file, "fixed_utf8_spacepad", 100, CharacterSet.Utf8, StringPadding.Space);
+            a8.Write("1234567891234567891234567891234567891234567891234567891234567891234567");
+            Debug.WriteLine(a8.ReadString());
+
+            using var a9 = H5Attribute.CreateStringAttribute(file, "fixed_ascii_nullterm_too_long", 32, CharacterSet.Ascii);
+            a9.Write("12345678912345678912123456789123456789121234567891234567891212345678912345678912");
+            Debug.WriteLine(a9.ReadString());
         });
     }
 
@@ -136,13 +158,13 @@ public class H5AttributeTests : H5Test
             using var group = file.CreateGroup("group");
 
             group.CreateAndWriteAttribute("int", 1);
-            group.CreateAndWriteAttribute("string", "short");
+            group.CreateAndWriteAttribute("string", "short", 10);
             group.CreateAndWriteAttribute("long", 1L);
 
             group.DeleteAttribute("string");
 
             const string s = "long-----------------------------------";
-            group.CreateAndWriteAttribute("string", s);
+            group.CreateAndWriteAttribute("string", s, 100);
 
             string s1 = group.ReadStringAttribute("string");
             Assert.AreEqual(s, s1);
@@ -169,7 +191,7 @@ public class H5AttributeTests : H5Test
             using var group = file.CreateGroup("group");
 
             group.CreateAndWriteAttribute("int", 1);
-            group.CreateAndWriteAttribute("string", "short");
+            group.CreateAndWriteAttribute("string", "short", 10);
 
             string s1 = group.ReadStringAttribute("string");
             Assert.AreEqual("short", s1);
@@ -185,7 +207,7 @@ public class H5AttributeTests : H5Test
     // Helper methods
     internal static void CreateIterateAttributesSucceeds(IH5ObjectWithAttributes objectWithAttributes)
     {
-        objectWithAttributes.CreateAndWriteAttribute("string", "This is a string 12345.");
+        objectWithAttributes.CreateAndWriteAttribute("string", "This is a string 12345.", 50);
         objectWithAttributes.CreateAndWriteAttribute("truncated", "This is a string 12345.", 10);
         objectWithAttributes.CreateAndWriteAttribute("dateTime", DateTime.Now);
         objectWithAttributes.CreateAndWriteAttribute("int16", (short)5);
