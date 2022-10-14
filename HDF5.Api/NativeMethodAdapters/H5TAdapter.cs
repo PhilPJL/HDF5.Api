@@ -34,6 +34,13 @@ internal static class H5TAdapter
         err.ThrowIfError();
     }
 
+    internal static CharacterSet GetCharacterSet(H5Type type)
+    {
+        cset_t cset = get_cset(type);
+        ((int)cset).ThrowIfError();
+        return (CharacterSet)cset;
+    }
+
     internal static void SetUTF8(H5Type type) => SetCharacterSet(type, CharacterSet.Utf8);
     internal static void SetAscii(H5Type type) => SetCharacterSet(type, CharacterSet.Ascii);
 
@@ -91,11 +98,11 @@ internal static class H5TAdapter
         return new H5Type(h);
     }
 
-    internal static H5Type CreateFixedLengthStringType(int length)
+    internal static H5Type CreateFixedLengthStringType(int storageLengthBytes)
     {
         long h = copy(C_S1);
         h.ThrowIfInvalidHandleValue();
-        int err = set_size(h, new ssize_t(length));
+        int err = set_size(h, new IntPtr(storageLengthBytes));
         err.ThrowIfError();
         return new H5Type(h);
     }

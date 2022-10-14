@@ -20,51 +20,43 @@ public class H5AttributeTests : H5Test
         }*/
 
     [TestMethod]
-    public void Attributes()
+    [DataRow("ascii_nullterm.h5", CharacterSet.Ascii, StringPadding.NullTerminate)]
+    [DataRow("ascii_nullpad.h5", CharacterSet.Ascii, StringPadding.NullPad)]
+    [DataRow("ascii_nullspace.h5", CharacterSet.Ascii, StringPadding.Space)]
+    [DataRow("utf8_nullterm.h5", CharacterSet.Utf8, StringPadding.NullTerminate)]
+    [DataRow("utf8_nullpad.h5", CharacterSet.Utf8, StringPadding.NullPad)]
+    [DataRow("utf8_space.h5", CharacterSet.Utf8, StringPadding.Space)]
+    public void FixedLengthStringAttributes(string path, CharacterSet characterSet, StringPadding padding)
     {
+        Debug.WriteLine($"{path}, {characterSet}, {padding}.");
+
         HandleCheck(() =>
         {
             // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
+            File.Delete(path);
+            Assert.IsFalse(File.Exists(path));
 
             // Create new file
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = H5File.Create(path);
+            Assert.IsTrue(File.Exists(path));
 
-            //using var a1 = H5Attribute.CreateStringAttribute(file, "variable_ascii", 0, true);
-            //a1.Write("123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789");
+            Test(file, "fixed_10", "", 10, characterSet, padding);
+            Test(file, "fixed_32", "12345678912345678912", 32, characterSet, padding);
 
-            //using var a2 = H5Attribute.CreateStringAttribute(file, "variable_utf8", 0);
-            //a2.Write("123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789");
+            if (characterSet == CharacterSet.Utf8)
+            {
+                // NOTE that this Unicode string is 107 characters long but requires 321 bytes of storage.
+                // HDF5 fixed length storage indicates the number of bytes not the number of characters.
+                Test(file, "fixed_200", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 500, characterSet, padding);
+            }
 
-            using var a3 = H5Attribute.CreateStringAttribute(file, "fixed_ascii_nullterm", 32, CharacterSet.Ascii);
-            a3.Write("12345678912345678912");
-            Debug.WriteLine(a3.ReadString());
-
-            using var a4 = H5Attribute.CreateStringAttribute(file, "fixed_utf8_nullterm", 100, CharacterSet.Utf8);
-            a4.Write("1234567891234567891234567891234567891234567891234567891234567891234567");
-            Debug.WriteLine(a4.ReadString());
-
-            using var a5 = H5Attribute.CreateStringAttribute(file, "fixed_ascii_nullpad", 32, CharacterSet.Ascii, StringPadding.NullPad);
-            a5.Write("12345678912345678912");
-            Debug.WriteLine(a5.ReadString());
-
-            using var a6 = H5Attribute.CreateStringAttribute(file, "fixed_utf8_nullpad", 100, CharacterSet.Utf8, StringPadding.NullPad);
-            a6.Write("1234567891234567891234567891234567891234567891234567891234567891234567");
-            Debug.WriteLine(a6.ReadString());
-
-            using var a7 = H5Attribute.CreateStringAttribute(file, "fixed_ascii_spacepad", 32, CharacterSet.Ascii, StringPadding.Space);
-            a7.Write("12345678912345678912");
-            Debug.WriteLine(a7.ReadString());
-
-            using var a8 = H5Attribute.CreateStringAttribute(file, "fixed_utf8_spacepad", 100, CharacterSet.Utf8, StringPadding.Space);
-            a8.Write("1234567891234567891234567891234567891234567891234567891234567891234567");
-            Debug.WriteLine(a8.ReadString());
-
-            using var a9 = H5Attribute.CreateStringAttribute(file, "fixed_ascii_nullterm_too_long", 32, CharacterSet.Ascii);
-            a9.Write("12345678912345678912123456789123456789121234567891234567891212345678912345678912");
-            Debug.WriteLine(a9.ReadString());
+            static void Test(H5File file, string name, string value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+            {
+                using var attribute = file.CreateStringAttribute(name, fixedStorageLength, characterSet, padding);
+                attribute.Write(value);
+                var r = attribute.ReadString();
+                Assert.AreEqual(value, r);
+            }
         });
     }
 
@@ -208,7 +200,7 @@ public class H5AttributeTests : H5Test
     internal static void CreateIterateAttributesSucceeds(IH5ObjectWithAttributes objectWithAttributes)
     {
         objectWithAttributes.CreateAndWriteAttribute("string", "This is a string 12345.", 50);
-        objectWithAttributes.CreateAndWriteAttribute("truncated", "This is a string 12345.", 10);
+        objectWithAttributes.CreateAndWriteAttribute("truncated", "This is a string 12345.", 50);
         objectWithAttributes.CreateAndWriteAttribute("dateTime", DateTime.Now);
         objectWithAttributes.CreateAndWriteAttribute("int16", (short)5);
         objectWithAttributes.CreateAndWriteAttribute("uint16", (ushort)6);
@@ -251,11 +243,12 @@ public class H5AttributeTests : H5Test
         CreateWriteReadUpdateDeleteAttribute(15uL, ulong.MaxValue);
         CreateWriteReadUpdateDeleteAttribute(1.5f, 123.456);
         CreateWriteReadUpdateDeleteAttribute(1.5123d, double.MaxValue);
-        CreateWriteReadUpdateDeleteStringAttribute("1234567890", "ABCDEFGH");
-        CreateWriteReadUpdateDeleteStringAttribute("1234567890", "ABCDEFGH", 5);
+        CreateWriteReadUpdateDeleteStringAttribute("1234567890", "ABCDEFGH", 10);
+        CreateWriteReadUpdateDeleteStringAttribute("", "ABCDEFGH", 10);
+        CreateWriteReadUpdateDeleteStringAttribute("abcdefghijklmnopqrstuvwzyz", "", 27);
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddMinutes(5));
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddYears(5));
-        CreateWriteReadUpdateDeleteStringAttribute(new string('A', 1000), new string('B', 500));
+        CreateWriteReadUpdateDeleteStringAttribute(new string('A', 1000), new string('B', 500), 1200);
         Assert.AreEqual(0, location.NumberOfAttributes);
 
         void CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime value, DateTime newValue)
@@ -279,50 +272,26 @@ public class H5AttributeTests : H5Test
             Assert.IsFalse(location.AttributeExists(name));
         }
 
-        void CreateWriteReadUpdateDeleteStringAttribute(string value, string newValue, int maxLength = 0)
+        void CreateWriteReadUpdateDeleteStringAttribute(string value, string newValue, int fixedStorageLength = 0)
         {
             const string name = "dtString";
 
-            location.CreateAndWriteAttribute(name, value, maxLength);
+            location.CreateAndWriteAttribute(name, value, fixedStorageLength);
             Assert.IsTrue(location.AttributeExists(name));
 
             string readValue = location.ReadStringAttribute(name);
 
-            if (maxLength != 0)
-            {
-                Assert.AreEqual(maxLength, readValue.Length);
-                Assert.IsTrue(value.StartsWith(readValue, StringComparison.Ordinal));
-            }
-            else
-            {
-                Assert.AreEqual(value, readValue);
-            }
+            Assert.AreEqual(value, readValue);
 
             using var a = location.OpenAttribute(name);
             string readValue2 = location.ReadStringAttribute(name);
 
-            if (maxLength != 0)
-            {
-                Assert.AreEqual(maxLength, readValue2.Length);
-                Assert.IsTrue(value.StartsWith(readValue, StringComparison.Ordinal));
-            }
-            else
-            {
-                Assert.AreEqual(value, readValue2);
-            }
+            Assert.AreEqual(value, readValue2);
 
             a.Write(newValue);
 
             string readValue3 = location.ReadStringAttribute(name);
-            if (maxLength != 0)
-            {
-                Assert.AreEqual(maxLength, readValue3.Length);
-                Assert.IsTrue(newValue.StartsWith(readValue3, StringComparison.Ordinal));
-            }
-            else
-            {
-                Assert.AreEqual(value, readValue);
-            }
+            Assert.AreEqual(value, readValue);
 
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));

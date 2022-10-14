@@ -33,18 +33,17 @@ public static class H5ObjectWithAttributeExtensions
         [DisallowNull] this IH5ObjectWithAttributes owa,
         [DisallowNull] string name,
         [DisallowNull] string value,
-        int fixedLength,
+        int fixedStorageLength,
+        CharacterSet characterSet = CharacterSet.Ascii,
+        StringPadding padding = StringPadding.NullPad,
         H5PropertyList? creationPropertyList = null)
     {
         Guard.IsNotNull(owa);
         Guard.IsNotNullOrWhiteSpace(name);
-        Guard.IsNotNullOrWhiteSpace(value);
+        Guard.IsNotNull(value);
 
-        using var attribute = owa.CreateStringAttribute(name, fixedLength, creationPropertyList);
+        using var attribute = owa.CreateStringAttribute(name, fixedStorageLength, characterSet, padding, creationPropertyList);
 
-        if (value != string.Empty)
-        {
-            H5AAdapter.Write(attribute, value);
-        }
+        H5AAdapter.WriteString(attribute, value);
     }
 }

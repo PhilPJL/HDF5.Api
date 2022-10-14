@@ -2,13 +2,13 @@
 
 public abstract class H5TypeAdapterBase
 {
-    internal static readonly ASCIIEncoding Ascii = new();
-    internal static readonly UTF8Encoding UTF8 = new();
+    //internal static readonly ASCIIEncoding Ascii = new();
+    //internal static readonly UTF8Encoding UTF8 = new();
 
     /// <summary>
     ///     Helper method to copy fixed/max length string
     /// </summary>
-    protected static unsafe void CopyString(string source, byte* destination, int destinationSizeInBytes)
+/*    protected static unsafe void CopyString(string source, byte* destination, int destinationSizeInBytes)
     {
         if (string.IsNullOrEmpty(source))
         {
@@ -37,4 +37,4 @@ public abstract class H5TypeAdapterBase
                 $"The provided data blob is length {length} is not an exact multiple of contained type of length {blobTypeLength}");
         }
     }
-}
+*/}

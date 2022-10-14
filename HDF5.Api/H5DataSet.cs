@@ -35,14 +35,14 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5AAdapter.Create(this, name, type, space, creationPropertyList);
     }
 
-    // TODO: add padding/cset etc
     public H5Attribute CreateStringAttribute(
-        [DisallowNull] string name, int fixedLength, [AllowNull] H5PropertyList? creationPropertyList = null)
+        [DisallowNull] string name,
+        int fixedStorageLength = 0, CharacterSet characterSet = CharacterSet.Ascii, StringPadding padding = StringPadding.NullTerminate,
+        [AllowNull] H5PropertyList? creationPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        // TODO: add more params
-        return H5AAdapter.CreateStringAttribute(this, name, fixedLength, CharacterSet.Ascii, StringPadding.NullTerminate, creationPropertyList);
+        return H5AAdapter.CreateStringAttribute(this, name, fixedStorageLength, characterSet, padding, creationPropertyList);
     }
 
     public static H5PropertyList CreatePropertyList(PropertyListType listType)
@@ -122,6 +122,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         H5DAdapter.SetExtent(this, dims);
     }
 
+    // TODO: get rid of IntPtr
     public void Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] IntPtr buffer)
     {
         Guard.IsNotNull(type);

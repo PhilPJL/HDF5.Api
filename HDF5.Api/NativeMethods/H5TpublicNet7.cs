@@ -102,6 +102,18 @@ internal static partial class H5T
     public static partial class_t get_class(hid_t dtype_id);
 
     /// <summary>
+    /// Retrieves the character set type of a string datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-GetCset
+    /// </summary>
+    /// <param name="dtype_id">Identifier of datatype to query.</param>
+    /// <returns>Returns a valid character set type if successful;
+    /// otherwise <code>H5T.cset_t.CSET_ERROR</code>.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tget_cset"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial cset_t get_cset(hid_t dtype_id);
+
+    /// <summary>
     /// Adds a new member to a compound datatype.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Insert
     /// </summary>

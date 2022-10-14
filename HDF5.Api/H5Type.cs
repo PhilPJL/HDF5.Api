@@ -134,6 +134,11 @@ public class H5Type : H5Object<H5Type>
         H5TAdapter.SetCharacterSet(this, cset);
     }
 
+    internal CharacterSet GetCharacterSet()
+    {
+        return H5TAdapter.GetCharacterSet(this);
+    }
+
     internal void SetPadding(StringPadding padding)
     {
         H5TAdapter.SetPadding(this, padding);

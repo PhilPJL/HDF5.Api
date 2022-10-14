@@ -27,6 +27,8 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AAdapter.GetPropertyList(this, listType);
     }
 
+    public int StorageSize => H5AAdapter.GetStorageSize(this);
+
     public string ReadString()
     {
         return H5AAdapter.ReadString(this);
@@ -42,9 +44,11 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AAdapter.ReadDateTime(this);
     }
 
-    public void Write(string value)
+    public void Write([DisallowNull] string value)
     {
-        H5AAdapter.Write(this, value);
+        Guard.IsNotNull(value);
+
+        H5AAdapter.WriteString(this, value);
     }
 
     public void Write<T>(T value) where T : unmanaged
@@ -63,15 +67,14 @@ public class H5Attribute : H5Object<H5Attribute>
     }
 
     public static H5Attribute CreateStringAttribute<T>(
-        H5Object<T> h5Object,
-        string name,
-        int length = 0,
-        CharacterSet characterSet = CharacterSet.Ascii,
-        StringPadding padding = StringPadding.NullTerminate,
+        [DisallowNull] H5Object<T> h5Object,
+        string name, int length = 0,
+        CharacterSet characterSet = CharacterSet.Ascii, StringPadding padding = StringPadding.NullTerminate, 
         [AllowNull] H5PropertyList? creationPropertyList = null) where T : H5Object<T>
     {
+        Guard.IsNotNull(h5Object);
         Guard.IsGreaterThanOrEqualTo(length, 0);
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.DataSet, HandleType.Group);
+        h5Object.AssertHasWithAttributesHandleType();
 
         return H5AAdapter.CreateStringAttribute(h5Object, name, length, characterSet, padding, creationPropertyList);
     }
