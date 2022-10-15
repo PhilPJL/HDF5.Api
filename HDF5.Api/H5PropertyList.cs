@@ -40,6 +40,14 @@ public class H5PropertyList : H5Object<H5PropertyList>
 
         return H5PAdapter.AreEqual(this, other);
     }
+
+    public static bool AreEqual([DisallowNull] H5PropertyList a, [DisallowNull] H5PropertyList b)
+    {
+        Guard.IsNotNull(a);
+        Guard.IsNotNull(b);
+
+        return a.Equals(b);
+    }
 }
 
 public enum PropertyListType

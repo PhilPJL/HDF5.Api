@@ -1,6 +1,7 @@
 ﻿#if NETSTANDARD
 using HDF5.Api.Disposables;
 #endif
+using CommunityToolkit.Diagnostics;
 #if NET7_0_OR_GREATER
 using CommunityToolkit.HighPerformance.Buffers;
 #endif
@@ -74,17 +75,20 @@ internal static class H5AAdapter
 
         int Callback(long id, IntPtr intPtrName, ref info_t info, IntPtr _)
         {
-            if (info.cset != H5T.cset_t.ASCII)
+            var name = info.cset switch
             {
-                throw new InvalidEnumArgumentException($"Unexpected character set {info.cset} when enumerating attribute names.");
-            }
+                H5T.cset_t.ASCII => Marshal.PtrToStringAnsi(intPtrName),
+#if NET7_0_OR_GREATER
+                H5T.cset_t.UTF8 => Marshal.PtrToStringUTF8(intPtrName),
+#else
+                H5T.cset_t.UTF8 => Marshal.PtrToStringAuto(intPtrName),
+#endif
+                _ => throw new InvalidEnumArgumentException($"Unexpected character set {info.cset} when enumerating attribute names."),
+            };
 
-            string? name = Marshal.PtrToStringAnsi(intPtrName);
+            Guard.IsNotNull(name);
 
-            if (name != null)
-            {
-                names.Add(name);
-            }
+            names.Add(name);
 
             return 0;
         }
@@ -187,34 +191,41 @@ internal static class H5AAdapter
 
         int storageSize = attribute.StorageSize;
         var characterSet = type.GetCharacterSet();
-        //bool isVariableLength = type.IsVariableLengthString();
+        bool isVariableLength = type.IsVariableLengthString();
 
-#if NET7_0_OR_GREATER
-        using var spanOwner = SpanOwner<byte>.Allocate(storageSize);
-        var buffer = spanOwner.Span;
-        int err = read(attribute, type, buffer);
-        err.ThrowIfError();
-
-        var nullTerminatorIndex = MemoryExtensions.IndexOf(spanOwner.Span, (byte)0);
-        nullTerminatorIndex = nullTerminatorIndex == -1 ? storageSize : nullTerminatorIndex;
-        return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
-#else
-        unsafe
+        if (isVariableLength)
         {
-            using var buffer = new GlobalMemory(storageSize + 1);
-            int err = read(attribute, type, buffer.IntPtr);
+            return "<TODO>";
+        }
+        else
+        {
+#if NET7_0_OR_GREATER
+            using var spanOwner = SpanOwner<byte>.Allocate(storageSize);
+            var buffer = spanOwner.Span;
+            int err = read(attribute, type, buffer);
             err.ThrowIfError();
 
-            Span<byte> bytes = new Span<byte>(buffer.IntPtr.ToPointer(), storageSize + 1);
-            var nullIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
-            if (nullIndex >= 0)
+            var nullTerminatorIndex = MemoryExtensions.IndexOf(spanOwner.Span, (byte)0);
+            nullTerminatorIndex = nullTerminatorIndex == -1 ? storageSize : nullTerminatorIndex;
+            return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
+#else
+            unsafe
             {
-                return Encoding.UTF8.GetString((byte*)buffer.IntPtr.ToPointer(), nullIndex);
-            }
+                using var buffer = new GlobalMemory(storageSize + 1);
+                int err = read(attribute, type, buffer.IntPtr);
+                err.ThrowIfError();
 
-            return Encoding.UTF8.GetString((byte*)buffer.IntPtr.ToPointer(), storageSize);
-        }
+                Span<byte> bytes = new Span<byte>(buffer.IntPtr.ToPointer(), storageSize + 1);
+                var nullIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
+                if (nullIndex >= 0)
+                {
+                    return Encoding.UTF8.GetString((byte*)buffer.IntPtr.ToPointer(), nullIndex);
+                }
+
+                return Encoding.UTF8.GetString((byte*)buffer.IntPtr.ToPointer(), storageSize);
+            }
 #endif
+        }
     }
 
     internal static T Read<T>(H5Attribute attribute) where T : unmanaged
@@ -349,6 +360,7 @@ internal static class H5AAdapter
 
         var bytes = characterSet switch
         {
+            // we absolutely need to add '\0' :)
             CharacterSet.Ascii => Encoding.ASCII.GetBytes(value + '\0'),
             CharacterSet.Utf8 => Encoding.UTF8.GetBytes(value + '\0'),
             _ => throw new InvalidEnumArgumentException($"Unknown CharacterSet:{characterSet}."),
@@ -356,7 +368,25 @@ internal static class H5AAdapter
 
         if (isVariableLength)
         {
-            //type.SetSize(bytes.Length);
+#if NETSTANDARD
+            unsafe
+            {
+                fixed (void* fixedBytes = bytes)
+                {
+                    var stringArray = new IntPtr[1] { new IntPtr(fixedBytes) };
+
+                    fixed (void* stringArrayPtr = stringArray)
+                    {
+                        Write(attribute, type, new IntPtr(stringArrayPtr));
+                    }
+                }
+            }
+#endif
+
+#if NET7_0_OR_GREATER
+            // TODO: indirection
+            //Write(attribute, type, bytes.AsSpan());
+#endif
         }
         else
         {

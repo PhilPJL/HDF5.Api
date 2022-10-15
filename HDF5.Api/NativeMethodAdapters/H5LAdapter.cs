@@ -1,4 +1,5 @@
-﻿using HDF5.Api.NativeMethods;
+﻿using CommunityToolkit.Diagnostics;
+using HDF5.Api.NativeMethods;
 using System.Collections.Generic;
 using System.Linq;
 using static HDF5.Api.NativeMethods.H5L;
@@ -48,21 +49,24 @@ internal static class H5LAdapter
 
         int Callback(long locationId, IntPtr intPtrName, ref info_t info, IntPtr _)
         {
-            if (info.cset != H5T.cset_t.ASCII)
+            var name = info.cset switch
             {
-                throw new InvalidEnumArgumentException($"Unexpected character set {info.cset} when enumerating attribute names.");
-            }
+                H5T.cset_t.ASCII => Marshal.PtrToStringAnsi(intPtrName),
+#if NET7_0_OR_GREATER
+                H5T.cset_t.UTF8 => Marshal.PtrToStringUTF8(intPtrName),
+#else
+                H5T.cset_t.UTF8 => Marshal.PtrToStringAuto(intPtrName),
+#endif
+                _ => throw new InvalidEnumArgumentException($"Unexpected character set {info.cset} when enumerating attribute names."),
+            };
 
-            string? name = Marshal.PtrToStringAnsi(intPtrName);
+            Guard.IsNotNull(name);
 
-            if (name != null)
+            var oinfo = H5OAdapter.GetInfoByName(locationId, name);
+
+            if (oinfo.type == type || type == H5O.type_t.UNKNOWN)
             {
-                var oinfo = H5OAdapter.GetInfoByName(locationId, name);
-
-                if (oinfo.type == type || type == H5O.type_t.UNKNOWN)
-                {
-                    names.Add((name, (H5ObjectType)oinfo.type));
-                }
+                names.Add((name, (H5ObjectType)oinfo.type));
             }
 
             return 0;

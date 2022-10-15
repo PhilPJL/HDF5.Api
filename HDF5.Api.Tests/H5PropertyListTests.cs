@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using HDF5.Api.NativeMethods;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace HDF5.Api.Tests;
 
@@ -12,13 +14,7 @@ public class H5PropertyListTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file with default property lists
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile(Path);
 
             // Is create list the same as default?
             using var fpc1 = file.GetPropertyList(PropertyListType.Create);
@@ -33,26 +29,26 @@ public class H5PropertyListTests : H5Test
     }
 
     // TODO: doesn't work - ask HDF Group
-/*    [TestMethod]
-    public void FileAccessDefaultPropertyList()
-    {
-        HandleCheck(() =>
+    /*    [TestMethod]
+        public void FileAccessDefaultPropertyList()
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
+            HandleCheck(() =>
+            {
+                // Ensure no existing file
+                File.Delete(Path);
+                Assert.IsFalse(File.Exists(Path));
 
-            using var fpa1 = H5File.CreatePropertyList(PropertyListType.Access);
+                using var fpa1 = H5File.CreatePropertyList(PropertyListType.Access);
 
-            // Create new file with default property lists
-            using var file = H5File.Create(Path, true, null, fpa1);
-            Assert.IsTrue(File.Exists(Path));
+                // Create new file with default property lists
+                using var file = H5File.Create(Path, true, null, fpa1);
+                Assert.IsTrue(File.Exists(Path));
 
-            using var fpa2 = file.GetPropertyList(PropertyListType.Access);
-            Assert.IsTrue(fpa1.IsEqualTo(fpa2));
-        });
-    }
-*/
+                using var fpa2 = file.GetPropertyList(PropertyListType.Access);
+                Assert.IsTrue(fpa1.IsEqualTo(fpa2));
+            });
+        }
+    */
 
     [TestMethod]
     public void FileCreateOrGetPropertyListWithInvalidEnumThrows()

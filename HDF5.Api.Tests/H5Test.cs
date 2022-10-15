@@ -25,4 +25,19 @@ public abstract class H5Test
 #endif
         Assert.AreEqual(expectedHandlesOpen, H5Handle.OpenHandleCount);
     }
+
+    protected static H5File CreateFile(string path,
+        bool failIfExists = false,
+        H5PropertyList? fileCreationPropertyList = null,
+        H5PropertyList? fileAccessPropertyList = null)
+    {
+        File.Delete(path);
+        Assert.IsFalse(File.Exists(path));
+
+        // Create new file with default property lists
+        var file = H5File.Create(path, failIfExists, fileCreationPropertyList, fileAccessPropertyList);
+        Assert.IsTrue(File.Exists(path));
+
+        return file;
+    }
 }

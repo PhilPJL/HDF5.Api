@@ -29,11 +29,12 @@ public class H5Object<T> : Disposable where T : H5Object<T>
         }
     }
 
-    public bool IsDisposed()
-    {
-        return _handle == H5Handle.InvalidHandleValue;
-    }
+    public bool IsDisposed => _handle == H5Handle.InvalidHandleValue;
 
+    /// <summary>
+    /// Disposes unmanaged handle by calling appropriate 'H5X.close' method.
+    /// </summary>
+    /// <param name="_">We don't have any unmanaged resources so ignored 'disposing' param.</param>
     protected override void Dispose(bool _)
     {
         if (_closeHandle == null || _handle == H5Handle.DefaultHandleValue)
@@ -42,10 +43,10 @@ public class H5Object<T> : Disposable where T : H5Object<T>
             return;
         }
 
-        if (_handle == H5Handle.InvalidHandleValue)
+        if (IsDisposed)
         {
-            // already disposed
-            throw new ObjectDisposedException($"{GetType().FullName}");
+            // Dispose is idempotent (so don't throw if already disposed).
+            return;
         }
 
         // close and mark as disposed
@@ -91,6 +92,14 @@ public class H5Object<T> : Disposable where T : H5Object<T>
 
     internal void AssertHasLocationHandleType() => AssertHasHandleType(HandleType.File, HandleType.Group);
     internal void AssertHasWithAttributesHandleType() => AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet); // NamedDataType?
+
+    internal void AssertNotDisposed()
+    {
+        if (IsDisposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
 
     #endregion
 }

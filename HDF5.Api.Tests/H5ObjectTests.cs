@@ -52,7 +52,7 @@
         }
 
         [TestMethod]
-        public void DisposeAlreadyDisposedObjectThrowsTest()
+        public void DisposeAlreadyDisposedObjectDoesntThrowTest()
         {
             HandleCheck(() =>
             {
@@ -62,10 +62,10 @@
 
                 // Create new file
                 var file = H5File.Create(Path);
-                Assert.IsFalse(file.IsDisposed());
+                Assert.IsFalse(file.IsDisposed);
                 file.Dispose();
-                Assert.IsTrue(file.IsDisposed());
-                Assert.ThrowsException<ObjectDisposedException>(() => file.Dispose());
+                Assert.IsTrue(file.IsDisposed);
+                file.Dispose();
             });
         }
     }
