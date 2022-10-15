@@ -7,14 +7,12 @@ namespace HDF5.Api.Tests;
 [TestClass]
 public class H5PropertyListTests : H5Test
 {
-    private const string Path = "test.h5";
-
     [TestMethod]
     public void FileCreateDefaultPropertyList()
     {
         HandleCheck(() =>
         {
-            using var file = CreateFile(Path);
+            using var file = CreateFile();
 
             // Is create list the same as default?
             using var fpc1 = file.GetPropertyList(PropertyListType.Create);
@@ -55,13 +53,8 @@ public class H5PropertyListTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
+            using var file = CreateFile();
 
-            // Create new file with default property lists
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
             Assert.ThrowsException<InvalidEnumArgumentException>(() => file.GetPropertyList(PropertyListType.None));
             Assert.ThrowsException<InvalidEnumArgumentException>(() => H5File.CreatePropertyList(PropertyListType.None));
         });
@@ -98,13 +91,7 @@ public class H5PropertyListTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile();
 
             // file property lists
             using var fpc1 = file.GetPropertyList(PropertyListType.Create);
@@ -146,13 +133,7 @@ public class H5PropertyListTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file with default property lists
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile();
 
             // group 
             using var group = file.CreateGroup("group");

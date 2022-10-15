@@ -1,12 +1,21 @@
-﻿namespace HDF5.Api.Tests;
+﻿using System.Runtime.CompilerServices;
+
+namespace HDF5.Api.Tests;
 
 [TestClass]
 public abstract class H5Test
 {
+    internal static string TestFolder = "TestFiles";
+
     [TestInitialize]
     public void TestInitialize()
     {
-        H5Error.SetAutoOff();
+        H5Error.DisableErrorPrinting();
+
+        if (!Directory.Exists(TestFolder))
+        {
+            Directory.CreateDirectory(TestFolder);
+        }
     }
 
     /// <summary>
@@ -26,14 +35,16 @@ public abstract class H5Test
         Assert.AreEqual(expectedHandlesOpen, H5Handle.OpenHandleCount);
     }
 
+    protected static H5File CreateFile([CallerMemberName] string? path = null)
+    {
+        return CreateFile(Path.Combine(TestFolder, Path.ChangeExtension(path, "h5")!)!, false);
+    }
+
     protected static H5File CreateFile(string path,
-        bool failIfExists = false,
+        bool failIfExists,
         H5PropertyList? fileCreationPropertyList = null,
         H5PropertyList? fileAccessPropertyList = null)
     {
-        File.Delete(path);
-        Assert.IsFalse(File.Exists(path));
-
         // Create new file with default property lists
         var file = H5File.Create(path, failIfExists, fileCreationPropertyList, fileAccessPropertyList);
         Assert.IsTrue(File.Exists(path));

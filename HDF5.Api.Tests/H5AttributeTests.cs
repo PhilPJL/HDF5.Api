@@ -6,8 +6,6 @@ namespace HDF5.Api.Tests;
 [TestClass]
 public class H5AttributeTests : H5Test
 {
-    private const string Path = "test.h5";
-
     /*    [TestMethod]
         public void Test()
         {
@@ -31,13 +29,7 @@ public class H5AttributeTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(path);
-            Assert.IsFalse(File.Exists(path));
-
-            // Create new file
-            using var file = H5File.Create(path);
-            Assert.IsTrue(File.Exists(path));
+            using var file = CreateFile(path);
 
             Test(file, "fixed_10", "", 10, characterSet, padding);
             Test(file, "fixed_32", "12345678912345678912", 32, characterSet, padding);
@@ -71,13 +63,7 @@ public class H5AttributeTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(path);
-            Assert.IsFalse(File.Exists(path));
-
-            // Create new file
-            using var file = H5File.Create(path);
-            Assert.IsTrue(File.Exists(path));
+            using var file = CreateFile(path);
 
             Test(file, "variable_empty", "", 0, characterSet, padding);
             Test(file, "variable_short", "12345678912345678912", 0, characterSet, padding);
@@ -104,13 +90,7 @@ public class H5AttributeTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile();
 
             // Create group
             using var group = file.CreateGroup("group");
@@ -148,13 +128,7 @@ public class H5AttributeTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile();
 
             // Create group
             using var group = file.CreateGroup("group");
@@ -177,13 +151,7 @@ public class H5AttributeTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile();
 
             // Create group
             using var group = file.CreateGroup("group");
@@ -210,13 +178,7 @@ public class H5AttributeTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile();
 
             // Create group
             using var group = file.CreateGroup("group");

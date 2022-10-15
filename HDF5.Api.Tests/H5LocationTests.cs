@@ -1,6 +1,4 @@
-﻿using HDF5.Api.NativeMethodAdapters;
-
-namespace HDF5.Api.Tests;
+﻿namespace HDF5.Api.Tests;
 
 public abstract class H5LocationTests : H5Test
 {

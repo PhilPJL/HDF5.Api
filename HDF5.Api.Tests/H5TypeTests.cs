@@ -8,7 +8,7 @@ public class H5TypeTests : H5Test
     {
         HandleCheck(() =>
         {
-            using var file = CreateFile("CreateCommittedDataType.h5");
+            using var file = CreateFile();
 
             using var bigStringType = H5Type.CreateFixedLengthStringType(1000);
             file.Commit("bigstring", bigStringType);

@@ -5,21 +5,12 @@ namespace HDF5.Api.Tests;
 [TestClass]
 public class DataSetWriterTests : H5Test
 {
-    private const string Path = "test.h5";
-    private const string Path1 = "test1.h5";
-
     [TestMethod]
     public void DataSetWriterTestCompressed()
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile();
 
             using var writer = H5DataSetWriter
                 .CreateOneDimensionalDataSetWriter(file, "TestRecords", TestRecordAdapter.Default, 10, 5);
@@ -38,13 +29,7 @@ public class DataSetWriterTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path1);
-            Assert.IsFalse(File.Exists(Path1));
-
-            // Create new file
-            using var file = H5File.Create(Path1);
-            Assert.IsTrue(File.Exists(Path1));
+            using var file = CreateFile();
 
             using var writer = H5DataSetWriter
                 .CreateOneDimensionalDataSetWriter(file, "TestRecords", TestRecordAdapter.Default, 10, 0);

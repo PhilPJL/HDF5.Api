@@ -82,7 +82,7 @@ internal static class H5GAdapter
     /// <remarks>
     ///     <para>
     ///         Note that if the path doesn't exist then by default HDF5 logs an error to the console
-    ///         which can cause performance issues.  It's recommended to use <see cref="H5Error.SetAutoOff" />
+    ///         which can cause performance issues.  It's recommended to use <see cref="H5Error.DisableErrorPrinting" />
     ///         to turn off logging in performance is critical.
     ///     </para>
     ///     <para>

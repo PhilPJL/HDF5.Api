@@ -1,12 +1,8 @@
-﻿using HDF5.Api.NativeMethodAdapters;
-
-namespace HDF5.Api.Tests;
+﻿namespace HDF5.Api.Tests;
 
 [TestClass]
 public class H5DataSetTests : H5Test
 {
-    private const string Path = "test.h5";
-
     internal static H5DataSet CreateTestDataset(IH5Location location, string dataSetName)
     {
         const int chunkSize = 1;
@@ -27,13 +23,7 @@ public class H5DataSetTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile();
 
             // Create test ds
             using var ds = CreateTestDataset(file, "aDataSet");
@@ -47,13 +37,7 @@ public class H5DataSetTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile();
 
             using var group = file.CreateGroup("aGroup");
 
@@ -89,13 +73,7 @@ public class H5DataSetTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile();
 
             // Create test ds
             using var ds = CreateTestDataset(file, "aDataSet");
@@ -109,13 +87,7 @@ public class H5DataSetTests : H5Test
     {
         HandleCheck(() =>
         {
-            // Ensure no existing file
-            File.Delete(Path);
-            Assert.IsFalse(File.Exists(Path));
-
-            // Create new file
-            using var file = H5File.Create(Path);
-            Assert.IsTrue(File.Exists(Path));
+            using var file = CreateFile();
 
             // Create test ds
             using var ds = CreateTestDataset(file, "aDataSet");

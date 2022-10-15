@@ -12,7 +12,7 @@ public static class H5Error
     /// <summary>
     ///     Stop HDF printing errors to the console
     /// </summary>
-    public static void SetAutoOff()
+    public static void DisableErrorPrinting()
     {
         H5EAdapter.DisableErrorPrinting();
     }
