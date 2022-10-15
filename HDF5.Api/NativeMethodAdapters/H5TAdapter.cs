@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using CommunityToolkit.Diagnostics;
+using System.Linq;
 using static HDF5.Api.NativeMethods.H5T;
 
 namespace HDF5.Api.NativeMethodAdapters;
@@ -142,11 +143,11 @@ internal static class H5TAdapter
             short => NATIVE_INT16,
             int => NATIVE_INT32,
             long => NATIVE_INT64,
-            
+
             ushort => NATIVE_USHORT,
             uint => NATIVE_UINT32,
             ulong => NATIVE_UINT64,
-            
+
             float => NATIVE_FLOAT,
             double => NATIVE_DOUBLE,
             // TODO: add more mappings as required
@@ -167,13 +168,23 @@ internal static class H5TAdapter
         err.ThrowIfError();
     }
 
-    /*
-   internal static void Commit(H5Type h5Type, string name)
-   {
-       int err = commit(typeId, name);
-       err.ThrowIfError();
-       return err > 0;
+    internal static void Commit<T>(
+        [DisallowNull] H5Object<T> h5Object,
+        [DisallowNull] string name,
+        [DisallowNull] H5Type h5Type,
+        [AllowNull] H5PropertyList? linkCreationPropertyList = null,
+        [AllowNull] H5PropertyList? dataTypeCreationPropertyList = null,
+        [AllowNull] H5PropertyList? dataTypeAccessPropertyList = null) where T : H5Object<T>
+    {
+        h5Object.AssertHasLocationHandleType();
 
-   }
-*/
+        Guard.IsNotNull(h5Object);
+        Guard.IsNotNullOrEmpty(name);
+        Guard.IsNotNull(h5Type);
+
+        int err = commit(h5Object, name, h5Type, 
+            linkCreationPropertyList, dataTypeCreationPropertyList, dataTypeAccessPropertyList);
+
+        err.ThrowIfError();
+    }
 }

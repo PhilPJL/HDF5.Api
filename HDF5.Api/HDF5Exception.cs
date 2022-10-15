@@ -17,7 +17,7 @@ public sealed class Hdf5Exception : Exception
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine(string.Join(", ", H5Errors.Select(e => e.Description)));
+            sb.AppendLine(string.Join("/", H5Errors.Select(e => $"{e.Number}:{e.Description}")));
 
             if (H5Errors.Count == 0)
             {

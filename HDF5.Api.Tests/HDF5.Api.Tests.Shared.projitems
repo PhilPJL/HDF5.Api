@@ -23,6 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)H5PropertyListTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)H5SpaceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)H5Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5TypeTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestRecordAdapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Usings.cs" />
   </ItemGroup>

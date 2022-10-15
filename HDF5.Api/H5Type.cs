@@ -29,13 +29,6 @@ public class H5Type : H5Object<H5Type>
         return H5TAdapter.AreEqual(type1, type2);
     }
 
-/*    public void Commit([DisallowNull] string name)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-
-        H5TAdapter.Commit(this, name);
-    }
-*/
     public static H5Type GetNativeType<T>() where T : unmanaged
     {
         long nativeHandle = H5TAdapter.GetNativeType<T>();

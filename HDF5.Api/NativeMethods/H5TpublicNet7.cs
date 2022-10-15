@@ -61,6 +61,29 @@ internal static partial class H5T
     public static partial hid_t copy(hid_t type_id);
 
     /// <summary>
+    /// Commits a transient datatype, linking it into the file and creating
+    /// a new named datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Commit2
+    /// </summary>
+    /// <param name="loc_id">Location identifier</param>
+    /// <param name="name">Name given to committed datatype</param>
+    /// <param name="dtype_id">Identifier of datatype to be committed and,
+    /// upon function’s return, identifier for the committed datatype</param>
+    /// <param name="lcpl_id">Link creation property list</param>
+    /// <param name="tcpl_id">Datatype creation property list</param>
+    /// <param name="tapl_id">Datatype access property list</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    /// <remarks>ASCII strings ONLY!</remarks>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcommit2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t commit
+        (hid_t loc_id, string name, hid_t dtype_id,
+        hid_t lcpl_id = H5P.DEFAULT, hid_t tcpl_id = H5P.DEFAULT,
+        hid_t tapl_id = H5P.DEFAULT);
+
+    /// <summary>
     /// Creates a new datatype.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Create
     /// </summary>
