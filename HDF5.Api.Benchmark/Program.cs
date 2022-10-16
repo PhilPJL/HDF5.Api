@@ -4,7 +4,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using HDF5.Api;
-using HDF5.Api.NativeMethods;
 
 namespace Benchmark
 {
@@ -12,7 +11,7 @@ namespace Benchmark
     {
         public static void Main()
         {
-            Console.WriteLine(Control.Describe());
+            Console.WriteLine(H5Global.Describe());
 
             BenchmarkRunner.Run<HDF5>();
         }

@@ -27,8 +27,12 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 
+using CommunityToolkit.Diagnostics;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -36,43 +40,6 @@ using System.Threading;
 
 namespace HDF5.Api.NativeMethods
 {
-    public static class Control
-    {
-        public static string? NativeProviderPath { get; set; }
-
-        public static string Describe()
-        {
-            var versionAttribute = typeof(Control).GetTypeInfo().Assembly.GetCustomAttribute(typeof(AssemblyInformationalVersionAttribute)) as AssemblyInformationalVersionAttribute;
-
-            var sb = new StringBuilder();
-            sb.AppendLine("Math.NET Numerics Configuration:");
-            sb.AppendLine($"Version {versionAttribute?.InformationalVersion}");
-#if NET7_0
-            sb.AppendLine("Built for .NET 7.0");
-#elif NETSTANDARD2_0
-            sb.AppendLine("Built for .NET Standard 2.0");
-#endif
-            // This would also work in .NET 4.0, but we don't want the dependency just for that.
-            sb.AppendLine($"Operating System: {RuntimeInformation.OSDescription}");
-            sb.AppendLine($"Operating System Architecture: {RuntimeInformation.OSArchitecture}");
-            sb.AppendLine($"Framework: {RuntimeInformation.FrameworkDescription}");
-            sb.AppendLine($"Process Architecture: {RuntimeInformation.ProcessArchitecture}");
-
-            var processorArchitecture = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
-            if (!string.IsNullOrEmpty(processorArchitecture))
-            {
-                sb.AppendLine($"Processor Architecture: {processorArchitecture}");
-            }
-            var processorId = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER");
-            if (!string.IsNullOrEmpty(processorId))
-            {
-                sb.AppendLine($"Processor Identifier: {processorId}");
-            }
-
-            return sb.ToString();
-        }
-    }
-
     internal enum ProcArchitecture
     {
         X64,
@@ -91,7 +58,7 @@ namespace HDF5.Api.NativeMethods
         /// <summary>
         /// Dictionary of handles to previously loaded libraries,
         /// </summary>
-        static readonly Lazy<ConcurrentDictionary<string, IntPtr>> NativeHandles = new(LazyThreadSafetyMode.PublicationOnly);
+        static readonly Lazy<ConcurrentDictionary<string, (IntPtr handle, string path)>> NativeHandles = new(LazyThreadSafetyMode.PublicationOnly);
 
 #if !NET5_0_OR_GREATER
         /// <summary>
@@ -108,6 +75,8 @@ namespace HDF5.Api.NativeMethods
 
         static ProcArchitecture ProcArchitecture { get; }
         static string Extension { get; }
+
+        public static IEnumerable<(string name, string path)> LoadedLibraries => NativeHandles.Value.Select(kvp => ((string)kvp.Key, kvp.Value.path));
 
         static NativeProviderLoader()
         {
@@ -139,44 +108,46 @@ namespace HDF5.Api.NativeMethods
                     : ProcArchitecture.X86;
         }
 
+        private static string EnsureExtension(string fileName)
+        {
+            return string.IsNullOrEmpty(Path.GetExtension(fileName))
+                ? Path.ChangeExtension(fileName, Extension)
+                : fileName;
+        }
+
         /// <summary>
         /// Load the native library with the given filename.
         /// </summary>
         /// <param name="fileName">The file name of the library to load.</param>
-        /// <param name="hintPath">Hint path where to look for the native binaries. Can be null.</param>
+        /// <param name="hintPath">Hint path where to look for the native binaries. Can be empty.</param>
         /// <returns>True if the library was successfully loaded or if it has already been loaded.</returns>
-        internal static bool TryLoad(string fileName, string? hintPath)
+        internal static bool TryLoad(string fileName, string hintPath)
         {
-            if (string.IsNullOrEmpty(fileName))
-            {
-                throw new ArgumentNullException(nameof(fileName));
-            }
+            Guard.IsNotNullOrEmpty(fileName);
 
-            // First just try to load it with the file name only
-            if (TryLoadDirect(fileName))
+            fileName = EnsureExtension(fileName);
+
+            Debug.WriteLine($"TryLoad: {fileName}, hintpath='{hintPath ?? string.Empty}'");
+
+            if (NativeHandles.Value.TryGetValue(fileName, out var library))
             {
+                Debug.WriteLine($"{fileName} already loaded from {library.path}.");
                 return true;
             }
 
-            if (string.IsNullOrEmpty(Path.GetExtension(fileName)))
+            // If we have hint path provided by the user, look there first
+            if (!string.IsNullOrWhiteSpace(hintPath))
             {
-                fileName = Path.ChangeExtension(fileName, Extension);
-
-                // Try it also with the proper file extension
-                if (TryLoadDirect(fileName))
+#pragma warning disable CS8604 // Possible null reference argument.
+                if (TryLoadFromDirectory(fileName, hintPath))
                 {
                     return true;
                 }
+#pragma warning restore CS8604 // Possible null reference argument.
             }
 
-            // If we have hint path provided by the user, look there next
-            if (hintPath != null && TryLoadFromDirectory(fileName, hintPath))
-            {
-                return true;
-            }
-
-            // If we have an overall hint path provided by the user, look there next
-            if (Control.NativeProviderPath != null && Control.NativeProviderPath != hintPath && TryLoadFromDirectory(fileName, Control.NativeProviderPath))
+            // Try to load it with the file name only
+            if (TryLoadDirect(fileName))
             {
                 return true;
             }
@@ -314,32 +285,38 @@ namespace HDF5.Api.NativeMethods
 
         internal static IntPtr TryGetHandle(string fileName)
         {
-            if (!NativeHandles.Value.TryGetValue(fileName, out IntPtr libraryHandle))
+            Guard.IsNotNullOrEmpty(fileName);
+
+            fileName = EnsureExtension(fileName);
+
+            if (NativeHandles.Value.TryGetValue(fileName, out var library))
             {
-                if (string.IsNullOrEmpty(Path.GetExtension(fileName)))
-                {
-                    fileName = Path.ChangeExtension(fileName, Extension);
-                    NativeHandles.Value.TryGetValue(fileName, out libraryHandle);
-                }
+                Debug.WriteLine($"TryGetHandle: {fileName} - success");
+                return library.handle;
             }
 
-            return libraryHandle;
+            Debug.WriteLine($"TryGetHandle: {fileName} - failure");
+            return IntPtr.Zero;
         }
 
         /// <summary>
         /// Try to load a native library by only the file name of the library.
         /// </summary>
         /// <returns>True if the library was successfully loaded or if it has already been loaded.</returns>
-        static bool TryLoadDirect(string fileName)
+        private static bool TryLoadDirect(string fileName)
         {
+            Guard.IsNotNullOrEmpty(fileName);
+            Guard.IsNotNullOrEmpty(Path.GetExtension(fileName));
+
             lock (StaticLock)
             {
-                if (NativeHandles.Value.TryGetValue(fileName, out IntPtr libraryHandle))
+                if (NativeHandles.Value.TryGetValue(fileName, out var library))
                 {
                     return true;
                 }
 
 #if NET5_0_OR_GREATER
+                IntPtr libraryHandle = IntPtr.Zero;
                 try
                 {
                     if (!NativeLibrary.TryLoad(fileName, out libraryHandle) || libraryHandle == IntPtr.Zero)
@@ -352,14 +329,14 @@ namespace HDF5.Api.NativeMethods
                     return false;
                 }
 
-                NativeHandles.Value[fileName] = libraryHandle;
+                NativeHandles.Value[fileName] = (libraryHandle, fileName);
                 return true;
 
 #else
                 try
                 {
                     // If successful this will return a handle to the library
-                    libraryHandle = IsWindows ? WindowsLoader.LoadLibrary(fileName) : IsMac ? MacLoader.LoadLibrary(fileName) : LinuxLoader.LoadLibrary(fileName);
+                    library.handle = IsWindows ? WindowsLoader.LoadLibrary(fileName) : IsMac ? MacLoader.LoadLibrary(fileName) : LinuxLoader.LoadLibrary(fileName);
                 }
                 catch (Exception e)
                 {
@@ -367,16 +344,16 @@ namespace HDF5.Api.NativeMethods
                     return false;
                 }
 
-                if (libraryHandle == IntPtr.Zero)
+                if (library.handle == IntPtr.Zero)
                 {
                     int lastError = Marshal.GetLastWin32Error();
-                    var exception = new System.ComponentModel.Win32Exception(lastError);
+                    var exception = new Win32Exception(lastError);
                     LastException = exception;
                     return false;
                 }
 
                 LastException = null;
-                NativeHandles.Value[fileName] = libraryHandle;
+                NativeHandles.Value[fileName] = (library.handle, fileName);
                 return true;
 #endif
             }
@@ -386,11 +363,15 @@ namespace HDF5.Api.NativeMethods
         /// Try to load a native library by providing the full path including the file name of the library.
         /// </summary>
         /// <returns>True if the library was successfully loaded or if it has already been loaded.</returns>
-        static bool TryLoadFile(string directory, string relativePath, string fileName)
+        private static bool TryLoadFile(string directory, string relativePath, string fileName)
         {
+            Guard.IsNotNullOrEmpty(fileName);
+            Guard.IsNotNullOrEmpty(Path.GetExtension(fileName));
+            Debug.WriteLine($"TryLoadFile {directory}, {relativePath}, {fileName}");
+
             lock (StaticLock)
             {
-                if (NativeHandles.Value.TryGetValue(fileName, out IntPtr libraryHandle))
+                if (NativeHandles.Value.TryGetValue(fileName, out var library))
                 {
                     return true;
                 }
@@ -398,32 +379,36 @@ namespace HDF5.Api.NativeMethods
                 var fullPath = Path.GetFullPath(Path.Combine(Path.Combine(directory, relativePath), fileName));
                 if (!File.Exists(fullPath))
                 {
+                    Debug.WriteLine($"TryLoadFile assembly doesn't exist: {fullPath}.");
                     // If the library isn't found within an architecture specific folder then return false
                     // to allow normal P/Invoke searching behavior when the library is called
                     return false;
                 }
 
 #if NET5_0_OR_GREATER
+                IntPtr libraryHandle = IntPtr.Zero;
                 try
                 {
                     if (!NativeLibrary.TryLoad(fullPath, out libraryHandle) || libraryHandle == IntPtr.Zero)
                     {
+                        Debug.WriteLine($"NativeLibrary failed to load {fileName} from {fullPath}");
                         return false;
                     }
                 }
-                catch
+                catch(Exception ex)
                 {
+                    Debug.WriteLine($"NativeLibrary failed to load {fileName} from {fullPath}, {ex.Message}");
                     return false;
                 }
 
-                NativeHandles.Value[fileName] = libraryHandle;
+                Debug.WriteLine($"NativeLibrary loaded {fileName} from {fullPath}");
+                NativeHandles.Value[fileName] = (libraryHandle, fullPath);
                 return true;
-
 #else
                 try
                 {
                     // If successful this will return a handle to the library
-                    libraryHandle = IsWindows ? WindowsLoader.LoadLibrary(fullPath) : IsMac ? MacLoader.LoadLibrary(fullPath) : LinuxLoader.LoadLibrary(fullPath);
+                    library.handle = IsWindows ? WindowsLoader.LoadLibrary(fullPath) : IsMac ? MacLoader.LoadLibrary(fullPath) : LinuxLoader.LoadLibrary(fullPath);
                 }
                 catch (Exception e)
                 {
@@ -431,16 +416,17 @@ namespace HDF5.Api.NativeMethods
                     return false;
                 }
 
-                if (libraryHandle == IntPtr.Zero)
+                if (library.handle == IntPtr.Zero)
                 {
                     int lastError = Marshal.GetLastWin32Error();
-                    var exception = new System.ComponentModel.Win32Exception(lastError);
+                    var exception = new Win32Exception(lastError);
                     LastException = exception;
                     return false;
                 }
 
                 LastException = null;
-                NativeHandles.Value[fileName] = libraryHandle;
+                Debug.WriteLine($"Loader loaded {fileName} from {fullPath}");
+                NativeHandles.Value[fileName] = (library.handle, fullPath);
                 return true;
 #endif
             }
@@ -449,7 +435,7 @@ namespace HDF5.Api.NativeMethods
 #if !NET5_0_OR_GREATER
         [SuppressUnmanagedCodeSecurity]
         [SecurityCritical]
-        static class WindowsLoader
+        private static class WindowsLoader
         {
             public static IntPtr LoadLibrary(string fileName)
             {
@@ -465,7 +451,7 @@ namespace HDF5.Api.NativeMethods
 
         [SuppressUnmanagedCodeSecurity]
         [SecurityCritical]
-        static class LinuxLoader
+        private static class LinuxLoader
         {
             public static IntPtr LoadLibrary(string fileName)
             {
@@ -480,7 +466,7 @@ namespace HDF5.Api.NativeMethods
 
         [SuppressUnmanagedCodeSecurity]
         [SecurityCritical]
-        static class MacLoader
+        private static class MacLoader
         {
             public static IntPtr LoadLibrary(string fileName)
             {

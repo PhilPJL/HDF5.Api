@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5.Api.NativeMethods;
+using System.Collections.Generic;
+using System.Reflection;
 using static HDF5.Api.NativeMethods.H5;
 
 namespace HDF5.Api;
@@ -9,6 +11,50 @@ namespace HDF5.Api;
 /// </summary>
 public static class H5Global
 {
+    public static (bool hdfLoaded, bool hdfHlLoaded) TryLoadLibraries([AllowNull] string? path = null)
+    {
+        bool hdfLoaded = NativeProviderLoader.TryLoad(Constants.DLLFileName, path ?? string.Empty);
+        bool hdfHlLoaded = NativeProviderLoader.TryLoad(Constants.HLDLLFileName, path ?? string.Empty);
+        return (hdfLoaded, hdfHlLoaded);
+    }
+
+    public static IEnumerable<(string name, string path)> LoadedLibraries => NativeProviderLoader.LoadedLibraries;
+
+    public static string Describe()
+    {
+        var versionAttribute = typeof(H5Global).GetTypeInfo().Assembly.GetCustomAttribute(typeof(AssemblyInformationalVersionAttribute)) as AssemblyInformationalVersionAttribute;
+
+        var sb = new StringBuilder();
+        sb.AppendLine("HDF.API configuration:");
+        sb.AppendLine($"Version {versionAttribute?.InformationalVersion}");
+#if NET7_0
+        sb.AppendLine("Built for .NET 7.0");
+#elif NETSTANDARD2_0
+        sb.AppendLine("Built for .NET Standard 2.0");
+#endif
+
+        sb.AppendLine($"Operating System: {RuntimeInformation.OSDescription}");
+        sb.AppendLine($"Operating System Architecture: {RuntimeInformation.OSArchitecture}");
+        sb.AppendLine($"Framework: {RuntimeInformation.FrameworkDescription}");
+        sb.AppendLine($"Process Architecture: {RuntimeInformation.ProcessArchitecture}");
+
+        sb.AppendLine($"HDF5 version: {GetLibraryVersion()}");
+        sb.AppendLine($"HDF5 is thread safe: {IsThreadSafe()}");
+
+        var processorArchitecture = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
+        if (!string.IsNullOrEmpty(processorArchitecture))
+        {
+            sb.AppendLine($"Processor Architecture: {processorArchitecture}");
+        }
+        var processorId = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER");
+        if (!string.IsNullOrEmpty(processorId))
+        {
+            sb.AppendLine($"Processor Identifier: {processorId}");
+        }
+
+        return sb.ToString();
+    }
+
     public static Version GetLibraryVersion()
     {
         uint major = 0;

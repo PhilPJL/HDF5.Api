@@ -18,7 +18,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HDF5.Api.Tests.x64", "HDF5.
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HDF5.Api.Tests", "HDF5.Api.Tests\HDF5.Api.Tests.shproj", "{442905FB-35D7-48C4-9BFF-2A897074CEA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PInvoke.Tests", "PInvoke.Tests\PInvoke.Tests.csproj", "{6C262AD8-5177-428C-B984-72D5BEC2F697}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PInvoke.Tests", "PInvoke.Tests\PInvoke.Tests.csproj", "{6C262AD8-5177-428C-B984-72D5BEC2F697}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HDF5.Api.TestHarness", "HDF5.Api.TestHarness\HDF5.Api.TestHarness.csproj", "{725120E8-414C-41E7-98CC-D9986D726E4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +48,10 @@ Global
 		{6C262AD8-5177-428C-B984-72D5BEC2F697}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C262AD8-5177-428C-B984-72D5BEC2F697}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C262AD8-5177-428C-B984-72D5BEC2F697}.Release|Any CPU.Build.0 = Release|Any CPU
+		{725120E8-414C-41E7-98CC-D9986D726E4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{725120E8-414C-41E7-98CC-D9986D726E4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{725120E8-414C-41E7-98CC-D9986D726E4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{725120E8-414C-41E7-98CC-D9986D726E4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
