@@ -171,3 +171,10 @@ public enum CharacterSet
     Ascii = H5T.cset_t.ASCII,
     Utf8 = H5T.cset_t.UTF8
 }
+
+public enum PropertyListType
+{
+    None = 0,
+    Create,
+    Access
+}

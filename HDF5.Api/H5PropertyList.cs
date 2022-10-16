@@ -48,12 +48,10 @@ public class H5PropertyList : H5Object<H5PropertyList>
 
         return a.Equals(b);
     }
-}
 
-public enum PropertyListType
-{
-    None = 0,
-    Create,
-    Access
+    public CharacterSet CharacterEncoding
+    {
+        get => H5PAdapter.GetCharacterEncoding(this);
+        set => H5PAdapter.SetCharacterEncoding(this, value);
+    }
 }
-

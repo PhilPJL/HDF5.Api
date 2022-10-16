@@ -20,7 +20,7 @@ internal static partial class H5
 {
     static H5()
     {
-        NativeProviderLoader.TryLoad(Constants.DLLFileName, null);
+        NativeProviderLoader.TryLoad(Constants.DLLFileName, string.Empty);
     }
 
     public const hsize_t HSIZE_UNDEF = unchecked((hsize_t)(hssize_t)(-1));

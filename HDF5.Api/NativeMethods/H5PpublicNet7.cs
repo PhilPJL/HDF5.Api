@@ -66,6 +66,37 @@ internal static partial class H5P
     public static partial htri_t equal(hid_t id1, hid_t id2);
 
     /// <summary>
+    /// Retrieves the character encoding used to create a link or attribute
+    /// name.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetCharEncoding
+    /// </summary>
+    /// <param name="plist_id">Link creation or attribute creation property
+    /// list identifier</param>
+    /// <param name="encoding">String encoding character set</param>
+    /// <returns>Returns a non-negative valule if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pget_char_encoding"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_char_encoding
+        (hid_t plist_id, ref H5T.cset_t encoding);
+
+    /// <summary>
+    /// Sets the character encoding used to encode link and attribute names.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetCharEncoding
+    /// </summary>
+    /// <param name="plist_id">Link creation or attribute creation property
+    /// list identifier</param>
+    /// <param name="encoding">String encoding character set</param>
+    /// <returns>Returns a non-negative valule if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pset_char_encoding"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t set_char_encoding
+        (hid_t plist_id, H5T.cset_t encoding);
+
+    /// <summary>
     /// Sets the size of the chunks used to store a chunked layout dataset.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetChunk
     /// </summary>

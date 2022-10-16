@@ -28,6 +28,27 @@ internal static class H5GAdapter
         h.ThrowIfInvalidHandleValue();
 
         return new H5Group(h);
+
+        /*#if NET7_0_OR_GREATER
+                return createImpl(propListLinkCreation?.CharacterEncoding == CharacterSet.Utf8 ? createUtf8 : create);
+
+                H5Group createImpl(Func<long, string, long, long, long, long> createFunc)
+                {
+                    long h = createFunc(location, name, propListLinkCreation, propListGroupCreation, propListGroupAccess);
+                    h.ThrowIfInvalidHandleValue();
+                    return new H5Group(h);
+                }
+        #else
+                byte[] nameBytes =
+                    propListLinkCreation?.CharacterEncoding == CharacterSet.Utf8
+                        ? Encoding.UTF8.GetBytes(name)
+                        : Encoding.ASCII.GetBytes(name);
+
+                long h = create(location, nameBytes, propListLinkCreation, propListGroupCreation, propListGroupAccess);
+                h.ThrowIfInvalidHandleValue();
+                return new H5Group(h);
+        #endif
+        */
     }
 
     internal static H5Group Open<T>(H5Location<T> location, string name, H5PropertyList? propListGroupAccess = null) where T : H5Object<T>

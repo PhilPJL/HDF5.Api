@@ -84,5 +84,15 @@ internal static class H5LAdapter
 
     internal static IEnumerable<(string name, H5ObjectType type)> GetMembers<T>(H5Location<T> location)
         where T : H5Object<T> => GetMembers(location, H5O.type_t.UNKNOWN);
+
+    internal static H5PropertyList CreatePropertyList(PropertyListType listType)
+    {
+        return listType switch
+        {
+            PropertyListType.Create => H5PAdapter.Create(H5P.LINK_CREATE),
+            PropertyListType.Access => H5PAdapter.Create(H5P.LINK_ACCESS),
+            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
+        };
+    }
 }
 

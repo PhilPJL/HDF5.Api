@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using HDF5.Api.NativeMethods;
+using System.Linq;
 using static HDF5.Api.NativeMethods.H5P;
 
 namespace HDF5.Api.NativeMethodAdapters;
@@ -54,5 +55,19 @@ internal static class H5PAdapter
         h.ThrowIfInvalidHandleValue();
 
         return new H5PropertyList(h);
+    }
+
+    internal static CharacterSet GetCharacterEncoding(H5PropertyList propertyList)
+    {
+        H5T.cset_t encoding = default;
+        int err = get_char_encoding(propertyList, ref encoding);
+        err.ThrowIfError();
+        return (CharacterSet)encoding;
+    }
+
+    internal static void SetCharacterEncoding(H5PropertyList propertyList, CharacterSet encoding)
+    {
+        int err = set_char_encoding(propertyList, (H5T.cset_t)encoding);
+        err.ThrowIfError();
     }
 }

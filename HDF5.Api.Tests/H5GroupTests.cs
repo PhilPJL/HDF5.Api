@@ -244,4 +244,46 @@ public class H5GroupTests : H5LocationTests
     }
 
     #endregion
-}
+
+/*    #region Encoding
+
+    [TestMethod]
+    public void CreateAnsiGroupSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+
+            using var lcpl = H5Link.CreatePropertyList(PropertyListType.Create);
+            lcpl.CharacterEncoding = CharacterSet.Ascii;
+
+            // Create new group
+            using var group = file.CreateGroup("ANSI_STRING", lcpl);
+
+            file.GroupNames.ForEach(n => Debug.WriteLine(n));
+
+            Assert.IsTrue(file.GroupExists("ANSI_STRING"));
+        });
+    }
+
+    [TestMethod]
+    public void CreateUtf8GroupSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+
+            using var lcpl = H5Link.CreatePropertyList(PropertyListType.Create);
+            lcpl.CharacterEncoding = CharacterSet.Utf8;
+
+            // Create new group
+            using var group = file.CreateGroup("Χαρακτηριστικό", lcpl);
+
+            file.GroupNames.ForEach(n => Debug.WriteLine(n));
+
+            //Assert.IsTrue(file.GroupExists("Χαρακτηριστικό"));
+        });
+    }
+
+    #endregion
+*/}
