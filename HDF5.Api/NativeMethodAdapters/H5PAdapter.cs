@@ -16,13 +16,19 @@ internal static class H5PAdapter
         err.ThrowIfError();
     }
 
+    [Obsolete("Use Create<TPList>")]
     internal static H5PropertyList Create(long classId)
+    {
+        return Create(classId, h => new H5PropertyList(h));
+    }
+
+    internal static TPList Create<TPList>(long classId, Func<long, TPList> createPropertyList) where TPList : H5PropertyList
     {
         long h = create(classId);
 
         h.ThrowIfInvalidHandleValue();
 
-        return new H5PropertyList(h);
+        return createPropertyList(h);
     }
 
     internal static void SetChunk(H5PropertyList propertyList, int rank, long[] dims)
@@ -48,13 +54,22 @@ internal static class H5PAdapter
         return err != 0;
     }
 
+    [Obsolete("Use GetPropertyList<T, TPList>")]
     internal static H5PropertyList GetPropertyList<T>(H5Object<T> obj, Func<long, long> get_plist) where T : H5Object<T>
+    {
+        return GetPropertyList(obj, get_plist, h => new H5PropertyList(h));
+    }
+
+    internal static TPList GetPropertyList<T, TPList>(
+            H5Object<T> obj, Func<long, long> get_plist, Func<long, TPList> createPropertyList) 
+        where T : H5Object<T>
+        where TPList : H5PropertyList
     {
         long h = get_plist(obj);
 
         h.ThrowIfInvalidHandleValue();
 
-        return new H5PropertyList(h);
+        return createPropertyList(h);
     }
 
     internal static CharacterSet GetCharacterEncoding(H5PropertyList propertyList)
@@ -69,5 +84,19 @@ internal static class H5PAdapter
     {
         int err = set_char_encoding(propertyList, (H5T.cset_t)encoding);
         err.ThrowIfError();
+    }
+
+    internal static void SetCreateIntermediateGroups(H5PropertyList propertyList, bool value)
+    {
+        int err = set_create_intermediate_group(propertyList, value ? 1 : (uint)0);
+        err.ThrowIfError();
+    }
+
+    internal static bool GetCreateIntermediateGroups(H5PropertyList propertyList)
+    {
+        uint value = 0;
+        int err = get_create_intermediate_group(propertyList, ref value);
+        err.ThrowIfError();
+        return value != 0;
     }
 }

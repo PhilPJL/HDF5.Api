@@ -44,9 +44,16 @@ public abstract class H5Test
     {
         Guard.IsNotNull(path);
 
+        var fullpath = Path.Combine(TestFolder, Path.ChangeExtension(path, "h5"));
+
         // Create new file with default property lists
-        var file = H5File.Create(path, failIfExists, fileCreationPropertyList, fileAccessPropertyList);
-        Assert.IsTrue(File.Exists(path));
+        var file = H5File.Create(
+            fullpath,
+            failIfExists,
+            fileCreationPropertyList,
+            fileAccessPropertyList); ;
+
+        Assert.IsTrue(File.Exists(fullpath));
 
         return file;
     }

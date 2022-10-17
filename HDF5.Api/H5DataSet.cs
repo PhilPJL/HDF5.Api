@@ -25,27 +25,25 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
     public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
 
     public H5Attribute CreateAttribute(
-        [DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space,
-        [AllowNull] H5PropertyList? creationPropertyList = null)
+        [DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
 
-        return H5AAdapter.Create(this, name, type, space, creationPropertyList);
+        return H5AAdapter.Create(this, name, type, space);
     }
 
     public H5Attribute CreateStringAttribute(
         [DisallowNull] string name,
-        int fixedStorageLength = 0, CharacterSet characterSet = CharacterSet.Ascii, StringPadding padding = StringPadding.NullTerminate,
-        [AllowNull] H5PropertyList? creationPropertyList = null)
+        int fixedStorageLength = 0, CharacterSet characterSet = CharacterSet.Ascii, StringPadding padding = StringPadding.NullTerminate)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5AAdapter.CreateStringAttribute(this, name, fixedStorageLength, characterSet, padding, creationPropertyList);
+        return H5AAdapter.CreateStringAttribute(this, name, fixedStorageLength, characterSet, padding);
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyListType listType)
+    internal static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
         return H5DAdapter.CreatePropertyList(listType);
     }
@@ -57,7 +55,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         H5AAdapter.Delete(this, name);
     }
 
-    public H5PropertyList GetPropertyList(PropertyListType listType)
+    internal H5PropertyList GetPropertyList(PropertyListType listType)
     {
         return H5DAdapter.GetPropertyList(this, listType);
     }

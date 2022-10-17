@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.IO;
 
 namespace HDF5.Api.Tests;
 
@@ -319,5 +318,68 @@ public class H5AttributeTests : H5Test
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
         }
+
+
+    }
+
+
+    // TODO: parameterize 
+    [TestMethod]
+    public void CreateAttributeWithAsciiNameSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            var attributeName = "AsciiName";
+            var value = "ascii value - 0123456789";
+
+            using var file = CreateFile();
+            using var attribute = file.CreateStringAttribute(attributeName, 100);
+
+            attribute.Write(value);
+            var read = attribute.ReadString();
+            Assert.AreEqual(value, read);
+
+            Assert.IsTrue(file.AttributeExists(attributeName));
+            file.AttributeNames.ForEach(a => Debug.WriteLine(a));
+        });
+    }
+
+    [TestMethod]
+    public void CreateAttributeWithUtf8NameAsciiValueSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            var attributeName = "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻ";
+            var value = "ascii value - 0123456789";
+
+            using var file = CreateFile();
+            using var attribute = file.CreateStringAttribute(attributeName, 100);
+
+            attribute.Write(value);
+            var read = attribute.ReadString();
+            Assert.AreEqual(value, read);
+
+            Assert.IsTrue(file.AttributeExists(attributeName));
+            file.AttributeNames.ForEach(a => Debug.WriteLine(a));
+        });
+    }
+
+    [TestMethod]
+    public void CreateAttributeWithUtf8NameUtf8ValueSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            var attributeName = "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻ";
+            var value = "Χαρακτηριστικό";
+
+            using var file = CreateFile();
+            using var attribute = file.CreateStringAttribute(attributeName, 100, characterSet:CharacterSet.Utf8);
+
+            attribute.Write(value);
+            var read = attribute.ReadString();
+            Assert.AreEqual(value, read);
+
+            file.AttributeNames.ForEach(a => Debug.WriteLine(a));
+        });
     }
 }

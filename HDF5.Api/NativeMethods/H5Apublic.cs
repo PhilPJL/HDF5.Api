@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5A
+internal static unsafe partial class H5A
 {
     static H5A() { _ = H5.open(); }
 
@@ -81,6 +81,26 @@ internal static partial class H5A
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t close(hid_t attr_id);
+
+    /// <summary>
+    /// Creates an attribute attached to a specified object.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Create2
+    /// </summary>
+    /// <param name="loc_id">Location or object identifier</param>
+    /// <param name="attr_name">Attribute name</param>
+    /// <param name="type_id">Attribute datatype identifier</param>
+    /// <param name="space_id">Attribute dataspace identifier</param>
+    /// <param name="acpl_id">Attribute creation property list identifier</param>
+    /// <param name="aapl_id">Attribute access property list identifier</param>
+    /// <returns>Returns an attribute identifier if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Acreate2",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t create
+        (hid_t loc_id, byte* attr_name, hid_t type_id, hid_t space_id,
+        hid_t acpl_id = H5P.DEFAULT, hid_t aapl_id = H5P.DEFAULT);
+
 
     /// <summary>
     /// Creates an attribute attached to a specified object.
@@ -183,6 +203,20 @@ internal static partial class H5A
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t delete(hid_t loc_id, byte[] name);
+
+    /// <summary>
+    /// Deletes an attribute from a specified location.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Delete
+    /// </summary>
+    /// <param name="loc_id">Identifier of the dataset, group, or named
+    /// datatype to have the attribute deleted from.</param>
+    /// <param name="name">Name of the attribute to delete.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Adelete",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t delete(hid_t loc_id, byte* name);
 
     /// <summary>
     /// Deletes an attribute from a specified location.
@@ -297,6 +331,20 @@ internal static partial class H5A
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern htri_t exists(hid_t obj_id, byte[] attr_name);
+
+    /// <summary>
+    /// Determines whether an attribute with a given name exists on an object.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Exists
+    /// </summary>
+    /// <param name="obj_id">Object identifier</param>
+    /// <param name="attr_name">Attribute name</param>
+    /// <returns>When successful, returns a positive value, for
+    /// <code>TRUE</code>, or 0 (zero), for <code>FALSE</code>. Otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Aexists",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern htri_t exists(hid_t obj_id, byte* attr_name);
 
     /// <summary>
     /// Determines whether an attribute with a given name exists on an object.
@@ -425,6 +473,27 @@ internal static partial class H5A
     public static extern herr_t get_info_by_idx
         (hid_t loc_id, string obj_name,
         H5.index_t idx_type, H5.iter_order_t order, hsize_t n,
+        ref info_t ainfo, hid_t lapl_id = H5P.DEFAULT);
+
+    /// <summary>
+    /// Retrieves attribute information, by attribute name.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-GetInfoByName
+    /// </summary>
+    /// <param name="loc_id">Location of object to which attribute is
+    /// attached</param>
+    /// <param name="obj_name">Name of object to which attribute is
+    /// attached, relative to location</param>
+    /// <param name="attr_name">Attribute name</param>
+    /// <param name="ainfo">Struct containing returned attribute
+    /// information</param>
+    /// <param name="lapl_id">Link access property list</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Aget_info_by_name",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_info_by_name
+        (hid_t loc_id, byte* obj_name, byte* attr_name,
         ref info_t ainfo, hid_t lapl_id = H5P.DEFAULT);
 
     /// <summary>
@@ -697,6 +766,23 @@ internal static partial class H5A
         string obj_name, H5.index_t idx_type, H5.iter_order_t order,
         ref hsize_t n, operator_t op, IntPtr op_data,
         hid_t lapd_id = H5P.DEFAULT);
+
+    /// <summary>
+    /// Opens an attribute for an object specified by object identifier
+    /// and attribute name.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Open
+    /// </summary>
+    /// <param name="obj_id">Identifer for object to which attribute is
+    /// attached</param>
+    /// <param name="attr_name">Name of attribute to open</param>
+    /// <param name="aapl_id">Attribute access property list</param>
+    /// <returns>Returns an attribute identifier if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Aopen",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t open
+        (hid_t obj_id, byte* attr_name, hid_t aapl_id = H5P.DEFAULT);
 
     /// <summary>
     /// Opens an attribute for an object specified by object identifier

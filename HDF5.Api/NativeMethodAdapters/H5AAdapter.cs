@@ -1,5 +1,6 @@
 ﻿#if NETSTANDARD
 using HDF5.Api.Disposables;
+using HDF5.Api.Utils;
 #endif
 using CommunityToolkit.Diagnostics;
 #if NET7_0_OR_GREATER
@@ -14,7 +15,7 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// <summary>
 /// H5 attribute native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
 /// </summary>
-internal static class H5AAdapter
+internal unsafe static class H5AAdapter
 {
     internal static void Close(H5Attribute attribute)
     {
@@ -27,15 +28,28 @@ internal static class H5AAdapter
         H5Object<T> h5Object,
         string name,
         H5Type type,
-        H5Space space,
-        H5PropertyList? creationPropertyList = null) where T : H5Object<T>
+        H5Space space) where T : H5Object<T>
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        var h = create(h5Object, name, type, space, creationPropertyList);
+        // TODO: cache/singleton default CreationPropertyList
+        using var creationPropertyList = CreateCreationPropertyList(CharacterSet.Utf8);
+
+        // ensure CharacterEncoding == CharacterSet.Utf8
+        creationPropertyList.CharacterEncoding = CharacterSet.Utf8;
+
+        long h;
+
+#if NET7_0_OR_GREATER
+        h = create(h5Object, name, type, space, creationPropertyList);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            h = create(h5Object, nameBytesPtr, type, space, creationPropertyList);
+        }
+#endif
 
         h.ThrowIfInvalidHandleValue();
-
         return new H5Attribute(h);
     }
 
@@ -43,7 +57,16 @@ internal static class H5AAdapter
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        int err = delete(h5Object, name);
+        int err = 0;
+
+#if NET7_0_OR_GREATER
+        err = delete(h5Object, name);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            err = delete(h5Object, nameBytesPtr);
+        }
+#endif
 
         err.ThrowIfError();
     }
@@ -52,7 +75,16 @@ internal static class H5AAdapter
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        int err = exists(h5Object, name);
+        int err = 0;
+
+#if NET7_0_OR_GREATER
+        err = exists(h5Object, name);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            err = exists(h5Object, nameBytesPtr);
+        }
+#endif
 
         err.ThrowIfError();
         return err > 0;
@@ -77,11 +109,10 @@ internal static class H5AAdapter
         {
             var name = info.cset switch
             {
-                H5T.cset_t.ASCII => Marshal.PtrToStringAnsi(intPtrName),
 #if NET7_0_OR_GREATER
-                H5T.cset_t.UTF8 => Marshal.PtrToStringUTF8(intPtrName),
+                H5T.cset_t.ASCII or H5T.cset_t.UTF8 => Marshal.PtrToStringUTF8(intPtrName),
 #else
-                H5T.cset_t.UTF8 => Marshal.PtrToStringAuto(intPtrName),
+                H5T.cset_t.ASCII or H5T.cset_t.UTF8 => MarshalExtensions.PtrToStringUTF8(intPtrName),
 #endif
                 _ => throw new InvalidEnumArgumentException($"Unexpected character set {info.cset} when enumerating attribute names."),
             };
@@ -94,37 +125,53 @@ internal static class H5AAdapter
         }
     }
 
-    internal static info_t GetInfoByName<T>(H5Object<T> h5Object,
-        string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null)
-        where T : H5Object<T>
-    {
-        info_t info = default;
-        int err = get_info_by_name(h5Object, objectName, attributeName, ref info, linkAccessPropertyList);
-        err.ThrowIfError();
-        return info;
-    }
+    // TODO: use or remove
+    /*    internal static info_t GetInfoByName<T>(H5Object<T> h5Object,
+            string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null)
+            where T : H5Object<T>
+        {
+            info_t info = default;
+            int err = 0;
+
+    #if NET7_0_OR_GREATER
+            err = get_info_by_name(h5Object, objectName, attributeName, ref info, linkAccessPropertyList);
+    #else
+            fixed (byte* objectNamePtr = Encoding.UTF8.GetBytes(objectName))
+            fixed (byte* attributeNamePtr = Encoding.UTF8.GetBytes(attributeName))
+            {
+                err = get_info_by_name(h5Object, objectNamePtr, attributeNamePtr, ref info, linkAccessPropertyList);
+            }
+    #endif
+
+            err.ThrowIfError();
+            return info;
+        }
+    */
 
     /// <summary>
-    /// Get copy of property list used to create the attribute.
+    /// Get copy of property list used when creating the attribute.
     /// </summary>
     /// <param name="attribute"></param>
     /// <returns></returns>
-    internal static H5PropertyList GetPropertyList(H5Attribute attribute, PropertyListType listType)
+    internal static H5AttributeCreationPropertyList GetCreationPropertyList(H5Attribute attribute)
     {
-        return listType switch
-        {
-            PropertyListType.Create => H5PAdapter.GetPropertyList(attribute, get_create_plist),
-            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
-        };
+        return H5PAdapter.GetPropertyList(attribute, get_create_plist, h => new H5AttributeCreationPropertyList(h));
     }
 
-    internal static H5PropertyList CreatePropertyList(PropertyListType listType)
+    /// <summary>
+    /// Create a new attribute creation property list
+    /// </summary>
+    /// <param name="encoding"></param>
+    /// <returns></returns>
+    internal static H5AttributeCreationPropertyList CreateCreationPropertyList(CharacterSet encoding)
     {
-        return listType switch
+        return H5PAdapter.Create(H5P.ATTRIBUTE_CREATE, h =>
         {
-            PropertyListType.Create => H5PAdapter.Create(H5P.ATTRIBUTE_CREATE),
-            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
-        };
+            return new H5AttributeCreationPropertyList(h)
+            {
+                CharacterEncoding = encoding
+            };
+        });
     }
 
     internal static H5Space GetSpace(H5Attribute attribute)
@@ -153,7 +200,16 @@ internal static class H5AAdapter
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        long h = open(h5Object, name);
+        long h = 0;
+
+#if NET7_0_OR_GREATER
+        h = open(h5Object, name);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            h = open(h5Object, nameBytesPtr);
+        }
+#endif
 
         h.ThrowIfInvalidHandleValue();
 
@@ -200,30 +256,24 @@ internal static class H5AAdapter
         else
         {
 #if NET7_0_OR_GREATER
+            // TODO: could optimise with stackalloc for small strings
             using var spanOwner = SpanOwner<byte>.Allocate(storageSize);
             var buffer = spanOwner.Span;
             int err = read(attribute, type, buffer);
             err.ThrowIfError();
 
             var nullTerminatorIndex = MemoryExtensions.IndexOf(spanOwner.Span, (byte)0);
-            nullTerminatorIndex = nullTerminatorIndex == -1 ? storageSize : nullTerminatorIndex;
+            nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
             return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
 #else
-            unsafe
-            {
-                using var buffer = new GlobalMemory(storageSize + 1);
-                int err = read(attribute, type, buffer.IntPtr);
-                err.ThrowIfError();
+            using var buffer = new GlobalMemory(storageSize + 1);
+            int err = read(attribute, type, buffer.IntPtr);
+            err.ThrowIfError();
 
-                Span<byte> bytes = new Span<byte>(buffer.IntPtr.ToPointer(), storageSize + 1);
-                var nullIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
-                if (nullIndex >= 0)
-                {
-                    return Encoding.UTF8.GetString((byte*)buffer.IntPtr.ToPointer(), nullIndex);
-                }
-
-                return Encoding.UTF8.GetString((byte*)buffer.IntPtr.ToPointer(), storageSize);
-            }
+            Span<byte> bytes = new Span<byte>(buffer.IntPtr.ToPointer(), storageSize + 1);
+            var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
+            nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
+            return Encoding.UTF8.GetString((byte*)buffer.IntPtr.ToPointer(), nullTerminatorIndex);
 #endif
         }
     }
@@ -265,24 +315,22 @@ internal static class H5AAdapter
 #if NET7_0_OR_GREATER
         if (size < 256)
         {
-            Span<T> buf = stackalloc T[size];
+            Span<T> buf = stackalloc T[1];
             read(attribute, type, MemoryMarshal.AsBytes(buf));
             return buf[0];
         }
         else
         {
-            using var buf = SpanOwner<T>.Allocate(size);
+            // TODO: is this required - most unmanaged types are small?
+            using var buf = SpanOwner<T>.Allocate(1);
             read(attribute, type, MemoryMarshal.AsBytes(buf.Span));
             return buf.Span[0];
         }
 #else
-        unsafe
-        {
-            T result = default;
-            int err = read(attribute, type, new IntPtr(&result));
-            err.ThrowIfError();
-            return result;
-        }
+        T result = default;
+        int err = read(attribute, type, new IntPtr(&result));
+        err.ThrowIfError();
+        return result;
 #endif
     }
 
@@ -420,7 +468,7 @@ internal static class H5AAdapter
 
     internal static H5Attribute CreateStringAttribute<T>(
         H5Object<T> h5Object, string name, int fixedStorageLength,
-        CharacterSet cset, StringPadding padding, H5PropertyList? creationPropertyList) where T : H5Object<T>
+        CharacterSet cset, StringPadding padding) where T : H5Object<T>
     {
         h5Object.AssertHasWithAttributesHandleType();
 
@@ -432,7 +480,7 @@ internal static class H5AAdapter
         type.SetPadding(padding);
 
         using var memorySpace = H5SAdapter.CreateScalar();
-        return Create(h5Object, name, type, memorySpace, creationPropertyList);
+        return Create(h5Object, name, type, memorySpace);
     }
 }
 

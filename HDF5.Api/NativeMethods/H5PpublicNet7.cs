@@ -82,6 +82,22 @@ internal static partial class H5P
         (hid_t plist_id, ref H5T.cset_t encoding);
 
     /// <summary>
+    /// Determines whether property is set to enable creating missing
+    /// intermediate groups.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetCreateIntermediateGroup
+    /// </summary>
+    /// <param name="lcpl_id">Link creation property list identifier</param>
+    /// <param name="crt_intermed_group">Flag specifying whether to create
+    /// intermediate groups upon creation of an object</param>
+    /// <returns>Returns a non-negative valule if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pget_create_intermediate_group"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_create_intermediate_group
+        (hid_t lcpl_id, ref uint crt_intermed_group);
+
+    /// <summary>
     /// Sets the character encoding used to encode link and attribute names.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetCharEncoding
     /// </summary>
@@ -112,6 +128,22 @@ internal static partial class H5P
     public static partial herr_t set_chunk
         (hid_t plist_id, int ndims,
         [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] hsize_t[] dims);
+
+    /// <summary>
+    /// Specifies in property list whether to create missing intermediate
+    /// groups.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetCreateIntermediateGroup
+    /// </summary>
+    /// <param name="lcpl_id">Link creation property list identifier</param>
+    /// <param name="crt_intermed_group">Flag specifying whether to create
+    /// intermediate groups upon the creation of an object</param>
+    /// <returns>Returns a non-negative valule if successful;
+    /// otherwise returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pset_create_intermediate_group"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t set_create_intermediate_group
+        (hid_t lcpl_id, uint crt_intermed_group);
 
     /// <summary>
     /// Sets deflate (GNU gzip) compression method and compression level.

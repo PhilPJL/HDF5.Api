@@ -115,16 +115,9 @@ public class H5PropertyListTests : H5Test
             // attribute
             file.CreateAndWriteAttribute("IntAttribute", 1);
             using var att = file.OpenAttribute("IntAttribute");
-            using var apc1 = att.GetPropertyList(PropertyListType.Create);
-            using var apc2 = H5Attribute.CreatePropertyList(PropertyListType.Create);
+            using var apc1 = att.GetCreationPropertyList();
+            using var apc2 = H5Attribute.CreateCreationPropertyList();
             Assert.IsTrue(apc1.IsEqualTo(apc2));
-
-            using var apc12 = H5Attribute.CreatePropertyList(PropertyListType.Create);
-            file.CreateAndWriteAttribute("Int2Attribute", 1, apc12);
-            using var att1 = file.OpenAttribute("IntAttribute");
-            using var apc11 = att1.GetPropertyList(PropertyListType.Create);
-
-            Assert.IsTrue(apc11.IsEqualTo(apc12));
         });
     }
 

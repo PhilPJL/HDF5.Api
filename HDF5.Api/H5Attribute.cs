@@ -22,9 +22,9 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AAdapter.GetType(this);
     }
 
-    public H5PropertyList GetPropertyList(PropertyListType listType)
+    internal H5AttributeCreationPropertyList GetCreationPropertyList()
     {
-        return H5AAdapter.GetPropertyList(this, listType);
+        return H5AAdapter.GetCreationPropertyList(this);
     }
 
     public int StorageSize => H5AAdapter.GetStorageSize(this);
@@ -61,22 +61,21 @@ public class H5Attribute : H5Object<H5Attribute>
         H5AAdapter.Write(this, value);
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyListType listType)
+    internal static H5AttributeCreationPropertyList CreateCreationPropertyList(CharacterSet encoding = CharacterSet.Utf8)
     {
-        return H5AAdapter.CreatePropertyList(listType);
+        return H5AAdapter.CreateCreationPropertyList(encoding);
     }
 
     public static H5Attribute CreateStringAttribute<T>(
         [DisallowNull] H5Object<T> h5Object,
         string name, int length = 0,
-        CharacterSet characterSet = CharacterSet.Ascii, StringPadding padding = StringPadding.NullTerminate, 
-        [AllowNull] H5PropertyList? creationPropertyList = null) where T : H5Object<T>
+        CharacterSet characterSet = CharacterSet.Ascii, StringPadding padding = StringPadding.NullTerminate) where T : H5Object<T>
     {
         Guard.IsNotNull(h5Object);
         Guard.IsGreaterThanOrEqualTo(length, 0);
         
         h5Object.AssertHasWithAttributesHandleType();
 
-        return H5AAdapter.CreateStringAttribute(h5Object, name, length, characterSet, padding, creationPropertyList);
+        return H5AAdapter.CreateStringAttribute(h5Object, name, length, characterSet, padding);
     }
 }

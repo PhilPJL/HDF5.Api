@@ -23,24 +23,22 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     public H5Attribute CreateAttribute(
         [DisallowNull] string name, 
         [DisallowNull] H5Type type, 
-        [DisallowNull] H5Space space,
-        [AllowNull] H5PropertyList? creationPropertyList = null)
+        [DisallowNull] H5Space space)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
 
-        return H5AAdapter.Create(this, name, type, space, creationPropertyList);
+        return H5AAdapter.Create(this, name, type, space);
     }
 
     public H5Attribute CreateStringAttribute(
         [DisallowNull] string name, 
-        int fixedStorageLength = 0, CharacterSet characterSet = CharacterSet.Ascii, StringPadding padding = StringPadding.NullTerminate,
-        [AllowNull] H5PropertyList? creationPropertyList = null)
+        int fixedStorageLength = 0, CharacterSet characterSet = CharacterSet.Ascii, StringPadding padding = StringPadding.NullTerminate)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5AAdapter.CreateStringAttribute(this, name, fixedStorageLength, characterSet, padding, creationPropertyList);
+        return H5AAdapter.CreateStringAttribute(this, name, fixedStorageLength, characterSet, padding);
     }
 
     /// <summary>

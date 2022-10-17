@@ -11,7 +11,7 @@ public class H5PropertyList : H5Object<H5PropertyList>
     internal H5PropertyList(long handle) : base(handle, HandleType.PropertyList, H5PAdapter.Close)
     {
     }
-      
+
     public void SetChunk([DisallowNull] params long[] dims)
     {
         Guard.IsNotNull(dims, nameof(dims));
@@ -48,10 +48,30 @@ public class H5PropertyList : H5Object<H5PropertyList>
 
         return a.Equals(b);
     }
+}
+
+internal class H5AttributeCreationPropertyList : H5PropertyList
+{
+    internal H5AttributeCreationPropertyList(long handle) : base(handle)
+    {
+    }
 
     public CharacterSet CharacterEncoding
     {
         get => H5PAdapter.GetCharacterEncoding(this);
         set => H5PAdapter.SetCharacterEncoding(this, value);
+    }
+}
+
+internal class H5LinkCreationPropertyList : H5AttributeCreationPropertyList
+{
+    internal H5LinkCreationPropertyList(long handle) : base(handle)
+    {
+    }
+
+    public bool CreateIntermediateGroups
+    {
+        get => H5PAdapter.GetCreateIntermediateGroups(this);
+        set => H5PAdapter.SetCreateIntermediateGroups(this, value);
     }
 }
