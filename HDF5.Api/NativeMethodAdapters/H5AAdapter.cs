@@ -304,16 +304,18 @@ internal unsafe static class H5AAdapter
             throw new Hdf5Exception($"Attribute is of class {cls} when expecting {expectedCls}.");
         }
 
-        int size = attribute.StorageSize;
+        int attributeStorageSize = attribute.StorageSize;
+        int marshalSize = Marshal.SizeOf<T>();
 
-        if (size != Marshal.SizeOf<T>())
+        if (attributeStorageSize != marshalSize)
         {
+            // TODO: common throw helper
             throw new Hdf5Exception(
-                $"Attribute storage size is {size}, which does not match the expected size for type {typeof(T).Name} of {Marshal.SizeOf<T>()}.");
+                $"Attribute storage size is {attributeStorageSize}, which does not match the expected marshalable size for type {typeof(T).Name} of {marshalSize}.");
         }
 
 #if NET7_0_OR_GREATER
-        if (size < 256)
+        if (attributeStorageSize < 256)
         {
             Span<T> buf = stackalloc T[1];
             read(attribute, type, MemoryMarshal.AsBytes(buf));
@@ -334,21 +336,34 @@ internal unsafe static class H5AAdapter
 #endif
     }
 
-#if NET7_0_OR_GREATER
     internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
     {
-        var size = Marshal.SizeOf<T>();
-
         using var type = attribute.GetH5Type();
 
-        if (size < 256)
+        Write(attribute, type, value);
+    }
+
+#if NET7_0_OR_GREATER
+    internal static void Write<T>(H5Attribute attribute, H5Type type, T value) where T : unmanaged
+    {
+        var marshalSize = Marshal.SizeOf<T>();
+        int attributeStorageSize = attribute.StorageSize;
+
+        if (marshalSize != attributeStorageSize)
+        {
+            // TODO: common throw helper
+            throw new Hdf5Exception(
+                $"Attribute storage size is {attributeStorageSize}, which does not match the marshalable size for type {typeof(T).Name} of {marshalSize}.");
+        }
+
+        if (marshalSize < 256)
         {
             Span<T> buffer = stackalloc T[1] { value };
             Write(attribute, type, MemoryMarshal.Cast<T, byte>(buffer));
         }
         else
         {
-            using var buffer = SpanOwner<T>.Allocate(size);
+            using var buffer = SpanOwner<T>.Allocate(marshalSize);
             buffer.Span[0] = value;
             Write(attribute, type, MemoryMarshal.Cast<T, byte>(buffer.Span));
         }
@@ -363,14 +378,12 @@ internal unsafe static class H5AAdapter
 #endif
 
 #if NETSTANDARD
-    internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
+    internal static void Write<T>(H5Attribute attribute, H5Type type, T value) where T : unmanaged
     {
         unsafe
         {
             void* p = &value;
             {
-                using var type = attribute.GetH5Type();
-
                 Write(attribute, type, new IntPtr(p));
             }
         }

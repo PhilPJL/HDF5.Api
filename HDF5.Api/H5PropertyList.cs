@@ -12,6 +12,7 @@ public class H5PropertyList : H5Object<H5PropertyList>
     {
     }
 
+    // TODO: move this to appropriate sub-class
     public void SetChunk([DisallowNull] params long[] dims)
     {
         Guard.IsNotNull(dims, nameof(dims));
@@ -20,6 +21,7 @@ public class H5PropertyList : H5Object<H5PropertyList>
         H5PAdapter.SetChunk(this, dims.Length, dims);
     }
 
+    // TODO: move this to appropriate sub-class
     /// <summary>
     ///     Level 0 = off
     ///     Level 1 = min compression + min CPU

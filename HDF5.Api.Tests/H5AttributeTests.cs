@@ -5,30 +5,18 @@ namespace HDF5.Api.Tests;
 [TestClass]
 public class H5AttributeTests : H5Test
 {
-    /*    [TestMethod]
-        public void Test()
-        {
-            HandleCheck(() =>
-            {
-                using var file = H5File.Open(@"D:\TeraViewTestFiles\C123456CE123.tprj");
-                using var grp = file.OpenGroup("TerapulseDocument");
-                using var att = grp.OpenAttribute("ClassName");
-                Debug.WriteLine(att.ReadString());
-            });
-        }*/
-
     [TestMethod]
-    [DataRow("ascii_nullterm.h5", CharacterSet.Ascii, StringPadding.NullTerminate)]
-    [DataRow("ascii_nullpad.h5", CharacterSet.Ascii, StringPadding.NullPad)]
-    [DataRow("ascii_nullspace.h5", CharacterSet.Ascii, StringPadding.Space)]
-    [DataRow("utf8_nullterm.h5", CharacterSet.Utf8, StringPadding.NullTerminate)]
-    [DataRow("utf8_nullpad.h5", CharacterSet.Utf8, StringPadding.NullPad)]
-    [DataRow("utf8_space.h5", CharacterSet.Utf8, StringPadding.Space)]
-    public void FixedLengthStringAttributes(string path, CharacterSet characterSet, StringPadding padding)
+    [DataRow("ascii_nullterm", CharacterSet.Ascii, StringPadding.NullTerminate)]
+    [DataRow("ascii_nullpad", CharacterSet.Ascii, StringPadding.NullPad)]
+    [DataRow("ascii_nullspace", CharacterSet.Ascii, StringPadding.Space)]
+    [DataRow("utf8_nullterm", CharacterSet.Utf8, StringPadding.NullTerminate)]
+    [DataRow("utf8_nullpad", CharacterSet.Utf8, StringPadding.NullPad)]
+    [DataRow("utf8_space", CharacterSet.Utf8, StringPadding.Space)]
+    public void ReadWriteFixedLengthStringAttributeSucceeds(string fileNameSuffix, CharacterSet characterSet, StringPadding padding)
     {
         HandleCheck(() =>
         {
-            using var file = CreateFile(path);
+            using var file = CreateFile2(fileNameSuffix);
 
             Test(file, "fixed_10", "", 10, characterSet, padding);
             Test(file, "fixed_32", "12345678912345678912", 32, characterSet, padding);
@@ -52,17 +40,17 @@ public class H5AttributeTests : H5Test
 
     [Ignore]
     [TestMethod]
-    [DataRow("v_ascii_nullterm.h5", CharacterSet.Ascii, StringPadding.NullTerminate)]
-    [DataRow("v_ascii_nullpad.h5", CharacterSet.Ascii, StringPadding.NullPad)]
-    [DataRow("v_ascii_nullspace.h5", CharacterSet.Ascii, StringPadding.Space)]
-    [DataRow("v_utf8_nullterm.h5", CharacterSet.Utf8, StringPadding.NullTerminate)]
-    [DataRow("v_utf8_nullpad.h5", CharacterSet.Utf8, StringPadding.NullPad)]
-    [DataRow("v_utf8_space.h5", CharacterSet.Utf8, StringPadding.Space)]
-    public void VariableLengthStringAttributes(string path, CharacterSet characterSet, StringPadding padding)
+    [DataRow("v_ascii_nullterm", CharacterSet.Ascii, StringPadding.NullTerminate)]
+    [DataRow("v_ascii_nullpad", CharacterSet.Ascii, StringPadding.NullPad)]
+    [DataRow("v_ascii_nullspace", CharacterSet.Ascii, StringPadding.Space)]
+    [DataRow("v_utf8_nullterm", CharacterSet.Utf8, StringPadding.NullTerminate)]
+    [DataRow("v_utf8_nullpad", CharacterSet.Utf8, StringPadding.NullPad)]
+    [DataRow("v_utf8_space", CharacterSet.Utf8, StringPadding.Space)]
+    public void ReadWriteVariableLengthStringAttributeSucceeds(string fileNameSuffix, CharacterSet characterSet, StringPadding padding)
     {
         HandleCheck(() =>
         {
-            using var file = CreateFile(path);
+            using var file = CreateFile2(fileNameSuffix);
 
             Test(file, "variable_empty", "", 0, characterSet, padding);
             Test(file, "variable_short", "12345678912345678912", 0, characterSet, padding);
@@ -85,63 +73,41 @@ public class H5AttributeTests : H5Test
     }
 
     [TestMethod]
-    public void CreateDuplicateAttributeNameThrows()
+    [DataRow("ascii", "an ascii attribute name")]
+    [DataRow("utf8", "Χαρακτηριστικό")]
+    public void CreateDuplicateAttributeNameThrows(string filename, string attributeName)
     {
         HandleCheck(() =>
         {
-            using var file = CreateFile();
+            using var file = CreateFile2(filename);
 
             // Create group
             using var group = file.CreateGroup("group");
 
             // Create duplicate attribute on file
-            file.CreateAndWriteAttribute("name", 1);
-            Assert.ThrowsException<Hdf5Exception>(() => file.CreateAndWriteAttribute("name", 2));
+            file.CreateAndWriteAttribute(attributeName, 1);
+            Assert.ThrowsException<Hdf5Exception>(() => file.CreateAndWriteAttribute(attributeName, 2));
 
             // Create duplicate attribute on group
-            group.CreateAndWriteAttribute("name", 1);
-            Assert.ThrowsException<Hdf5Exception>(() => group.CreateAndWriteAttribute("name", 2));
+            group.CreateAndWriteAttribute(attributeName, 1);
+            Assert.ThrowsException<Hdf5Exception>(() => group.CreateAndWriteAttribute(attributeName, 2));
 
             // Create test dataset on file
             using var datasetFile = H5DataSetTests.CreateTestDataset(file, "aDataSet");
 
             // Create duplicate attribute on data set on file
-            datasetFile.CreateAndWriteAttribute("name", 1);
-            Assert.ThrowsException<Hdf5Exception>(() => datasetFile.CreateAndWriteAttribute("name", 2));
+            datasetFile.CreateAndWriteAttribute(attributeName, 1);
+            Assert.ThrowsException<Hdf5Exception>(() => datasetFile.CreateAndWriteAttribute(attributeName, 2));
 
             // Create test dataset on group
             using var datasetGroup = H5DataSetTests.CreateTestDataset(group, "aDataSet");
 
             // Create duplicate attribute on data set on group
-            datasetGroup.CreateAndWriteAttribute("name", 1);
-            Assert.ThrowsException<Hdf5Exception>(() => datasetGroup.CreateAndWriteAttribute("name", 2));
+            datasetGroup.CreateAndWriteAttribute(attributeName, 1);
+            Assert.ThrowsException<Hdf5Exception>(() => datasetGroup.CreateAndWriteAttribute(attributeName, 2));
 
             // File + Group + 2 x DataSet
             Assert.AreEqual(4, file.GetObjectCount());
-        });
-    }
-
-
-    [TestMethod]
-    public void CreateDuplicateAttributeNameThrows2()
-    {
-        HandleCheck(() =>
-        {
-            using var file = CreateFile();
-
-            // Create group
-            using var group = file.CreateGroup("group");
-
-            // Create duplicate attribute on file
-            file.CreateAndWriteAttribute("name", 1);
-            try
-            {
-                file.CreateAndWriteAttribute("name", 2);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.ToString());
-            };
         });
     }
 
@@ -202,6 +168,8 @@ public class H5AttributeTests : H5Test
         objectWithAttributes.CreateAndWriteAttribute("string", "This is a string 12345.", 50);
         objectWithAttributes.CreateAndWriteAttribute("truncated", "This is a string 12345.", 50);
         objectWithAttributes.CreateAndWriteAttribute("dateTime", DateTime.Now);
+        //objectWithAttributes.CreateAndWriteAttribute("bool", true);
+        objectWithAttributes.CreateAndWriteAttribute("byte", (byte)5);
         objectWithAttributes.CreateAndWriteAttribute("int16", (short)5);
         objectWithAttributes.CreateAndWriteAttribute("uint16", (ushort)6);
         objectWithAttributes.CreateAndWriteAttribute("int32", 7);
@@ -213,6 +181,8 @@ public class H5AttributeTests : H5Test
 
         var names = new List<string> {
             "dateTime",
+            //"bool",
+            "byte",
             "string",
             "truncated",
             "int16",
@@ -229,7 +199,7 @@ public class H5AttributeTests : H5Test
 
         Assert.IsTrue(!names.Except(attributeNames).Any());
         Assert.IsTrue(!attributeNames.Except(names).Any());
-        Assert.AreEqual(11, objectWithAttributes.NumberOfAttributes);
+        Assert.AreEqual(names.Count, objectWithAttributes.NumberOfAttributes);
     }
 
     internal static void CreateWriteReadDeleteAttributesSucceeds(IH5ObjectWithAttributes location)
@@ -237,6 +207,8 @@ public class H5AttributeTests : H5Test
         // Create attributes
         CreateWriteReadUpdateDeleteAttribute((short)15, (short)99);
         CreateWriteReadUpdateDeleteAttribute((ushort)15, (ushort)77);
+        CreateWriteReadUpdateDeleteAttribute((byte)15, (byte)0xff);
+        //CreateWriteReadUpdateDeleteAttribute(true, false);
         CreateWriteReadUpdateDeleteAttribute(15, 1234);
         CreateWriteReadUpdateDeleteAttribute(15u, 4567u);
         CreateWriteReadUpdateDeleteAttribute(15L, long.MaxValue);
@@ -318,67 +290,25 @@ public class H5AttributeTests : H5Test
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
         }
-
-
     }
 
-
-    // TODO: parameterize 
     [TestMethod]
-    public void CreateAttributeWithAsciiNameSucceeds()
+    [DataRow("ascii_ascii", "an ascii attribute name", "an ascii attribute value", CharacterSet.Ascii)]
+    [DataRow("utf8_ascii", "Χαρακτηριστικό", "an ascii attribute value", CharacterSet.Ascii)]
+    [DataRow("ascii_utf8", "an ascii attribute name", "ᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪ", CharacterSet.Utf8)]
+    [DataRow("utf8_utf8", "Χαρακτηριστικό", "ᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪ", CharacterSet.Utf8)]
+    public void CreateAttributeSucceeds(string fileSuffix, string attributeName, string value, CharacterSet encoding)
     {
         HandleCheck(() =>
         {
-            var attributeName = "AsciiName";
-            var value = "ascii value - 0123456789";
-
-            using var file = CreateFile();
-            using var attribute = file.CreateStringAttribute(attributeName, 100);
+            using var file = CreateFile2(fileSuffix);
+            using var attribute = file.CreateStringAttribute(attributeName, 100, encoding);
 
             attribute.Write(value);
             var read = attribute.ReadString();
             Assert.AreEqual(value, read);
 
             Assert.IsTrue(file.AttributeExists(attributeName));
-            file.AttributeNames.ForEach(a => Debug.WriteLine(a));
-        });
-    }
-
-    [TestMethod]
-    public void CreateAttributeWithUtf8NameAsciiValueSucceeds()
-    {
-        HandleCheck(() =>
-        {
-            var attributeName = "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻ";
-            var value = "ascii value - 0123456789";
-
-            using var file = CreateFile();
-            using var attribute = file.CreateStringAttribute(attributeName, 100);
-
-            attribute.Write(value);
-            var read = attribute.ReadString();
-            Assert.AreEqual(value, read);
-
-            Assert.IsTrue(file.AttributeExists(attributeName));
-            file.AttributeNames.ForEach(a => Debug.WriteLine(a));
-        });
-    }
-
-    [TestMethod]
-    public void CreateAttributeWithUtf8NameUtf8ValueSucceeds()
-    {
-        HandleCheck(() =>
-        {
-            var attributeName = "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻ";
-            var value = "Χαρακτηριστικό";
-
-            using var file = CreateFile();
-            using var attribute = file.CreateStringAttribute(attributeName, 100, characterSet:CharacterSet.Utf8);
-
-            attribute.Write(value);
-            var read = attribute.ReadString();
-            Assert.AreEqual(value, read);
-
             file.AttributeNames.ForEach(a => Debug.WriteLine(a));
         });
     }

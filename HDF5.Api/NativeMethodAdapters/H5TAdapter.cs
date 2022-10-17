@@ -136,8 +136,8 @@ internal static class H5TAdapter
     {
         return default(T) switch
         {
-            //            char => H5T.NATIVE_CHAR,
-            bool => NATIVE_B8,
+            // TODO: handle bool
+            //bool => NATIVE_HBOOL, hmm bool has marshalable size of 4, but storage size of 1.
             byte => NATIVE_B8,
 
             short => NATIVE_INT16,

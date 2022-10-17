@@ -36,11 +36,21 @@ public abstract class H5Test
         Assert.AreEqual(expectedHandlesOpen, H5Handle.OpenHandleCount);
     }
 
+    protected static H5File CreateFile2(
+        string suffix,
+        [CallerMemberName] string? path = null,
+        bool failIfExists = false,
+        H5PropertyList? fileCreationPropertyList = null)
+    {
+        Guard.IsNotNull(path);
+
+        return CreateFile($"{path}_{suffix}", failIfExists, fileCreationPropertyList);
+    }
+
     protected static H5File CreateFile(
         [CallerMemberName] string? path = null,
         bool failIfExists = false,
-        H5PropertyList? fileCreationPropertyList = null,
-        H5PropertyList? fileAccessPropertyList = null)
+        H5PropertyList? fileCreationPropertyList = null)
     {
         Guard.IsNotNull(path);
 
@@ -50,8 +60,7 @@ public abstract class H5Test
         var file = H5File.Create(
             fullpath,
             failIfExists,
-            fileCreationPropertyList,
-            fileAccessPropertyList); ;
+            fileCreationPropertyList);
 
         Assert.IsTrue(File.Exists(fullpath));
 
