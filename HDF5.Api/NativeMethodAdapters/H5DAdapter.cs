@@ -11,7 +11,7 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// <summary>
 /// H5 data-set native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_d.html"/>
 /// </summary>
-internal static class H5DAdapter
+internal unsafe static class H5DAdapter
 {
     internal static void Close(H5DataSet dataSet)
     {
@@ -26,14 +26,25 @@ internal static class H5DAdapter
     }
 
     internal static H5DataSet Create<T>(H5Location<T> location, string name, H5Type type, H5Space space,
-        H5PropertyList? linkCreationPropertyList = null,
-        H5PropertyList? dataSetCreationPropertyList = null,
-        H5PropertyList? accessCreationPropertyList = null) where T : H5Object<T>
+        H5PropertyList? dataSetCreationPropertyList,
+        H5PropertyList? accessCreationPropertyList) where T : H5Object<T>
     {
         location.AssertHasLocationHandleType();
 
-        long h = create(location, name, type, space,
+        using var linkCreationPropertyList = H5Link.CreateCreationPropertyList();
+
+        long h = 0;
+
+#if NET7_0_OR_GREATER
+        h = create(location, name, type, space,
             linkCreationPropertyList, dataSetCreationPropertyList, accessCreationPropertyList);
+#else
+        fixed(byte* namePtr = Encoding.UTF8.GetBytes(name))
+        {
+            h = create(location, namePtr, type, space,
+                linkCreationPropertyList, dataSetCreationPropertyList, accessCreationPropertyList);
+        }
+#endif
 
         h.ThrowIfInvalidHandleValue();
 
@@ -90,18 +101,27 @@ internal static class H5DAdapter
 #endif
     }
 
-    internal static H5DataSet Open<T>(H5Location<T> location, string name, H5PropertyList? dataSetAccessPropertyList = null) where T : H5Object<T>
+    internal static H5DataSet Open<T>(H5Location<T> location, string name, H5PropertyList? dataSetAccessPropertyList) where T : H5Object<T>
     {
         location.AssertHasLocationHandleType();
 
-        long h = open(location, name, dataSetAccessPropertyList);
+        long h = 0;
+
+#if NET7_0_OR_GREATER
+        h = open(location, name, dataSetAccessPropertyList);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            h = open(location, nameBytesPtr, dataSetAccessPropertyList);
+        }
+#endif
 
         h.ThrowIfInvalidHandleValue();
 
         return new H5DataSet(h);
     }
 
-    internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
+    internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList) where T : H5Object<T>
     {
         return H5LAdapter.Exists(location, name, linkAccessPropertyList);
     }
@@ -113,7 +133,7 @@ internal static class H5DAdapter
         err.ThrowIfError();
     }
 
-    internal static void Write(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, IntPtr buffer, H5PropertyList? transferPropertyList = null) 
+    internal static void Write(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, IntPtr buffer, H5PropertyList? transferPropertyList) 
     {
         int err = write(dataSet, type, memorySpace, fileSpace, transferPropertyList, buffer);
 
@@ -145,30 +165,15 @@ internal static class H5DAdapter
 
         return new H5Type(h);
     }
-
-    internal static H5PropertyList CreatePropertyList(PropertyListType listType)
+ 
+    internal static H5DataSetCreationPropertyList CreateCreationPropertyList()
     {
-        return listType switch
-        {
-            PropertyListType.Create => H5PAdapter.Create(H5P.DATASET_CREATE),
-            PropertyListType.Access => H5PAdapter.Create(H5P.DATASET_ACCESS),
-            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
-        };
+        return H5PAdapter.Create(H5P.DATASET_CREATE, h => new H5DataSetCreationPropertyList(h));
     }
-
-    /// <summary>
-    /// Get copy of property list used to create the data-set.
-    /// </summary>
-    /// <param name="dataSet"></param>
-    /// <returns></returns>
-    internal static H5PropertyList GetPropertyList(H5DataSet dataSet, PropertyListType listType)
+ 
+    internal static H5DataSetCreationPropertyList GetCreationPropertyList(H5DataSet dataSet)
     {
-        return listType switch
-        {
-            PropertyListType.Create => H5PAdapter.GetPropertyList(dataSet, get_create_plist),
-            PropertyListType.Access => H5PAdapter.GetPropertyList(dataSet, get_access_plist),
-            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
-        };
+        return H5PAdapter.GetPropertyList(dataSet, get_create_plist, h => new H5DataSetCreationPropertyList(h));
     }
 }
 

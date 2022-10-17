@@ -45,8 +45,7 @@ internal static partial class H5D
     /// <param name="dapl_id">Dataset access property list</param>
     /// <returns>Returns a dataset identifier if successful; otherwise
     /// returns a negative value.</returns>
-    /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dcreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dcreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial hid_t create
@@ -126,8 +125,7 @@ internal static partial class H5D
     /// <param name="dapl_id">Dataset access property list</param>
     /// <returns>Returns a dataset identifier if successful; otherwise
     /// returns a negative value.</returns>
-    /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dopen2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dopen2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial hid_t open

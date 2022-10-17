@@ -13,15 +13,6 @@ public class H5PropertyList : H5Object<H5PropertyList>
     }
 
     // TODO: move this to appropriate sub-class
-    public void SetChunk([DisallowNull] params long[] dims)
-    {
-        Guard.IsNotNull(dims, nameof(dims));
-        Guard.IsGreaterThanOrEqualTo(1, dims.Length, nameof(dims));
-
-        H5PAdapter.SetChunk(this, dims.Length, dims);
-    }
-
-    // TODO: move this to appropriate sub-class
     /// <summary>
     ///     Level 0 = off
     ///     Level 1 = min compression + min CPU
@@ -75,5 +66,20 @@ internal class H5LinkCreationPropertyList : H5AttributeCreationPropertyList
     {
         get => H5PAdapter.GetCreateIntermediateGroups(this);
         set => H5PAdapter.SetCreateIntermediateGroups(this, value);
+    }
+}
+
+internal class H5DataSetCreationPropertyList : H5PropertyList
+{
+    internal H5DataSetCreationPropertyList(long handle) : base(handle)
+    {
+    }
+
+    public void SetChunk([DisallowNull] params long[] dims)
+    {
+        Guard.IsNotNull(dims, nameof(dims));
+        Guard.IsGreaterThanOrEqualTo(1, dims.Length, nameof(dims));
+
+        H5PAdapter.SetChunk(this, dims.Length, dims);
     }
 }

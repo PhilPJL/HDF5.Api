@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5D
+internal static unsafe partial class H5D
 {
     static H5D() { _ = H5.open(); }
 
@@ -235,6 +235,27 @@ internal static partial class H5D
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t close(hid_t dset_id);
+
+    /// <summary>
+    /// Creates a new dataset and links it into the file.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Create2
+    /// </summary>
+    /// <param name="loc_id">Location identifier</param>
+    /// <param name="name">Dataset name</param>
+    /// <param name="type_id">Datatype identifier</param>
+    /// <param name="space_id">Dataspace identifier</param>
+    /// <param name="lcpl_id">Link creation property list</param>
+    /// <param name="dcpl_id">Dataset creation property list</param>
+    /// <param name="dapl_id">Dataset access property list</param>
+    /// <returns>Returns a dataset identifier if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dcreate2",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t create
+        (hid_t loc_id, byte* name, hid_t type_id, hid_t space_id,
+        hid_t lcpl_id = H5P.DEFAULT, hid_t dcpl_id = H5P.DEFAULT,
+        hid_t dapl_id = H5P.DEFAULT);
 
     /// <summary>
     /// Creates a new dataset and links it into the file.
@@ -622,6 +643,21 @@ internal static partial class H5D
     public static extern herr_t iterate
         (IntPtr buf, hid_t type_id, hid_t space_id,
         operator_t op, IntPtr op_data);
+
+    /// <summary>
+    /// Opens an existing dataset.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Open2
+    /// </summary>
+    /// <param name="file_id">Location identifier</param>
+    /// <param name="name">Dataset name</param>
+    /// <param name="dapl_id">Dataset access property list</param>
+    /// <returns>Returns a dataset identifier if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dopen2",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t open
+        (hid_t file_id, byte* name, hid_t dapl_id = H5P.DEFAULT);
 
     /// <summary>
     /// Opens an existing dataset.

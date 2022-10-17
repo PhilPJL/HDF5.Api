@@ -44,7 +44,7 @@ internal static partial class H5G
     /// <returns>Returns a group identifier if successful; otherwise returns
     /// a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gcreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gcreate2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial hid_t create
@@ -75,7 +75,7 @@ internal static partial class H5G
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strngs ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_name", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_name", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t get_info_by_name
@@ -93,7 +93,7 @@ internal static partial class H5G
     /// <returns>Returns a group identifier if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gopen2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Gopen2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial hid_t open

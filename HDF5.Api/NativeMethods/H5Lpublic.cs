@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5L
+internal static unsafe partial class H5L
 {
     static H5L() { _ = H5.open(); }
 
@@ -622,6 +622,22 @@ internal static partial class H5L
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Ldelete",
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t delete(hid_t loc_id, byte* name,
+        hid_t lapl_id = H5P.DEFAULT);
+
+    /// <summary>
+    /// Removes a link from a group.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5L.html#Link-Delete
+    /// </summary>
+    /// <param name="loc_id">Identifier of the file or group containing
+    /// the object.</param>
+    /// <param name="name">Name of the link to delete.</param>
+    /// <param name="lapl_id">Link access property list identifier.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Ldelete",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t delete(hid_t loc_id, byte[] name,
         hid_t lapl_id = H5P.DEFAULT);
 
@@ -684,6 +700,21 @@ internal static partial class H5L
     public static extern herr_t delete_by_idx
         (hid_t loc_id, string group_name, H5.index_t idx_type,
         H5.iter_order_t order, hsize_t n, hid_t lapl_id = H5P.DEFAULT);
+
+    /// <summary>
+    /// Determine whether a link with the specified name exists in a group.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5L.html#Link-Exists
+    /// </summary>
+    /// <param name="loc_id">Identifier of the file or group to query.</param>
+    /// <param name="name">The name of the link to check.</param>
+    /// <param name="lapl_id">Link access property list identifier.</param>
+    /// <returns>Returns 1 or 0 if successful; otherwise returns a negative
+    /// value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Lexists",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern htri_t exists(hid_t loc_id, byte* name,
+        hid_t lapl_id = H5P.DEFAULT);
 
     /// <summary>
     /// Determine whether a link with the specified name exists in a group.

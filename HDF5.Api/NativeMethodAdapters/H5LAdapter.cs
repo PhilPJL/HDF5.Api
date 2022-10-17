@@ -3,33 +3,53 @@ using HDF5.Api.NativeMethods;
 using System.Collections.Generic;
 using System.Linq;
 using static HDF5.Api.NativeMethods.H5L;
+#if NETSTANDARD
+using HDF5.Api.Utils;
+#endif
 
 namespace HDF5.Api.NativeMethodAdapters;
 
 /// <summary>
 /// H5 group native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_l.html"/>
 /// </summary>
-internal static class H5LAdapter
+internal static unsafe class H5LAdapter
 {
-    internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList = null)
+    internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList)
         where T : H5Object<T>
     {
-        location.AssertHasHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasLocationHandleType();
 
-        int err = exists(location, name, linkAccessPropertyList);
+        int err;
+
+#if NET7_0_OR_GREATER
+        err = exists(location, name, linkAccessPropertyList);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            err = exists(location, nameBytesPtr, linkAccessPropertyList);
+        }
+#endif
 
         err.ThrowIfError();
 
         return err > 0;
     }
 
-    internal static void Delete<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList = null)
+    internal static void Delete<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList)
         where T : H5Object<T>
-
     {
-        location.AssertHasHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasLocationHandleType();
 
-        int err = delete(location, name, linkAccessPropertyList);
+        int err;
+
+#if NET7_0_OR_GREATER
+         err = delete(location, name, linkAccessPropertyList);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            err = delete(location, nameBytesPtr, linkAccessPropertyList);
+        }
+#endif
 
         err.ThrowIfError();
     }
@@ -51,11 +71,10 @@ internal static class H5LAdapter
         {
             var name = info.cset switch
             {
-                H5T.cset_t.ASCII => Marshal.PtrToStringAnsi(intPtrName),
 #if NET7_0_OR_GREATER
-                H5T.cset_t.UTF8 => Marshal.PtrToStringUTF8(intPtrName),
+                H5T.cset_t.ASCII or H5T.cset_t.UTF8 => Marshal.PtrToStringUTF8(intPtrName),
 #else
-                H5T.cset_t.UTF8 => Marshal.PtrToStringAuto(intPtrName),
+                H5T.cset_t.ASCII or H5T.cset_t.UTF8 => MarshalExtensions.PtrToStringUTF8(intPtrName),
 #endif
                 _ => throw new InvalidEnumArgumentException($"Unexpected character set {info.cset} when enumerating attribute names."),
             };
@@ -85,14 +104,21 @@ internal static class H5LAdapter
     internal static IEnumerable<(string name, H5ObjectType type)> GetMembers<T>(H5Location<T> location)
         where T : H5Object<T> => GetMembers(location, H5O.type_t.UNKNOWN);
 
-    internal static H5PropertyList CreatePropertyList(PropertyListType listType)
+    /// <summary>
+    /// Create a new link creation property list
+    /// </summary>
+    /// <param name="encoding"></param>
+    /// <returns></returns>
+    internal static H5LinkCreationPropertyList CreateCreationPropertyList(CharacterSet encoding, bool createIntermediateGroups)
     {
-        return listType switch
+        return H5PAdapter.Create(H5P.LINK_CREATE, h =>
         {
-            PropertyListType.Create => H5PAdapter.Create(H5P.LINK_CREATE),
-            PropertyListType.Access => H5PAdapter.Create(H5P.LINK_ACCESS),
-            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
-        };
+            return new H5LinkCreationPropertyList(h)
+            {
+                CharacterEncoding = encoding,
+                CreateIntermediateGroups = createIntermediateGroups
+            };
+        });
     }
 }
 

@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5G
+internal static unsafe partial class H5G
 {
     static H5G() { _ = H5.open(); }
 
@@ -81,6 +81,25 @@ internal static partial class H5G
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t close(hid_t group_id);
+
+    /// <summary>
+    /// Creates a new group and links it into the file.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5G.html#Group-Create2
+    /// </summary>
+    /// <param name="loc_id">File or group identifier</param>
+    /// <param name="name">Absolute or relative name of the link to the
+    /// new group</param>
+    /// <param name="lcpl_id">Link creation property list identifier</param>
+    /// <param name="gcpl_id">Group creation property list identifier</param>
+    /// <param name="gapl_id">Group access property list identifier</param>
+    /// <returns>Returns a group identifier if successful; otherwise returns
+    /// a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gcreate2",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t create
+        (hid_t loc_id, byte* name, hid_t lcpl_id = H5P.DEFAULT,
+        hid_t gcpl_id = H5P.DEFAULT, hid_t gapl_id = H5P.DEFAULT);
 
     /// <summary>
     /// Creates a new group and links it into the file.
@@ -243,6 +262,24 @@ internal static partial class H5G
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t get_info_by_name
+        (hid_t loc_id, byte* name, ref info_t ginfo,
+        hid_t lapl_id = H5P.DEFAULT);
+
+    /// <summary>
+    /// Retrieves information about a group.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5G.html#Group-GetInfoByName
+    /// </summary>
+    /// <param name="loc_id">File or group identifier</param>
+    /// <param name="name">Name of group for which information is to be
+    /// retrieved</param>
+    /// <param name="ginfo">Struct in which group information is returned</param>
+    /// <param name="lapl_id">Link access property list</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gget_info_by_name",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_info_by_name
         (hid_t loc_id, byte[] name, ref info_t ginfo,
         hid_t lapl_id = H5P.DEFAULT);
 
@@ -265,6 +302,22 @@ internal static partial class H5G
     public static extern herr_t get_info_by_name
         (hid_t loc_id, string name, ref info_t ginfo,
         hid_t lapl_id = H5P.DEFAULT);
+
+    /// <summary>
+    /// Opens an existing group with a group access property list.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5G.html#Group-Open2
+    /// </summary>
+    /// <param name="loc_id">File or group identifier specifying the
+    /// location of the group to be opened</param>
+    /// <param name="name">Name of the group to open</param>
+    /// <param name="gapl_id">Group access property list identifier</param>
+    /// <returns>Returns a group identifier if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Gopen2",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t open
+        (hid_t loc_id, byte* name, hid_t gapl_id = H5P.DEFAULT);
 
     /// <summary>
     /// Opens an existing group with a group access property list.

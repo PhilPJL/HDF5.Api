@@ -43,9 +43,9 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         return H5AAdapter.CreateStringAttribute(this, name, fixedStorageLength, characterSet, padding);
     }
 
-    internal static H5PropertyList CreatePropertyList(PropertyListType listType)
+    internal static H5DataSetCreationPropertyList CreateCreationPropertyList()
     {
-        return H5DAdapter.CreatePropertyList(listType);
+        return H5DAdapter.CreateCreationPropertyList();
     }
 
     public void DeleteAttribute([DisallowNull] string name)
@@ -55,9 +55,9 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         H5AAdapter.Delete(this, name);
     }
 
-    internal H5PropertyList GetPropertyList(PropertyListType listType)
+    internal H5DataSetCreationPropertyList GetCreationPropertyList()
     {
-        return H5DAdapter.GetPropertyList(this, listType);
+        return H5DAdapter.GetCreationPropertyList(this);
     }
 
     public H5Type GetH5Type()
@@ -128,7 +128,7 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
         Guard.IsNotNull(fileSpace);
         Guard.IsNotNull(buffer);
 
-        H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
+        H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer, null);
     }
 
     /*    public void Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] T[] buffer) where T : unmanaged

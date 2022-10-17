@@ -84,6 +84,7 @@ internal static class H5FAdapter
 #endif
     }
 
+    [Obsolete]
     internal static H5PropertyList CreatePropertyList(PropertyListType listType)
     {
         return listType switch
@@ -94,6 +95,7 @@ internal static class H5FAdapter
         };
     }
 
+    [Obsolete]
     internal static H5PropertyList GetPropertyList(H5File file, PropertyListType listType)
     {
         return listType switch

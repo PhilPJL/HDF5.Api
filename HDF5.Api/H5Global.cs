@@ -172,6 +172,7 @@ public enum CharacterSet
     Utf8 = H5T.cset_t.UTF8
 }
 
+[Obsolete]
 public enum PropertyListType
 {
     None = 0,

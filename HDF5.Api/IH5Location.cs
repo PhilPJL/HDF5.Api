@@ -12,7 +12,6 @@ public interface IH5Location : IH5ObjectWithAttributes
 {
     // Groups
     H5Group CreateGroup(string name,
-        [AllowNull] H5PropertyList? linkCreationPropertyList = null,
         [AllowNull] H5PropertyList? groupCreationPropertyList = null,
         [AllowNull] H5PropertyList? groupAccessPropertyList = null);
     H5Group OpenGroup(string name);

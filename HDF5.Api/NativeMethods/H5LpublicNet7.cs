@@ -28,8 +28,7 @@ internal static partial class H5L
     /// <param name="lapl_id">Link access property list identifier.</param>
     /// <returns>Returns 1 or 0 if successful; otherwise returns a negative
     /// value.</returns>
-    /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lexists", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Lexists", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial htri_t exists(hid_t loc_id, string name,
@@ -45,8 +44,7 @@ internal static partial class H5L
     /// <param name="lapl_id">Link access property list identifier.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Ldelete", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Ldelete", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t delete(hid_t loc_id, string name,

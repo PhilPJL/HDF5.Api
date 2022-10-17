@@ -6,7 +6,7 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// <summary>
 /// H5 group native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_g.html"/>
 /// </summary>
-internal static class H5GAdapter
+internal static unsafe class H5GAdapter
 {
     internal static void Close(H5Group attribute)
     {
@@ -17,52 +17,50 @@ internal static class H5GAdapter
 
     internal static H5Group Create<T>(
         H5Location<T> location, string name,
-        H5PropertyList? propListLinkCreation = null,
-        H5PropertyList? propListGroupCreation = null,
-        H5PropertyList? propListGroupAccess = null) where T : H5Object<T>
+        H5PropertyList? propListGroupCreation,
+        H5PropertyList? propListGroupAccess) where T : H5Object<T>
     {
-        location.AssertHasHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasLocationHandleType();
 
-        long h = create(location, name, propListLinkCreation, propListGroupCreation, propListGroupAccess);
+        using var propListLinkCreation = H5Link.CreateCreationPropertyList();
 
-        h.ThrowIfInvalidHandleValue();
+        long h;
 
-        return new H5Group(h);
-
-        /*#if NET7_0_OR_GREATER
-                return createImpl(propListLinkCreation?.CharacterEncoding == CharacterSet.Utf8 ? createUtf8 : create);
-
-                H5Group createImpl(Func<long, string, long, long, long, long> createFunc)
-                {
-                    long h = createFunc(location, name, propListLinkCreation, propListGroupCreation, propListGroupAccess);
-                    h.ThrowIfInvalidHandleValue();
-                    return new H5Group(h);
-                }
-        #else
-                byte[] nameBytes =
-                    propListLinkCreation?.CharacterEncoding == CharacterSet.Utf8
-                        ? Encoding.UTF8.GetBytes(name)
-                        : Encoding.ASCII.GetBytes(name);
-
-                long h = create(location, nameBytes, propListLinkCreation, propListGroupCreation, propListGroupAccess);
-                h.ThrowIfInvalidHandleValue();
-                return new H5Group(h);
-        #endif
-        */
-    }
-
-    internal static H5Group Open<T>(H5Location<T> location, string name, H5PropertyList? propListGroupAccess = null) where T : H5Object<T>
-    {
-        location.AssertHasHandleType(HandleType.File, HandleType.Group);
-
-        long h = open(location, name, propListGroupAccess);
+#if NET7_0_OR_GREATER
+        h = create(location, name, propListLinkCreation, propListGroupCreation, propListGroupAccess);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            h = create(location, nameBytesPtr, propListLinkCreation, propListGroupCreation, propListGroupAccess);
+        }
+#endif
 
         h.ThrowIfInvalidHandleValue();
 
         return new H5Group(h);
     }
 
-    internal static void Delete<T>(H5Location<T> location, string path, H5PropertyList? propListLinkAccess = null) where T : H5Object<T>
+    internal static H5Group Open<T>(H5Location<T> location, string name, H5PropertyList? propListGroupAccess) where T : H5Object<T>
+    {
+        location.AssertHasLocationHandleType();
+
+        long h;
+
+#if NET7_0_OR_GREATER
+        h = open(location, name, propListGroupAccess);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            h = open(location, nameBytesPtr, propListGroupAccess);
+        }
+#endif
+
+        h.ThrowIfInvalidHandleValue();
+
+        return new H5Group(h);
+    }
+
+    internal static void Delete<T>(H5Location<T> location, string path, H5PropertyList? propListLinkAccess) where T : H5Object<T>
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group);
 
@@ -75,9 +73,9 @@ internal static class H5GAdapter
     /// <param name="location">A file or group id</param>
     /// <param name="name">A simple object name, e.g. 'group' not 'group/sub-group'.</param>
     /// <param name="linkAccessPropertyList"></param>
-    internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
+    internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList) where T : H5Object<T>
     {
-        location.AssertHasHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasLocationHandleType();
 
         if (!IsSimpleName(name))
         {
@@ -93,7 +91,7 @@ internal static class H5GAdapter
             return !name.Contains("\\") && !name.Contains("/");
 #else
             return !name.Contains('\\') && !name.Contains('/');
-#endif
+#endif        
         }
     }
 
@@ -115,10 +113,24 @@ internal static class H5GAdapter
     /// <param name="linkAccessPropertyList"></param>
     internal static bool PathExists<T>(H5Location<T> location, string path, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
     {
-        location.AssertHasHandleType(HandleType.File, HandleType.Group);
+        location.AssertHasLocationHandleType();
 
         info_t ginfo = default;
-        int err = get_info_by_name(location, path, ref ginfo, linkAccessPropertyList);
+        int err;
+
+#if NET7_0_OR_GREATER
+        err = get_info_by_name(location, path, ref ginfo, linkAccessPropertyList);
+#else
+        fixed (byte* pathBytesPtr = Encoding.UTF8.GetBytes(path))
+        {
+            err = get_info_by_name(location, pathBytesPtr, ref ginfo, linkAccessPropertyList);
+        }
+#endif
+
+        // NOTE: we don't throw on error here since we're relying 
+        // on err <= 0 to mean 'path not found'.  
+        // Not satisfying. 
+
         return err >= 0;
     }
 
