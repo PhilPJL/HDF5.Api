@@ -15,16 +15,14 @@ public sealed class Hdf5Exception : Exception
     {
         get
         {
-            var sb = new StringBuilder();
-
-            sb.AppendLine(string.Join("/", H5Errors.Select(e => $"{e.Number}:{e.Description}")));
-
-            if (H5Errors.Count == 0)
+            if (H5Errors.Count > 0)
             {
-                sb.AppendLine(base.Message);
+                return string.Join("/", H5Errors.Select(e => $"{e.Number}:{e.Description}"));
             }
-
-            return sb.ToString();
+            else
+            {
+                return base.Message;
+            }
         }
     }
 

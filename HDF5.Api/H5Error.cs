@@ -27,6 +27,7 @@ public
 #if NET7_0_OR_GREATER
 readonly 
 #endif
+// ReSharper disable once StructCanBeMadeReadOnly
 record struct H5ErrorInfo
 (
     int Number,

@@ -16,7 +16,18 @@ public class DataSetWriterTests : H5Test
                 .CreateOneDimensionalDataSetWriter(file, "TestRecords", TestRecordAdapter.Default, 10, 5);
 
             Enumerable.Range(0, 50000)
-                .Select(i => new TestRecord { Id = i })
+                .Select(i => new TestRecord
+                {
+                    Id = i,
+                    DoubleProperty = 1,
+                    FloatProperty = 2,
+                    IntProperty = 3,
+                    LongProperty = 4,
+                    ShortProperty = 5,
+                    UIntProperty = 6,
+                    ULongProperty = 7,
+                    UShortProperty = 8
+                })
                 .Buffer(50)
                 .ForEach(b => writer.Write(b));
 
@@ -35,7 +46,18 @@ public class DataSetWriterTests : H5Test
                 .CreateOneDimensionalDataSetWriter(file, "TestRecords", TestRecordAdapter.Default, 10, 0);
 
             Enumerable.Range(0, 50000)
-                .Select(i => new TestRecord { Id = i })
+                .Select(i => new TestRecord
+                {
+                    Id = i,
+                    DoubleProperty = 1,
+                    FloatProperty = 2,
+                    IntProperty = 3,
+                    LongProperty = 4,
+                    ShortProperty = 5,
+                    UIntProperty = 6,
+                    ULongProperty = 7,
+                    UShortProperty = 8
+                })
                 .Buffer(50)
                 .ForEach(b => writer.Write(b));
 

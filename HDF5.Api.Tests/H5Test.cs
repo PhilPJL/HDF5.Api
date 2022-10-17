@@ -6,13 +6,15 @@ namespace HDF5.Api.Tests;
 [TestClass]
 public abstract class H5Test
 {
-    internal static string TestFolder = "TestFiles";
+    private const string TestFolder = "TestFiles";
 
     [TestInitialize]
     public void TestInitialize()
     {
         H5Error.DisableErrorPrinting();
 
+        // TODO: could clean folder 
+        
         if (!Directory.Exists(TestFolder))
         {
             Directory.CreateDirectory(TestFolder);

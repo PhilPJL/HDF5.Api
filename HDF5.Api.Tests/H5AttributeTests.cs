@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 namespace HDF5.Api.Tests;
 
@@ -310,6 +311,55 @@ public class H5AttributeTests : H5Test
 
             Assert.IsTrue(file.AttributeExists(attributeName));
             file.AttributeNames.ForEach(a => Debug.WriteLine(a));
+        });
+    }
+
+    [TestMethod]
+    public void DuplicateAttributeThrowsH5ErrorInfo()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+            using var attribute = file.CreateStringAttribute("duplicate", 100);
+
+            try
+            {
+                using var attribute2 = file.CreateStringAttribute("duplicate", 100);
+            }
+            catch (Hdf5Exception ex)
+            {
+                Assert.IsNull(ex.InnerException);
+
+                string msg = ex.Message;
+                string toString = ex.ToString();
+                Debug.WriteLine(msg);
+                Debug.WriteLine(toString);
+
+                Assert.AreEqual("0:unable to create attribute/1:attribute already exists", msg);
+            }
+        });
+    }
+
+    [TestMethod]
+    public void EmptyAttributeNameThrows()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+
+            try
+            {
+                using var attribute = file.CreateStringAttribute("", 100);
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.IsNull(ex.InnerException);
+
+                string msg = ex.Message;
+                string toString = ex.ToString();
+                Debug.WriteLine(msg);
+                Debug.WriteLine(toString);
+            }
         });
     }
 }
