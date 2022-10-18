@@ -3,7 +3,7 @@
 namespace HDF5.Api.Tests;
 
 [TestClass]
-public class H5TypeTests : H5Test
+public class H5TypeTests : H5Test<H5TypeTests> 
 {
     [TestMethod]
     public void CreateCommittedDataTypeAscii()

@@ -1,7 +1,7 @@
 ﻿namespace HDF5.Api.Tests
 {
     [TestClass]
-    public class H5ObjectTests : H5Test
+    public class H5ObjectTests : H5Test<H5ObjectTests>
     {
         [TestMethod]
         public void HasHandleTypeTest()

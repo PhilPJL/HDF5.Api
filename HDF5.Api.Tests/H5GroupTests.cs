@@ -1,7 +1,9 @@
-﻿namespace HDF5.Api.Tests;
+﻿using System.Diagnostics;
+
+namespace HDF5.Api.Tests;
 
 [TestClass]
-public class H5GroupTests : H5LocationTests
+public class H5GroupTests : H5LocationTests<H5GroupTests>
 {
     [TestMethod]
     public void CreateGroupInGroupSucceeds()
@@ -245,45 +247,40 @@ public class H5GroupTests : H5LocationTests
 
     #endregion
 
-/*    #region Encoding
-
     [TestMethod]
-    public void CreateAnsiGroupSucceeds()
+    [DataRow("ansi", "group")]
+    [DataRow("utf8", "Χαρακτηριστικό")]
+    public void CreateGroupAndCheckNameSucceeds(string suffix, string name)
     {
         HandleCheck(() =>
         {
-            using var file = CreateFile();
+            using var file = CreateFile2(suffix);
+            using var group = file.CreateGroup(name);
 
-            using var lcpl = H5Link.CreatePropertyList(PropertyListType.Create);
-            lcpl.CharacterEncoding = CharacterSet.Ascii;
+            Assert.IsTrue(file.GroupNames.Contains(name));
+            Assert.IsTrue(file.GroupExists(name));
 
-            // Create new group
-            using var group = file.CreateGroup("ANSI_STRING", lcpl);
-
-            file.GroupNames.ForEach(n => Debug.WriteLine(n));
-
-            Assert.IsTrue(file.GroupExists("ANSI_STRING"));
+            // group.Name returns rooted path name
+            Assert.AreEqual("/" + name, group.Name);
         });
     }
 
     [TestMethod]
-    public void CreateUtf8GroupSucceeds()
+    [DataRow("ansi", "group")]
+    [DataRow("utf8", "Χαρακτηριστικό")]
+    public void CreateGroupAndCheckNameSucceeds2(string suffix, string name)
     {
         HandleCheck(() =>
         {
-            using var file = CreateFile();
+            using var file = CreateFile2(suffix);
+            using var parent = file.CreateGroup("parent");
+            using var group = parent.CreateGroup(name);
 
-            using var lcpl = H5Link.CreatePropertyList(PropertyListType.Create);
-            lcpl.CharacterEncoding = CharacterSet.Utf8;
+            Assert.IsTrue(parent.GroupNames.Contains(name));
+            Assert.IsTrue(parent.GroupExists(name));
 
-            // Create new group
-            using var group = file.CreateGroup("Χαρακτηριστικό", lcpl);
-
-            file.GroupNames.ForEach(n => Debug.WriteLine(n));
-
-            //Assert.IsTrue(file.GroupExists("Χαρακτηριστικό"));
+            // group.Name returns rooted path name
+            Assert.AreEqual("/parent/" + name, group.Name);
         });
     }
-
-    #endregion
-*/}
+}

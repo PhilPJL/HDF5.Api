@@ -1,7 +1,7 @@
 ﻿namespace HDF5.Api.Tests;
 
 [TestClass]
-public class H5SpaceTests : H5LocationTests
+public class H5SpaceTests : H5LocationTests<H5SpaceTests>
 {
     [TestMethod]
     public void CreateOneDimension()

@@ -65,17 +65,4 @@ public class H5Attribute : H5Object<H5Attribute>
     {
         return H5AAdapter.CreateCreationPropertyList(encoding);
     }
-
-    public static H5Attribute CreateStringAttribute<T>(
-        [DisallowNull] H5Object<T> h5Object,
-        string name, int length = 0,
-        CharacterSet characterSet = CharacterSet.Ascii, StringPadding padding = StringPadding.NullTerminate) where T : H5Object<T>
-    {
-        Guard.IsNotNull(h5Object);
-        Guard.IsGreaterThanOrEqualTo(length, 0);
-        
-        h5Object.AssertHasWithAttributesHandleType();
-
-        return H5AAdapter.CreateStringAttribute(h5Object, name, length, characterSet, padding);
-    }
 }

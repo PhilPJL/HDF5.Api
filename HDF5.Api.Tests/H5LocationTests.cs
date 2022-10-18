@@ -1,6 +1,6 @@
 ﻿namespace HDF5.Api.Tests;
 
-public abstract class H5LocationTests : H5Test
+public abstract class H5LocationTests<T> : H5Test<T> where T : H5LocationTests<T>
 {
     #region Groups
     protected static void CreateGroupSucceeds<T>(H5Location<T> location) where T : H5Object<T>

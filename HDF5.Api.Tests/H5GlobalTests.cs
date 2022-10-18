@@ -1,7 +1,7 @@
 ﻿namespace HDF5.Api.Tests;
 
 [TestClass]
-public class H5GlobalTests : H5Test
+public class H5GlobalTests : H5Test<H5GlobalTests>
 {
     [TestMethod]
     public void IsThreadSafe()

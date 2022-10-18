@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics;
-using System.Text;
 
 namespace HDF5.Api.Tests;
 
 [TestClass]
-public class H5AttributeTests : H5Test
+public class H5AttributeTests : H5Test<H5AttributeTests>
 {
     [TestMethod]
     [DataRow("ascii_nullterm", CharacterSet.Ascii, StringPadding.NullTerminate)]
@@ -239,6 +238,9 @@ public class H5AttributeTests : H5Test
             a.Write(newValue);
 
             var readValue2 = location.ReadDateTimeAttribute(name);
+            Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
+
+            var readValue3 = a.ReadDateTime();
             Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
             location.DeleteAttribute(name);

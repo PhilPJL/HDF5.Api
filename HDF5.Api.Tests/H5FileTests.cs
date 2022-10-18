@@ -1,9 +1,7 @@
-﻿using System.Diagnostics;
-
-namespace HDF5.Api.Tests;
+﻿namespace HDF5.Api.Tests;
 
 [TestClass]
-public class H5FileTests : H5LocationTests
+public class H5FileTests : H5LocationTests<H5FileTests>
 {
     #region Create file tests
 
@@ -331,10 +329,7 @@ public class H5FileTests : H5LocationTests
         {
             using var file = CreateFile2(suffix);
 
-            var fileName = Path.GetFileName(file.Name);
-            Debug.WriteLine(fileName);
-
-            Assert.AreEqual(Path.ChangeExtension($"{nameof(GetNameSucceeds)}_{suffix}", "h5"), fileName);
+            Assert.AreEqual(GetFileName2(suffix), file.Name);
         });
     }
 

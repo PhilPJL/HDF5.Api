@@ -3,7 +3,7 @@
 namespace HDF5.Api.Tests;
 
 [TestClass]
-public class DataSetWriterTests : H5Test
+public class DataSetWriterTests : H5Test<DataSetWriterTests>
 {
     [TestMethod]
     public void DataSetWriterTestCompressed()

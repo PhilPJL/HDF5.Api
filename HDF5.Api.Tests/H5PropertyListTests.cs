@@ -1,11 +1,9 @@
-﻿using HDF5.Api.NativeMethods;
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.ComponentModel;
 
 namespace HDF5.Api.Tests;
 
 [TestClass]
-public class H5PropertyListTests : H5Test
+public class H5PropertyListTests : H5Test<H5PropertyListTests>
 {
     [TestMethod]
     public void FileCreateDefaultPropertyList()

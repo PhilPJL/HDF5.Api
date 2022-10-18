@@ -1,7 +1,7 @@
 ﻿namespace HDF5.Api.Tests;
 
 [TestClass]
-public class H5DataSetTests : H5Test
+public class H5DataSetTests : H5Test<H5DataSetTests>
 {
     internal static H5DataSet CreateTestDataset(IH5Location location, string dataSetName)
     {

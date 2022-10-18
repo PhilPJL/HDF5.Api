@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace HDF5.Api.Tests;
 
 [TestClass]
-public abstract class H5Test
+public abstract class H5Test<T> where T : H5Test<T>
 {
     private const string TestFolder = "TestFiles";
 
@@ -36,6 +36,16 @@ public abstract class H5Test
         Assert.AreEqual(expectedHandlesOpen, H5Handle.OpenHandleCount);
     }
 
+    protected string GetFileName([CallerMemberName] string? path = null)
+    {
+        return Path.Combine(TestFolder, Path.ChangeExtension($"{typeof(T).Name}-{path}", "h5"));
+    }
+
+    protected string GetFileName2(string suffix, [CallerMemberName] string? path = null)
+    {
+        return GetFileName($"{path}_{suffix}");
+    }
+
     protected static H5File CreateFile2(
         string suffix,
         [CallerMemberName] string? path = null,
@@ -54,7 +64,8 @@ public abstract class H5Test
     {
         Guard.IsNotNull(path);
 
-        var fullpath = Path.Combine(TestFolder, Path.ChangeExtension(path, "h5"));
+        var typeName = typeof(T).Name;
+        var fullpath = Path.Combine(TestFolder, Path.ChangeExtension($"{typeName}-{path}", "h5"));
 
         var file = H5File.Create(
             fullpath,
@@ -73,7 +84,8 @@ public abstract class H5Test
     {
         Guard.IsNotNull(path);
 
-        var fullpath = Path.Combine(TestFolder, Path.ChangeExtension(path, "h5"));
+        var typeName = typeof(T).Name;
+        var fullpath = Path.Combine(TestFolder, Path.ChangeExtension($"{typeName}-{path}", "h5"));
 
         var file = H5File.CreateOrOpen(
             fullpath,
@@ -92,7 +104,8 @@ public abstract class H5Test
     {
         Guard.IsNotNull(path);
 
-        var fullpath = Path.Combine(TestFolder, Path.ChangeExtension(path, "h5"));
+        var typeName = typeof(T).Name;
+        var fullpath = Path.Combine(TestFolder, Path.ChangeExtension($"{typeName}-{path}", "h5"));
 
         var file = H5File.Open(
             fullpath,

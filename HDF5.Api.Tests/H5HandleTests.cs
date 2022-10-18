@@ -1,7 +1,7 @@
 ﻿namespace HDF5.Api.Tests;
 
 [TestClass]
-public class H5HandleTests : H5Test
+public class H5HandleTests : H5Test<H5HandleTests>
 {
     private const string Path = "test.h5";
 
