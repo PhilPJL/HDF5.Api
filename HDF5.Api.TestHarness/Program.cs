@@ -40,7 +40,6 @@
                         Console.WriteLine(sIndent + "->V: " + att.Read<double>());
                         break;
                 }
-
             }
 
             foreach (var d in location.DataSetNames)
@@ -50,8 +49,6 @@
                 Console.WriteLine(sIndent + "DS: " + d);
 
                 using var type = ds.GetH5Type();
-
-
             }
 
             foreach (var g in location.GroupNames)

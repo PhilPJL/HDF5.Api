@@ -5,6 +5,7 @@ public abstract class H5LocationTests : H5Test
     #region Groups
     protected static void CreateGroupSucceeds<T>(H5Location<T> location) where T : H5Object<T>
     {
+        // Ascii
         const string grp1Name = "grp1";
         const string grp2Name = "grp2";
 
@@ -15,6 +16,18 @@ public abstract class H5LocationTests : H5Test
         Assert.IsTrue(grp1.GroupExists(grp2Name));
 
         Assert.IsTrue(location.GroupPathExists($"{grp1Name}/{grp2Name}"));
+
+        // UTF-8
+        const string grp3Name = "ᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻ";
+        const string grp4Name = "Χαρακτηριστικό";
+
+        using var grp3 = location.CreateGroup(grp3Name);
+        Assert.IsTrue(location.GroupExists(grp3Name));
+
+        using var grp4 = grp3.CreateGroup(grp4Name);
+        Assert.IsTrue(grp3.GroupExists(grp4Name));
+
+        Assert.IsTrue(location.GroupPathExists($"{grp3Name}/{grp4Name}"));
     }
 
     protected static void CreateAndOpenGroupSucceeds<T>(H5Location<T> location) where T : H5Object<T>

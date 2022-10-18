@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5O
+internal static unsafe partial class H5O
 {
     static H5O() { _ = H5.open(); }
 
@@ -616,6 +616,26 @@ internal static partial class H5O
     public static extern herr_t get_info_by_idx
         (hid_t loc_id, string group_name, H5.index_t idx_type,
         H5.iter_order_t order, hsize_t n, ref info_t oinfo,
+        hid_t lapl_id = H5P.DEFAULT);
+
+    /// <summary>
+    /// Retrieves the metadata for an object, identifying the object by
+    /// location and relative name.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5O.html#Object-GetInfoByName
+    /// </summary>
+    /// <param name="loc_id">File or group identifier specifying location
+    /// of group in which object is located</param>
+    /// <param name="name">Name of object, relative to
+    /// <paramref name="loc_id"/></param>
+    /// <param name="oinfo">Buffer in which to return object information</param>
+    /// <param name="lapl_id">Link access property list</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Oget_info_by_name1",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t get_info_by_name
+        (hid_t loc_id, byte* name, ref info_t oinfo,
         hid_t lapl_id = H5P.DEFAULT);
 
     /// <summary>
