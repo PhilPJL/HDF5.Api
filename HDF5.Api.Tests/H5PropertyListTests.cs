@@ -108,19 +108,5 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
         });
     }
 
-    [TestMethod]
-    public void GroupCreateOrGetPropertyListWithInvalidEnumThrows()
-    {
-        HandleCheck(() =>
-        {
-            using var file = CreateFile();
-
-            // group 
-            using var group = file.CreateGroup("group");
-            Assert.ThrowsException<InvalidEnumArgumentException>(() => group.GetCreationPropertyList());
-            Assert.ThrowsException<InvalidEnumArgumentException>(() => H5Group.CreateCreationPropertyList());
-        });
-    }
-
     // TODO: data set property lists
 }

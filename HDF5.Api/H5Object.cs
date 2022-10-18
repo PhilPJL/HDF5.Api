@@ -65,6 +65,11 @@ public class H5Object<T> : Disposable where T : H5Object<T>
             return H5Handle.DefaultHandleValue;
         }
 
+        if (h5Object.IsDisposed)
+        {
+            throw new ObjectDisposedException(h5Object.GetType().Name);
+        }
+
         h5Object._handle.ThrowIfInvalidHandleValue();
         return h5Object._handle;
     }

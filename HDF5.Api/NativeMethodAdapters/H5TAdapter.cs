@@ -191,7 +191,7 @@ internal static unsafe class H5TAdapter
         Guard.IsNotNullOrEmpty(name);
         Guard.IsNotNull(h5Type);
 
-        var linkCreationPropertyList = H5Link.CreateCreationPropertyList();
+        using var linkCreationPropertyList = H5Link.CreateCreationPropertyList();
 
         int err;
 
