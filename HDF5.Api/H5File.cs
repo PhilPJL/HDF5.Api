@@ -49,19 +49,39 @@ public class H5File : H5Location<H5File>
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>
-    public static H5PropertyList CreatePropertyList(PropertyListType listType)
+    public static H5FileCreationPropertyList CreateCreationPropertyList()
     {
-        return H5FAdapter.CreatePropertyList(listType);
+        return H5FAdapter.CreateCreationPropertyList();
     }
 
     /// <summary>
-    /// Gets a copy of the specified <see cref="H5PropertyList"/> used to create the object.
+    /// Creates a <see cref="H5PropertyList"/> of the required type.
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>
-    public H5PropertyList GetPropertyList(PropertyListType listType)
+    public static H5FileAccessPropertyList CreateAccessPropertyList()
     {
-        return H5FAdapter.GetPropertyList(this, listType);
+        return H5FAdapter.CreateAccessPropertyList();
+    }
+
+    /// <summary>
+    /// Gets a copy of the <see cref="H5FileCreationPropertyList"/> used to create the object.
+    /// </summary>
+    /// <param name="listType"></param>
+    /// <returns></returns>
+    public H5FileCreationPropertyList GetCreationPropertyList()
+    {
+        return H5FAdapter.GetCreationPropertyList(this);
+    }
+
+    /// <summary>
+    /// Gets a copy of the <see cref="H5FileAccessPropertyList"/> used to create the object.
+    /// </summary>
+    /// <param name="listType"></param>
+    /// <returns></returns>
+    public H5FileAccessPropertyList GetAccessPropertyList()
+    {
+        return H5FAdapter.GetAccessPropertyList(this);
     }
 
     /// <summary>
@@ -72,7 +92,7 @@ public class H5File : H5Location<H5File>
     public static H5File Open(
         [DisallowNull] string path, 
         bool readOnly = false, 
-        [AllowNull] H5PropertyList? fileAccessPropertyList = null)
+        [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
@@ -87,8 +107,8 @@ public class H5File : H5Location<H5File>
     public static H5File CreateOrOpen(
         [DisallowNull] string path, 
         bool readOnly = false,
-        [AllowNull] H5PropertyList? fileCreationPropertyList = null,
-        [AllowNull] H5PropertyList? fileAccessPropertyList = null)
+        [AllowNull] H5FileCreationPropertyList? fileCreationPropertyList = null,
+        [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
@@ -106,8 +126,8 @@ public class H5File : H5Location<H5File>
     public static H5File Create(
         [DisallowNull] string path, 
         bool failIfExists = false, 
-        [AllowNull] H5PropertyList? fileCreationPropertyList = null, 
-        [AllowNull] H5PropertyList? fileAccessPropertyList = null)
+        [AllowNull] H5FileCreationPropertyList? fileCreationPropertyList = null, 
+        [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 

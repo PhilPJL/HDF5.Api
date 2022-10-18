@@ -26,8 +26,7 @@ internal unsafe static class H5DAdapter
     }
 
     internal static H5DataSet Create<T>(H5Location<T> location, string name, H5Type type, H5Space space,
-        H5PropertyList? dataSetCreationPropertyList,
-        H5PropertyList? accessCreationPropertyList) where T : H5Object<T>
+        H5DataSetCreationPropertyList? dataSetCreationPropertyList) where T : H5Object<T>
     {
         location.AssertHasLocationHandleType();
 
@@ -37,12 +36,12 @@ internal unsafe static class H5DAdapter
 
 #if NET7_0_OR_GREATER
         h = create(location, name, type, space,
-            linkCreationPropertyList, dataSetCreationPropertyList, accessCreationPropertyList);
+            linkCreationPropertyList, dataSetCreationPropertyList);
 #else
         fixed(byte* namePtr = Encoding.UTF8.GetBytes(name))
         {
             h = create(location, namePtr, type, space,
-                linkCreationPropertyList, dataSetCreationPropertyList, accessCreationPropertyList);
+                linkCreationPropertyList, dataSetCreationPropertyList);
         }
 #endif
 

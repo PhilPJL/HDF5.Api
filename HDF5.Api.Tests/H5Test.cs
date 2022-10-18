@@ -50,7 +50,7 @@ public abstract class H5Test<T> where T : H5Test<T>
         string suffix,
         [CallerMemberName] string? path = null,
         bool failIfExists = false,
-        H5PropertyList? fileCreationPropertyList = null)
+        H5FileCreationPropertyList? fileCreationPropertyList = null)
     {
         Guard.IsNotNull(path);
 
@@ -60,7 +60,7 @@ public abstract class H5Test<T> where T : H5Test<T>
     protected static H5File CreateFile(
         [CallerMemberName] string? path = null,
         bool failIfExists = false,
-        H5PropertyList? fileCreationPropertyList = null)
+        H5FileCreationPropertyList? fileCreationPropertyList = null)
     {
         Guard.IsNotNull(path);
 
@@ -80,7 +80,7 @@ public abstract class H5Test<T> where T : H5Test<T>
     protected static H5File CreateOrOpenFile(
         [CallerMemberName] string? path = null,
         bool readOnly = false,
-        H5PropertyList? fileCreationPropertyList = null)
+        H5FileCreationPropertyList? fileCreationPropertyList = null)
     {
         Guard.IsNotNull(path);
 
@@ -100,7 +100,7 @@ public abstract class H5Test<T> where T : H5Test<T>
     protected static H5File OpenFile(
         [CallerMemberName] string? path = null,
         bool readOnly = false,
-        H5PropertyList? fileCreationPropertyList = null)
+        H5FileAccessPropertyList? fileAccessPropertyList = null)
     {
         Guard.IsNotNull(path);
 
@@ -110,7 +110,7 @@ public abstract class H5Test<T> where T : H5Test<T>
         var file = H5File.Open(
             fullpath,
             readOnly,
-            fileCreationPropertyList);
+            fileAccessPropertyList);
 
         Assert.IsTrue(File.Exists(fullpath));
 

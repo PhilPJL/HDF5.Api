@@ -6,38 +6,29 @@ namespace HDF5.Api;
 ///     <para>.NET wrapper for H5P (Property list) API.</para>
 ///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_p.html"/>
 /// </summary>
-public class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5PropertyList>
+public abstract class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5PropertyList>
 {
-    internal H5PropertyList(long handle) : base(handle, HandleType.PropertyList, H5PAdapter.Close)
+    internal protected H5PropertyList(long handle) : base(handle, HandleType.PropertyList, H5PAdapter.Close)
     {
     }
 
-    // TODO: move this to appropriate sub-class
-    /// <summary>
-    ///     Level 0 = off
-    ///     Level 1 = min compression + min CPU
-    ///     ..
-    ///     Level 9 = max compression + max CPU and time
-    /// </summary>
-    /// <param name="level"></param>
-    public void EnableDeflateCompression(int level)
+    public bool IsEqualTo([AllowNull] H5PropertyList? other)
     {
-        Guard.IsBetweenOrEqualTo(level, 0, 9);
+        if(other is null) { return false; }
 
-        H5PAdapter.EnableDeflateCompression(this, level);
+        return H5PAdapter.AreEqual(this, other);
     }
 
-    public bool Equals(H5PropertyList other)
+#if NET7_0_OR_GREATER
+    public bool Equals([AllowNull] H5PropertyList? other)
+#else
+    public bool Equals([AllowNull] H5PropertyList other)
+#endif
     {
         return IsEqualTo(other);
     }
 
-    public bool IsEqualTo([DisallowNull] H5PropertyList other)
-    {
-        Guard.IsNotNull(other);
-
-        return H5PAdapter.AreEqual(this, other);
-    }
+    // TODO: getclass, copy, ...
 }
 
 internal class H5AttributeCreationPropertyList : H5PropertyList
@@ -66,7 +57,7 @@ internal class H5LinkCreationPropertyList : H5AttributeCreationPropertyList
     }
 }
 
-internal class H5DataSetCreationPropertyList : H5PropertyList
+public class H5DataSetCreationPropertyList : H5PropertyList
 {
     internal H5DataSetCreationPropertyList(long handle) : base(handle)
     {
@@ -79,4 +70,50 @@ internal class H5DataSetCreationPropertyList : H5PropertyList
 
         H5PAdapter.SetChunk(this, dims.Length, dims);
     }
+
+    /// <summary>
+    ///     Level 0 = off
+    ///     Level 1 = min compression + min CPU
+    ///     ..
+    ///     Level 9 = max compression + max CPU and time
+    /// </summary>
+    /// <param name="level"></param>
+    public void SetDeflate(int level)
+    {
+        Guard.IsBetweenOrEqualTo(level, 0, 9);
+
+        H5PAdapter.SetDeflate(this, level);
+    }
+
+    // TODO: GetChunk, etc.... loads
 }
+
+public class H5DataSetAccessPropertyList : H5PropertyList
+{
+    internal H5DataSetAccessPropertyList(long handle) : base(handle)
+    {
+    }
+}
+
+public class H5FileAccessPropertyList : H5PropertyList
+{
+    public H5FileAccessPropertyList(long handle) : base(handle)
+    {
+    }
+}
+
+public class H5FileCreationPropertyList : H5PropertyList
+{
+    internal H5FileCreationPropertyList(long handle) : base(handle)
+    {
+    }
+}
+
+public class H5GroupCreationPropertyList : H5PropertyList
+{
+    internal H5GroupCreationPropertyList(long handle) : base(handle)
+    {
+    }
+}
+
+// Etc...

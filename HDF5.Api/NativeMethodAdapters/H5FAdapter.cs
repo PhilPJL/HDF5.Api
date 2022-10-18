@@ -16,7 +16,8 @@ internal static unsafe class H5FAdapter
         err.ThrowIfError();
     }
 
-    internal static H5File Create(string path, bool failIfExists = false, H5PropertyList? fileCreationPropertyList = null, H5PropertyList? fileAccessPropertyList = null)
+    internal static H5File Create(string path, bool failIfExists = false,
+        H5FileCreationPropertyList? fileCreationPropertyList = null, H5FileAccessPropertyList? fileAccessPropertyList = null)
     {
         long h;
 
@@ -63,29 +64,27 @@ internal static unsafe class H5FAdapter
 #endif
     }
 
-    [Obsolete]
-    internal static H5PropertyList CreatePropertyList(PropertyListType listType)
+    internal static H5FileCreationPropertyList CreateCreationPropertyList()
     {
-        return listType switch
-        {
-            PropertyListType.Create => H5PAdapter.Create(H5P.FILE_CREATE),
-            PropertyListType.Access => H5PAdapter.Create(H5P.FILE_ACCESS),
-            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
-        };
+        return H5PAdapter.Create(H5P.FILE_CREATE, h => new H5FileCreationPropertyList(h));
     }
 
-    [Obsolete]
-    internal static H5PropertyList GetPropertyList(H5File file, PropertyListType listType)
+    internal static H5FileAccessPropertyList CreateAccessPropertyList()
     {
-        return listType switch
-        {
-            PropertyListType.Create => H5PAdapter.GetPropertyList(file, get_create_plist),
-            PropertyListType.Access => H5PAdapter.GetPropertyList(file, get_access_plist),
-            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
-        };
+        return H5PAdapter.Create(H5P.FILE_ACCESS, h => new H5FileAccessPropertyList(h));
     }
 
-    internal static H5File Open(string path, bool readOnly, H5PropertyList? fileAccessPropertyList = null)
+    internal static H5FileCreationPropertyList GetCreationPropertyList(H5File file)
+    {
+        return H5PAdapter.GetPropertyList(file, get_create_plist, h => new H5FileCreationPropertyList(h));
+    }
+
+    internal static H5FileAccessPropertyList GetAccessPropertyList(H5File file)
+    {
+        return H5PAdapter.GetPropertyList(file, get_access_plist, h => new H5FileAccessPropertyList(h));
+    }
+
+    internal static H5File Open(string path, bool readOnly, H5FileAccessPropertyList? fileAccessPropertyList = null)
     {
         long h = open(path, readOnly ? ACC_RDONLY : ACC_RDWR, fileAccessPropertyList);
 

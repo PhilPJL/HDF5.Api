@@ -12,15 +12,15 @@ public interface IH5Location : IH5ObjectWithAttributes
 {
     // Groups
     H5Group CreateGroup(string name,
-        [AllowNull] H5PropertyList? groupCreationPropertyList = null,
-        [AllowNull] H5PropertyList? groupAccessPropertyList = null);
+        [AllowNull] H5GroupCreationPropertyList? groupCreationPropertyList = null);
     H5Group OpenGroup(string name);
     bool GroupExists(string name);
     bool GroupPathExists(string path);
     void DeleteGroup(string name);
 
     // Data sets
-    H5DataSet CreateDataSet(string name, H5Type typeId, H5Space space, H5PropertyList propertyList);
+    H5DataSet CreateDataSet(string name, H5Type typeId, H5Space space,
+        [AllowNull] H5DataSetCreationPropertyList? propertyList = null);
     H5DataSet OpenDataSet(string name);
     bool DataSetExists(string name);
     // TODO: DataSetPathExists?
@@ -32,4 +32,10 @@ public interface IH5Location : IH5ObjectWithAttributes
 
     // TODO: move to IH5ObjectWithAttributes?
     IEnumerable<(string name, H5ObjectType type)> Members { get; }
+
+    void Commit(
+        [DisallowNull] string name,
+        [DisallowNull] H5Type h5Type,
+        [AllowNull] H5PropertyList? dataTypeCreationPropertyList = null,
+        [AllowNull] H5PropertyList? dataTypeAccessPropertyList = null);
 }

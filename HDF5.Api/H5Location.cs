@@ -101,12 +101,11 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     ///     Create a Group in this location
     /// </summary>
     public H5Group CreateGroup([DisallowNull] string name,
-        [AllowNull] H5PropertyList? groupCreationPropertyList = null,
-        [AllowNull] H5PropertyList? groupAccessPropertyList = null)
+        [AllowNull] H5GroupCreationPropertyList? groupCreationPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5GAdapter.Create(this, name, groupCreationPropertyList, groupAccessPropertyList);
+        return H5GAdapter.Create(this, name, groupCreationPropertyList);
     }
 
     /// <summary>
@@ -147,13 +146,13 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         [DisallowNull] string name, 
         [DisallowNull] H5Type type, 
         [DisallowNull] H5Space space, 
-        [AllowNull] H5PropertyList? dataSetCreationPropertyList = null)
+        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
 
-        return H5DAdapter.Create(this, name, type, space, dataSetCreationPropertyList, null);
+        return H5DAdapter.Create(this, name, type, space, dataSetCreationPropertyList);
     }
 
     /// <summary>
@@ -176,11 +175,10 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     public void Commit(
         [DisallowNull] string name,
         [DisallowNull] H5Type h5Type,
-        [AllowNull] H5PropertyList? linkCreationPropertyList = null,
         [AllowNull] H5PropertyList? dataTypeCreationPropertyList = null,
         [AllowNull] H5PropertyList? dataTypeAccessPropertyList = null)
     {
         H5TAdapter.Commit(this, name, h5Type,
-            linkCreationPropertyList, dataTypeCreationPropertyList, dataTypeAccessPropertyList);
+            dataTypeCreationPropertyList, dataTypeAccessPropertyList);
     }
 }

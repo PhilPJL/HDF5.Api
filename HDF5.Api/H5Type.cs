@@ -13,14 +13,18 @@ public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
 
     private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
 
-    public bool IsEqualTo([DisallowNull] H5Type other)
+    public bool IsEqualTo([AllowNull] H5Type? other)
     {
-        Guard.IsNotNull(other);
+        if(other is null) { return false; }
 
         return H5TAdapter.AreEqual(this, other);
     }
 
-    public bool Equals(H5Type other)
+#if NET7_0_OR_GREATER
+    public bool Equals([AllowNull] H5Type? other)
+#else
+    public bool Equals([AllowNull] H5Type other)
+#endif
     {
         return IsEqualTo(other);
     }

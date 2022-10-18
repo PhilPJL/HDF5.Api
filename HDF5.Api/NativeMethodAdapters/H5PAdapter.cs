@@ -16,12 +16,6 @@ internal static class H5PAdapter
         err.ThrowIfError();
     }
 
-    [Obsolete("Use Create<TPList>")]
-    internal static H5PropertyList Create(long classId)
-    {
-        return Create(classId, h => new H5PropertyList(h));
-    }
-
     internal static TPList Create<TPList>(long classId, Func<long, TPList> createPropertyList) where TPList : H5PropertyList
     {
         long h = create(classId);
@@ -38,7 +32,7 @@ internal static class H5PAdapter
         err.ThrowIfError();
     }
 
-    internal static void EnableDeflateCompression(H5PropertyList propertyList, int level)
+    internal static void SetDeflate(H5PropertyList propertyList, int level)
     {
         int err = set_deflate(propertyList, (uint)level);
 
@@ -52,12 +46,6 @@ internal static class H5PAdapter
         err.ThrowIfError();
 
         return err != 0;
-    }
-
-    [Obsolete("Use GetPropertyList<T, TPList>")]
-    internal static H5PropertyList GetPropertyList<T>(H5Object<T> obj, Func<long, long> get_plist) where T : H5Object<T>
-    {
-        return GetPropertyList(obj, get_plist, h => new H5PropertyList(h));
     }
 
     internal static TPList GetPropertyList<T, TPList>(

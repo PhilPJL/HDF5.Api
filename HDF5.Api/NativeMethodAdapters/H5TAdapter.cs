@@ -181,7 +181,6 @@ internal static unsafe class H5TAdapter
         [DisallowNull] H5Object<T> h5Object,
         [DisallowNull] string name,
         [DisallowNull] H5Type h5Type,
-        [AllowNull] H5PropertyList? linkCreationPropertyList = null,
         [AllowNull] H5PropertyList? dataTypeCreationPropertyList = null,
         [AllowNull] H5PropertyList? dataTypeAccessPropertyList = null) where T : H5Object<T>
     {
@@ -190,6 +189,8 @@ internal static unsafe class H5TAdapter
         Guard.IsNotNull(h5Object);
         Guard.IsNotNullOrEmpty(name);
         Guard.IsNotNull(h5Type);
+
+        var linkCreationPropertyList = H5Link.CreateCreationPropertyList();
 
         int err;
 

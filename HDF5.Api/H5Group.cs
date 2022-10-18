@@ -12,9 +12,9 @@ public class H5Group : H5Location<H5Group>
     {
     }
 
-    public static H5PropertyList CreatePropertyList(PropertyListType listType)
+    public static H5PropertyList CreateCreationPropertyList()
     {
-        return H5GAdapter.CreatePropertyList(listType);
+        return H5GAdapter.CreateCreationPropertyList();
     }
 
     /// <summary>
@@ -22,9 +22,9 @@ public class H5Group : H5Location<H5Group>
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>
-    public H5PropertyList GetPropertyList(PropertyListType listType)
+    public H5PropertyList GetCreationPropertyList()
     {
-        return H5GAdapter.GetPropertyList(this, listType);
+        return H5GAdapter.GetCreationPropertyList(this);
     }
 
     public string Name => H5IAdapter.GetName(this);

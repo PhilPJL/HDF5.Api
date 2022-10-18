@@ -17,8 +17,7 @@ internal static unsafe class H5GAdapter
 
     internal static H5Group Create<T>(
         H5Location<T> location, string name,
-        H5PropertyList? propListGroupCreation,
-        H5PropertyList? propListGroupAccess) where T : H5Object<T>
+        H5GroupCreationPropertyList? propListGroupCreation) where T : H5Object<T>
     {
         location.AssertHasLocationHandleType();
 
@@ -27,11 +26,11 @@ internal static unsafe class H5GAdapter
         long h;
 
 #if NET7_0_OR_GREATER
-        h = create(location, name, propListLinkCreation, propListGroupCreation, propListGroupAccess);
+        h = create(location, name, propListLinkCreation, propListGroupCreation);
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            h = create(location, nameBytesPtr, propListLinkCreation, propListGroupCreation, propListGroupAccess);
+            h = create(location, nameBytesPtr, propListLinkCreation, propListGroupCreation);
         }
 #endif
 
@@ -134,14 +133,9 @@ internal static unsafe class H5GAdapter
         return err >= 0;
     }
 
-    internal static H5PropertyList CreatePropertyList(PropertyListType listType)
+    internal static H5GroupCreationPropertyList CreateCreationPropertyList()
     {
-        return listType switch
-        {
-            PropertyListType.Create => H5PAdapter.Create(H5P.GROUP_CREATE),
-            PropertyListType.Access => H5PAdapter.Create(H5P.GROUP_ACCESS),
-            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
-        };
+        return H5PAdapter.Create(H5P.GROUP_CREATE, h => new H5GroupCreationPropertyList(h));
     }
 
     /// <summary>
@@ -149,12 +143,8 @@ internal static unsafe class H5GAdapter
     /// </summary>
     /// <param name="group"></param>
     /// <returns></returns>
-    internal static H5PropertyList GetPropertyList(H5Group group, PropertyListType listType)
+    internal static H5GroupCreationPropertyList GetCreationPropertyList(H5Group group)
     {
-        return listType switch
-        {
-            PropertyListType.Create => H5PAdapter.GetPropertyList(group, get_create_plist),
-            _ => throw new InvalidEnumArgumentException(nameof(listType), (int)listType, typeof(PropertyListType)),
-        };
+        return H5PAdapter.GetPropertyList(group, get_create_plist, h => new H5GroupCreationPropertyList(h));
     }
 }

@@ -13,8 +13,8 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
             using var file = CreateFile();
 
             // Is create list the same as default?
-            using var fpc1 = file.GetPropertyList(PropertyListType.Create);
-            using var fpc2 = H5File.CreatePropertyList(PropertyListType.Create);
+            using var fpc1 = file.GetCreationPropertyList();
+            using var fpc2 = H5File.CreateCreationPropertyList();
             Assert.IsTrue(fpc1.IsEqualTo(fpc2));
 
             // TODO: why doesn't this work?
@@ -46,17 +46,6 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
         }
     */
 
-    [TestMethod]
-    public void FileCreateOrGetPropertyListWithInvalidEnumThrows()
-    {
-        HandleCheck(() =>
-        {
-            using var file = CreateFile();
-
-            Assert.ThrowsException<InvalidEnumArgumentException>(() => file.GetPropertyList(PropertyListType.None));
-            Assert.ThrowsException<InvalidEnumArgumentException>(() => H5File.CreatePropertyList(PropertyListType.None));
-        });
-    }
 
     /*    [TestMethod]
         public void FileCreateNonDefaultPropertyList()
@@ -92,8 +81,8 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
             using var file = CreateFile();
 
             // file property lists
-            using var fpc1 = file.GetPropertyList(PropertyListType.Create);
-            using var fpc2 = H5File.CreatePropertyList(PropertyListType.Create);
+            using var fpc1 = file.GetCreationPropertyList();
+            using var fpc2 = H5File.CreateCreationPropertyList();
             Assert.IsTrue(fpc1.IsEqualTo(fpc2));
 
             // TODO: why doesn't this work?
@@ -103,8 +92,8 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
 
             // group 
             using var group = file.CreateGroup("group");
-            using var gpc1 = group.GetPropertyList(PropertyListType.Create);
-            using var gpc2 = H5Group.CreatePropertyList(PropertyListType.Create);
+            using var gpc1 = group.GetCreationPropertyList();
+            using var gpc2 = H5Group.CreateCreationPropertyList();
             Assert.IsTrue(gpc1.IsEqualTo(gpc2));
 
             // dataset
@@ -128,8 +117,8 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
 
             // group 
             using var group = file.CreateGroup("group");
-            Assert.ThrowsException<InvalidEnumArgumentException>(() => group.GetPropertyList(PropertyListType.None));
-            Assert.ThrowsException<InvalidEnumArgumentException>(() => H5Group.CreatePropertyList(PropertyListType.None));
+            Assert.ThrowsException<InvalidEnumArgumentException>(() => group.GetCreationPropertyList());
+            Assert.ThrowsException<InvalidEnumArgumentException>(() => H5Group.CreateCreationPropertyList());
         });
     }
 

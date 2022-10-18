@@ -19,7 +19,7 @@ public static class H5DataSetWriter
 
         if (compressionLevel > 0)
         {
-            propertyList.EnableDeflateCompression(compressionLevel);
+            propertyList.SetDeflate(compressionLevel);
         }
 
         var h5CompoundType = converter.GetH5Type();
