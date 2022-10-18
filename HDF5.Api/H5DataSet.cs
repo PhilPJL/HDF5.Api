@@ -149,15 +149,4 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
             H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
         }*/
-
-    public void Commit(
-        [DisallowNull] string name,
-        [DisallowNull] H5Type h5Type,
-        [AllowNull] H5PropertyList? linkCreationPropertyList = null,
-        [AllowNull] H5PropertyList? dataTypeCreationPropertyList = null,
-        [AllowNull] H5PropertyList? dataTypeAccessPropertyList = null)
-    {
-        H5TAdapter.Commit(this, name, h5Type,
-            linkCreationPropertyList, dataTypeCreationPropertyList, dataTypeAccessPropertyList);
-    }
 }

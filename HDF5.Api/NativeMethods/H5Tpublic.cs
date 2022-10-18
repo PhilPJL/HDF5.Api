@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5T
+internal static unsafe partial class H5T
 {
     static H5T()
     {
@@ -499,6 +499,28 @@ internal static partial class H5T
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t close(hid_t type_id);
+
+    /// <summary>
+    /// Commits a transient datatype, linking it into the file and creating
+    /// a new named datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Commit2
+    /// </summary>
+    /// <param name="loc_id">Location identifier</param>
+    /// <param name="name">Name given to committed datatype</param>
+    /// <param name="dtype_id">Identifier of datatype to be committed and,
+    /// upon function’s return, identifier for the committed datatype</param>
+    /// <param name="lcpl_id">Link creation property list</param>
+    /// <param name="tcpl_id">Datatype creation property list</param>
+    /// <param name="tapl_id">Datatype access property list</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tcommit2",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t commit
+        (hid_t loc_id, byte* name, hid_t dtype_id,
+        hid_t lcpl_id = H5P.DEFAULT, hid_t tcpl_id = H5P.DEFAULT,
+        hid_t tapl_id = H5P.DEFAULT);
 
     /// <summary>
     /// Commits a transient datatype, linking it into the file and creating
@@ -1155,6 +1177,24 @@ internal static partial class H5T
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern IntPtr get_tag(hid_t dtype_id);
+
+    /// <summary>
+    /// Adds a new member to a compound datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Insert
+    /// </summary>
+    /// <param name="dtype_id">Identifier of compound datatype to modify.</param>
+    /// <param name="name">Name of the field to insert.</param>
+    /// <param name="offset">Offset in memory structure of the field to
+    /// insert.</param>
+    /// <param name="field_id">Datatype identifier of the field to insert.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tinsert",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t insert
+        (hid_t dtype_id, byte* name, size_t offset, hid_t field_id);
 
     /// <summary>
     /// Adds a new member to a compound datatype.

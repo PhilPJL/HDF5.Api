@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5S
+internal static unsafe partial class H5S
 {
     static H5S() { _ = H5.open(); }
 
@@ -427,7 +427,6 @@ internal static partial class H5S
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern int get_simple_extent_dims
         (hid_t space_id, [In][Out] hsize_t[] dims, [In][Out] hsize_t[] maxdims);
-
 
     /// <summary>
     /// Retrieves dataspace dimension size and maximum size.

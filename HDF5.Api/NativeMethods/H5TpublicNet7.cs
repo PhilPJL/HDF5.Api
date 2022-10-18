@@ -75,7 +75,7 @@ internal static partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcommit2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcommit2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t commit
@@ -148,7 +148,7 @@ internal static partial class H5T
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tinsert", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tinsert", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t insert

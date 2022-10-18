@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace HDF5.Api.Tests;
+﻿namespace HDF5.Api.Tests;
 
 [TestClass]
 public class H5DataSetTests : H5Test

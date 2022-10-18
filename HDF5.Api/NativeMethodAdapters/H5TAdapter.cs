@@ -7,7 +7,7 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// <summary>
 /// H5 property list native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_t.html"/>
 /// </summary>
-internal static class H5TAdapter
+internal static unsafe class H5TAdapter
 {
     internal static bool AreEqual(H5Type type1, H5Type type2)
     {
@@ -115,14 +115,23 @@ internal static class H5TAdapter
 
     internal static void Insert(H5Type typeId, string name, ssize_t offset, long nativeTypeId)
     {
-        int err = insert(typeId, name, offset, nativeTypeId);
+        int err;
+
+#if NET7_0_OR_GREATER
+        err = insert(typeId, name, offset, nativeTypeId);
+#else
+        fixed(byte * nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            err = insert(typeId, nameBytesPtr, offset, nativeTypeId);
+        }
+#endif
+
         err.ThrowIfError();
     }
 
     internal static void Insert(H5Type typeId, string name, ssize_t offset, H5Type dataTypeId)
     {
-        int err = insert(typeId, name, offset, dataTypeId);
-        err.ThrowIfError();
+        Insert(typeId, name, offset, (long)dataTypeId);
     }
 
     internal static bool IsVariableLengthString(H5Type typeId)
@@ -182,8 +191,18 @@ internal static class H5TAdapter
         Guard.IsNotNullOrEmpty(name);
         Guard.IsNotNull(h5Type);
 
-        int err = commit(h5Object, name, h5Type, 
+        int err;
+
+#if NET7_0_OR_GREATER
+        err = commit(h5Object, name, h5Type, 
             linkCreationPropertyList, dataTypeCreationPropertyList, dataTypeAccessPropertyList);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            err = commit(h5Object, nameBytesPtr, h5Type,
+                linkCreationPropertyList, dataTypeCreationPropertyList, dataTypeAccessPropertyList);
+        }
+#endif
 
         err.ThrowIfError();
     }

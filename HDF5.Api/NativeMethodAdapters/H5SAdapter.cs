@@ -7,7 +7,7 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// <summary>
 /// H5 property list native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_s.html"/>
 /// </summary>
-internal static class H5SAdapter
+internal static unsafe class H5SAdapter
 {
     public static void Close(H5Space attribute)
     {
@@ -18,6 +18,8 @@ internal static class H5SAdapter
 
     internal static H5Space CreateSimple(params Dimension[] dimensions)
     {
+        // TODO: pin?
+
         long h = create_simple(dimensions.Length,
             dimensions.Select(d => d.InitialSize).ToArray(),
             dimensions.Select(d => d.UpperLimit).ToArray());
@@ -42,6 +44,8 @@ internal static class H5SAdapter
     //TODO: expose other params
     internal static void SelectHyperslab(H5Space space, long offset, long count)
     {
+        // TODO: pin?
+
         int err = select_hyperslab(
             space, seloper_t.SET, new[] { (ulong)offset }, null!, new[] { (ulong)count }, null!);
 
@@ -74,7 +78,9 @@ internal static class H5SAdapter
         }
 
 #if NET7_0_OR_GREATER
-        // Assuming rank < 120-ish
+        // Fairly safe assuming rank is small enough to fit on the stack
+        // TODO: use SpanOwner<> for large rank
+
         Span<ulong> dims = stackalloc ulong[rank];
         Span<ulong> maxDims = stackalloc ulong[rank];
 
@@ -86,6 +92,7 @@ internal static class H5SAdapter
         {
             dimensions.Add(new Dimension(dims[i], maxDims[i]));
         }
+
         return dimensions;
 #endif
 
@@ -93,9 +100,13 @@ internal static class H5SAdapter
         var dims = new ulong[rank];
         var maxDims = new ulong[rank];
 
-        int err = get_simple_extent_dims(space, dims, maxDims);
-        err.ThrowIfError();
-        return Enumerable.Zip(dims, maxDims, (f, s) => new Dimension(f, s)).ToList();
+        fixed (ulong* dimsPtr = dims)
+        fixed (ulong* maxDimsPtr = maxDims)
+        {
+            int err = get_simple_extent_dims(space, dimsPtr, maxDimsPtr);
+            err.ThrowIfError();
+            return Enumerable.Zip(dims, maxDims, (f, s) => new Dimension(f, s)).ToList();
+        }
 #endif
     }
 }
