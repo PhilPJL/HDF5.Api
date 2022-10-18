@@ -44,8 +44,7 @@ internal static partial class H5F
     /// </param>
     /// <returns>Returns a file identifier if successful; otherwise returns
     /// a negative value.</returns>
-    /// <remarks><paramref name="filename"/> MUST be an ASCII string.</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fcreate", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fcreate", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial hid_t create
@@ -151,8 +150,7 @@ internal static partial class H5F
     /// list.</param>
     /// <returns>Returns a file identifier if successful; otherwise returns
     /// a negative value.</returns>
-    /// <remarks><paramref name="filename"/> MUST be an ASCII string!</remarks>
-    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fopen", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(AnsiStringMarshaller)),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fopen", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial hid_t open

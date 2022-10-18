@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5F
+internal static unsafe partial class H5F
 {
     static H5F() { _ = H5.open(); }
 
@@ -420,6 +420,27 @@ internal static partial class H5F
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t close(hid_t file_id);
+
+    /// <summary>
+    /// Creates an HDF5 file.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-CreateS
+    /// </summary>
+    /// <param name="filename">Name of the file to access.</param>
+    /// <param name="flags">File access flags (H5.ACC_*).</param>
+    /// <param name="create_plist">File creation property list identifier.
+    /// </param>
+    /// <param name="access_plist">File access property list identifier.
+    /// </param>
+    /// <returns>Returns a file identifier if successful; otherwise returns
+    /// a negative value.</returns>
+    /// <remarks><paramref name="filename"/> MUST be an ASCII string.</remarks>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Fcreate",
+        CharSet = CharSet.Ansi,
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t create
+        (byte* filename, uint flags,
+        hid_t create_plist = H5P.DEFAULT, hid_t access_plist = H5P.DEFAULT);
 
     /// <summary>
     /// Creates an HDF5 file.

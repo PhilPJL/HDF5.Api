@@ -1,5 +1,4 @@
 ﻿using HDF5.Api.NativeMethods;
-using System.IO;
 using static HDF5.Api.NativeMethods.H5F;
 
 namespace HDF5.Api.NativeMethodAdapters;
@@ -7,7 +6,7 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// <summary>
 /// H5 file native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_f.html"/>
 /// </summary>
-internal static class H5FAdapter
+internal static unsafe class H5FAdapter
 {
     internal static void Close(H5File file)
     {
@@ -18,7 +17,16 @@ internal static class H5FAdapter
 
     internal static H5File Create(string path, bool failIfExists = false, H5PropertyList? fileCreationPropertyList = null, H5PropertyList? fileAccessPropertyList = null)
     {
-        long h = create(path, failIfExists ? ACC_EXCL : ACC_TRUNC, fileCreationPropertyList, fileAccessPropertyList);
+        long h;
+
+#if NET7_0_OR_GREATER
+        h = create(path, failIfExists ? ACC_EXCL : ACC_TRUNC, fileCreationPropertyList, fileAccessPropertyList);
+#else
+        fixed (byte* pathBytesPtr = Encoding.UTF8.GetBytes(path))
+        {
+            h = create(pathBytesPtr, failIfExists ? ACC_EXCL : ACC_TRUNC, fileCreationPropertyList, fileAccessPropertyList);
+        }
+#endif
 
         h.ThrowIfInvalidHandleValue();
 
@@ -37,14 +45,6 @@ internal static class H5FAdapter
 #if NET7_0_OR_GREATER
         int length = (int)get_name(file, new Span<byte>(), 0);
         length.ThrowIfError();
-        if (length > 261)
-        {
-            throw new PathTooLongException();
-        }
-        if (length <= 1)
-        {
-            throw new Hdf5Exception("Name length returned was too short");
-        }
         Span<byte> buffer = stackalloc byte[length + 1];
         var err = (int)get_name(file, buffer, length + 1);
         err.ThrowIfError();
@@ -52,14 +52,6 @@ internal static class H5FAdapter
 #else
         int length = (int)get_name(file, null!, new IntPtr(0));
         length.ThrowIfError();
-        if (length > 261)
-        {
-            throw new PathTooLongException();
-        }
-        if (length <= 1)
-        {
-            throw new Hdf5Exception("Name length returned was too short");
-        }
         var name = new StringBuilder(length + 1);
         var err = get_name(file, name, new IntPtr(length + 1));
         ((int)err).ThrowIfError();
