@@ -141,4 +141,14 @@ public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
     {
         H5TAdapter.SetSize(this, size);
     }
+
+    internal static H5TypeCreationPropertyList CreateCreationPropertyList()
+    {
+        return H5TAdapter.CreateCreationPropertyList();
+    }
+
+    internal static H5TypeAccessPropertyList CreateAccessPropertyList()
+    {
+        return H5TAdapter.CreateAccessPropertyList();
+    }
 }

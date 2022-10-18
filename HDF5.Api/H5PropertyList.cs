@@ -116,4 +116,20 @@ public class H5GroupCreationPropertyList : H5PropertyList
     }
 }
 
+
+public class H5TypeCreationPropertyList : H5PropertyList
+{
+    internal H5TypeCreationPropertyList(long handle) : base(handle)
+    {
+    }
+
+}
+
+public class H5TypeAccessPropertyList : H5PropertyList
+{
+    internal H5TypeAccessPropertyList(long handle) : base(handle)
+    {
+    }
+}
+
 // Etc...

@@ -20,7 +20,8 @@ public interface IH5Location : IH5ObjectWithAttributes
 
     // Data sets
     H5DataSet CreateDataSet(string name, H5Type typeId, H5Space space,
-        [AllowNull] H5DataSetCreationPropertyList? propertyList = null);
+        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList = null,
+        [AllowNull] H5DataSetAccessPropertyList? dataSetAccessPropertyList = null);
     H5DataSet OpenDataSet(string name);
     bool DataSetExists(string name);
     // TODO: DataSetPathExists?

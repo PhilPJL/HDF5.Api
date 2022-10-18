@@ -26,7 +26,8 @@ internal unsafe static class H5DAdapter
     }
 
     internal static H5DataSet Create<T>(H5Location<T> location, string name, H5Type type, H5Space space,
-        H5DataSetCreationPropertyList? dataSetCreationPropertyList) where T : H5Object<T>
+        H5DataSetCreationPropertyList? dataSetCreationPropertyList,
+        H5DataSetAccessPropertyList? dataSetAccessPropertyList) where T : H5Object<T>
     {
         location.AssertHasLocationHandleType();
 
@@ -36,12 +37,12 @@ internal unsafe static class H5DAdapter
 
 #if NET7_0_OR_GREATER
         h = create(location, name, type, space,
-            linkCreationPropertyList, dataSetCreationPropertyList);
+            linkCreationPropertyList, dataSetCreationPropertyList, dataSetAccessPropertyList);
 #else
-        fixed(byte* namePtr = Encoding.UTF8.GetBytes(name))
+        fixed (byte* namePtr = Encoding.UTF8.GetBytes(name))
         {
             h = create(location, namePtr, type, space,
-                linkCreationPropertyList, dataSetCreationPropertyList);
+                linkCreationPropertyList, dataSetCreationPropertyList, dataSetAccessPropertyList);
         }
 #endif
 
@@ -173,6 +174,16 @@ internal unsafe static class H5DAdapter
     internal static H5DataSetCreationPropertyList GetCreationPropertyList(H5DataSet dataSet)
     {
         return H5PAdapter.GetPropertyList(dataSet, get_create_plist, h => new H5DataSetCreationPropertyList(h));
+    }
+ 
+    internal static H5DataSetAccessPropertyList CreateAccessPropertyList()
+    {
+        return H5PAdapter.Create(H5P.DATASET_ACCESS, h => new H5DataSetAccessPropertyList(h));
+    }
+ 
+    internal static H5DataSetAccessPropertyList GetAccessPropertyList(H5DataSet dataSet)
+    {
+        return H5PAdapter.GetPropertyList(dataSet, get_access_plist, h => new H5DataSetAccessPropertyList(h));
     }
 }
 

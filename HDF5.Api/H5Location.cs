@@ -146,13 +146,14 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         [DisallowNull] string name, 
         [DisallowNull] H5Type type, 
         [DisallowNull] H5Space space, 
-        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList = null)
+        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList = null, 
+        [AllowNull] H5DataSetAccessPropertyList? dataSetAccessPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
 
-        return H5DAdapter.Create(this, name, type, space, dataSetCreationPropertyList);
+        return H5DAdapter.Create(this, name, type, space, dataSetCreationPropertyList, dataSetAccessPropertyList);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Diagnostics;
+using HDF5.Api.NativeMethods;
 using System.Linq;
 using static HDF5.Api.NativeMethods.H5T;
 
@@ -206,5 +207,15 @@ internal static unsafe class H5TAdapter
 #endif
 
         err.ThrowIfError();
+    }
+
+    internal static H5TypeCreationPropertyList CreateCreationPropertyList()
+    {
+        return H5PAdapter.Create(H5P.DATATYPE_CREATE, h => new H5TypeCreationPropertyList(h));
+    }
+
+    internal static H5TypeAccessPropertyList CreateAccessPropertyList()
+    {
+        return H5PAdapter.Create(H5P.DATATYPE_ACCESS, h => new H5TypeAccessPropertyList(h));
     }
 }
