@@ -6,7 +6,7 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     #region Create file tests
 
     [TestMethod]
-    public void CreateFileDanglingHandleTest()
+    public void CreateFileDanglingHandle()
     {
         H5File? file = null;
 

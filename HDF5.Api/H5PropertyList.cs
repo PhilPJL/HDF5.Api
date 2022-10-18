@@ -6,7 +6,7 @@ namespace HDF5.Api;
 ///     <para>.NET wrapper for H5P (Property list) API.</para>
 ///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_p.html"/>
 /// </summary>
-public class H5PropertyList : H5Object<H5PropertyList>
+public class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5PropertyList>
 {
     internal H5PropertyList(long handle) : base(handle, HandleType.PropertyList, H5PAdapter.Close)
     {
@@ -27,19 +27,16 @@ public class H5PropertyList : H5Object<H5PropertyList>
         H5PAdapter.EnableDeflateCompression(this, level);
     }
 
+    public bool Equals(H5PropertyList other)
+    {
+        return IsEqualTo(other);
+    }
+
     public bool IsEqualTo([DisallowNull] H5PropertyList other)
     {
         Guard.IsNotNull(other);
 
         return H5PAdapter.AreEqual(this, other);
-    }
-
-    public static bool AreEqual([DisallowNull] H5PropertyList a, [DisallowNull] H5PropertyList b)
-    {
-        Guard.IsNotNull(a);
-        Guard.IsNotNull(b);
-
-        return a.Equals(b);
     }
 }
 

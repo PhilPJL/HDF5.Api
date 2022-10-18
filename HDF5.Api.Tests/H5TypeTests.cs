@@ -6,7 +6,7 @@ namespace HDF5.Api.Tests;
 public class H5TypeTests : H5Test<H5TypeTests> 
 {
     [TestMethod]
-    public void CreateCommittedDataTypeAscii()
+    public void CreateCommittedDataTypeAsciiSucceeds()
     {
         HandleCheck(() =>
         {
@@ -30,7 +30,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
     }
 
     [TestMethod]
-    public void CreateCommittedDataTypeUtf8()
+    public void CreateCommittedDataTypeUtf8Succeeds()
     {
         HandleCheck(() =>
         {
@@ -54,7 +54,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
     }
 
     [TestMethod]
-    public void CreateCompoundDataType()
+    public void CreateCompoundDataTypeSucceeds()
     {
         HandleCheck(() =>
         {

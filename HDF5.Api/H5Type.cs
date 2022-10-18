@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5.Api.NativeMethodAdapters;
-using HDF5.Api.NativeMethods;
 
 namespace HDF5.Api;
 
@@ -8,7 +7,7 @@ namespace HDF5.Api;
 ///     <para>.NET wrapper for H5T (Type) API.</para>
 ///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_t.html"/>
 /// </summary>
-public class H5Type : H5Object<H5Type>
+public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
 {
     internal H5Type(long handle) : base(handle, HandleType.Type, H5TAdapter.Close) { }
 
@@ -21,12 +20,9 @@ public class H5Type : H5Object<H5Type>
         return H5TAdapter.AreEqual(this, other);
     }
 
-    public static bool AreEqual([DisallowNull] H5Type type1, [DisallowNull] H5Type type2)
+    public bool Equals(H5Type other)
     {
-        Guard.IsNotNull(type1);
-        Guard.IsNotNull(type2);
-
-        return H5TAdapter.AreEqual(type1, type2);
+        return IsEqualTo(other);
     }
 
     public static H5Type GetNativeType<T>() where T : unmanaged

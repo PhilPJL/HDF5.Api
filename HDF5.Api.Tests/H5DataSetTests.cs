@@ -31,6 +31,32 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
             using var ds = CreateTestDataset(file, dataSetName);
 
             Assert.IsTrue(file.DataSetExists(dataSetName));
+            Assert.IsTrue(file.DataSetNames.Contains(dataSetName));
+            Assert.AreEqual("/" + dataSetName, ds.Name);
+        });
+    }
+
+    [TestMethod]
+    [DataRow("ascii", "data-set-name-ascii")]
+    [DataRow("utf8", "data-set-name-utf8-ᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠ")]
+    public void GetCreationPropertyListSucceeds(string fileNameSuffix, string dataSetName)
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile2(fileNameSuffix);
+
+            // Create test ds
+            using var ds = CreateTestDataset(file, dataSetName);
+
+            Assert.IsTrue(file.DataSetExists(dataSetName));
+
+            using var dscpl = ds.GetCreationPropertyList();
+
+            // Set same params as for CreateTestDataset
+            using var cpl1 = H5DataSet.CreateCreationPropertyList();
+            cpl1.SetChunk(1);
+
+            Assert.IsTrue(cpl1.Equals(dscpl));
         });
     }
 

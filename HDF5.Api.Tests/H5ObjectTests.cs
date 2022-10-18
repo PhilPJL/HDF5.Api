@@ -40,7 +40,7 @@
         }
 
         [TestMethod]
-        public void DisposeAlreadyDisposedObjectDoesntThrowTest()
+        public void DisposeAlreadyDisposedObjectDoesntThrow()
         {
             HandleCheck(() =>
             {
