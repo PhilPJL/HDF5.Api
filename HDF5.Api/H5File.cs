@@ -37,7 +37,7 @@ public class H5File : H5Location<H5File>
     /// <summary>
     /// The filename.
     /// </summary>
-    public string Name => H5FAdapter.GetName(this);
+    public override string Name => H5FAdapter.GetName(this);
 
     /// <summary>
     /// Size of the file in bytes.
@@ -45,7 +45,7 @@ public class H5File : H5Location<H5File>
     public long Size => H5FAdapter.GetSize(this);
 
     /// <summary>
-    /// Creates a <see cref="H5PropertyList"/> of the required type.
+    /// Creates a <see cref="H5FileCreationPropertyList"/> of the required type.
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>
@@ -55,7 +55,7 @@ public class H5File : H5Location<H5File>
     }
 
     /// <summary>
-    /// Creates a <see cref="H5PropertyList"/> of the required type.
+    /// Creates a <see cref="H5FileAccessPropertyList"/> of the required type.
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>

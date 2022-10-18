@@ -7,6 +7,7 @@ using CommunityToolkit.Diagnostics;
 using CommunityToolkit.HighPerformance.Buffers;
 #endif
 using HDF5.Api.NativeMethods;
+using HDF5.Api.Utils;
 using System.Collections.Generic;
 using static HDF5.Api.NativeMethods.H5A;
 
@@ -22,6 +23,11 @@ internal unsafe static class H5AAdapter
         int err = close(attribute);
 
         err.ThrowIfError();
+    }
+
+    internal static H5Attribute Create<T, TA>(H5Object<T> h5Object, string name) where T : H5Object<T>
+    {
+        throw new NotImplementedException();
     }
 
     internal static H5Attribute Create<T>(
@@ -172,6 +178,15 @@ internal unsafe static class H5AAdapter
                 CharacterEncoding = encoding
             };
         });
+    }
+
+    internal static string GetName(H5Attribute attribute) 
+    {
+#if NET7_0_OR_GREATER
+        return MarshalHelpers.GetName(attribute, (long attr_id, Span<byte> name, nint size) => get_name(attr_id, size, name));
+#else
+        return MarshalHelpers.GetName(attribute, (long attr_id, byte* name, nint size) => get_name(attr_id, size, name));
+#endif
     }
 
     internal static H5Space GetSpace(H5Attribute attribute)

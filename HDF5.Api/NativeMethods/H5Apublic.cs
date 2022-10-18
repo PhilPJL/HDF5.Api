@@ -555,6 +555,23 @@ internal static unsafe partial class H5A
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern ssize_t get_name(
+        hid_t attr_id, size_t size, byte* name);
+
+    /// <summary>
+    /// Gets an attribute name.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-GetName
+    /// </summary>
+    /// <param name="attr_id">Identifier of the attribute.</param>
+    /// <param name="size">The size of the buffer to store the name
+    /// in.</param>
+    /// <param name="name">Buffer to store name in.</param>
+    /// <returns>Returns the length of the attribute's name, which may be
+    /// longer than <code>buf_size</code>, if successful. Otherwise returns
+    /// a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Aget_name",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern ssize_t get_name(
         hid_t attr_id, size_t size, [In][Out] byte[] name);
 
     /// <summary>

@@ -32,6 +32,13 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         return H5AAdapter.Create(this, name, type, space);
     }
 
+    public H5Attribute CreateAttribute<TA>([DisallowNull] string name)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        return H5AAdapter.Create<T, TA>(this, name);
+    }
+
     public H5Attribute CreateStringAttribute(
         [DisallowNull] string name, 
         int fixedStorageLength = 0, CharacterSet characterSet = CharacterSet.Ascii, StringPadding padding = StringPadding.NullTerminate)
@@ -176,10 +183,13 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     public void Commit(
         [DisallowNull] string name,
         [DisallowNull] H5Type h5Type,
+        // TODO: H5DataType..PL
         [AllowNull] H5PropertyList? dataTypeCreationPropertyList = null,
         [AllowNull] H5PropertyList? dataTypeAccessPropertyList = null)
     {
         H5TAdapter.Commit(this, name, h5Type,
             dataTypeCreationPropertyList, dataTypeAccessPropertyList);
     }
+
+    public abstract string Name { get; }
 }

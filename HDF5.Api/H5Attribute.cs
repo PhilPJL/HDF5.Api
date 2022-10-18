@@ -65,4 +65,35 @@ public class H5Attribute : H5Object<H5Attribute>
     {
         return H5AAdapter.CreateCreationPropertyList(encoding);
     }
+
+    public string Name => H5AAdapter.GetName(this);
+}
+
+public class H5Attribute<T> : H5Attribute where T : new()
+{
+    internal H5Attribute(long handle) : base(handle)
+    {
+    }
+
+    public void Write([DisallowNull] T value)
+    {
+        Guard.IsNotNull(value);
+
+        //...
+        throw new NotImplementedException();
+    }
+
+    public T Read()
+    {
+        throw new NotImplementedException();
+        //return new T();
+    }
+
+    [DisallowNull]
+    public T Value
+    {
+        get => Read();
+        set => Write(value);
+    }
+
 }

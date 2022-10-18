@@ -112,6 +112,23 @@ internal static partial class H5A
         ref info_t ainfo, hid_t lapl_id = H5P.DEFAULT);
 
     /// <summary>
+    /// Gets an attribute name.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-GetName
+    /// </summary>
+    /// <param name="attr_id">Identifier of the attribute.</param>
+    /// <param name="size">The size of the buffer to store the name
+    /// in.</param>
+    /// <param name="name">Buffer to store name in.</param>
+    /// <returns>Returns the length of the attribute's name, which may be
+    /// longer than <code>buf_size</code>, if successful. Otherwise returns
+    /// a negative value.</returns>
+    /// <remarks>ASCII strings ONLY!</remarks>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aget_name"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial nint get_name(hid_t attr_id, nint size, Span<byte> name);
+
+    /// <summary>
     /// Gets a copy of the dataspace for an attribute.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-GetSpace
     /// </summary>

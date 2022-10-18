@@ -39,4 +39,6 @@ public interface IH5Location : IH5ObjectWithAttributes
         [DisallowNull] H5Type h5Type,
         [AllowNull] H5PropertyList? dataTypeCreationPropertyList = null,
         [AllowNull] H5PropertyList? dataTypeAccessPropertyList = null);
+
+    string Name { get; }
 }

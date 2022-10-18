@@ -8,7 +8,7 @@ namespace HDF5.Api;
 internal class H5Link 
 {
     /// <summary>
-    /// Creates a <see cref="H5PropertyList"/> of the required type.
+    /// Creates a <see cref="H5LinkCreationPropertyList"/> of the required type.
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>
