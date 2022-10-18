@@ -926,6 +926,22 @@ internal static unsafe partial class H5A
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern unsafe herr_t read
+        (hid_t attr_id, hid_t type_id, byte* buf);
+
+    /// <summary>
+    /// Reads an attribute.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Read
+    /// </summary>
+    /// <param name="attr_id">Identifier of an attribute to read.</param>
+    /// <param name="type_id"> Identifier of the attribute datatype
+    /// (in memory).</param>
+    /// <param name="buf">Buffer for data to be read.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Aread",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern unsafe herr_t read
         (hid_t attr_id, hid_t type_id, IntPtr buf);
 
     /// <summary>

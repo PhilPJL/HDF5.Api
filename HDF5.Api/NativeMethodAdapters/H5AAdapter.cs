@@ -112,7 +112,7 @@ internal unsafe static class H5AAdapter
 #if NET7_0_OR_GREATER
                 H5T.cset_t.ASCII or H5T.cset_t.UTF8 => Marshal.PtrToStringUTF8(intPtrName),
 #else
-                H5T.cset_t.ASCII or H5T.cset_t.UTF8 => MarshalExtensions.PtrToStringUTF8(intPtrName),
+                H5T.cset_t.ASCII or H5T.cset_t.UTF8 => MarshalHelpers.PtrToStringUTF8(intPtrName),
 #endif
                 _ => throw new InvalidEnumArgumentException($"Unexpected character set {info.cset} when enumerating attribute names."),
             };
@@ -266,14 +266,17 @@ internal unsafe static class H5AAdapter
             nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
             return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
 #else
-            using var buffer = new GlobalMemory(storageSize + 1);
-            int err = read(attribute, type, buffer.IntPtr);
-            err.ThrowIfError();
+            var buffer = new byte[(storageSize + 1)];
+            fixed (byte* bufferPtr = buffer)
+            {
+                int err = read(attribute, type, bufferPtr);
+                err.ThrowIfError();
 
-            Span<byte> bytes = new Span<byte>(buffer.IntPtr.ToPointer(), storageSize + 1);
-            var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
-            nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
-            return Encoding.UTF8.GetString((byte*)buffer.IntPtr.ToPointer(), nullTerminatorIndex);
+                Span<byte> bytes = buffer;
+                var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
+                nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
+                return Encoding.UTF8.GetString(bufferPtr, nullTerminatorIndex);
+            }
 #endif
         }
     }

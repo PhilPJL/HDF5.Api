@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5I
+internal static unsafe partial class H5I
 {
     static H5I() { _ = H5.open(); }
 
@@ -176,6 +176,26 @@ internal static partial class H5I
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t get_file_id(hid_t obj_id);
+
+    /// <summary>
+    /// Retrieves a name of an object based on the object identifier.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5I.html#Identify-GetName
+    /// </summary>
+    /// <param name="obj_id">Identifier of the object. This identifier can
+    /// refer to a group, dataset, or named datatype.</param>
+    /// <param name="name">A name associated with the identifier.</param>
+    /// <param name="size">The size of the name buffer; must be the size of
+    /// the name in bytes plus 1 for a <code>NULL</code> terminator.</param>
+    /// <returns>Returns the length of the name if successful, returning 0
+    /// (zero) if no name is associated with the identifier. Otherwise 
+    /// returns a negative value.</returns>
+    /// encoded strings. See JIRA issue HDF5/HDFFV-9686.</remarks>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Iget_name",
+        CharSet = CharSet.Ansi,
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern ssize_t get_name
+        (hid_t obj_id, byte* name, size_t size);
 
     /// <summary>
     /// Retrieves a name of an object based on the object identifier.

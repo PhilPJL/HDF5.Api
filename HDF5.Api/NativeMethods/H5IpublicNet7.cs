@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5I
+internal static unsafe partial class H5I
 {
 #if NET7_0_OR_GREATER
     /// <summary>
@@ -31,11 +31,9 @@ internal static partial class H5I
     /// <returns>Returns the length of the name if successful, returning 0
     /// (zero) if no name is associated with the identifier. Otherwise 
     /// returns a negative value.</returns>
-    /// <remarks>ASCII strings ONLY! This function does not work with UTF-8
     /// encoded strings. See JIRA issue HDF5/HDFFV-9686.</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Iget_name"), SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial ssize_t get_name
-        (hid_t obj_id, Span<byte> name, nint size);
+    public static partial nint get_name(hid_t obj_id, Span<byte> name, nint size);
 #endif
 }

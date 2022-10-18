@@ -52,7 +52,7 @@ public partial class H5ITest
     [TestMethod]
     public void H5Iget_nameTest2()
     {
-        IntPtr size = H5I.get_name(Utilities.RandomInvalidHandle(), null,
+        IntPtr size = H5I.get_name(Utilities.RandomInvalidHandle(), (StringBuilder)null,
             IntPtr.Zero);
         Assert.IsFalse(size.ToInt32() >= 0);
     }

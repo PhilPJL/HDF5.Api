@@ -748,6 +748,23 @@ internal static unsafe partial class H5F
         (hid_t obj_id, StringBuilder name, size_t size);
 
     /// <summary>
+    /// Retrieves name of file to which object belongs.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-GetName
+    /// </summary>
+    /// <param name="obj_id">Identifier of the object for which the
+    /// associated filename is sought.</param>
+    /// <param name="name">Buffer to contain the returned filename.</param>
+    /// <param name="size">Buffer size, in bytes.</param>
+    /// <returns>Returns the length of the filename if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Fget_name",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern ssize_t get_name
+        (hid_t obj_id, byte* name, size_t size);
+
+    /// <summary>
     /// Returns the number of open object identifiers for an open file.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5F.html#File-GetObjCount
     /// </summary>

@@ -1,4 +1,5 @@
 ﻿using HDF5.Api.NativeMethods;
+using HDF5.Api.Utils;
 using static HDF5.Api.NativeMethods.H5F;
 
 namespace HDF5.Api.NativeMethodAdapters;
@@ -42,21 +43,7 @@ internal static unsafe class H5FAdapter
 
     internal static string GetName(H5File file)
     {
-#if NET7_0_OR_GREATER
-        int length = (int)get_name(file, new Span<byte>(), 0);
-        length.ThrowIfError();
-        Span<byte> buffer = stackalloc byte[length + 1];
-        var err = (int)get_name(file, buffer, length + 1);
-        err.ThrowIfError();
-        return Encoding.UTF8.GetString(buffer).TrimEnd('\0');
-#else
-        int length = (int)get_name(file, null!, new IntPtr(0));
-        length.ThrowIfError();
-        var name = new StringBuilder(length + 1);
-        var err = get_name(file, name, new IntPtr(length + 1));
-        ((int)err).ThrowIfError();
-        return name.ToString();
-#endif
+        return MarshalHelpers.GetName(file, get_name);
     }
 
     internal static long GetSize(H5File file)

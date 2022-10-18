@@ -136,8 +136,7 @@ internal static partial class H5F
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fget_name"),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-    public static partial ssize_t get_name
-        (hid_t obj_id, Span<byte> name, nint size);
+    public static partial nint get_name(hid_t obj_id, Span<byte> name, nint size);
 
     /// <summary>
     /// Opens an existing HDF5 file.
