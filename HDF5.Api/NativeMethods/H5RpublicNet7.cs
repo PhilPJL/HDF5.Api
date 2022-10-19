@@ -19,6 +19,5 @@ namespace HDF5.Api.NativeMethods;
 internal static partial class H5R
 {
 #if NET7_0_OR_GREATER
-    // TODO
 #endif
 }

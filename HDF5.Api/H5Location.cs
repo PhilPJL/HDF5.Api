@@ -163,7 +163,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
-        H5GAdapter.Delete(this, path, null);
+        H5LAdapter.Delete(this, path, null);
     }
 
     /// <summary>
@@ -216,10 +216,16 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         return H5DAdapter.Exists(this, name, null);
     }
 
+    public void DeleteDataSet([DisallowNull] string path)
+    {
+        Guard.IsNotNullOrWhiteSpace(path);
+
+        H5LAdapter.Delete(this, path, null);
+    }
+
     public void Commit(
         [DisallowNull] string name,
         [DisallowNull] H5Type h5Type,
-        // TODO: H5DataType..PL
         [AllowNull] H5PropertyList? dataTypeCreationPropertyList = null,
         [AllowNull] H5PropertyList? dataTypeAccessPropertyList = null)
     {

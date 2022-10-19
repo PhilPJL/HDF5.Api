@@ -261,7 +261,7 @@ internal static unsafe class H5AAdapter
 
 
         int storageSize = attribute.StorageSize;
-        var characterSet = type.GetCharacterSet();
+        var characterSet = type.CharacterSet;
         bool isVariableLength = type.IsVariableLengthString();
 
         if (isVariableLength)
@@ -336,12 +336,7 @@ internal static unsafe class H5AAdapter
         int attributeStorageSize = attribute.StorageSize;
         int marshalSize = Marshal.SizeOf<T>();
 
-        if (attributeStorageSize != marshalSize)
-        {
-            // TODO: common throw helper
-            throw new Hdf5Exception(
-                $"Attribute storage size is {attributeStorageSize}, which does not match the expected marshalable size for type {typeof(T).Name} of {marshalSize}.");
-        }
+        H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
 #if NET7_0_OR_GREATER
         if (attributeStorageSize < 256)
@@ -377,12 +372,7 @@ internal static unsafe class H5AAdapter
         var marshalSize = Marshal.SizeOf<T>();
         int attributeStorageSize = attribute.StorageSize;
 
-        if (marshalSize != attributeStorageSize)
-        {
-            // TODO: common throw helper
-            throw new Hdf5Exception(
-                $"Attribute storage size is {attributeStorageSize}, which does not match the marshalable size for type {typeof(T).Name} of {marshalSize}.");
-        }
+        H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
         if (marshalSize < 256)
         {
@@ -444,7 +434,7 @@ internal static unsafe class H5AAdapter
             throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{H5Class.String}'.");
         }
 
-        var characterSet = type.GetCharacterSet();
+        var characterSet = type.CharacterSet;
         bool isVariableLength = type.IsVariableLengthString();
 
         var bytes = characterSet switch
@@ -517,8 +507,8 @@ internal static unsafe class H5AAdapter
             ? H5TAdapter.CreateFixedLengthStringType(fixedStorageLength)
             : H5TAdapter.CreateVariableLengthStringType();
 
-        type.SetCharacterSet(cset);
-        type.SetPadding(padding);
+        type.CharacterSet = cset;
+        type.StringPadding = padding;
 
         using var memorySpace = H5SAdapter.CreateScalar();
         return Create(h5Object, name, type, memorySpace);

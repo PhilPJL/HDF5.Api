@@ -41,9 +41,7 @@ public class H5Space : H5Object<H5Space>
     public static H5Space Create([DisallowNull] params Dimension[] dimensions)
     {
         Guard.IsNotNull(dimensions);
-
-        // TODO: >=1 ?
-        // TOOD: or ==0 -> CreateScalar()?
+        Guard.IsGreaterThanOrEqualTo(dimensions.Length, 1);
 
         return H5SAdapter.CreateSimple(dimensions);
     }

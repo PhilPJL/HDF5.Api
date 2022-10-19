@@ -7,7 +7,7 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// <summary>
 /// H5 property list native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_p.html"/>
 /// </summary>
-internal static class H5PAdapter
+internal static unsafe class H5PAdapter
 {
     internal static void Close(H5PropertyList propertyList)
     {
@@ -58,7 +58,7 @@ internal static class H5PAdapter
     }
 
     internal static TPList GetPropertyList<T, TPList>(
-            H5Object<T> obj, Func<long, long> get_plist, Func<long, TPList> createPropertyList) 
+            H5Object<T> obj, Func<long, long> get_plist, Func<long, TPList> createPropertyList)
         where T : H5Object<T>
         where TPList : H5PropertyList
     {
@@ -95,5 +95,12 @@ internal static class H5PAdapter
         int err = get_create_intermediate_group(propertyList, ref value);
         err.ThrowIfError();
         return value != 0;
+    }
+
+    internal static long GetClassId(H5PropertyList propertyList)
+    {
+        long cls = get_class(propertyList);
+        cls.ThrowIfError();
+        return cls;
     }
 }

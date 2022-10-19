@@ -84,6 +84,20 @@ internal static partial class H5T
         hid_t tapl_id = H5P.DEFAULT);
 
     /// <summary>
+    /// Determines whether a datatype is a named type or a transient type.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Committed
+    /// </summary>
+    /// <param name="dtype_id">Datatype identifier.</param>
+    /// <returns>When successful, returns a positive value, for
+    /// <code>TRUE</code>, if the datatype has been committed, or 0 (zero),
+    /// for <code>FALSE</code>, if the datatype has not been committed.
+    /// Otherwise returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcommitted"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial htri_t committed(hid_t dtype_id);
+
+    /// <summary>
     /// Creates a new datatype.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Create
     /// </summary>
@@ -135,6 +149,30 @@ internal static partial class H5T
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial cset_t get_cset(hid_t dtype_id);
+    
+    /// <summary>
+    /// Returns the size of a datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-GetSize
+    /// </summary>
+    /// <param name="dtype_id">Identifier of datatype to query.</param>
+    /// <returns>Returns the size of the datatype in bytes if successful;
+    /// otherwise 0.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tget_size"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial size_t get_size(hid_t dtype_id);
+
+    /// <summary>
+    /// Retrieves the type of padding used for a string datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-GetStrpad
+    /// </summary>
+    /// <param name="dtype_id">Identifier of datatype to query.</param>
+    /// <returns>Returns a valid string storage mechanism if successful;
+    /// otherwise <code>H5T.str_t.ERROR</code>.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tget_strpad"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial str_t get_strpad(hid_t dtype_id);
 
     /// <summary>
     /// Adds a new member to a compound datatype.

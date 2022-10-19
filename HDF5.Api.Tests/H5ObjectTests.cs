@@ -34,9 +34,25 @@
                 using var att = group.CreateAttribute("att", type, space);
                 att.AssertHasHandleType(HandleType.Attribute);
 
-                // Create data-set
-                // TODO:
+                // Create data set
+                using var ds = CreateTestDataset(group, "ds");
+                ds.AssertHasHandleType(HandleType.DataSet);
             });
+        }
+
+        internal static H5DataSet CreateTestDataset(IH5Location location, string dataSetName)
+        {
+            const int chunkSize = 1;
+
+            using var memorySpace = H5Space.Create(new Dimension(chunkSize));
+            using var propertyList = H5DataSet.CreateCreationPropertyList();
+
+            // Enable chunking. From the user guide: "HDF5 requires the use of chunking when defining extendable datasets."
+            propertyList.SetChunk(chunkSize);
+
+            using var type = H5Type.GetNativeType<long>();
+
+            return location.CreateDataSet(dataSetName, type, memorySpace, propertyList);
         }
 
         [TestMethod]

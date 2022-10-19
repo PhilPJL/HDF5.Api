@@ -17,7 +17,7 @@ public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
 
     public bool IsEqualTo([AllowNull] H5Type? other)
     {
-        if(other is null) { return false; }
+        if (other is null) { return false; }
 
         return H5TAdapter.AreEqual(this, other);
     }
@@ -44,8 +44,8 @@ public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
 
     public override int GetHashCode()
     {
-        // TODO?
-        return base.GetHashCode();
+        // Use the handle value which will be unique anyway - hopefully
+        return HashCode.Combine((long)this);
     }
 
     #endregion
@@ -87,11 +87,6 @@ public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
     public bool IsVariableLengthString()
     {
         return H5TAdapter.IsVariableLengthString(this);
-    }
-
-    public H5Class GetClass()
-    {
-        return H5TAdapter.GetClass(this);
     }
 
     public static H5Type CreateDoubleArrayType(int size)
@@ -143,25 +138,27 @@ public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
         return H5TAdapter.CreateFixedLengthStringType(length);
     }
 
-    internal void SetCharacterSet(CharacterSet cset)
+    internal CharacterSet CharacterSet
     {
-        H5TAdapter.SetCharacterSet(this, cset);
+        get => H5TAdapter.GetCharacterSet(this);
+        set => H5TAdapter.SetCharacterSet(this, value);
     }
 
-    internal CharacterSet GetCharacterSet()
+    internal StringPadding StringPadding
     {
-        return H5TAdapter.GetCharacterSet(this);
+        get => H5TAdapter.GetPadding(this);
+        set => H5TAdapter.SetPadding(this, value);
     }
 
-    internal void SetPadding(StringPadding padding)
+    public int Size
     {
-        H5TAdapter.SetPadding(this, padding);
+        get => H5TAdapter.GetSize(this);
+        set => H5TAdapter.SetSize(this, value);
     }
 
-    internal void SetSize(int size) 
-    {
-        H5TAdapter.SetSize(this, size);
-    }
+    public bool Committed => H5TAdapter.GetCommitted(this);
+
+    public H5Class GetClass() => H5TAdapter.GetClass(this);
 
     internal static H5DataTypeCreationPropertyList CreateCreationPropertyList()
     {

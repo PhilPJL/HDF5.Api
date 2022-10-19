@@ -21,6 +21,22 @@ internal static partial class H5
 #if NET7_0_OR_GREATER
 
     /// <summary>
+    /// Frees memory allocated by the HDF5 Library.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5.html#Library-FreeMemory
+    /// </summary>
+    /// <param name="buf">
+    /// Buffer to be freed. Can be NULL.
+    /// </param>
+    /// <returns>
+    /// Returns a non-negative value if successful; otherwise returns a
+    /// negative value.
+    /// </returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5free_memory"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t free_memory(IntPtr buf);
+
+    /// <summary>
     /// Returns the HDF library release number.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5.html#Library-Version
     /// </summary>

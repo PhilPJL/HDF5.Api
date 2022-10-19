@@ -42,7 +42,6 @@ internal static unsafe class H5SAdapter
         return new H5Space(h);
     }
 
-    //TODO: expose other params
     internal static void SelectHyperslab(H5Space space, long offset, long count)
     {
         // TODO: pin?

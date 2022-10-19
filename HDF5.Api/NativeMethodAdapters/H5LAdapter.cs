@@ -38,7 +38,7 @@ internal static unsafe class H5LAdapter
     internal static void Delete<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList)
         where T : H5Object<T>
     {
-        location.AssertHasLocationHandleType();
+        location.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet, HandleType.Attribute);
 
         int err;
 

@@ -54,7 +54,6 @@ internal static unsafe class H5DAdapter
     public static IEnumerable<T> Read<T>(H5DataSet dataSet) 
         where T : unmanaged 
     {
-        // TODO: move this check into separate method
         using var space = dataSet.GetSpace();
         using var type = dataSet.GetH5Type();
         long count = space.GetSimpleExtentNPoints();

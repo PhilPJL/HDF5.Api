@@ -82,6 +82,32 @@ internal static partial class H5P
         (hid_t plist_id, ref H5T.cset_t encoding);
 
     /// <summary>
+    /// Returns the property list class identifier for a property list.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetClass
+    /// </summary>
+    /// <param name="plist">Identifier of property list to query.</param>
+    /// <returns>Returns a property list class identifier if successful.
+    /// Otherwise returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pget_class"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t get_class(hid_t plist);
+
+    /// <summary>
+    /// Retrieves the name of a class.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetClassName
+    /// </summary>
+    /// <param name="pcid">Identifier of the property class to query</param>
+    /// <returns>If successful returns a pointer to an allocated string
+    /// containing the class name; <code>NULL</code> if unsuccessful.</returns>
+    /// <remarks>The pointer to the name must be freed by the user after
+    /// each successful call.</remarks>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pget_class_name"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial IntPtr get_class_name(hid_t pcid);
+
+    /// <summary>
     /// Determines whether property is set to enable creating missing
     /// intermediate groups.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetCreateIntermediateGroup

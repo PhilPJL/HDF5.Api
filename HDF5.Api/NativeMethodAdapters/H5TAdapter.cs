@@ -121,7 +121,7 @@ internal static unsafe class H5TAdapter
 #if NET7_0_OR_GREATER
         err = insert(typeId, name, offset, nativeTypeId);
 #else
-        fixed(byte * nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
             err = insert(typeId, nameBytesPtr, offset, nativeTypeId);
         }
@@ -146,7 +146,6 @@ internal static unsafe class H5TAdapter
     {
         return default(T) switch
         {
-            // TODO: handle bool
             //bool => NATIVE_HBOOL, hmm bool has marshalable size of 4, but storage size of 1.
             byte => NATIVE_B8,
 
@@ -160,7 +159,7 @@ internal static unsafe class H5TAdapter
 
             float => NATIVE_FLOAT,
             double => NATIVE_DOUBLE,
-            // TODO: add more mappings as required
+            // add more mappings as required
 
             _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
         }; ;
@@ -172,10 +171,31 @@ internal static unsafe class H5TAdapter
         err.ThrowIfError();
     }
 
+    internal static StringPadding GetPadding(H5Type h5Type)
+    {
+        var pad = get_strpad(h5Type);
+        ((int)pad).ThrowIfError();
+        return (StringPadding)pad;
+    }
+
     internal static void SetSize(H5Type h5Type, int size)
     {
         int err = set_size(h5Type, new IntPtr(size));
         err.ThrowIfError();
+    }
+
+    internal static int GetSize(H5Type h5Type)
+    {
+        int size = (int)get_size(h5Type);
+        size.ThrowIfError();
+        return size;
+    }
+
+    internal static bool GetCommitted(H5Type h5Type)
+    {
+        int retval = (int)committed(h5Type);
+        retval.ThrowIfError();
+        return retval > 0;
     }
 
     internal static void Commit<T>(
@@ -196,7 +216,7 @@ internal static unsafe class H5TAdapter
         int err;
 
 #if NET7_0_OR_GREATER
-        err = commit(h5Object, name, h5Type, 
+        err = commit(h5Object, name, h5Type,
             linkCreationPropertyList, dataTypeCreationPropertyList, dataTypeAccessPropertyList);
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))

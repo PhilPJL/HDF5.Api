@@ -22,14 +22,12 @@ public interface IH5Location : IH5ObjectWithAttributes
         [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList = null);
     H5DataSet OpenDataSet(string name);
     bool DataSetExists(string name);
-    // TODO: DataSetPathExists?
-    // TODO: DeleteDataSet?
+    void DeleteDataSet(string name);
 
     IEnumerable<string> GroupNames { get; }
     IEnumerable<string> DataSetNames { get; }
     IEnumerable<string> NamedDataTypeNames { get; }
 
-    // TODO: move to IH5ObjectWithAttributes?
     IEnumerable<(string name, H5ObjectType type)> Members { get; }
 
     void Commit(

@@ -69,13 +69,6 @@ internal static unsafe class H5GAdapter
         return new H5Group(h);
     }
 
-    internal static void Delete<T>(H5Location<T> location, string path, H5PropertyList? propListLinkAccess) where T : H5Object<T>
-    {
-        location.AssertHasHandleType(HandleType.File, HandleType.Group);
-
-        H5LAdapter.Delete(location, path, propListLinkAccess);
-    }
-
     /// <summary>
     ///     Test if an object exists by name in the specified location.
     /// </summary>

@@ -43,13 +43,13 @@ public abstract class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5Pr
 
     public override int GetHashCode()
     {
-        // TODO?
-        return base.GetHashCode();
+        // Use the handle value which will be unique anyway - hopefully
+        return HashCode.Combine((long)this);
     }
     
     #endregion
 
-    // TODO: getclass, copy, ...
+    public long GetClassId() => H5PAdapter.GetClassId(this);
 }
 
 internal class H5AttributeCreationPropertyList : H5PropertyList

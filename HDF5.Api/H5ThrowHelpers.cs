@@ -1,6 +1,6 @@
 ﻿namespace HDF5.Api;
 
-internal static class H5ThrowExtensions
+internal static class H5ThrowHelpers
 {
     public static void ThrowIfInvalidHandleValue(this long handle, [CallerMemberName] string? methodName = null)
     {
@@ -46,6 +46,15 @@ internal static class H5ThrowExtensions
             }
 
             throw new Hdf5Exception($"Error {err} calling: {methodName}.");
+        }
+    }
+
+    public static void ThrowOnAttributeStorageMismatch<T>(int attributeStorageSize, int marshalSize)
+    {
+        if (marshalSize != attributeStorageSize)
+        {
+            throw new Hdf5Exception(
+              $"Attribute storage size is {attributeStorageSize}, which does not match the marshalable size for type {typeof(T).Name} of {marshalSize}.");
         }
     }
 }
