@@ -142,7 +142,7 @@ public readonly struct Dimension
     }
 };
 
-public enum H5Class
+public enum DataTypeClass
 {
     None = -1,
     Integer = 0,
@@ -157,6 +157,25 @@ public enum H5Class
     VariableLength = 9,
     Array = 10,
     NClasses
+}
+
+public enum PropertyListClass
+{
+    None = 0,
+    ObjectCreate = 1,
+    FileCreate = 2,
+    FileAccess = 3,
+    DatasetCreate = 4,
+    DatasetAccess = 5,
+    DatasetXfer = 6,
+    FileMount = 7,
+    GroupCreate = 8,
+    GroupAccess = 9,
+    DataTypeCreate = 10,
+    DataTypeAccess = 11,
+    StringCreate = 12,
+    LinkCreate = 13,
+    LinkAccess = 14
 }
 
 public enum StringPadding

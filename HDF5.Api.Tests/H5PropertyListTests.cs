@@ -15,6 +15,9 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
             using var fpc2 = H5File.CreateCreationPropertyList();
             Assert.IsTrue(fpc1.IsEqualTo(fpc2));
             Assert.IsTrue(fpc1.Equals(fpc2));
+
+            Assert.AreEqual(fpc1.GetClass(), fpc2.GetClass());
+            Assert.AreNotEqual(fpc1.GetHashCode(), fpc2.GetHashCode());
         });
     }
 
@@ -46,6 +49,10 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
             using var fpc3 = new H5FileCreationPropertyList();
             Assert.IsTrue(fpc1.IsEqualTo(fpc2));
             Assert.IsTrue(fpc1.IsEqualTo(fpc3));
+
+            // To exercise null checks
+            Assert.IsFalse(fpc1.IsEqualTo(null));
+            Assert.IsFalse(((object)fpc1).Equals(null));
 
             // This isn't true - HDF5 quirk
             //using var fac1 = file.GetAccessPropertyList();

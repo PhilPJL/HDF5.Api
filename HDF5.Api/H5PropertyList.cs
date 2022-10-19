@@ -1,5 +1,8 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5.Api.NativeMethodAdapters;
+using HDF5.Api.NativeMethods;
+using System.Collections.Concurrent;
+
 namespace HDF5.Api;
 
 /// <summary>
@@ -16,7 +19,7 @@ public abstract class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5Pr
 
     public bool IsEqualTo([AllowNull] H5PropertyList? other)
     {
-        if(other is null) { return false; }
+        if (other is null) { return false; }
 
         return H5PAdapter.AreEqual(this, other);
     }
@@ -46,10 +49,42 @@ public abstract class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5Pr
         // Use the handle value which will be unique anyway - hopefully
         return HashCode.Combine((long)this);
     }
-    
+
     #endregion
 
-    public long GetClassId() => H5PAdapter.GetClassId(this);
+    private static readonly Lazy<ConcurrentBag<(long classId, PropertyListClass classEnum)>> ClassLookup = new(InitClassLookup, true);
+
+    public static ConcurrentBag<(long classId, PropertyListClass classEnum)> InitClassLookup()
+    {
+        return new ConcurrentBag<(long classId, PropertyListClass classEnum)>
+        {
+            ( H5P.FILE_CREATE, PropertyListClass.FileCreate ),
+            ( H5P.FILE_ACCESS, PropertyListClass.FileAccess ),
+            ( H5P.DATASET_CREATE, PropertyListClass.DatasetCreate ),
+            ( H5P.DATASET_ACCESS, PropertyListClass.DatasetAccess ),
+            ( H5P.GROUP_CREATE, PropertyListClass.GroupCreate ),
+            ( H5P.GROUP_ACCESS, PropertyListClass.GroupAccess ),
+            ( H5P.DATATYPE_CREATE, PropertyListClass.DataTypeCreate ),
+            ( H5P.DATATYPE_ACCESS, PropertyListClass.DataTypeAccess ),
+            ( H5P.LINK_CREATE, PropertyListClass.LinkCreate ),
+            ( H5P.LINK_ACCESS, PropertyListClass.LinkAccess ),
+        };
+    }
+
+    public PropertyListClass GetClass()
+    {
+        long classId = H5PAdapter.GetClassId(this);
+
+        foreach(var plClass in ClassLookup.Value)
+        {
+            if(H5PAdapter.AreEqual(plClass.classId, classId))
+            {
+                return plClass.classEnum;
+            }
+        }
+
+        return PropertyListClass.None;
+    }
 }
 
 internal class H5AttributeCreationPropertyList : H5PropertyList

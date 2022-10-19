@@ -158,7 +158,7 @@ public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
 
     public bool Committed => H5TAdapter.GetCommitted(this);
 
-    public H5Class GetClass() => H5TAdapter.GetClass(this);
+    public DataTypeClass GetClass() => H5TAdapter.GetClass(this);
 
     internal static H5DataTypeCreationPropertyList CreateCreationPropertyList()
     {

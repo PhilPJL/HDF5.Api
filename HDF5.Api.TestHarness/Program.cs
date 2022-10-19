@@ -30,13 +30,13 @@
 
                 switch (type.GetClass())
                 {
-                    case H5Class.Integer:
+                    case DataTypeClass.Integer:
                         Console.WriteLine(sIndent + "->V: " + att.Read<int>());
                         break;
-                    case H5Class.String:
+                    case DataTypeClass.String:
                         Console.WriteLine(sIndent + "->V: " + att.ReadString());
                         break;
-                    case H5Class.Float:
+                    case DataTypeClass.Float:
                         Console.WriteLine(sIndent + "->V: " + att.Read<double>());
                         break;
                 }

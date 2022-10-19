@@ -24,9 +24,9 @@ internal static unsafe class H5TAdapter
         err.ThrowIfError();
     }
 
-    internal static H5Class GetClass(H5Type type)
+    internal static DataTypeClass GetClass(H5Type type)
     {
-        return (H5Class)get_class(type);
+        return (DataTypeClass)get_class(type);
     }
 
     internal static void SetCharacterSet(H5Type type, CharacterSet cset)
@@ -47,7 +47,7 @@ internal static unsafe class H5TAdapter
 
     internal static H5Type CreateCompoundType(int size)
     {
-        long h = create((class_t)H5Class.Compound, new ssize_t(size));
+        long h = create((class_t)DataTypeClass.Compound, new ssize_t(size));
         h.ThrowIfInvalidHandleValue();
         return new H5Type(h);
     }

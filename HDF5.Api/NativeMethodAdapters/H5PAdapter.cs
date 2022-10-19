@@ -48,13 +48,18 @@ internal static unsafe class H5PAdapter
         err.ThrowIfError();
     }
 
-    internal static bool AreEqual(H5PropertyList propertyList1, H5PropertyList propertyList2)
+    internal static bool AreEqual(long propertyListId1, long propertyListId2)
     {
-        int err = equal(propertyList1, propertyList2);
+        int err = equal(propertyListId1, propertyListId2);
 
         err.ThrowIfError();
 
         return err != 0;
+    }
+
+    internal static bool AreEqual(H5PropertyList propertyList1, H5PropertyList propertyList2)
+    {
+        return AreEqual((long)propertyList1, (long)propertyList2);
     }
 
     internal static TPList GetPropertyList<T, TPList>(

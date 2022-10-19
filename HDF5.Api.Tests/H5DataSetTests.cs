@@ -39,6 +39,25 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
     [TestMethod]
     [DataRow("ascii", "data-set-name-ascii")]
     [DataRow("utf8", "data-set-name-utf8-ᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠ")]
+    public void CreateDeleteOnFile(string fileNameSuffix, string dataSetName)
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile2(fileNameSuffix);
+
+            // Create test ds
+            using var ds = CreateTestDataset(file, dataSetName);
+
+            file.DeleteDataSet(dataSetName);
+
+            Assert.IsFalse(file.DataSetExists(dataSetName));
+            Assert.IsFalse(file.DataSetNames.Contains(dataSetName));
+        });
+    }
+
+    [TestMethod]
+    [DataRow("ascii", "data-set-name-ascii")]
+    [DataRow("utf8", "data-set-name-utf8-ᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠ")]
     public void GetCreationPropertyListSucceeds(string fileNameSuffix, string dataSetName)
     {
         HandleCheck(() =>
@@ -93,6 +112,27 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
 
             // 1 file, 2 groups, 2 data-sets
             Assert.AreEqual(5, file.GetObjectCount());
+        });
+    }
+
+    [TestMethod]
+    [DataRow("ascii", "data-set-name-ascii")]
+    [DataRow("utf8", "data-set-name-utf8-ᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠ")]
+    public void CreateDeleteOnGroup(string fileNameSuffix, string dataSetName)
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile2(fileNameSuffix);
+
+            using var group = file.CreateGroup("aGroup");
+
+            // Create test ds on file/group
+            using var ds = CreateTestDataset(group, dataSetName);
+
+            group.DeleteDataSet(dataSetName);
+
+            Assert.IsFalse(group.DataSetExists(dataSetName));
+            Assert.IsFalse(group.DataSetExists(dataSetName + "x"));
         });
     }
 

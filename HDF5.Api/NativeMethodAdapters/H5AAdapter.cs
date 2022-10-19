@@ -254,9 +254,9 @@ internal static unsafe class H5AAdapter
         }
 
         var cls = type.GetClass();
-        if (cls != H5Class.String)
+        if (cls != DataTypeClass.String)
         {
-            throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{H5Class.String}'.");
+            throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
         }
 
 
@@ -429,9 +429,9 @@ internal static unsafe class H5AAdapter
         }
 
         var cls = type.GetClass();
-        if (cls != H5Class.String)
+        if (cls != DataTypeClass.String)
         {
-            throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{H5Class.String}'.");
+            throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
         }
 
         var characterSet = type.CharacterSet;

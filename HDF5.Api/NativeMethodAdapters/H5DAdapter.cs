@@ -60,9 +60,9 @@ internal static unsafe class H5DAdapter
 
         var cls = type.GetClass();
 
-        if (cls != H5Class.Compound)
+        if (cls != DataTypeClass.Compound)
         {
-            throw new Hdf5Exception($"DataSet is of class {cls} when expecting {H5Class.Compound}.");
+            throw new Hdf5Exception($"DataSet is of class {cls} when expecting {DataTypeClass.Compound}.");
         }
 
         long size = (long)GetStorageSize(dataSet);
