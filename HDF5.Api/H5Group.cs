@@ -12,7 +12,7 @@ public class H5Group : H5Location<H5Group>
     {
     }
 
-    public static H5GroupCreationPropertyList CreateCreationPropertyList()
+    internal static H5GroupCreationPropertyList CreateCreationPropertyList()
     {
         return H5GAdapter.CreateCreationPropertyList();
     }
@@ -22,7 +22,7 @@ public class H5Group : H5Location<H5Group>
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>
-    public H5GroupCreationPropertyList GetCreationPropertyList()
+    internal H5GroupCreationPropertyList GetCreationPropertyList()
     {
         return H5GAdapter.GetCreationPropertyList(this);
     }

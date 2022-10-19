@@ -12,6 +12,8 @@ public abstract class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5Pr
     {
     }
 
+    #region Equality and hashcode
+
     public bool IsEqualTo([AllowNull] H5PropertyList? other)
     {
         if(other is null) { return false; }
@@ -27,6 +29,25 @@ public abstract class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5Pr
     {
         return IsEqualTo(other);
     }
+
+#if NET7_0_OR_GREATER
+    public override bool Equals(object? obj)
+#else
+    public override bool Equals(object obj)
+#endif
+    {
+        if (obj is not H5PropertyList other) { return false; }
+
+        return Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        // TODO?
+        return base.GetHashCode();
+    }
+    
+    #endregion
 
     // TODO: getclass, copy, ...
 }
@@ -88,48 +109,83 @@ public class H5DataSetCreationPropertyList : H5PropertyList
     // TODO: GetChunk, etc.... loads
 }
 
-public class H5DataSetAccessPropertyList : H5PropertyList
+internal class H5DataSetAccessPropertyList : H5PropertyList
 {
     internal H5DataSetAccessPropertyList(long handle) : base(handle)
     {
     }
+
+    internal H5DataSetAccessPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.DATASET_CREATE))
+    {
+    }
+
+    // TODO: add properties and then make public
 }
 
-public class H5FileAccessPropertyList : H5PropertyList
+internal class H5FileAccessPropertyList : H5PropertyList
 {
     public H5FileAccessPropertyList(long handle) : base(handle)
     {
     }
+
+    internal H5FileAccessPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.FILE_ACCESS))
+    {
+    }
+
+    // TODO: add properties and then make public
 }
 
-public class H5FileCreationPropertyList : H5PropertyList
+internal class H5FileCreationPropertyList : H5PropertyList
 {
     internal H5FileCreationPropertyList(long handle) : base(handle)
     {
     }
+
+    internal H5FileCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.FILE_CREATE))
+    {
+    }
+
+    // TODO: add properties and then make public
 }
 
-public class H5GroupCreationPropertyList : H5PropertyList
+internal class H5GroupCreationPropertyList : H5PropertyList
 {
     internal H5GroupCreationPropertyList(long handle) : base(handle)
     {
     }
-}
 
-
-public class H5TypeCreationPropertyList : H5PropertyList
-{
-    internal H5TypeCreationPropertyList(long handle) : base(handle)
+    internal H5GroupCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.GROUP_CREATE))
     {
     }
 
+    // TODO: add properties and then make public
 }
 
-public class H5TypeAccessPropertyList : H5PropertyList
+internal class H5DataTypeCreationPropertyList : H5PropertyList
 {
-    internal H5TypeAccessPropertyList(long handle) : base(handle)
+    internal H5DataTypeCreationPropertyList(long handle) : base(handle)
     {
     }
+
+    internal H5DataTypeCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.DATATYPE_CREATE))
+    {
+    }
+
+    // TODO: add properties and then make public
 }
 
-// Etc...
+internal class H5DataTypeAccessPropertyList : H5PropertyList
+{
+    internal H5DataTypeAccessPropertyList(long handle) : base(handle)
+    {
+    }
+
+    internal H5DataTypeAccessPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.DATATYPE_ACCESS))
+    {
+    }
+
+    // TODO: add properties and then make public
+
+}
+
+// TODO: other property lists

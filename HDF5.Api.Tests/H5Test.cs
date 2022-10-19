@@ -46,7 +46,7 @@ public abstract class H5Test<T> where T : H5Test<T>
         return GetFileName($"{path}_{suffix}");
     }
 
-    protected static H5File CreateFile2(
+    internal static H5File CreateFile2(
         string suffix,
         [CallerMemberName] string? path = null,
         bool failIfExists = false,
@@ -57,7 +57,7 @@ public abstract class H5Test<T> where T : H5Test<T>
         return CreateFile($"{path}_{suffix}", failIfExists, fileCreationPropertyList);
     }
 
-    protected static H5File CreateFile(
+    internal static H5File CreateFile(
         [CallerMemberName] string? path = null,
         bool failIfExists = false,
         H5FileCreationPropertyList? fileCreationPropertyList = null)
@@ -70,14 +70,15 @@ public abstract class H5Test<T> where T : H5Test<T>
         var file = H5File.Create(
             fullpath,
             failIfExists,
-            fileCreationPropertyList);
+            fileCreationPropertyList,
+            null);
 
         Assert.IsTrue(File.Exists(fullpath));
 
         return file;
     }
 
-    protected static H5File CreateOrOpenFile(
+    internal static H5File CreateOrOpenFile(
         [CallerMemberName] string? path = null,
         bool readOnly = false,
         H5FileCreationPropertyList? fileCreationPropertyList = null)
@@ -90,14 +91,15 @@ public abstract class H5Test<T> where T : H5Test<T>
         var file = H5File.CreateOrOpen(
             fullpath,
             readOnly,
-            fileCreationPropertyList);
+            fileCreationPropertyList,
+            null);
 
         Assert.IsTrue(File.Exists(fullpath));
 
         return file;
     }
 
-    protected static H5File OpenFile(
+    internal static H5File OpenFile(
         [CallerMemberName] string? path = null,
         bool readOnly = false,
         H5FileAccessPropertyList? fileAccessPropertyList = null)

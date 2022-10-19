@@ -107,8 +107,18 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// <summary>
     ///     Create a Group in this location
     /// </summary>
-    public H5Group CreateGroup([DisallowNull] string name,
-        [AllowNull] H5GroupCreationPropertyList? groupCreationPropertyList = null)
+    public H5Group CreateGroup([DisallowNull] string name)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        return CreateGroup(name, null);
+    }
+
+    /// <summary>
+    ///     Create a Group in this location
+    /// </summary>
+    internal H5Group CreateGroup([DisallowNull] string name,
+        [AllowNull] H5GroupCreationPropertyList? groupCreationPropertyList)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
@@ -153,8 +163,24 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         [DisallowNull] string name, 
         [DisallowNull] H5Type type, 
         [DisallowNull] H5Space space, 
-        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList = null, 
-        [AllowNull] H5DataSetAccessPropertyList? dataSetAccessPropertyList = null)
+        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList = null)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(type);
+        Guard.IsNotNull(space);
+
+        return CreateDataSet(name, type, space, dataSetCreationPropertyList, null);
+    }
+
+    /// <summary>
+    ///     Create a DataSet in this location
+    /// </summary>
+    internal H5DataSet CreateDataSet(
+        [DisallowNull] string name, 
+        [DisallowNull] H5Type type, 
+        [DisallowNull] H5Space space, 
+        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList, 
+        [AllowNull] H5DataSetAccessPropertyList? dataSetAccessPropertyList)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);

@@ -25,6 +25,15 @@ internal static class H5PAdapter
         return createPropertyList(h);
     }
 
+    internal static long Create(long classId)
+    {
+        long h = create(classId);
+
+        h.ThrowIfInvalidHandleValue();
+
+        return h;
+    }
+
     internal static void SetChunk(H5PropertyList propertyList, int rank, long[] dims)
     {
         int err = set_chunk(propertyList, rank, dims.Select(d => (ulong)d).ToArray());

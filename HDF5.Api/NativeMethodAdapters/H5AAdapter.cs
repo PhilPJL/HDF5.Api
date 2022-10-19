@@ -1,13 +1,12 @@
 ﻿#if NETSTANDARD
 using HDF5.Api.Disposables;
-using HDF5.Api.Utils;
 #endif
 using CommunityToolkit.Diagnostics;
 #if NET7_0_OR_GREATER
 using CommunityToolkit.HighPerformance.Buffers;
 #endif
-using HDF5.Api.NativeMethods;
 using HDF5.Api.Utils;
+using HDF5.Api.NativeMethods;
 using System.Collections.Generic;
 using static HDF5.Api.NativeMethods.H5A;
 

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace HDF5.Api.Tests;
+﻿namespace HDF5.Api.Tests;
 
 [TestClass]
 public class H5PropertyListTests : H5Test<H5PropertyListTests>
@@ -13,7 +11,7 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
             using var file = CreateFile();
 
             // Is create list the same as default?
-            using var fpc1 = file.GetCreationPropertyList();
+            using var fpc1 = new H5FileCreationPropertyList();
             using var fpc2 = H5File.CreateCreationPropertyList();
             Assert.IsTrue(fpc1.IsEqualTo(fpc2));
 

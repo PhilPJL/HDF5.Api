@@ -209,13 +209,13 @@ internal static unsafe class H5TAdapter
         err.ThrowIfError();
     }
 
-    internal static H5TypeCreationPropertyList CreateCreationPropertyList()
+    internal static H5DataTypeCreationPropertyList CreateCreationPropertyList()
     {
-        return H5PAdapter.Create(H5P.DATATYPE_CREATE, h => new H5TypeCreationPropertyList(h));
+        return H5PAdapter.Create(H5P.DATATYPE_CREATE, h => new H5DataTypeCreationPropertyList(h));
     }
 
-    internal static H5TypeAccessPropertyList CreateAccessPropertyList()
+    internal static H5DataTypeAccessPropertyList CreateAccessPropertyList()
     {
-        return H5PAdapter.Create(H5P.DATATYPE_ACCESS, h => new H5TypeAccessPropertyList(h));
+        return H5PAdapter.Create(H5P.DATATYPE_ACCESS, h => new H5DataTypeAccessPropertyList(h));
     }
 }

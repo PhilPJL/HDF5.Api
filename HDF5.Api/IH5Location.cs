@@ -11,8 +11,7 @@ namespace HDF5.Api;
 public interface IH5Location : IH5ObjectWithAttributes
 {
     // Groups
-    H5Group CreateGroup(string name,
-        [AllowNull] H5GroupCreationPropertyList? groupCreationPropertyList = null);
+    H5Group CreateGroup(string name);
     H5Group OpenGroup(string name);
     bool GroupExists(string name);
     bool GroupPathExists(string path);
@@ -20,8 +19,7 @@ public interface IH5Location : IH5ObjectWithAttributes
 
     // Data sets
     H5DataSet CreateDataSet(string name, H5Type typeId, H5Space space,
-        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList = null,
-        [AllowNull] H5DataSetAccessPropertyList? dataSetAccessPropertyList = null);
+        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList = null);
     H5DataSet OpenDataSet(string name);
     bool DataSetExists(string name);
     // TODO: DataSetPathExists?

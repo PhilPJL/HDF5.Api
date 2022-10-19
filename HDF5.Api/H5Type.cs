@@ -13,6 +13,8 @@ public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
 
     private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
 
+    #region Equality and hashcode
+
     public bool IsEqualTo([AllowNull] H5Type? other)
     {
         if(other is null) { return false; }
@@ -28,6 +30,25 @@ public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
     {
         return IsEqualTo(other);
     }
+
+#if NET7_0_OR_GREATER
+    public override bool Equals(object? obj)
+#else
+    public override bool Equals(object obj)
+#endif
+    {
+        if (obj is not H5Type other) { return false; }
+
+        return Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        // TODO?
+        return base.GetHashCode();
+    }
+
+    #endregion
 
     public static H5Type GetNativeType<T>() where T : unmanaged
     {
@@ -142,12 +163,12 @@ public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
         H5TAdapter.SetSize(this, size);
     }
 
-    internal static H5TypeCreationPropertyList CreateCreationPropertyList()
+    internal static H5DataTypeCreationPropertyList CreateCreationPropertyList()
     {
         return H5TAdapter.CreateCreationPropertyList();
     }
 
-    internal static H5TypeAccessPropertyList CreateAccessPropertyList()
+    internal static H5DataTypeAccessPropertyList CreateAccessPropertyList()
     {
         return H5TAdapter.CreateAccessPropertyList();
     }

@@ -49,7 +49,7 @@ public class H5File : H5Location<H5File>
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>
-    public static H5FileCreationPropertyList CreateCreationPropertyList()
+    internal static H5FileCreationPropertyList CreateCreationPropertyList()
     {
         return H5FAdapter.CreateCreationPropertyList();
     }
@@ -59,7 +59,7 @@ public class H5File : H5Location<H5File>
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>
-    public static H5FileAccessPropertyList CreateAccessPropertyList()
+    internal static H5FileAccessPropertyList CreateAccessPropertyList()
     {
         return H5FAdapter.CreateAccessPropertyList();
     }
@@ -69,7 +69,7 @@ public class H5File : H5Location<H5File>
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>
-    public H5FileCreationPropertyList GetCreationPropertyList()
+    internal H5FileCreationPropertyList GetCreationPropertyList()
     {
         return H5FAdapter.GetCreationPropertyList(this);
     }
@@ -79,7 +79,7 @@ public class H5File : H5Location<H5File>
     /// </summary>
     /// <param name="listType"></param>
     /// <returns></returns>
-    public H5FileAccessPropertyList GetAccessPropertyList()
+    internal H5FileAccessPropertyList GetAccessPropertyList()
     {
         return H5FAdapter.GetAccessPropertyList(this);
     }
@@ -91,8 +91,20 @@ public class H5File : H5Location<H5File>
     /// <param name="readOnly">Open the file in read-only mode.  Defaults to read-write.</param>
     public static H5File Open(
         [DisallowNull] string path, 
-        bool readOnly = false, 
-        [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList = null)
+        bool readOnly = false)
+    {
+        return Open(path, readOnly, null);
+    }
+
+    /// <summary>
+    ///     Opens an existing file.
+    /// </summary>
+    /// <param name="path">Path to the file.</param>
+    /// <param name="readOnly">Open the file in read-only mode.  Defaults to read-write.</param>
+    internal static H5File Open(
+        [DisallowNull] string path, 
+        bool readOnly, 
+        [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
@@ -106,9 +118,21 @@ public class H5File : H5Location<H5File>
     /// <param name="readOnly">Open the file in read-only mode.  Defaults to read-write.</param>
     public static H5File CreateOrOpen(
         [DisallowNull] string path, 
-        bool readOnly = false,
-        [AllowNull] H5FileCreationPropertyList? fileCreationPropertyList = null,
-        [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList = null)
+        bool readOnly = false)
+    {
+        return CreateOrOpen(path, readOnly, null, null);
+    }
+
+    /// <summary>
+    ///     Opens an existing file or creates a new one if the file does not exist.
+    /// </summary>
+    /// <param name="path">Path to the file.</param>
+    /// <param name="readOnly">Open the file in read-only mode.  Defaults to read-write.</param>
+    internal static H5File CreateOrOpen(
+        [DisallowNull] string path, 
+        bool readOnly,
+        [AllowNull] H5FileCreationPropertyList? fileCreationPropertyList,
+        [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
@@ -125,9 +149,22 @@ public class H5File : H5Location<H5File>
     /// <param name="failIfExists">Fail if the file being created already exists.</param>
     public static H5File Create(
         [DisallowNull] string path, 
-        bool failIfExists = false, 
-        [AllowNull] H5FileCreationPropertyList? fileCreationPropertyList = null, 
-        [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList = null)
+        bool failIfExists = false)
+    {
+        return Create(path, failIfExists, null, null);
+    }
+
+    /// <summary>
+    /// Attempts to create a new <see cref="H5File"/>.  
+    /// By default an existing file will be truncated.
+    /// </summary>
+    /// <param name="path">Path tp the file</param>
+    /// <param name="failIfExists">Fail if the file being created already exists.</param>
+    internal static H5File Create(
+        [DisallowNull] string path, 
+        bool failIfExists, 
+        [AllowNull] H5FileCreationPropertyList? fileCreationPropertyList, 
+        [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
