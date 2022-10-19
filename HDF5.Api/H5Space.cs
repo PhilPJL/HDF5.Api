@@ -48,11 +48,11 @@ public class H5Space : H5Object<H5Space>
 
     public static H5Space Create(params long[] dimensions)
     {
-        return Create(dimensions.Select(d => new Dimension(d)).ToArray());
+        return Create(Dimension.Create(dimensions));
     }
 
     public static H5Space Create(params (long initialSize, long upperLimit)[] dimensions)
     {
-        return Create(dimensions.Select(d => new Dimension(d.initialSize, d.upperLimit)).ToArray());
+        return Create(Dimension.Create(dimensions));
     }
 }

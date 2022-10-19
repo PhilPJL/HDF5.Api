@@ -95,7 +95,7 @@ public class H5Object<T> : Disposable where T : H5Object<T>
     }
 
     internal void AssertHasLocationHandleType() => AssertHasHandleType(HandleType.File, HandleType.Group);
-    internal void AssertHasWithAttributesHandleType() => AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet); // NamedDataType?
+    internal void AssertHasWithAttributesHandleType() => AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);// , HandleType.Type);
 
     internal void AssertNotDisposed()
     {

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5.Api.NativeMethodAdapters;
+using System.Collections.Generic;
 
 namespace HDF5.Api;
 
@@ -169,4 +170,6 @@ public class H5Type : H5Object<H5Type>, IEquatable<H5Type>
     {
         return H5TAdapter.CreateAccessPropertyList();
     }
+
+    public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
 }

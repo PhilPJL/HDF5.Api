@@ -9,7 +9,6 @@ using HDF5.Api.Utils;
 using HDF5.Api.NativeMethods;
 using System.Collections.Generic;
 using static HDF5.Api.NativeMethods.H5A;
-using System;
 
 namespace HDF5.Api.NativeMethodAdapters;
 
@@ -113,21 +112,31 @@ internal static unsafe class H5AAdapter
 
         int Callback(long id, IntPtr intPtrName, ref info_t info, IntPtr _)
         {
-            var name = info.cset switch
+            try
             {
+                var name = info.cset switch
+                {
 #if NET7_0_OR_GREATER
-                H5T.cset_t.ASCII or H5T.cset_t.UTF8 => Marshal.PtrToStringUTF8(intPtrName),
+                    H5T.cset_t.ASCII or H5T.cset_t.UTF8 => Marshal.PtrToStringUTF8(intPtrName),
 #else
-                H5T.cset_t.ASCII or H5T.cset_t.UTF8 => MarshalHelpers.PtrToStringUTF8(intPtrName),
+                    H5T.cset_t.ASCII or H5T.cset_t.UTF8 => MarshalHelpers.PtrToStringUTF8(intPtrName),
 #endif
-                _ => throw new InvalidEnumArgumentException($"Unexpected character set {info.cset} when enumerating attribute names."),
-            };
+                    // Don't throw inside callback - see HDF docs
+                    _ => string.Empty
+                };
 
-            Guard.IsNotNull(name);
+                if (name != null)
+                {
+                    names.Add(name);
+                }
 
-            names.Add(name);
-
-            return 0;
+                return 0;
+            }
+            catch
+            {
+                // Don't throw inside callback - see HDF docs
+                return -1;
+            }
         }
     }
 

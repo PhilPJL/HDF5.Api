@@ -146,19 +146,26 @@ internal static unsafe class H5TAdapter
     {
         return default(T) switch
         {
-            //bool => NATIVE_HBOOL, hmm bool has marshalable size of 4, but storage size of 1.
+            bool => NATIVE_HBOOL, // hmm bool has marshalable size of 4, but storage size of 1.
+
             byte => NATIVE_B8,
+            sbyte => NATIVE_B8,
 
             short => NATIVE_INT16,
-            int => NATIVE_INT32,
-            long => NATIVE_INT64,
-
             ushort => NATIVE_USHORT,
+
+            // TODO: check sizes 
+            char => NATIVE_CHAR,
+
+            int => NATIVE_INT32,
             uint => NATIVE_UINT32,
+
+            long => NATIVE_INT64,
             ulong => NATIVE_UINT64,
 
             float => NATIVE_FLOAT,
             double => NATIVE_DOUBLE,
+
             // add more mappings as required
 
             _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")

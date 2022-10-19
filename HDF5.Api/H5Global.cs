@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5.Api.NativeMethods;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using static HDF5.Api.NativeMethods.H5;
 
@@ -139,6 +140,16 @@ public readonly struct Dimension
         InitialSize = initialSize;
 
         UpperLimit = upperLimit ?? Unlimited;
+    }
+
+    public static Dimension[] Create(params long[] dimensions)
+    {
+        return dimensions.Select(d => new Dimension(d)).ToArray();
+    }
+
+    public static Dimension[] Create(params (long initialSize, long upperLimit)[] dimensions)
+    {
+        return dimensions.Select(d => new Dimension(d.initialSize, d.upperLimit)).ToArray();
     }
 };
 
