@@ -15,13 +15,23 @@ internal static unsafe class H5GAdapter
         err.ThrowIfError();
     }
 
+    // Overload used by default which enabled intermediate group creation and UTF8 names.
     internal static H5Group Create<T>(
         H5Location<T> location, string name,
         H5GroupCreationPropertyList? propListGroupCreation) where T : H5Object<T>
     {
-        location.AssertHasLocationHandleType();
-
         using var propListLinkCreation = H5Link.CreateCreationPropertyList();
+
+        return Create(location, name, propListLinkCreation, propListGroupCreation);
+    }
+
+    // Overload for test purposes
+    internal static H5Group Create<T>(
+        H5Location<T> location, string name,
+        H5LinkCreationPropertyList? propListLinkCreation,
+        H5GroupCreationPropertyList? propListGroupCreation) where T : H5Object<T>
+    {
+        location.AssertHasLocationHandleType();
 
         long h;
 

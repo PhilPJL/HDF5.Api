@@ -58,6 +58,10 @@ internal class H5AttributeCreationPropertyList : H5PropertyList
     {
     }
 
+    internal H5AttributeCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.ATTRIBUTE_CREATE))
+    {
+    }
+
     public CharacterSet CharacterEncoding
     {
         get => H5PAdapter.GetCharacterEncoding(this);
@@ -71,6 +75,10 @@ internal class H5LinkCreationPropertyList : H5AttributeCreationPropertyList
     {
     }
 
+    internal H5LinkCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.LINK_CREATE))
+    {
+    }
+
     public bool CreateIntermediateGroups
     {
         get => H5PAdapter.GetCreateIntermediateGroups(this);
@@ -81,6 +89,10 @@ internal class H5LinkCreationPropertyList : H5AttributeCreationPropertyList
 public class H5DataSetCreationPropertyList : H5PropertyList
 {
     internal H5DataSetCreationPropertyList(long handle) : base(handle)
+    {
+    }
+
+    internal H5DataSetCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.DATASET_CREATE))
     {
     }
 
@@ -115,7 +127,7 @@ internal class H5DataSetAccessPropertyList : H5PropertyList
     {
     }
 
-    internal H5DataSetAccessPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.DATASET_CREATE))
+    internal H5DataSetAccessPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.DATASET_ACCESS))
     {
     }
 

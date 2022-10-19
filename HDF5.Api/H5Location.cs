@@ -39,9 +39,19 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
         return H5AAdapter.Create<T, TA>(this, name);
     }
 
+    /// <summary>
+    /// Create and configure string attribute in the target location.
+    /// </summary>
+    /// <param name="name">Attribute name. This can be unicode and isn't impacted by the <paramref name="fixedStorageLength"/> value.</param>
+    /// <param name="fixedStorageLength">The total number of bytes allocated to store the string including the null terminator.  
+    /// <para>ASCII strings require 1 byte per character, plus 1 for the null terminator.</para>
+    /// <para>UTF8 strings require 1-4 bytes per character, plus 1 for the null terminator.</para></param>
+    /// <param name="characterSet">Defaults to <see cref="CharacterSet.Utf8"/>.</param>
+    /// <param name="padding"></param>
+    /// <returns></returns>
     public H5Attribute CreateStringAttribute(
         [DisallowNull] string name, 
-        int fixedStorageLength = 0, CharacterSet characterSet = CharacterSet.Ascii, StringPadding padding = StringPadding.NullTerminate)
+        int fixedStorageLength = 0, CharacterSet characterSet = CharacterSet.Utf8, StringPadding padding = StringPadding.NullTerminate)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 

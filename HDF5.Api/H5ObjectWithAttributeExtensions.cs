@@ -32,7 +32,7 @@ public static class H5ObjectWithAttributeExtensions
         [DisallowNull] string name,
         [DisallowNull] string value,
         int fixedStorageLength,
-        CharacterSet characterSet = CharacterSet.Ascii,
+        CharacterSet characterSet = CharacterSet.Utf8,
         StringPadding padding = StringPadding.NullPad)
     {
         Guard.IsNotNull(owa);

@@ -15,7 +15,7 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// <summary>
 /// H5 attribute native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
 /// </summary>
-internal unsafe static class H5AAdapter
+internal static unsafe class H5AAdapter
 {
     internal static void Close(H5Attribute attribute)
     {
@@ -472,7 +472,7 @@ internal unsafe static class H5AAdapter
 
             if (bytes.Length > storageSize)
             {
-                throw new ArgumentOutOfRangeException($"The string requires {bytes.Length} storage which than the allocated fixed storage size of {storageSize} bytes.");
+                throw new ArgumentOutOfRangeException($"The string requires {bytes.Length} storage which is greater than the allocated fixed storage size of {storageSize} bytes.");
             }
 
 #if NETSTANDARD
