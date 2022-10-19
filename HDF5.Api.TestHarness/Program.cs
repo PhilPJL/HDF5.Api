@@ -1,13 +1,13 @@
 ﻿namespace HDF5.Api.TestHarness
 {
-    internal class Program
+    internal static class Program
     {
-        static void Main()
+        private static void Main()
         {
             H5Global.TryLoadLibraries(@"C:\Program Files\HDF_Group\HDF5\1.10.9_intel\bin");
             H5Global.TryLoadLibraries();
 
-            string fileName = @"C:\Users\passp\Downloads\ex_table_11.h5";
+            const string fileName = @"C:\Users\passp\Downloads\ex_table_11.h5";
             using var file = H5File.Open(fileName);
 
             Console.WriteLine(fileName);
@@ -17,7 +17,7 @@
             Console.WriteLine(H5Global.GetLibraryVersion());
         }
 
-        static void DumpLocation<T>(H5Location<T> location, string locationName, int indent) where T : H5Object<T>
+        private static void DumpLocation<T>(H5Location<T> location, string locationName, int indent) where T : H5Object<T>
         {
             string sIndent = new string(' ', indent * 2);
 

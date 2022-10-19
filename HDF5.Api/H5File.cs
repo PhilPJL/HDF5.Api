@@ -57,7 +57,6 @@ public class H5File : H5Location<H5File>
     /// <summary>
     /// Creates a <see cref="H5FileAccessPropertyList"/> of the required type.
     /// </summary>
-    /// <param name="listType"></param>
     /// <returns></returns>
     internal static H5FileAccessPropertyList CreateAccessPropertyList()
     {
@@ -67,7 +66,6 @@ public class H5File : H5Location<H5File>
     /// <summary>
     /// Gets a copy of the <see cref="H5FileCreationPropertyList"/> used to create the object.
     /// </summary>
-    /// <param name="listType"></param>
     /// <returns></returns>
     internal H5FileCreationPropertyList GetCreationPropertyList()
     {
@@ -77,7 +75,6 @@ public class H5File : H5Location<H5File>
     /// <summary>
     /// Gets a copy of the <see cref="H5FileAccessPropertyList"/> used to create the object.
     /// </summary>
-    /// <param name="listType"></param>
     /// <returns></returns>
     internal H5FileAccessPropertyList GetAccessPropertyList()
     {
@@ -101,6 +98,7 @@ public class H5File : H5Location<H5File>
     /// </summary>
     /// <param name="path">Path to the file.</param>
     /// <param name="readOnly">Open the file in read-only mode.  Defaults to read-write.</param>
+    /// <param name="fileAccessPropertyList"></param>
     internal static H5File Open(
         [DisallowNull] string path, 
         bool readOnly, 

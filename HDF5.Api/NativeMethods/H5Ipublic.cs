@@ -189,7 +189,7 @@ internal static unsafe partial class H5I
     /// <returns>Returns the length of the name if successful, returning 0
     /// (zero) if no name is associated with the identifier. Otherwise 
     /// returns a negative value.</returns>
-    /// encoded strings. See JIRA issue HDF5/HDFFV-9686.</remarks>
+    /// <remarks>encoded strings. See JIRA issue HDF5/HDFFV-9686.</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Iget_name",
         CharSet = CharSet.Ansi,
         CallingConvention = CallingConvention.Cdecl),

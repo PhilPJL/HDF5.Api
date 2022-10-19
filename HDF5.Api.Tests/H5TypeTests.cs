@@ -70,7 +70,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    struct CompoundType
+    private struct CompoundType
     {
         public int Id;
         public short ShortProperty;

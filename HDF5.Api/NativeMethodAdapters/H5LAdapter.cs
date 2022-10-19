@@ -108,6 +108,7 @@ internal static unsafe class H5LAdapter
     /// Create a new link creation property list
     /// </summary>
     /// <param name="encoding"></param>
+    /// <param name="createIntermediateGroups"></param>
     /// <returns></returns>
     internal static H5LinkCreationPropertyList CreateCreationPropertyList(CharacterSet encoding, bool createIntermediateGroups)
     {

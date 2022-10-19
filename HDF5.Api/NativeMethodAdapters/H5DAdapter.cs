@@ -11,7 +11,7 @@ namespace HDF5.Api.NativeMethodAdapters;
 /// <summary>
 /// H5 data-set native methods: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_d.html"/>
 /// </summary>
-internal unsafe static class H5DAdapter
+internal static unsafe class H5DAdapter
 {
     internal static void Close(H5DataSet dataSet)
     {
@@ -93,7 +93,7 @@ internal unsafe static class H5DAdapter
             var result = new T[count];
             fixed (T* ptr = result)
             {
-                int err = H5D.read(dataSet, type, space, space, 0, new IntPtr(ptr));
+                int err = read(dataSet, type, space, space, 0, new IntPtr(ptr));
                 err.ThrowIfError();
                 return result;
             }

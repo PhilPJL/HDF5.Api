@@ -18,7 +18,7 @@
 
 namespace UnitTests;
 
-class Utilities
+internal static class Utilities
 {
     public static void DisableErrorPrinting()
     {

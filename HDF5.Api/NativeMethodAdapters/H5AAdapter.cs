@@ -462,7 +462,7 @@ internal static unsafe class H5AAdapter
             {
                 fixed (void* fixedBytes = bytes)
                 {
-                    var stringArray = new IntPtr[1] { new IntPtr(fixedBytes) };
+                    var stringArray = new IntPtr[1] { new (fixedBytes) };
 
                     fixed (void* stringArrayPtr = stringArray)
                     {

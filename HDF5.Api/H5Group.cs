@@ -20,7 +20,6 @@ public class H5Group : H5Location<H5Group>
     /// <summary>
     /// Gets a copy of the specified property list used to create the object
     /// </summary>
-    /// <param name="listType"></param>
     /// <returns></returns>
     internal H5GroupCreationPropertyList GetCreationPropertyList()
     {

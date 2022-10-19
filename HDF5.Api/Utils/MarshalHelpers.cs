@@ -7,7 +7,7 @@ using HDF5.Api.Disposables;
 
 namespace HDF5.Api.Utils
 {
-    internal unsafe class MarshalHelpers
+    internal static unsafe class MarshalHelpers
     {
 #if NETSTANDARD
         public static string PtrToStringUTF8(IntPtr native)

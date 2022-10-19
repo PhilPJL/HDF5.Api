@@ -7,7 +7,7 @@ using HDF5.Api;
 
 namespace Benchmark
 {
-    public class Program
+    public static class Program
     {
         public static void Main()
         {
