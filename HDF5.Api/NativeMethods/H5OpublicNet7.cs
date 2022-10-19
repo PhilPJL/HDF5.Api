@@ -28,10 +28,10 @@ internal static partial class H5O
     /// <param name="oinfo">Buffer in which to return object information</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Oget_info1",
-        CallingConvention = CallingConvention.Cdecl),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Oget_info1"),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    public static extern herr_t get_info(hid_t loc_id, ref info_t oinfo);
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t get_info(hid_t loc_id, ref info_t oinfo);
 
     /// <summary>
     /// Retrieves the metadata for an object, identifying the object by

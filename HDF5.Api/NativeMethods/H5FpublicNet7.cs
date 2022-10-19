@@ -117,10 +117,10 @@ internal static partial class H5F
     /// returned.</param>
     /// <returns>Returns the number of open objects if successful; otherwise
     /// returns a negative value.</returns>
-    [DllImport(Constants.DLLFileName, EntryPoint = "H5Fget_obj_count",
-        CallingConvention = CallingConvention.Cdecl),
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Fget_obj_count"),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
-    public static extern ssize_t get_obj_count
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial ssize_t get_obj_count
         (hid_t file_id, uint types);
 
     /// <summary>

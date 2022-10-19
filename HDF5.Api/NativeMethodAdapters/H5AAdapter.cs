@@ -9,6 +9,7 @@ using HDF5.Api.Utils;
 using HDF5.Api.NativeMethods;
 using System.Collections.Generic;
 using static HDF5.Api.NativeMethods.H5A;
+using System;
 
 namespace HDF5.Api.NativeMethodAdapters;
 
@@ -179,7 +180,7 @@ internal static unsafe class H5AAdapter
         });
     }
 
-    internal static string GetName(H5Attribute attribute) 
+    internal static string GetName(H5Attribute attribute)
     {
 #if NET7_0_OR_GREATER
         return MarshalHelpers.GetName(attribute, (long attr_id, Span<byte> name, nint size) => get_name(attr_id, size, name));
@@ -270,15 +271,26 @@ internal static unsafe class H5AAdapter
         else
         {
 #if NET7_0_OR_GREATER
-            // TODO: could optimise with stackalloc for small strings
-            using var spanOwner = SpanOwner<byte>.Allocate(storageSize);
-            var buffer = spanOwner.Span;
-            int err = read(attribute, type, buffer);
-            err.ThrowIfError();
+            if (storageSize < 256)
+            {
+                Span<byte> buffer = stackalloc byte[storageSize + 1];
+                return ReadString(buffer);
+            }
+            else
+            {
+                using var spanOwner = SpanOwner<byte>.Allocate(storageSize + 1);
+                return ReadString(spanOwner.Span);
+            }
 
-            var nullTerminatorIndex = MemoryExtensions.IndexOf(spanOwner.Span, (byte)0);
-            nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
-            return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
+            string ReadString(Span<byte> buffer)
+            {
+                int err = read(attribute, type, buffer);
+                err.ThrowIfError();
+
+                var nullTerminatorIndex = MemoryExtensions.IndexOf(buffer, (byte)0);
+                nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
+                return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
+            }
 #else
             var buffer = new byte[(storageSize + 1)];
             fixed (byte* bufferPtr = buffer)
@@ -340,7 +352,6 @@ internal static unsafe class H5AAdapter
         }
         else
         {
-            // TODO: is this required - most unmanaged types are small?
             using var buf = SpanOwner<T>.Allocate(1);
             read(attribute, type, MemoryMarshal.AsBytes(buf.Span));
             return buf.Span[0];

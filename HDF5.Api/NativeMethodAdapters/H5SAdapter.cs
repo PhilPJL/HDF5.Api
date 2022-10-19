@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CommunityToolkit.HighPerformance.Buffers;
+using System.Collections.Generic;
 using System.Linq;
 using static HDF5.Api.NativeMethods.H5S;
 
@@ -78,22 +79,34 @@ internal static unsafe class H5SAdapter
         }
 
 #if NET7_0_OR_GREATER
-        // Fairly safe assuming rank is small enough to fit on the stack
-        // TODO: use SpanOwner<> for large rank
-
-        Span<ulong> dims = stackalloc ulong[rank];
-        Span<ulong> maxDims = stackalloc ulong[rank];
-
-        int err = get_simple_extent_dims(space, dims, maxDims);
-        err.ThrowIfError();
-
-        var dimensions = new List<Dimension>();
-        for(int i= 0; i < rank; i++)
+        if (rank > 255)
         {
-            dimensions.Add(new Dimension(dims[i], maxDims[i]));
+            using var dimsOwner = SpanOwner<ulong>.Allocate(rank);
+            using var maxDimsOwner = SpanOwner<ulong>.Allocate(rank);
+
+            return GetSimpleExtentDims(dimsOwner.Span, maxDimsOwner.Span);
+        }
+        else
+        {
+            Span<ulong> dims = stackalloc ulong[rank];
+            Span<ulong> maxDims = stackalloc ulong[rank];
+
+            return GetSimpleExtentDims(dims, maxDims);
         }
 
-        return dimensions;
+        IReadOnlyList<Dimension> GetSimpleExtentDims(Span<ulong> dims, Span<ulong> maxDims)
+        {
+            int err = get_simple_extent_dims(space, dims, maxDims);
+            err.ThrowIfError();
+
+            var dimensions = new List<Dimension>();
+            for (int i = 0; i < rank; i++)
+            {
+                dimensions.Add(new Dimension(dims[i], maxDims[i]));
+            }
+
+            return dimensions;
+        }
 #endif
 
 #if NETSTANDARD

@@ -44,16 +44,16 @@ namespace HDF5.Api.Utils
             if (length > 255)
             {
                 using var bufferOwner = SpanOwner<byte>.Allocate(length + 1);
-                var buffer = bufferOwner.Span;
-                var err = (int)getNameFunc(h5Object, buffer, length + 1);
-                err.ThrowIfError();
-                int nullTerminatorIndex = MemoryExtensions.IndexOf(buffer, (byte)0);
-                nullTerminatorIndex = nullTerminatorIndex < 0 ? length : nullTerminatorIndex;
-                return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
+                return GetName(bufferOwner.Span);
             }
             else
             {
                 Span<byte> buffer = stackalloc byte[length + 1];
+                return GetName(buffer);
+            }
+
+            string GetName(Span<byte> buffer)
+            {
                 var err = (int)getNameFunc(h5Object, buffer, length + 1);
                 err.ThrowIfError();
                 int nullTerminatorIndex = MemoryExtensions.IndexOf(buffer, (byte)0);
