@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5D
+internal static unsafe partial class H5D
 {
 #if NET7_0_OR_GREATER
     /// <summary>
@@ -165,6 +165,58 @@ internal static partial class H5D
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t set_extent(hid_t dset_id, hsize_t[] size);
+
+    /// <summary>
+    /// Determines the number of bytes required to store variable-length
+    /// (VL) data.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-VLGetBuf
+    /// </summary>
+    /// <param name="dataset_id">Identifier of the dataset to query.</param>
+    /// <param name="type_id">Datatype identifier.</param>
+    /// <param name="space_id">Dataspace identifier.</param>
+    /// <param name="size">The size in bytes of the memory buffer required
+    /// to store the VL data.</param>
+    /// <returns>Returns non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dvlen_get_buf_size"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t vlen_get_buf_size
+        (hid_t dataset_id, hid_t type_id, hid_t space_id, ref hsize_t size);
+
+    /// <summary>
+    /// Reclaims variable-length (VL) datatype memory buffers.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-VLReclaim
+    /// </summary>
+    /// <param name="type_id">Identifier of the datatype.</param>
+    /// <param name="space_id">Identifier of the dataspace.</param>
+    /// <param name="plist_id">Identifier of the property list used to
+    /// create the buffer.</param>
+    /// <param name="buf">Pointer to the buffer to be reclaimed.</param>
+    /// <returns>Returns non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dvlen_reclaim"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t vlen_reclaim
+        (hid_t type_id, hid_t space_id, hid_t plist_id, byte* buf);
+
+    /// <summary>
+    /// Reclaims variable-length (VL) datatype memory buffers.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-VLReclaim
+    /// </summary>
+    /// <param name="type_id">Identifier of the datatype.</param>
+    /// <param name="space_id">Identifier of the dataspace.</param>
+    /// <param name="plist_id">Identifier of the property list used to
+    /// create the buffer.</param>
+    /// <param name="buf">Pointer to the buffer to be reclaimed.</param>
+    /// <returns>Returns non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dvlen_reclaim"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t vlen_reclaim
+        (hid_t type_id, hid_t space_id, hid_t plist_id, byte** buf);
 
     /// <summary>
     /// Writes raw data from a buffer to a dataset.

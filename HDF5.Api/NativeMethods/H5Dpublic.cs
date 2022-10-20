@@ -830,6 +830,40 @@ internal static unsafe partial class H5D
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t vlen_reclaim
+        (hid_t type_id, hid_t space_id, hid_t plist_id, byte* buf);
+
+    /// <summary>
+    /// Reclaims variable-length (VL) datatype memory buffers.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-VLReclaim
+    /// </summary>
+    /// <param name="type_id">Identifier of the datatype.</param>
+    /// <param name="space_id">Identifier of the dataspace.</param>
+    /// <param name="plist_id">Identifier of the property list used to
+    /// create the buffer.</param>
+    /// <param name="buf">Pointer to the buffer to be reclaimed.</param>
+    /// <returns>Returns non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dvlen_reclaim",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t vlen_reclaim
+        (hid_t type_id, hid_t space_id, hid_t plist_id, byte** buf);
+
+    /// <summary>
+    /// Reclaims variable-length (VL) datatype memory buffers.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-VLReclaim
+    /// </summary>
+    /// <param name="type_id">Identifier of the datatype.</param>
+    /// <param name="space_id">Identifier of the dataspace.</param>
+    /// <param name="plist_id">Identifier of the property list used to
+    /// create the buffer.</param>
+    /// <param name="buf">Pointer to the buffer to be reclaimed.</param>
+    /// <returns>Returns non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Dvlen_reclaim",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t vlen_reclaim
         (hid_t type_id, hid_t space_id, hid_t plist_id, IntPtr buf);
 
     /// <summary>

@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal static partial class H5A
+internal unsafe static partial class H5A
 {
 #if NET7_0_OR_GREATER
     /// <summary>
@@ -235,6 +235,22 @@ internal static partial class H5A
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread"),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t read
+        (hid_t attr_id, hid_t type_id, byte* buf);
+
+    /// <summary>
+    /// Reads an attribute.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Read
+    /// </summary>
+    /// <param name="attr_id">Identifier of an attribute to read.</param>
+    /// <param name="type_id"> Identifier of the attribute datatype
+    /// (in memory).</param>
+    /// <param name="buf">Buffer for data to be read.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Aread"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static unsafe partial herr_t read
         (hid_t attr_id, hid_t type_id, IntPtr buf);
 
@@ -250,6 +266,6 @@ internal static partial class H5A
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t write
-        (hid_t attr_id, hid_t mem_type_id, Span<byte> buf);
+        (hid_t attr_id, hid_t mem_type_id, IntPtr buf);
 #endif
 }

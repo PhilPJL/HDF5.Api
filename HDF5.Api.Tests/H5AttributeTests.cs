@@ -18,22 +18,31 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             using var file = CreateFile2(fileNameSuffix);
 
-            Test(file, "fixed_10", "", 10, characterSet, padding);
-            Test(file, "fixed_32", "12345678912345678912", 32, characterSet, padding);
+            Test(file, "fixed_null", null, 10, characterSet, padding);
+            Test(file, "fixed_empty", "", 10, characterSet, padding);
+            Test(file, "fixed_22", "12345678912345678912", 32, characterSet, padding);
 
             if (characterSet == CharacterSet.Utf8)
             {
-                // NOTE that this Unicode string is 107 characters long but requires 321 bytes of storage.
+                // NOTE that this Unicode string is 107 characters but requires 321 bytes of storage.
                 // HDF5 fixed length storage indicates the number of bytes not the number of characters.
                 Test(file, "fixed_500", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 500, characterSet, padding);
             }
 
-            static void Test(H5File file, string name, string value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+            static void Test(H5File file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
             {
                 using var attribute = file.CreateStringAttribute(name, fixedStorageLength, characterSet, padding);
-                attribute.Write(value);
+
+                if (value != null)
+                {
+                    attribute.Write(value);
+                }
+
                 var r = attribute.ReadString();
-                Assert.AreEqual(value, r);
+                
+                // NOTE: assuming that if no value is written ReadString will return string.Empty
+                Assert.AreEqual(value ?? string.Empty, r);
+
                 Assert.AreEqual(name, attribute.Name);
             }
         });
@@ -52,22 +61,36 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             using var file = CreateFile2(fileNameSuffix);
 
+            Test(file, "variable_null", null, 0, characterSet, padding);
             Test(file, "variable_empty", "", 0, characterSet, padding);
             Test(file, "variable_short", "12345678912345678912", 0, characterSet, padding);
 
             if (characterSet == CharacterSet.Utf8)
             {
-                // NOTE that this Unicode string is 107 characters long but requires 321 bytes of storage.
+                // NOTE that this Unicode string is 107 characters but requires 321 bytes of storage.
                 // HDF5 fixed length storage indicates the number of bytes not the number of characters.
                 Test(file, "variable_long", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 0, characterSet, padding);
             }
 
-            static void Test(H5File file, string name, string value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+            static void Test(H5File file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
             {
-                using var attribute = file.CreateStringAttribute(name, fixedStorageLength, characterSet, padding);
-                attribute.Write(value);
-                var r = attribute.ReadString();
-                Assert.AreEqual(value, r);
+                using (var attribute = file.CreateStringAttribute(name, fixedStorageLength, characterSet, padding))
+                {
+                    if (value != null)
+                    {
+                        attribute.Write(value);
+                    }
+                }
+
+                using (var attribute = file.OpenAttribute(name))
+                {
+                    var r = attribute.ReadString();
+
+                    // NOTE: assuming that if no value is written ReadString will return string.Empty
+                    Assert.AreEqual(value ?? string.Empty, r);
+
+                    Assert.AreEqual(name, attribute.Name);
+                }
             }
         });
     }

@@ -1,14 +1,11 @@
-﻿#if NETSTANDARD
-using HDF5.Api.Disposables;
-#endif
-using CommunityToolkit.Diagnostics;
-#if NET7_0_OR_GREATER
+﻿#if NET7_0_OR_GREATER
 using CommunityToolkit.HighPerformance.Buffers;
 #endif
 using HDF5.Api.Utils;
 using HDF5.Api.NativeMethods;
 using System.Collections.Generic;
 using static HDF5.Api.NativeMethods.H5A;
+using System.Linq;
 
 namespace HDF5.Api.NativeMethodAdapters;
 
@@ -38,9 +35,6 @@ internal static unsafe class H5AAdapter
         h5Object.AssertHasWithAttributesHandleType();
 
         using var creationPropertyList = CreateCreationPropertyList(CharacterSet.Utf8);
-
-        // ensure CharacterEncoding == CharacterSet.Utf8
-        creationPropertyList.CharacterEncoding = CharacterSet.Utf8;
 
         long h;
 
@@ -156,8 +150,7 @@ internal static unsafe class H5AAdapter
     /// <returns></returns>
     internal static H5AttributeCreationPropertyList CreateCreationPropertyList(CharacterSet encoding)
     {
-        // NOTE: ideally we would cache two CreationPropertyLists (Utf8/Ascii) and exclude them from 
-        // handle tracking.
+        // TODO: ideally cache two CreationPropertyLists (Utf8/Ascii) and exclude them from handle tracking.
         return H5PAdapter.Create(H5P.ATTRIBUTE_CREATE, h =>
         {
             return new H5AttributeCreationPropertyList(h)
@@ -231,11 +224,9 @@ internal static unsafe class H5AAdapter
         var count = space.GetSimpleExtentNPoints();
         var dims = space.GetSimpleExtentDims();
 
-        // TODO: handle dims.Count > 0 where NPoints=1
         // TODO: generalise to NPoints >= 0
-        // TODO: handle fixed/variable length string
 
-        if (count != 1 || dims.Count != 0)
+        if (count != 1 || dims.Any(d => d.UpperLimit > 1)) // NOTE: dims.Count could be > 0 with count == 1 where we have an array of [1]..[1] with one element
         {
             throw new Hdf5Exception("Attribute is not scalar.");
         }
@@ -246,16 +237,71 @@ internal static unsafe class H5AAdapter
             throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
         }
 
-        int storageSize = attribute.StorageSize;
-        var characterSet = type.CharacterSet;
-        bool isVariableLength = type.IsVariableLengthString();
-
-        if (isVariableLength)
+        if (type.IsVariableLengthString())
         {
-            return "<TODO>";
+            if (count < 256 / sizeof(nint))
+            {
+                Span<nint> buffer = stackalloc nint[(int)count];
+                return ReadVariableStrings(buffer);
+            }
+            else
+            {
+#if NET7_0_OR_GREATER
+                using var spanOwner = SpanOwner<nint>.Allocate((int)count);
+                return ReadVariableStrings(spanOwner.Span);
+#else
+                return ReadVariableStrings(new Span<nint>(new nint[count]));
+#endif
+            }
+
+            string ReadVariableStrings(Span<nint> buffer)
+            {
+                fixed (nint* bufferPtr = buffer)
+                {
+                    // IntPtr is a struct so no need to pin
+                    var ptr = new IntPtr(bufferPtr);
+                    try
+                    {
+                        // TODO: eliminate unnecessary overloads (read)
+                        int err = read(attribute, type, ptr);
+                        err.ThrowIfError();
+
+                        if (buffer[0] == 0)
+                        {
+                            // If the attribute was never written (or do we allow nulls?)
+                            return string.Empty;
+                        }
+                        else
+                        {
+                            // NOTE: no way to retrieve size of variable length buffer.
+                            // Only search for null up to a fixed length.
+                            Span<byte> bytes = new((byte*)buffer[0], H5Global.MaxVariableLengthStringBuffer);
+                            var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
+                            if (nullTerminatorIndex != -1)
+                            {
+                                return Encoding.UTF8.GetString((byte*)buffer[0], nullTerminatorIndex);
+                            }
+                            else
+                            {
+                                throw new Hdf5Exception(
+                                    $"Unable to locate end of string within first {H5Global.MaxVariableLengthStringBuffer} bytes." +
+                                    " If required increase the value in {nameof(H5Global)}.{nameof(H5Global.MaxVariableLengthStringBuffer)}).");
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        // TODO: check this really works
+                        // TODO: eliminate unnecessary overloads
+                        H5DAdapter.ReclaimVariableLengthMemory(type, space, (byte**)bufferPtr);
+                    }
+                }
+            }
         }
         else
         {
+            int storageSize = attribute.StorageSize;
+
 #if NET7_0_OR_GREATER
             if (storageSize < 256)
             {
@@ -324,25 +370,10 @@ internal static unsafe class H5AAdapter
 
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
-#if NET7_0_OR_GREATER
-        if (attributeStorageSize < 256)
-        {
-            Span<T> buf = stackalloc T[1];
-            read(attribute, type, MemoryMarshal.AsBytes(buf));
-            return buf[0];
-        }
-        else
-        {
-            using var buf = SpanOwner<T>.Allocate(1);
-            read(attribute, type, MemoryMarshal.AsBytes(buf.Span));
-            return buf.Span[0];
-        }
-#else
         T result = default;
         int err = read(attribute, type, new IntPtr(&result));
         err.ThrowIfError();
         return result;
-#endif
     }
 
     internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
@@ -352,40 +383,15 @@ internal static unsafe class H5AAdapter
         Write(attribute, type, value);
     }
 
-#if NET7_0_OR_GREATER
     internal static void Write<T>(H5Attribute attribute, H5Type type, T value) where T : unmanaged
     {
         var marshalSize = Marshal.SizeOf<T>();
         int attributeStorageSize = attribute.StorageSize;
-
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
-        if (marshalSize < 256)
-        {
-            Span<T> buffer = stackalloc T[1] { value };
-            Write(attribute, type, MemoryMarshal.Cast<T, byte>(buffer));
-        }
-        else
-        {
-            using var buffer = SpanOwner<T>.Allocate(marshalSize);
-            buffer.Span[0] = value;
-            Write(attribute, type, MemoryMarshal.Cast<T, byte>(buffer.Span));
-        }
-    }
-
-    internal static void Write(H5Attribute attribute, H5Type type, Span<byte> buffer)
-    {
-        int err = write(attribute, type, buffer);
-
-        err.ThrowIfError();
-    }
-#endif
-
-#if NETSTANDARD
-    internal static void Write<T>(H5Attribute attribute, H5Type type, T value) where T : unmanaged
-    {
         unsafe
         {
+            // No need to pin 
             void* p = &value;
             {
                 Write(attribute, type, new IntPtr(p));
@@ -399,10 +405,11 @@ internal static unsafe class H5AAdapter
 
         err.ThrowIfError();
     }
-#endif
 
     internal static void WriteString(H5Attribute attribute, string value)
     {
+        // TODO: handle array of strings
+
         using var type = attribute.GetH5Type();
         using var space = attribute.GetSpace();
 
@@ -421,7 +428,6 @@ internal static unsafe class H5AAdapter
         }
 
         var characterSet = type.CharacterSet;
-        bool isVariableLength = type.IsVariableLengthString();
 
         var bytes = characterSet switch
         {
@@ -431,14 +437,13 @@ internal static unsafe class H5AAdapter
             _ => throw new InvalidEnumArgumentException($"Unknown CharacterSet:{characterSet}."),
         };
 
-        if (isVariableLength)
+        if (type.IsVariableLengthString())
         {
-#if NETSTANDARD
             unsafe
             {
                 fixed (void* fixedBytes = bytes)
                 {
-                    var stringArray = new IntPtr[1] { new (fixedBytes) };
+                    var stringArray = new IntPtr[1] { new(fixedBytes) };
 
                     fixed (void* stringArrayPtr = stringArray)
                     {
@@ -446,12 +451,6 @@ internal static unsafe class H5AAdapter
                     }
                 }
             }
-#endif
-
-#if NET7_0_OR_GREATER
-            // TODO: indirection
-            //Write(attribute, type, bytes.AsSpan());
-#endif
         }
         else
         {
@@ -462,7 +461,6 @@ internal static unsafe class H5AAdapter
                 throw new ArgumentOutOfRangeException($"The string requires {bytes.Length} storage which is greater than the allocated fixed storage size of {storageSize} bytes.");
             }
 
-#if NETSTANDARD
             unsafe
             {
                 fixed (void* fixedBytes = bytes)
@@ -470,11 +468,6 @@ internal static unsafe class H5AAdapter
                     Write(attribute, type, new IntPtr(fixedBytes));
                 }
             }
-#endif
-
-#if NET7_0_OR_GREATER
-            Write(attribute, type, bytes.AsSpan());
-#endif
         }
     }
 

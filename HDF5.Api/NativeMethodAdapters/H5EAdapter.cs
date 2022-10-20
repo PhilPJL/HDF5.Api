@@ -23,23 +23,31 @@ internal static class H5EAdapter
 
         if (err < 0)
         {
-            Debug.WriteLine("Error calling H5E.walk");
+            Trace.WriteLine("Error calling H5E.walk");
         }
 
         return errors;
 
         herr_t Callback(uint n, ref error_t err_desc, IntPtr client_data)
         {
-            errors.Add(new H5ErrorInfo
+            try
             {
-                Number = (int)n,
-                Description = err_desc.desc,
-                Filename = err_desc.file_name,
-                FunctionName = err_desc.func_name,
-                LineNumber = (int)err_desc.line
-            });
+                errors.Add(new H5ErrorInfo
+                {
+                    Number = (int)n,
+                    Description = err_desc.desc,
+                    Filename = err_desc.file_name,
+                    FunctionName = err_desc.func_name,
+                    LineNumber = (int)err_desc.line
+                });
 
-            return 0;
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Trace.WriteLine($"Error in WalkStack.Callback: {ex.Message}.");
+                return -1;
+            }
         }
     }
 }

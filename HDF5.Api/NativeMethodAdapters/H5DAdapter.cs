@@ -185,5 +185,25 @@ internal static unsafe class H5DAdapter
     {
         return H5PAdapter.GetPropertyList(dataSet, get_access_plist, h => new H5DataSetAccessPropertyList(h));
     }
+
+    internal static void ReclaimVariableLengthMemory(H5Type type, H5Space space, H5PropertyList? propertyList, byte* buffer)
+    {
+        int err = vlen_reclaim(type, space, propertyList, buffer);
+        err.ThrowIfError();
+    }
+
+    internal static void ReclaimVariableLengthMemory(H5Type type, H5Space space, byte** buffer)
+    {
+        int err = vlen_reclaim(type, space, H5P.DEFAULT, buffer);
+        err.ThrowIfError();
+    }
+
+    internal static long GetVariableLengthBufferSize(H5DataSet dataSet, H5Type type, H5Space space)
+    {
+        ulong size = default;
+        int err = vlen_get_buf_size(dataSet, type, space, ref size);
+        err.ThrowIfError();
+        return (long)size;
+    }
 }
 

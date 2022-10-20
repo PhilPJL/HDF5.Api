@@ -81,6 +81,13 @@ public static class H5Global
 
         return is_ts != 0;
     }
+
+    /// <summary>
+    /// It's not possible to determine the size of buffers allocated (internally by HDF) when retrieving
+    /// variable length strings.  As a safety measure assume variable length strings are never longer than 
+    /// this.
+    /// </summary>
+    public static int MaxVariableLengthStringBuffer { get; set; } = 0x100000;
 }
 
 [Flags]
