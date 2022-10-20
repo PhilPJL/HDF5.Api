@@ -9,7 +9,7 @@ namespace HDF5.Api;
 ///     for use in an HDF5 dataset
 /// </summary>
 /// <typeparam name="TInput"></typeparam>
-public abstract class H5TypeAdapter<TInput> : H5TypeAdapterBase, IH5TypeAdapter<TInput>
+public abstract class H5TypeAdapter<TInput> : IH5TypeAdapter<TInput>
 {
     public abstract H5Type GetH5Type();
 
