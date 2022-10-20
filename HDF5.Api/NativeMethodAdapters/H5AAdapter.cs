@@ -37,7 +37,6 @@ internal static unsafe class H5AAdapter
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        // TODO: cache/singleton default CreationPropertyList
         using var creationPropertyList = CreateCreationPropertyList(CharacterSet.Utf8);
 
         // ensure CharacterEncoding == CharacterSet.Utf8
@@ -140,29 +139,6 @@ internal static unsafe class H5AAdapter
         }
     }
 
-    // TODO: use or remove
-    /*    internal static info_t GetInfoByName<T>(H5Object<T> h5Object,
-            string objectName, string attributeName, H5PropertyList? linkAccessPropertyList = null)
-            where T : H5Object<T>
-        {
-            info_t info = default;
-            int err = 0;
-
-    #if NET7_0_OR_GREATER
-            err = get_info_by_name(h5Object, objectName, attributeName, ref info, linkAccessPropertyList);
-    #else
-            fixed (byte* objectNamePtr = Encoding.UTF8.GetBytes(objectName))
-            fixed (byte* attributeNamePtr = Encoding.UTF8.GetBytes(attributeName))
-            {
-                err = get_info_by_name(h5Object, objectNamePtr, attributeNamePtr, ref info, linkAccessPropertyList);
-            }
-    #endif
-
-            err.ThrowIfError();
-            return info;
-        }
-    */
-
     /// <summary>
     /// Get copy of property list used when creating the attribute.
     /// </summary>
@@ -180,6 +156,8 @@ internal static unsafe class H5AAdapter
     /// <returns></returns>
     internal static H5AttributeCreationPropertyList CreateCreationPropertyList(CharacterSet encoding)
     {
+        // NOTE: ideally we would cache two CreationPropertyLists (Utf8/Ascii) and exclude them from 
+        // handle tracking.
         return H5PAdapter.Create(H5P.ATTRIBUTE_CREATE, h =>
         {
             return new H5AttributeCreationPropertyList(h)
@@ -267,7 +245,6 @@ internal static unsafe class H5AAdapter
         {
             throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
         }
-
 
         int storageSize = attribute.StorageSize;
         var characterSet = type.CharacterSet;

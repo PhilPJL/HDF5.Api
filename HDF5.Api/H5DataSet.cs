@@ -140,23 +140,4 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
         H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer, null);
     }
-
-    /*    public void Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] T[] buffer) where T : unmanaged
-        {
-            Guard.IsNotNull(type);
-            Guard.IsNotNull(memorySpace);
-            Guard.IsNotNull(fileSpace);
-            Guard.IsNotNull(buffer);
-
-            H5DAdapter.Write<T>(this, type, memorySpace, fileSpace, buffer);
-        }
-    */
-    /*    public void Write<T>([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, Span<T> buffer) where T : unmanaged
-        {
-            Guard.IsNotNull(type);
-            Guard.IsNotNull(memorySpace);
-            Guard.IsNotNull(fileSpace);
-
-            H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer);
-        }*/
 }

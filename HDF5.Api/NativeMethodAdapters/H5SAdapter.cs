@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.HighPerformance.Buffers;
+﻿#if NET7_0_OR_GREATER
+using CommunityToolkit.HighPerformance.Buffers;
+#endif
 using System.Collections.Generic;
 using System.Linq;
 using static HDF5.Api.NativeMethods.H5S;
@@ -19,11 +21,13 @@ internal static unsafe class H5SAdapter
 
     internal static H5Space CreateSimple(params Dimension[] dimensions)
     {
-        // TODO: pin?
+        // NOTE: assuming .NET standard marshalling is doing the right thing here
+        // pin?
 
-        long h = create_simple(dimensions.Length,
-            dimensions.Select(d => d.InitialSize).ToArray(),
-            dimensions.Select(d => d.UpperLimit).ToArray());
+        ulong[] dims = dimensions.Select(d => d.InitialSize).ToArray();
+        ulong[] maxDims = dimensions.Select(d => d.UpperLimit).ToArray();
+
+        long h = create_simple(dimensions.Length, dims, maxDims);
 
         h.ThrowIfInvalidHandleValue();
         return new H5Space(h);
@@ -44,7 +48,8 @@ internal static unsafe class H5SAdapter
 
     internal static void SelectHyperslab(H5Space space, long offset, long count)
     {
-        // TODO: pin?
+        // NOTE: assuming .NET standard marshalling is doing the right thing here
+        // pin?
 
         int err = select_hyperslab(
             space, seloper_t.SET, new[] { (ulong)offset }, null!, new[] { (ulong)count }, null!);

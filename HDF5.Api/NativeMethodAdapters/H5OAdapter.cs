@@ -34,8 +34,6 @@ internal static unsafe class H5OAdapter
     {
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
 
-        // TODO: pin for NETSTANDARD?
-
         info_t oinfo = default;
         int err = get_info(h5Object, ref oinfo);
         err.ThrowIfError();

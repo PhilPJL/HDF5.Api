@@ -186,5 +186,47 @@ internal static partial class H5D
     public static partial herr_t write
         (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id,
         hid_t file_space_id, hid_t plist_id, IntPtr buf);
+
+    /// <summary>
+    /// Writes raw data from a buffer to a dataset.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Write
+    /// </summary>
+    /// <param name="dset_id">Identifier of the dataset to write to.</param>
+    /// <param name="mem_type_id">Identifier of the memory datatype.</param>
+    /// <param name="mem_space_id">Identifier of the memory dataspace.</param>
+    /// <param name="file_space_id">Identifier of the dataset's dataspace
+    /// in the file.</param>
+    /// <param name="plist_id">Identifier of a transfer property list for
+    /// this I/O operation.</param>
+    /// <param name="buf">Buffer with data to be written to the file.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dwrite"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t write
+        (hid_t dset_id, hid_t mem_type_id, hid_t mem_space_id,
+        hid_t file_space_id, hid_t plist_id, Span<byte> buf);
+
+    /// <summary>
+    /// Writes a raw data chunk from a buffer directly to a dataset.
+    /// See https://www.hdfgroup.org/HDF5/doc/HL/RM_HDF5Optimized.html
+    /// </summary>
+    /// <param name="dset_id">Identifier for the dataset to write to</param>
+    /// <param name="dxpl_id">UNUSED</param>
+    /// <param name="filter_mask">Mask for identifying the filters in use</param>
+    /// <param name="offset">Logical position of the chunk’s first element
+    /// in the dataspace</param>
+    /// <param name="data_size">Size of the actual data to be written in
+    /// bytes</param>
+    /// <param name="buf">Buffer containing data to be written to the file</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Dwrite_chunk"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t write_chunk
+        (hid_t dset_id, hid_t dxpl_id, uint32_t filter_mask,
+        ref hsize_t offset, size_t data_size, Span<byte> buf);
 #endif
 }

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text;
 
 namespace HDF5.Api.Tests;
 
@@ -40,7 +39,6 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         });
     }
 
-    [Ignore]
     [TestMethod]
     [DataRow("v_ascii_nullterm", CharacterSet.Ascii, StringPadding.NullTerminate)]
     [DataRow("v_ascii_nullpad", CharacterSet.Ascii, StringPadding.NullPad)]

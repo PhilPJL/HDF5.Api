@@ -139,13 +139,14 @@ internal static unsafe class H5DAdapter
         err.ThrowIfError();
     }
 
-    // TODO:
-    /*    public static void Write<T>(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, Span<T> buffer, H5PropertyList? transferPropertyList = null) where T : unmanaged
-        {
-            int err = write(dataSet, type, memorySpace, fileSpace, transferPropertyList, MemoryMarshal.Cast<T, byte>(buffer));
+#if NET7_0_OR_GREATER
+    internal static void Write<T>(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, Span<byte> buffer, H5PropertyList? transferPropertyList) 
+    {
+        int err = write(dataSet, type, memorySpace, fileSpace, transferPropertyList, buffer);
 
-            err.ThrowIfError(nameof(write));
-        }*/
+        err.ThrowIfError(nameof(write));
+    }
+#endif
 
     internal static H5Space GetSpace(H5DataSet dataSet)
     {
