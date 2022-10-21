@@ -54,7 +54,43 @@ public class H5TypeTests : H5Test<H5TypeTests>
     }
 
     [TestMethod]
-    public void CreateCompoundDataTypeSucceeds()
+    public void CreateAndOpenCompoundDataTypeSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+
+            using (var type = H5Type.CreateCompoundType<CompoundType>()
+                .Insert<CompoundType, int>(nameof(CompoundType.Id))
+                .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
+                .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό)))
+            {
+                file.Commit("TypeWithUtf8", type);
+            }
+
+            using (var type = file.OpenType("TypeWithUtf8"))
+            {
+                // TODO: add type.Name
+            }
+        });
+    }
+
+    [TestMethod]
+    public void OpenInvalidCompoundDataTypeFails()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+
+            Assert.ThrowsException<Hdf5Exception>(() => file.OpenType("TypeWithUtf8"));
+        });
+
+    }
+
+    #region Attributes
+
+    [TestMethod]
+    public void CreateWriteReadDeleteAttributesSucceeds()
     {
         HandleCheck(() =>
         {
@@ -66,36 +102,46 @@ public class H5TypeTests : H5Test<H5TypeTests>
                 .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό));
 
             file.Commit("TypeWithUtf8", type);
+
+            H5AttributeTests.CreateWriteReadDeleteAttributesSucceeds(type);
         });
     }
 
     [TestMethod]
-    [Ignore]
-    public void OpenAndEnumerateCommittedDataTypeSucceeds()
+    public void AttributeOnUncommittedTypeThrows()
     {
         HandleCheck(() =>
         {
             using var file = CreateFile();
 
-            using (var type = H5Type.CreateCompoundType<CompoundType>()
+            using var type = H5Type.CreateCompoundType<CompoundType>()
                 .Insert<CompoundType, int>(nameof(CompoundType.Id))
                 .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
-                .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό)))
-            {
-                file.Commit("ᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻ", type);
-            }
+                .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό));
 
-            using var type2 = file.OpenType("ᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻ");
-
-            // TODO: update H5Type to support attributes
-            var names = type2.AttributeNames;
-
-            //Assert.IsTrue(type2.AttributeNames.Contains(nameof(CompoundType.Id)));
-            //Assert.IsTrue(type2.AttributeNames.Contains(nameof(CompoundType.ShortProperty)));
-            //Assert.IsTrue(type2.AttributeNames.Contains(nameof(CompoundType.Χαρακτηριστικό)));
+            Assert.ThrowsException<Hdf5Exception>(() => type.CreateAndWriteAttribute("test", 1));
         });
-
     }
+
+    [TestMethod]
+    public void CreateIterateAttributesSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+
+            using var type = H5Type.CreateCompoundType<CompoundType>()
+                .Insert<CompoundType, int>(nameof(CompoundType.Id))
+                .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
+                .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό));
+
+            file.Commit("TypeWithUtf8", type);
+
+            H5AttributeTests.CreateIterateAttributesSucceeds(type);
+        });
+    }
+
+    #endregion
 
     [StructLayout(LayoutKind.Sequential)]
     private struct CompoundType

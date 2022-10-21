@@ -25,14 +25,14 @@ internal static unsafe class H5OAdapter
 
     internal static info_t GetInfoByName<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet, HandleType.Type, HandleType.Attribute);
 
         return GetInfoByName((long)h5Object, name);
     }
 
     internal static info_t GetInfo<T>(H5Object<T> h5Object) where T : H5Object<T>
     {
-        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);
+        h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet, HandleType.Type, HandleType.Attribute);
 
         info_t oinfo = default;
         int err = get_info(h5Object, ref oinfo);

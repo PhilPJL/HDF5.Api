@@ -8,7 +8,7 @@ namespace HDF5.Api;
 /// <remarks>
 ///     Add more methods as required.
 /// </remarks>
-public interface IH5Location : IH5ObjectWithAttributes
+public interface IH5Location
 {
     // Groups
     H5Group CreateGroup(string name);

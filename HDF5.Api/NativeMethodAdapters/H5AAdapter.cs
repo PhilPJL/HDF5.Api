@@ -224,6 +224,7 @@ internal static unsafe class H5AAdapter
         var count = space.GetSimpleExtentNPoints();
         var dims = space.GetSimpleExtentDims();
 
+        // TODO: optionally convert UTF-8 to Ascii with <?> markers
         // TODO: generalise to NPoints >= 0
 
         if (count != 1 || dims.Any(d => d.UpperLimit > 1)) // NOTE: dims.Count could be > 0 with count == 1 where we have an array of [1]..[1] with one element
@@ -426,6 +427,8 @@ internal static unsafe class H5AAdapter
         }
 
         var characterSet = type.CharacterSet;
+
+        // TODO: optionally throw if writing a string containing non-ASCII characters when characterSet = Ascii
 
         var bytes = characterSet switch
         {
