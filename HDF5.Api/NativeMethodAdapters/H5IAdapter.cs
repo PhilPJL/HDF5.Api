@@ -9,7 +9,7 @@ internal static unsafe class H5IAdapter
 {
     internal static string GetName<T>(H5Object<T> location) where T : H5Object<T>
     {
-        location.AssertHasHandleType(HandleType.DataSet, HandleType.Group);
+        location.AssertHasHandleType(HandleType.DataSet, HandleType.Group, HandleType.Type);
 
         return MarshalHelpers.GetName(location, get_name);
     }

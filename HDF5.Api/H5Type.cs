@@ -169,4 +169,6 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     {
         return H5TAdapter.CreateAccessPropertyList();
     }
+
+    public string Name => H5IAdapter.GetName(this);
 }

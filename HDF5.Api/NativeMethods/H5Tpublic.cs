@@ -1253,6 +1253,22 @@ internal static unsafe partial class H5T
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern hid_t open
+        (hid_t loc_id, byte* name, hid_t tapl_id = H5P.DEFAULT);
+
+    /// <summary>
+    /// Opens a committed (named) datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Open2
+    /// </summary>
+    /// <param name="loc_id">A file or group identifier.</param>
+    /// <param name="name">A datatype name, defined within the file or
+    /// group identified by <paramref name="loc_id"/>.</param>
+    /// <param name="tapl_id">Datatype access property list identifier.</param>
+    /// <returns>Returns a committed datatype identifier if successful;
+    /// otherwise returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Topen2",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern hid_t open
         (hid_t loc_id, byte[] name, hid_t tapl_id = H5P.DEFAULT);
 
     /// <summary>

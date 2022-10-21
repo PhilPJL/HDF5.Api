@@ -54,23 +54,25 @@ public class H5TypeTests : H5Test<H5TypeTests>
     }
 
     [TestMethod]
-    public void CreateAndOpenCompoundDataTypeSucceeds()
+    [DataRow("TypeWithUtf8PropertyAndAsciiName")]
+    [DataRow("TypeWithUtf8PropertyAndUf8Name_᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫")]
+    public void CreateAndOpenCompoundDataTypeAsciiSucceeds(string name)
     {
         HandleCheck(() =>
         {
-            using var file = CreateFile();
+            using var file = CreateFile2(name);
 
             using (var type = H5Type.CreateCompoundType<CompoundType>()
                 .Insert<CompoundType, int>(nameof(CompoundType.Id))
                 .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
                 .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό)))
             {
-                file.Commit("TypeWithUtf8", type);
+                file.Commit(name, type);
             }
 
-            using (var type = file.OpenType("TypeWithUtf8"))
+            using (var type = file.OpenType(name))
             {
-                // TODO: add type.Name
+                Assert.AreEqual("/" + name, type.Name);
             }
         });
     }

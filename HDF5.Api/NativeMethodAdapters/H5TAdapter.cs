@@ -262,7 +262,16 @@ internal static unsafe class H5TAdapter
         Guard.IsNotNull(h5Object);
         Guard.IsNotNullOrEmpty(name);
 
-        long h = open(h5Object, name, dataTypeAccessPropertyList);
+        long h;
+
+#if NET7_0_OR_GREATER
+        h = open(h5Object, name, dataTypeAccessPropertyList);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            h = open(h5Object, nameBytesPtr, dataTypeAccessPropertyList);
+        }
+#endif
 
         h.ThrowIfInvalidHandleValue();
 
