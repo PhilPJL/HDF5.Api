@@ -205,6 +205,18 @@ internal static partial class H5T
     public static partial htri_t is_variable_str(hid_t dtype_id);
 
     /// <summary>
+    /// Locks a datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Lock
+    /// </summary>
+    /// <param name="dtype_id">Identifier of datatype to lock.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tlock"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t lock_datatype(hid_t dtype_id);
+
+    /// <summary>
     /// Sets character set to be used in a string or character datatype.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-SetCset
     /// </summary>

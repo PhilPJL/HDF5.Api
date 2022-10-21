@@ -200,7 +200,7 @@ internal static unsafe class H5TAdapter
 
     internal static bool GetCommitted(H5Type h5Type)
     {
-        int retval = (int)committed(h5Type);
+        int retval = committed(h5Type);
         retval.ThrowIfError();
         return retval > 0;
     }
@@ -244,5 +244,11 @@ internal static unsafe class H5TAdapter
     internal static H5DataTypeAccessPropertyList CreateAccessPropertyList()
     {
         return H5PAdapter.Create(H5P.DATATYPE_ACCESS, h => new H5DataTypeAccessPropertyList(h));
+    }
+
+    internal static void Lock(H5Type type)
+    {
+        int err = lock_datatype(type);
+        err.ThrowIfError();
     }
 }

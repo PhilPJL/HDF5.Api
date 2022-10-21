@@ -262,7 +262,6 @@ internal static unsafe class H5AAdapter
                     var ptr = new IntPtr(bufferPtr);
                     try
                     {
-                        // TODO: eliminate unnecessary overloads (read)
                         int err = read(attribute, type, ptr);
                         err.ThrowIfError();
 
@@ -292,7 +291,6 @@ internal static unsafe class H5AAdapter
                     finally
                     {
                         // TODO: check this really works
-                        // TODO: eliminate unnecessary overloads
                         H5DAdapter.ReclaimVariableLengthMemory(type, space, (byte**)bufferPtr);
                     }
                 }

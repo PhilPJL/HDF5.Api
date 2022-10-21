@@ -13,11 +13,11 @@
             Console.WriteLine(fileName);
 
             Console.WriteLine(H5Global.GetLibraryVersion());
-            DumpLocation(file, fileName, 1);
+            DumpLocation(file, 1);
             Console.WriteLine(H5Global.GetLibraryVersion());
         }
 
-        private static void DumpLocation<T>(H5Location<T> location, string locationName, int indent) where T : H5Object<T>
+        private static void DumpLocation<T>(H5Location<T> location, int indent) where T : H5Object<T>
         {
             string sIndent = new string(' ', indent * 2);
 
@@ -57,7 +57,7 @@
 
                 Console.WriteLine(sIndent + "G: " + g);
 
-                DumpLocation(gp, g, indent + 2);
+                DumpLocation(gp, indent + 2);
             }
         }
     }
