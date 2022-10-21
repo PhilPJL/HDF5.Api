@@ -1,9 +1,6 @@
 ﻿#if NET7_0_OR_GREATER
 using CommunityToolkit.HighPerformance.Buffers;
 #endif
-#if NETSTANDARD
-using HDF5.Api.Disposables;
-#endif
 
 namespace HDF5.Api.Utils
 {
@@ -21,7 +18,11 @@ namespace HDF5.Api.Utils
             static int GetNativeDataSize(IntPtr ptr)
             {
                 int size;
-                for (size = 0; Marshal.ReadByte(ptr, size) > 0; size++) ;
+                
+                for (size = 0; Marshal.ReadByte(ptr, size) > 0; size++)
+                {
+                }
+
                 return size;
             }
         }

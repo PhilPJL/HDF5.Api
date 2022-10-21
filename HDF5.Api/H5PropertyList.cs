@@ -54,9 +54,9 @@ public abstract class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5Pr
 
     private static readonly Lazy<ConcurrentBag<(long classId, PropertyListClass classEnum)>> ClassLookup = new(InitClassLookup, true);
 
-    public static ConcurrentBag<(long classId, PropertyListClass classEnum)> InitClassLookup()
+    private static ConcurrentBag<(long classId, PropertyListClass classEnum)> InitClassLookup()
     {
-        return new ConcurrentBag<(long classId, PropertyListClass classEnum)>
+        return new()
         {
             ( H5P.FILE_CREATE, PropertyListClass.FileCreate ),
             ( H5P.FILE_ACCESS, PropertyListClass.FileAccess ),
@@ -67,7 +67,7 @@ public abstract class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5Pr
             ( H5P.DATATYPE_CREATE, PropertyListClass.DataTypeCreate ),
             ( H5P.DATATYPE_ACCESS, PropertyListClass.DataTypeAccess ),
             ( H5P.LINK_CREATE, PropertyListClass.LinkCreate ),
-            ( H5P.LINK_ACCESS, PropertyListClass.LinkAccess ),
+            ( H5P.LINK_ACCESS, PropertyListClass.LinkAccess )
         };
     }
 
@@ -75,6 +75,7 @@ public abstract class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5Pr
     {
         long classId = H5PAdapter.GetClassId(this);
 
+        // ReSharper disable once LoopCanBeConvertedToQuery
         foreach(var plClass in ClassLookup.Value)
         {
             if(H5PAdapter.AreEqual(plClass.classId, classId))
@@ -93,7 +94,7 @@ internal class H5AttributeCreationPropertyList : H5PropertyList
     {
     }
 
-    internal H5AttributeCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.ATTRIBUTE_CREATE))
+    internal H5AttributeCreationPropertyList() : base(H5PAdapter.Create(H5P.ATTRIBUTE_CREATE))
     {
     }
 
@@ -110,7 +111,7 @@ internal class H5LinkCreationPropertyList : H5AttributeCreationPropertyList
     {
     }
 
-    internal H5LinkCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.LINK_CREATE))
+    internal H5LinkCreationPropertyList() : base(H5PAdapter.Create(H5P.LINK_CREATE))
     {
     }
 
@@ -127,7 +128,7 @@ public class H5DataSetCreationPropertyList : H5PropertyList
     {
     }
 
-    internal H5DataSetCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.DATASET_CREATE))
+    internal H5DataSetCreationPropertyList() : base(H5PAdapter.Create(H5P.DATASET_CREATE))
     {
     }
 
@@ -162,7 +163,7 @@ internal class H5DataSetAccessPropertyList : H5PropertyList
     {
     }
 
-    internal H5DataSetAccessPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.DATASET_ACCESS))
+    internal H5DataSetAccessPropertyList() : base(H5PAdapter.Create(H5P.DATASET_ACCESS))
     {
     }
 
@@ -175,7 +176,7 @@ internal class H5FileAccessPropertyList : H5PropertyList
     {
     }
 
-    internal H5FileAccessPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.FILE_ACCESS))
+    internal H5FileAccessPropertyList() : base(H5PAdapter.Create(H5P.FILE_ACCESS))
     {
     }
 
@@ -188,7 +189,7 @@ internal class H5FileCreationPropertyList : H5PropertyList
     {
     }
 
-    internal H5FileCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.FILE_CREATE))
+    internal H5FileCreationPropertyList() : base(H5PAdapter.Create(H5P.FILE_CREATE))
     {
     }
 
@@ -201,7 +202,7 @@ internal class H5GroupCreationPropertyList : H5PropertyList
     {
     }
 
-    internal H5GroupCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.GROUP_CREATE))
+    internal H5GroupCreationPropertyList() : base(H5PAdapter.Create(H5P.GROUP_CREATE))
     {
     }
 
@@ -214,7 +215,7 @@ internal class H5DataTypeCreationPropertyList : H5PropertyList
     {
     }
 
-    internal H5DataTypeCreationPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.DATATYPE_CREATE))
+    internal H5DataTypeCreationPropertyList() : base(H5PAdapter.Create(H5P.DATATYPE_CREATE))
     {
     }
 
@@ -227,7 +228,7 @@ internal class H5DataTypeAccessPropertyList : H5PropertyList
     {
     }
 
-    internal H5DataTypeAccessPropertyList() : base(H5PAdapter.Create(NativeMethods.H5P.DATATYPE_ACCESS))
+    internal H5DataTypeAccessPropertyList() : base(H5PAdapter.Create(H5P.DATATYPE_ACCESS))
     {
     }
 

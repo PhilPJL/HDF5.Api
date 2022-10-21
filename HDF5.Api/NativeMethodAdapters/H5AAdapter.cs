@@ -55,7 +55,7 @@ internal static unsafe class H5AAdapter
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        int err = 0;
+        int err;
 
 #if NET7_0_OR_GREATER
         err = delete(h5Object, name);
@@ -73,7 +73,7 @@ internal static unsafe class H5AAdapter
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        int err = 0;
+        int err;
 
 #if NET7_0_OR_GREATER
         err = exists(h5Object, name);
@@ -118,6 +118,7 @@ internal static unsafe class H5AAdapter
                     _ => string.Empty
                 };
 
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                 if (name != null)
                 {
                     names.Add(name);
@@ -151,12 +152,9 @@ internal static unsafe class H5AAdapter
     internal static H5AttributeCreationPropertyList CreateCreationPropertyList(CharacterSet encoding)
     {
         // TODO: ideally cache two CreationPropertyLists (Utf8/Ascii) and exclude them from handle tracking.
-        return H5PAdapter.Create(H5P.ATTRIBUTE_CREATE, h =>
+        return H5PAdapter.Create(H5P.ATTRIBUTE_CREATE, h => new H5AttributeCreationPropertyList(h)
         {
-            return new H5AttributeCreationPropertyList(h)
-            {
-                CharacterEncoding = encoding
-            };
+            CharacterEncoding = encoding
         });
     }
 
@@ -165,7 +163,8 @@ internal static unsafe class H5AAdapter
 #if NET7_0_OR_GREATER
         return MarshalHelpers.GetName(attribute, (long attr_id, Span<byte> name, nint size) => get_name(attr_id, size, name));
 #else
-        return MarshalHelpers.GetName(attribute, (long attr_id, byte* name, nint size) => get_name(attr_id, size, name));
+        return MarshalHelpers.GetName(attribute,
+            (long attr_id, byte* name, nint size) => get_name(attr_id, size, name));
 #endif
     }
 
@@ -227,7 +226,10 @@ internal static unsafe class H5AAdapter
         // TODO: optionally convert UTF-8 to Ascii with <?> markers
         // TODO: generalise to NPoints >= 0
 
-        if (count != 1 || dims.Any(d => d.UpperLimit > 1)) // NOTE: dims.Count could be > 0 with count == 1 where we have an array of [1]..[1] with one element
+        if (count != 1 ||
+            dims.Any(d =>
+                d.UpperLimit >
+                1)) // NOTE: dims.Count could be > 0 with count == 1 where we have an array of [1]..[1] with one element
         {
             throw new Hdf5Exception("Attribute is not scalar.");
         }
@@ -245,15 +247,13 @@ internal static unsafe class H5AAdapter
                 Span<nint> buffer = stackalloc nint[(int)count];
                 return ReadVariableStrings(buffer);
             }
-            else
-            {
+
 #if NET7_0_OR_GREATER
-                using var spanOwner = SpanOwner<nint>.Allocate((int)count);
-                return ReadVariableStrings(spanOwner.Span);
+            using var spanOwner = SpanOwner<nint>.Allocate((int)count);
+            return ReadVariableStrings(spanOwner.Span);
 #else
-                return ReadVariableStrings(new Span<nint>(new nint[count]));
+            return ReadVariableStrings(new Span<nint>(new nint[count]));
 #endif
-            }
 
             string ReadVariableStrings(Span<nint> buffer)
             {
@@ -323,7 +323,7 @@ internal static unsafe class H5AAdapter
                 return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
             }
 #else
-            var buffer = new byte[(storageSize + 1)];
+            var buffer = new byte[storageSize + 1];
             fixed (byte* bufferPtr = buffer)
             {
                 int err = read(attribute, type, bufferPtr);
@@ -388,13 +388,10 @@ internal static unsafe class H5AAdapter
         int attributeStorageSize = attribute.StorageSize;
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
-        unsafe
+        // No need to pin 
+        void* p = &value;
         {
-            // No need to pin 
-            void* p = &value;
-            {
-                Write(attribute, type, new IntPtr(p));
-            }
+            Write(attribute, type, new IntPtr(p));
         }
     }
 
@@ -435,21 +432,18 @@ internal static unsafe class H5AAdapter
             // we absolutely need to add '\0' :)
             CharacterSet.Ascii => Encoding.ASCII.GetBytes(value + '\0'),
             CharacterSet.Utf8 => Encoding.UTF8.GetBytes(value + '\0'),
-            _ => throw new InvalidEnumArgumentException($"Unknown CharacterSet:{characterSet}."),
+            _ => throw new InvalidEnumArgumentException($"Unknown CharacterSet:{characterSet}.")
         };
 
         if (type.IsVariableLengthString())
         {
-            unsafe
+            fixed (void* fixedBytes = bytes)
             {
-                fixed (void* fixedBytes = bytes)
-                {
-                    var stringArray = new IntPtr[1] { new(fixedBytes) };
+                var stringArray = new IntPtr[] { new(fixedBytes) };
 
-                    fixed (void* stringArrayPtr = stringArray)
-                    {
-                        Write(attribute, type, new IntPtr(stringArrayPtr));
-                    }
+                fixed (void* stringArrayPtr = stringArray)
+                {
+                    Write(attribute, type, new IntPtr(stringArrayPtr));
                 }
             }
         }
@@ -459,15 +453,13 @@ internal static unsafe class H5AAdapter
 
             if (bytes.Length > storageSize)
             {
-                throw new ArgumentOutOfRangeException($"The string requires {bytes.Length} storage which is greater than the allocated fixed storage size of {storageSize} bytes.");
+                throw new ArgumentOutOfRangeException(
+                    $"The string requires {bytes.Length} storage which is greater than the allocated fixed storage size of {storageSize} bytes.");
             }
 
-            unsafe
+            fixed (void* fixedBytes = bytes)
             {
-                fixed (void* fixedBytes = bytes)
-                {
-                    Write(attribute, type, new IntPtr(fixedBytes));
-                }
+                Write(attribute, type, new IntPtr(fixedBytes));
             }
         }
     }
@@ -494,4 +486,3 @@ internal static unsafe class H5AAdapter
         return Create(h5Object, name, type, memorySpace);
     }
 }
-

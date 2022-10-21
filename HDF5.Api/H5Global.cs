@@ -113,8 +113,8 @@ public readonly struct Dimension
 {
     public const ulong Unlimited = ulong.MaxValue;
 
-    public readonly ulong InitialSize { get; }
-    public readonly ulong UpperLimit { get; }
+    public ulong InitialSize { get; }
+    public ulong UpperLimit { get; }
 
     public Dimension(long initialSize, long? upperLimit = null)
     {
@@ -158,7 +158,7 @@ public readonly struct Dimension
     {
         return dimensions.Select(d => new Dimension(d.initialSize, d.upperLimit)).ToArray();
     }
-};
+}
 
 public enum DataTypeClass
 {

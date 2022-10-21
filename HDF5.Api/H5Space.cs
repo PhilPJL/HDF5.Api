@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using CommunityToolkit.Diagnostics;
 using HDF5.Api.NativeMethodAdapters;
 

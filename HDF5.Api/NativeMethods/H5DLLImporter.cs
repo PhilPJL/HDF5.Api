@@ -61,11 +61,11 @@ internal abstract class H5DLLImporter
 
     protected abstract IntPtr InternalGetAddress(string varName);
 
-    public IntPtr GetAddress(string varName)
+    private IntPtr GetAddress(string varName)
     {
         var address = InternalGetAddress(varName);
         if (address == IntPtr.Zero)
-            throw new Exception(string.Format("The export with name \"{0}\" doesn't exist.", varName));
+            throw new Exception($"The export with name \"{varName}\" doesn't exist.");
         return address;
     }
 
@@ -105,7 +105,7 @@ internal class H5WindowsDLLImporter : H5DLLImporter
     }
 
     [DllImport("kernel32", EntryPoint = "GetProcAddress", CharSet = CharSet.Ansi, SetLastError = true)]
-    internal static extern IntPtr GetProcAddress(IntPtr hModule, [MarshalAs(UnmanagedType.LPStr)] string procName);
+    private static extern IntPtr GetProcAddress(IntPtr hModule, [MarshalAs(UnmanagedType.LPStr)] string procName);
 
     protected override IntPtr InternalGetAddress(string varName)
     {
@@ -116,10 +116,10 @@ internal class H5WindowsDLLImporter : H5DLLImporter
 internal class H5LinuxDllImporter : H5DLLImporter
 {
     [DllImport("libdl.so.2")]
-    protected static extern IntPtr dlsym(IntPtr handle, string symbol);
+    private static extern IntPtr dlsym(IntPtr handle, string symbol);
 
     [DllImport("libdl.so.2")]
-    protected static extern IntPtr dlerror();
+    private static extern IntPtr dlerror();
 
     protected override IntPtr InternalGetAddress(string varName)
     {
@@ -136,10 +136,10 @@ internal class H5LinuxDllImporter : H5DLLImporter
 internal class H5MacDllImporter : H5DLLImporter
 {
     [DllImport("libdl.dylib")]
-    protected static extern IntPtr dlsym(IntPtr handle, string symbol);
+    private static extern IntPtr dlsym(IntPtr handle, string symbol);
 
     [DllImport("libdl.dylib")]
-    protected static extern IntPtr dlerror();
+    private static extern IntPtr dlerror();
 
     protected override IntPtr InternalGetAddress(string varName)
     {

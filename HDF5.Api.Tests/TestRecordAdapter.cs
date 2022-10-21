@@ -21,7 +21,7 @@ public sealed class TestRecordAdapter : H5TypeAdapter<TestRecord, TestRecordAdap
             UIntProperty = source.UIntProperty,
             ULongProperty = source.ULongProperty,
             FloatProperty = source.FloatProperty,
-            DoubleProperty = source.DoubleProperty,
+            DoubleProperty = source.DoubleProperty
         };
     }
 

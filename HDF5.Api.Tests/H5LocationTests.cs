@@ -199,7 +199,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         location.Enumerate((H5Group g) => groupNames2.Add(g.Name));
 
         // Since group name is a full path '/grp1/grp2/grp3' we extract the 'filename' to compare with
-        Assert.IsTrue(location.GroupNames.SequenceEqual(groupNames2.Select(g => Path.GetFileNameWithoutExtension(g))));
+        Assert.IsTrue(location.GroupNames.SequenceEqual(groupNames2.Select(Path.GetFileNameWithoutExtension)));
     }
     #endregion
 

@@ -3,9 +3,8 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using HDF5.Api;
 
-namespace Benchmark
+namespace HDF5.Api.Benchmark
 {
     public static class Program
     {

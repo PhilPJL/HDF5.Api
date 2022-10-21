@@ -19,10 +19,8 @@ public sealed class Hdf5Exception : Exception
             {
                 return string.Join("/", H5Errors.Select(e => $"{e.Number}:{e.Description}"));
             }
-            else
-            {
-                return base.Message;
-            }
+
+            return base.Message;
         }
     }
 

@@ -37,7 +37,7 @@ internal static unsafe class H5TAdapter
 
     internal static CharacterSet GetCharacterSet(H5Type type)
     {
-        cset_t cset = get_cset(type);
+        var cset = get_cset(type);
         ((int)cset).ThrowIfError();
         return (CharacterSet)cset;
     }
@@ -169,7 +169,7 @@ internal static unsafe class H5TAdapter
             // add more mappings as required
 
             _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
-        }; ;
+        };
     }
 
     internal static void SetPadding(H5Type h5Type, StringPadding padding)

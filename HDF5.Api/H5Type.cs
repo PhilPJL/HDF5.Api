@@ -7,7 +7,7 @@ namespace HDF5.Api;
 ///     <para>.NET wrapper for H5T (Type) API.</para>
 ///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_t.html"/>
 /// </summary>
-public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>, IH5ObjectWithAttributes
+public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 {
     internal H5Type(long handle) : base(handle, HandleType.Type, H5TAdapter.Close) { }
 

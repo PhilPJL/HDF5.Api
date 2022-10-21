@@ -303,7 +303,7 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
         {
             using var file = CreateFile();
 
-            string groupPath = "parent/child/grandchild";
+            const string groupPath = "parent/child/grandchild";
 
             using var grandChild = file.CreateGroup(groupPath);
 
@@ -332,7 +332,7 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
         {
             using var file = CreateFile();
 
-            string groupPath = "parent/child/grandchild";
+            const string groupPath = "parent/child/grandchild";
 
             using var lcpl = H5Link.CreateCreationPropertyList(createIntermediateGroups: false);
 

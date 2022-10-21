@@ -47,7 +47,6 @@ public class H5File : H5Location<H5File>
     /// <summary>
     /// Creates a <see cref="H5FileCreationPropertyList"/> of the required type.
     /// </summary>
-    /// <param name="listType"></param>
     /// <returns></returns>
     internal static H5FileCreationPropertyList CreateCreationPropertyList()
     {
@@ -126,6 +125,8 @@ public class H5File : H5Location<H5File>
     /// </summary>
     /// <param name="path">Path to the file.</param>
     /// <param name="readOnly">Open the file in read-only mode.  Defaults to read-write.</param>
+    /// <param name="fileCreationPropertyList"></param>
+    /// <param name="fileAccessPropertyList"></param>
     internal static H5File CreateOrOpen(
         [DisallowNull] string path, 
         bool readOnly,
@@ -158,6 +159,8 @@ public class H5File : H5Location<H5File>
     /// </summary>
     /// <param name="path">Path tp the file</param>
     /// <param name="failIfExists">Fail if the file being created already exists.</param>
+    /// <param name="fileCreationPropertyList"></param>
+    /// <param name="fileAccessPropertyList"></param>
     internal static H5File Create(
         [DisallowNull] string path, 
         bool failIfExists, 

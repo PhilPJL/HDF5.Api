@@ -43,7 +43,7 @@ internal static class H5EAdapter
 
                 return 0;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Trace.WriteLine($"Error in WalkStack.Callback: {ex.Message}.");
                 return -1;

@@ -152,7 +152,7 @@ internal static unsafe partial class H5T
         RESERVED_11 = 11,
         RESERVED_12 = 12,
         RESERVED_13 = 13,
-        RESERVED_14 = 14,
+        RESERVED_14 = 14
     }
 
     /// <summary>

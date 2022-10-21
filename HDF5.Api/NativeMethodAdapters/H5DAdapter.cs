@@ -87,15 +87,12 @@ internal static unsafe class H5DAdapter
             return buf.Span.ToArray();
         }
 #else
-        unsafe
+        var result = new T[count];
+        fixed (T* ptr = result)
         {
-            var result = new T[count];
-            fixed (T* ptr = result)
-            {
-                int err = read(dataSet, type, space, space, 0, new IntPtr(ptr));
-                err.ThrowIfError();
-                return result;
-            }
+            int err = read(dataSet, type, space, space, 0, new IntPtr(ptr));
+            err.ThrowIfError();
+            return result;
         }
 #endif
     }

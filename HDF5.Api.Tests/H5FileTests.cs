@@ -90,7 +90,7 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     {
         HandleCheck(() =>
         {
-            string path = "none.h5";
+            const string path = "none.h5";
 
             // Ensure no existing file
             File.Delete(path);

@@ -16,7 +16,7 @@
 namespace HDF5.Api.NativeMethods;
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-internal unsafe static partial class H5A
+internal static unsafe partial class H5A
 {
 #if NET7_0_OR_GREATER
     /// <summary>

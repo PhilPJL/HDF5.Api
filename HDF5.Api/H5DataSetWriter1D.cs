@@ -22,8 +22,8 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
         OwnsDataSet = ownsDataSet;
     }
 
-    private H5DataSet DataSet { get; set; }
-    private H5Type Type { get; set; }
+    private H5DataSet DataSet { get; }
+    private H5Type Type { get; }
     private IH5TypeAdapter<TInput> Converter { get; }
     private bool OwnsDataSet { get; }
     public long RowsWritten { get; private set; }
@@ -33,7 +33,7 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
         if (disposing)
         {
             // Finalize the length of the data set
-            DataSet.SetExtent(new[] { RowsWritten });
+            DataSet.SetExtent(RowsWritten);
 
             // We may own the data-set
             if (OwnsDataSet)

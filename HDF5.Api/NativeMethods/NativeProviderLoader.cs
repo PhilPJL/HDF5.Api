@@ -209,7 +209,7 @@ namespace HDF5.Api.NativeMethods
                         || TryLoadFile(directory, "win-arm", fileName)
                         || TryLoadFile(directory, "arm", fileName)
                         || TryLoadFile(directory, string.Empty, fileName),
-                    _ => TryLoadFile(directory, string.Empty, fileName),
+                    _ => TryLoadFile(directory, string.Empty, fileName)
                 };
             }
 
@@ -241,7 +241,7 @@ namespace HDF5.Api.NativeMethods
                         || TryLoadFile(directory, "linux-arm", fileName)
                         || TryLoadFile(directory, "arm", fileName)
                         || TryLoadFile(directory, string.Empty, fileName),
-                    _ => TryLoadFile(directory, string.Empty, fileName),
+                    _ => TryLoadFile(directory, string.Empty, fileName)
                 };
             }
 
@@ -261,7 +261,7 @@ namespace HDF5.Api.NativeMethods
                         || TryLoadFile(directory, "osx-arm64", fileName)
                         || TryLoadFile(directory, "arm64", fileName)
                         || TryLoadFile(directory, string.Empty, fileName),
-                    _ => TryLoadFile(directory, string.Empty, fileName),
+                    _ => TryLoadFile(directory, string.Empty, fileName)
                 };
             }
 
@@ -279,7 +279,7 @@ namespace HDF5.Api.NativeMethods
                 ProcArchitecture.Arm =>
                     TryLoadFile(directory, "arm", fileName)
                     || TryLoadFile(directory, string.Empty, fileName),
-                _ => TryLoadFile(directory, string.Empty, fileName),
+                _ => TryLoadFile(directory, string.Empty, fileName)
             };
         }
 

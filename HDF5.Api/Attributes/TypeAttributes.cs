@@ -2,7 +2,7 @@
 
 namespace HDF5.Api.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class H5IncludeAttribute : Attribute
     {
         public H5IncludeAttribute()
@@ -13,12 +13,11 @@ namespace HDF5.Api.Attributes
         public string Title { get; set; }
     }
 
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class H5IgnoreAttribute : Attribute
-    {
-    }
+    {}
 
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class H5StringAttribute : H5IncludeAttribute
     {
         public H5StringAttribute()

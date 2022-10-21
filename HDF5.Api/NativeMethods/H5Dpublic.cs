@@ -82,7 +82,7 @@ internal static unsafe partial class H5D
         /// v2 B-tree index (for >1 unlimited dims)
         /// </summary>
         BT2 = 5,
-        IDX_NTYPES = 6,
+        IDX_NTYPES = 6
     }
 
     /// <summary>

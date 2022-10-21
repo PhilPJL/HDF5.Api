@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Diagnostics;
-using HDF5.Api.NativeMethods;
+﻿using HDF5.Api.NativeMethods;
 using System.Collections.Generic;
 using System.Linq;
 using static HDF5.Api.NativeMethods.H5L;
@@ -79,7 +78,7 @@ internal static unsafe class H5LAdapter
                     H5T.cset_t.ASCII or H5T.cset_t.UTF8 => MarshalHelpers.PtrToStringUTF8(intPtrName),
 #endif
                     // Don't throw inside callback - see HDF docs
-                    _ => string.Empty,
+                    _ => string.Empty
                 };
 
                 if (!string.IsNullOrEmpty(name))
@@ -122,13 +121,10 @@ internal static unsafe class H5LAdapter
     /// <returns></returns>
     internal static H5LinkCreationPropertyList CreateCreationPropertyList(CharacterSet encoding, bool createIntermediateGroups)
     {
-        return H5PAdapter.Create(H5P.LINK_CREATE, h =>
+        return H5PAdapter.Create(H5P.LINK_CREATE, h => new H5LinkCreationPropertyList(h)
         {
-            return new H5LinkCreationPropertyList(h)
-            {
-                CharacterEncoding = encoding,
-                CreateIntermediateGroups = createIntermediateGroups
-            };
+            CharacterEncoding = encoding,
+            CreateIntermediateGroups = createIntermediateGroups
         });
     }
 }

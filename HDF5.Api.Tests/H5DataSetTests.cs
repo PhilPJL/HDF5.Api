@@ -104,8 +104,8 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
             Assert.IsFalse(group2.DataSetExists(dataSetName + "y"));
 
             // Test using rooted path
-            Assert.IsTrue(file.GroupPathExists($"/aGroup/bGroup"));
-            Assert.IsFalse(file.GroupPathExists($"/aGroup/bGroupx"));
+            Assert.IsTrue(file.GroupPathExists("/aGroup/bGroup"));
+            Assert.IsFalse(file.GroupPathExists("/aGroup/bGroupx"));
 
             Assert.IsTrue(file.DataSetExists($"/aGroup/bGroup/{dataSetName}"));
             Assert.IsFalse(file.DataSetExists($"/aGroup/bGroup/{dataSetName}x"));

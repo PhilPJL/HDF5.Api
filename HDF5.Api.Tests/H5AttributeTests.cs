@@ -29,7 +29,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 Test(file, "fixed_500", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 500, characterSet, padding);
             }
 
-            static void Test(H5File file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+            static void Test(IH5ObjectWithAttributes file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
             {
                 using var attribute = file.CreateStringAttribute(name, fixedStorageLength, characterSet, padding);
 
@@ -72,7 +72,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 Test(file, "variable_long", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 0, characterSet, padding);
             }
 
-            static void Test(H5File file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+            static void Test(IH5ObjectWithAttributes file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
             {
                 using (var attribute = file.CreateStringAttribute(name, fixedStorageLength, characterSet, padding))
                 {
@@ -302,15 +302,15 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             location.CreateAndWriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
-            T readValue = location.ReadAttribute<T>(name);
+            var readValue = location.ReadAttribute<T>(name);
             Assert.AreEqual(value, readValue);
 
             using var a = location.OpenAttribute(name);
-            T readValue2 = location.ReadAttribute<T>(name);
+            var readValue2 = location.ReadAttribute<T>(name);
             Assert.AreEqual(value, readValue2);
 
             a.Write(newValue);
-            T readValue3 = location.ReadAttribute<T>(name);
+            var readValue3 = location.ReadAttribute<T>(name);
             Assert.AreEqual(newValue, readValue3);
 
             location.DeleteAttribute(name);

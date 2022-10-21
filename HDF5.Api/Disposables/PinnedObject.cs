@@ -5,7 +5,7 @@
 /// </summary>
 internal class PinnedObject : Disposable
 {
-    private GCHandle Pinned { get; set; }
+    private GCHandle Pinned { get; }
 
     public PinnedObject(object objectToPin)
     {
