@@ -1,4 +1,6 @@
-﻿namespace HDF5.Api;
+﻿using System.Linq;
+
+namespace HDF5.Api;
 
 /// <summary>
 ///     Base class for H5 object types.
@@ -65,12 +67,9 @@ public class H5Object<T> : Disposable where T : H5Object<T>
             return H5Handle.DefaultHandleValue;
         }
 
-        if (h5Object.IsDisposed)
-        {
-            throw new ObjectDisposedException(h5Object.GetType().Name);
-        }
-
+        h5Object.AssertNotDisposed();
         h5Object._handle.ThrowIfInvalidHandleValue();
+
         return h5Object._handle;
     }
 
@@ -86,7 +85,7 @@ public class H5Object<T> : Disposable where T : H5Object<T>
             if ((long)t == type) { return; }
         }
 
-        throw new Hdf5Exception($"Handle type '{(HandleType)type}' is not valid.  Expecting one of: {string.Join(", ", types)}.");
+        throw new Hdf5Exception($"Handle type '{(HandleType)type}' is not valid.  Expecting one of: {string.Join(", ", types.OrderBy(s => s))}.");
     }
 
     internal void AssertHasHandleType(params HandleType[] types)
@@ -95,7 +94,7 @@ public class H5Object<T> : Disposable where T : H5Object<T>
     }
 
     internal void AssertHasLocationHandleType() => AssertHasHandleType(HandleType.File, HandleType.Group);
-    internal void AssertHasWithAttributesHandleType() => AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet);// , HandleType.Type);
+    internal void AssertHasWithAttributesHandleType() => AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet, HandleType.Type);
 
     internal void AssertNotDisposed()
     {

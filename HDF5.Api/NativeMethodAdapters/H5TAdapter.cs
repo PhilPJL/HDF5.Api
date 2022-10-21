@@ -209,8 +209,8 @@ internal static unsafe class H5TAdapter
         [DisallowNull] H5Object<T> h5Object,
         [DisallowNull] string name,
         [DisallowNull] H5Type h5Type,
-        [AllowNull] H5PropertyList? dataTypeCreationPropertyList = null,
-        [AllowNull] H5PropertyList? dataTypeAccessPropertyList = null) where T : H5Object<T>
+        [AllowNull] H5DataTypeCreationPropertyList? dataTypeCreationPropertyList,
+        [AllowNull] H5DataTypeAccessPropertyList? dataTypeAccessPropertyList) where T : H5Object<T>
     {
         h5Object.AssertHasLocationHandleType();
 
@@ -250,5 +250,22 @@ internal static unsafe class H5TAdapter
     {
         int err = lock_datatype(type);
         err.ThrowIfError();
+    }
+
+    internal static H5Type Open<T>(
+        [DisallowNull] H5Object<T> h5Object,
+        [DisallowNull] string name,
+        [AllowNull] H5DataTypeAccessPropertyList? dataTypeAccessPropertyList) where T : H5Object<T>
+    {
+        h5Object.AssertHasLocationHandleType();
+
+        Guard.IsNotNull(h5Object);
+        Guard.IsNotNullOrEmpty(name);
+
+        long h = open(h5Object, name, dataTypeAccessPropertyList);
+
+        h.ThrowIfInvalidHandleValue();
+
+        return new H5Type(h);
     }
 }

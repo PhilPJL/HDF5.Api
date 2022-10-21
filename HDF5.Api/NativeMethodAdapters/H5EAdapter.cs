@@ -33,13 +33,13 @@ internal static class H5EAdapter
             try
             {
                 errors.Add(new H5ErrorInfo
-                {
-                    Number = (int)n,
-                    Description = err_desc.desc,
-                    Filename = err_desc.file_name,
-                    FunctionName = err_desc.func_name,
-                    LineNumber = (int)err_desc.line
-                });
+                (
+                    (int)n,
+                    (int)err_desc.line,
+                    err_desc.func_name,
+                    err_desc.file_name,
+                    err_desc.desc
+                ));
 
                 return 0;
             }

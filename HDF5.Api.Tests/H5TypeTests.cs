@@ -3,7 +3,7 @@
 namespace HDF5.Api.Tests;
 
 [TestClass]
-public class H5TypeTests : H5Test<H5TypeTests> 
+public class H5TypeTests : H5Test<H5TypeTests>
 {
     [TestMethod]
     public void CreateCommittedDataTypeAsciiSucceeds()
@@ -17,7 +17,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
             using var bigStringType = H5Type.CreateFixedLengthStringType(1000);
             file.Commit(bigString, bigStringType);
 
-            Assert.IsTrue(file.NamedDataTypeNames.Contains(bigString));
+            Assert.IsTrue(file.DataTypeNames.Contains(bigString));
 
             const string smallString = "smallstring";
 
@@ -25,7 +25,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
             using var smallStringType = H5Type.CreateFixedLengthStringType(10);
             group.Commit(smallString, smallStringType);
 
-            Assert.IsTrue(group.NamedDataTypeNames.Contains(smallString));
+            Assert.IsTrue(group.DataTypeNames.Contains(smallString));
         });
     }
 
@@ -41,7 +41,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
             using var bigStringType = H5Type.CreateFixedLengthStringType(1000);
             file.Commit(bigString, bigStringType);
 
-            Assert.IsTrue(file.NamedDataTypeNames.Contains(bigString));
+            Assert.IsTrue(file.DataTypeNames.Contains(bigString));
 
             const string smallString = "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ";
 
@@ -49,7 +49,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
             using var smallStringType = H5Type.CreateFixedLengthStringType(10);
             group.Commit(smallString, smallStringType);
 
-            Assert.IsTrue(group.NamedDataTypeNames.Contains(smallString));
+            Assert.IsTrue(group.DataTypeNames.Contains(smallString));
         });
     }
 
@@ -67,6 +67,34 @@ public class H5TypeTests : H5Test<H5TypeTests>
 
             file.Commit("TypeWithUtf8", type);
         });
+    }
+
+    [TestMethod]
+    [Ignore]
+    public void OpenAndEnumerateCommittedDataTypeSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+
+            using (var type = H5Type.CreateCompoundType<CompoundType>()
+                .Insert<CompoundType, int>(nameof(CompoundType.Id))
+                .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
+                .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό)))
+            {
+                file.Commit("ᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻ", type);
+            }
+
+            using var type2 = file.OpenType("ᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻ");
+
+            // TODO: update H5Type to support attributes
+            var names = type2.AttributeNames;
+
+            //Assert.IsTrue(type2.AttributeNames.Contains(nameof(CompoundType.Id)));
+            //Assert.IsTrue(type2.AttributeNames.Contains(nameof(CompoundType.ShortProperty)));
+            //Assert.IsTrue(type2.AttributeNames.Contains(nameof(CompoundType.Χαρακτηριστικό)));
+        });
+
     }
 
     [StructLayout(LayoutKind.Sequential)]

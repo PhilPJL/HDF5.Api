@@ -24,6 +24,16 @@ public class H5DataSet : H5Object<H5DataSet>, IH5ObjectWithAttributes
 
     public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
 
+    public void Enumerate(Action<H5Attribute> action)
+    {
+        foreach (var name in AttributeNames)
+        {
+            using var h5Object = OpenAttribute(name);
+
+            action(h5Object);
+        }
+    }
+
     public H5Attribute CreateAttribute(
         [DisallowNull] string name, [DisallowNull] H5Type type, [DisallowNull] H5Space space)
     {

@@ -3,6 +3,7 @@
 public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5LocationTests<TLoc>
 {
     #region Groups
+
     protected static void CreateGroupSucceeds<T>(H5Location<T> location) where T : H5Object<T>
     {
         // Ascii
@@ -172,6 +173,33 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         Assert.IsTrue(groupNames.Any(c => c == grp1Name));
         Assert.IsTrue(groupNames.Any(c => c == grp2Name));
         Assert.IsTrue(groupNames.Any(c => c == grp10Name));
+    }
+
+    protected static void EnumerateGroupsSucceeds<T>(H5Location<T> location) where T : H5Object<T>
+    {
+        var groupNames = location.GroupNames;
+        Assert.IsTrue(!groupNames.Any());
+
+        // Create group
+        const string grp1Name = "grp1";
+        using var group = location.CreateGroup(grp1Name);
+        Assert.IsTrue(location.GroupExists(grp1Name));
+
+        // Create group
+        const string grp2Name = "grp2";
+        using var group2 = location.CreateGroup(grp2Name);
+        Assert.IsTrue(location.GroupExists(grp2Name));
+
+        // Create group
+        const string grp10Name = "grp10";
+        using var group10 = location.CreateGroup(grp10Name);
+        Assert.IsTrue(location.GroupExists(grp10Name));
+
+        List<string> groupNames2 = new();
+        location.Enumerate((H5Group g) => groupNames2.Add(g.Name));
+
+        // Since group name is a full path '/grp1/grp2/grp3' we extract the 'filename' to compare with
+        Assert.IsTrue(location.GroupNames.SequenceEqual(groupNames2.Select(g => Path.GetFileNameWithoutExtension(g))));
     }
     #endregion
 

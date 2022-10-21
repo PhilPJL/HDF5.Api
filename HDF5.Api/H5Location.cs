@@ -21,8 +21,8 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     ///     Create an Attribute for this location
     /// </summary>
     public H5Attribute CreateAttribute(
-        [DisallowNull] string name, 
-        [DisallowNull] H5Type type, 
+        [DisallowNull] string name,
+        [DisallowNull] H5Type type,
         [DisallowNull] H5Space space)
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -50,7 +50,7 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     /// <param name="padding"></param>
     /// <returns></returns>
     public H5Attribute CreateStringAttribute(
-        [DisallowNull] string name, 
+        [DisallowNull] string name,
         int fixedStorageLength = 0, CharacterSet characterSet = CharacterSet.Utf8, StringPadding padding = StringPadding.NullTerminate)
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -107,9 +107,49 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     }
 
     public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
+
+    public void Enumerate(Action<H5Attribute> action)
+    {
+        foreach (var name in AttributeNames)
+        {
+            using var h5Object = OpenAttribute(name);
+            action(h5Object);
+        }
+    }
+
     public IEnumerable<string> GroupNames => H5LAdapter.GetGroupNames(this);
+
+    public void Enumerate(Action<H5Group> action)
+    {
+        foreach (var name in GroupNames)
+        {
+            using var h5Object = OpenGroup(name);
+            action(h5Object);
+        }
+    }
+
     public IEnumerable<string> DataSetNames => H5LAdapter.GetDataSetNames(this);
-    public IEnumerable<string> NamedDataTypeNames => H5LAdapter.GetNamedDataTypeNames(this);
+
+    public void Enumerate(Action<H5DataSet> action)
+    {
+        foreach (var name in DataSetNames)
+        {
+            using var h5Object = OpenDataSet(name);
+            action(h5Object);
+        }
+    }
+
+    public IEnumerable<string> DataTypeNames => H5LAdapter.GetNamedDataTypeNames(this);
+
+    public void Enumerate(Action<H5Type> action)
+    {
+        foreach (var name in DataTypeNames)
+        {
+            using var h5Object = OpenType(name);
+            action(h5Object);
+        }
+    }
+
     public IEnumerable<(string name, H5ObjectType type)> Members => H5LAdapter.GetMembers(this);
 
     public int NumberOfAttributes => (int)H5OAdapter.GetInfo(this).num_attrs;
@@ -170,9 +210,9 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     ///     Create a DataSet in this location
     /// </summary>
     public H5DataSet CreateDataSet(
-        [DisallowNull] string name, 
-        [DisallowNull] H5Type type, 
-        [DisallowNull] H5Space space, 
+        [DisallowNull] string name,
+        [DisallowNull] H5Type type,
+        [DisallowNull] H5Space space,
         [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -186,10 +226,10 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
     ///     Create a DataSet in this location
     /// </summary>
     internal H5DataSet CreateDataSet(
-        [DisallowNull] string name, 
-        [DisallowNull] H5Type type, 
-        [DisallowNull] H5Space space, 
-        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList, 
+        [DisallowNull] string name,
+        [DisallowNull] H5Type type,
+        [DisallowNull] H5Space space,
+        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList,
         [AllowNull] H5DataSetAccessPropertyList? dataSetAccessPropertyList)
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -225,12 +265,16 @@ public abstract class H5Location<T> : H5Object<T>, IH5Location where T : H5Objec
 
     public void Commit(
         [DisallowNull] string name,
-        [DisallowNull] H5Type h5Type,
-        [AllowNull] H5PropertyList? dataTypeCreationPropertyList = null,
-        [AllowNull] H5PropertyList? dataTypeAccessPropertyList = null)
+        [DisallowNull] H5Type h5Type)
     {
-        H5TAdapter.Commit(this, name, h5Type,
-            dataTypeCreationPropertyList, dataTypeAccessPropertyList);
+        H5TAdapter.Commit(this, name, h5Type, null, null);
+    }
+
+    public H5Type OpenType(string name)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        return H5TAdapter.Open(this, name, null);
     }
 
     public abstract string Name { get; }

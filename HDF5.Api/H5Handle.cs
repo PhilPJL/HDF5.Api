@@ -52,9 +52,9 @@ internal enum HandleType : long
     Space = 4L << 56,
     DataSet = 5L << 56,
     Attribute = 6L << 56,
-
-    // TODO: NamedDataType (7,8,9)
-
+    // 7 ?
+    // 8 ?
+    // 9 ?
     PropertyList = 10L << 56,
 
     Mask = 0x7fL << 56

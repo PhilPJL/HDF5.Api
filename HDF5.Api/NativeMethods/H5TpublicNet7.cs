@@ -74,7 +74,6 @@ internal static partial class H5T
     /// <param name="tapl_id">Datatype access property list</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tcommit2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
@@ -185,7 +184,6 @@ internal static partial class H5T
     /// <param name="field_id">Datatype identifier of the field to insert.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
-    /// <remarks>ASCII strings ONLY!</remarks>
     [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tinsert", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
@@ -215,6 +213,22 @@ internal static partial class H5T
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t lock_datatype(hid_t dtype_id);
+
+    /// <summary>
+    /// Opens a committed (named) datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Open2
+    /// </summary>
+    /// <param name="loc_id">A file or group identifier.</param>
+    /// <param name="name">A datatype name, defined within the file or
+    /// group identified by <paramref name="loc_id"/>.</param>
+    /// <param name="tapl_id">Datatype access property list identifier.</param>
+    /// <returns>Returns a committed datatype identifier if successful;
+    /// otherwise returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Topen2", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t open
+        (hid_t loc_id, string name, hid_t tapl_id = H5P.DEFAULT);
 
     /// <summary>
     /// Sets character set to be used in a string or character datatype.

@@ -14,8 +14,9 @@ public interface IH5ObjectWithAttributes
     DateTime ReadDateTimeAttribute(string name);
 
     IEnumerable<string> AttributeNames { get; }
+    void Enumerate(Action<H5Attribute> action); 
 
-    H5Attribute CreateStringAttribute(string name, int fixedStorageLength, 
+    H5Attribute CreateStringAttribute(string name, int fixedStorageLength,
         CharacterSet characterSet = CharacterSet.Utf8, StringPadding padding = StringPadding.NullTerminate);
 
     int NumberOfAttributes { get; }

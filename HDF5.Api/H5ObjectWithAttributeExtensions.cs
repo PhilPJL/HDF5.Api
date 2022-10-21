@@ -13,7 +13,7 @@ public static class H5ObjectWithAttributeExtensions
 
         // Add CreateScalarAttribute
         using var type = H5Type.GetNativeType<T>();
-        using var memorySpace = H5SAdapter.CreateScalar();
+        using var memorySpace = H5Space.CreateScalar();
         using var attribute = owa.CreateAttribute(name, type, memorySpace);
         H5AAdapter.Write(attribute, type, value);
     }

@@ -16,6 +16,8 @@ public interface IH5Location : IH5ObjectWithAttributes
     bool GroupExists(string name);
     bool GroupPathExists(string path);
     void DeleteGroup(string name);
+    IEnumerable<string> GroupNames { get; }
+    void Enumerate(Action<H5Group> action);
 
     // Data sets
     H5DataSet CreateDataSet(string name, H5Type typeId, H5Space space,
@@ -23,18 +25,21 @@ public interface IH5Location : IH5ObjectWithAttributes
     H5DataSet OpenDataSet(string name);
     bool DataSetExists(string name);
     void DeleteDataSet(string name);
-
-    IEnumerable<string> GroupNames { get; }
     IEnumerable<string> DataSetNames { get; }
-    IEnumerable<string> NamedDataTypeNames { get; }
+    void Enumerate(Action<H5DataSet> action);
 
-    IEnumerable<(string name, H5ObjectType type)> Members { get; }
+
+    // Data types
+    IEnumerable<string> DataTypeNames { get; }
+    H5Type OpenType(string name);
+    void Enumerate(Action<H5Type> action);
 
     void Commit(
         [DisallowNull] string name,
-        [DisallowNull] H5Type h5Type,
-        [AllowNull] H5PropertyList? dataTypeCreationPropertyList = null,
-        [AllowNull] H5PropertyList? dataTypeAccessPropertyList = null);
+        [DisallowNull] H5Type h5Type);
+
+    // General
+    IEnumerable<(string name, H5ObjectType type)> Members { get; }
 
     string Name { get; }
 }

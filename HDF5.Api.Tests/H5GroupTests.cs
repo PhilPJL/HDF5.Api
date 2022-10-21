@@ -183,6 +183,17 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
         });
     }
 
+    [TestMethod]
+    public void EnumerateChildrenSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+
+            EnumerateGroupsSucceeds(file);
+        });
+    }
+
     #region Attributes
 
     [TestMethod]

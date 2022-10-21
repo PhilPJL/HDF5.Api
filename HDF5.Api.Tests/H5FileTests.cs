@@ -261,6 +261,17 @@ public class H5FileTests : H5LocationTests<H5FileTests>
         });
     }
 
+    [TestMethod]
+    public void EnumerateChildrenSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+
+            EnumerateGroupsSucceeds(file);
+        });
+    }
+
     #endregion
 
     #region Attributes
