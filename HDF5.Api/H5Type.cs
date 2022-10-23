@@ -13,6 +13,14 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 
     private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
 
+    protected override void GuardAttributesAllowed()
+    {
+        if(!Committed)
+        {
+            throw new Hdf5Exception("The type must be commited in order to use attributes.");
+        }
+    }
+
     #region Equality and hashcode
 
     public bool IsEqualTo([AllowNull] H5Type? other)

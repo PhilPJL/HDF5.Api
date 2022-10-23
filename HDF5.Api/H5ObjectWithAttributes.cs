@@ -11,6 +11,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     {
     }
 
+    protected virtual void GuardAttributesAllowed() { }
+
     public int NumberOfAttributes => (int)H5OAdapter.GetInfo(this).num_attrs;
 
     public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
@@ -26,6 +28,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
+        GuardAttributesAllowed();
 
         return H5AAdapter.Create(this, name, type, space);
     }
@@ -33,6 +36,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public H5Attribute CreateAttribute<TA>([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
+        GuardAttributesAllowed();
 
         return H5AAdapter.Create<T, TA>(this, name);
     }
@@ -52,6 +56,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         int fixedStorageLength = 0, CharacterSet characterSet = CharacterSet.Utf8, StringPadding padding = StringPadding.NullTerminate)
     {
         Guard.IsNotNullOrWhiteSpace(name);
+        GuardAttributesAllowed();
 
         return H5AAdapter.CreateStringAttribute(this, name, fixedStorageLength, characterSet, padding);
     }
@@ -62,6 +67,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public H5Attribute OpenAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
+        GuardAttributesAllowed();
 
         return H5AAdapter.Open(this, name);
     }
@@ -69,6 +75,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public void DeleteAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
+        GuardAttributesAllowed();
 
         H5AAdapter.Delete(this, name);
     }
@@ -76,6 +83,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public bool AttributeExists([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
+        GuardAttributesAllowed();
 
         return H5AAdapter.Exists(this, name);
     }
@@ -83,6 +91,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public TA ReadAttribute<TA>([DisallowNull] string name) where TA : unmanaged
     {
         Guard.IsNotNullOrWhiteSpace(name);
+        GuardAttributesAllowed();
 
         using var attribute = H5AAdapter.Open(this, name);
         return H5AAdapter.Read<TA>(attribute);
@@ -91,6 +100,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public string ReadStringAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
+        GuardAttributesAllowed();
 
         using var attribute = H5AAdapter.Open(this, name);
         return H5AAdapter.ReadString(attribute);
@@ -99,6 +109,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public DateTime ReadDateTimeAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
+        GuardAttributesAllowed();
 
         using var attribute = H5AAdapter.Open(this, name);
         return H5AAdapter.ReadDateTime(attribute);
@@ -106,6 +117,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
 
     public void Enumerate(Action<H5Attribute> action)
     {
+        GuardAttributesAllowed();
+
         foreach (var name in AttributeNames)
         {
             using var h5Object = OpenAttribute(name);
@@ -116,6 +129,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public void CreateAndWriteAttribute<TA>( [DisallowNull] string name, TA value) where TA : unmanaged
     {
         Guard.IsNotNullOrWhiteSpace(name);
+        GuardAttributesAllowed();
 
         // Add CreateScalarAttribute
         using var type = H5Type.GetNativeType<TA>();
@@ -127,6 +141,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public void CreateAndWriteAttribute([DisallowNull] string name, DateTime value)
     {
         Guard.IsNotNullOrWhiteSpace(name);
+        GuardAttributesAllowed();
 
         CreateAndWriteAttribute(name, value.ToOADate());
     }
@@ -140,6 +155,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(value);
+        GuardAttributesAllowed();
 
         using var attribute = CreateStringAttribute(name, fixedStorageLength, characterSet, padding);
 

@@ -189,40 +189,85 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     internal static void CreateIterateAttributesSucceeds(IH5ObjectWithAttributes objectWithAttributes)
     {
         objectWithAttributes.CreateAndWriteAttribute("string", "This is a string 12345.", 50);
-        objectWithAttributes.CreateAndWriteAttribute("truncated", "This is a string 12345.", 50);
         objectWithAttributes.CreateAndWriteAttribute("dateTime", DateTime.Now);
         //objectWithAttributes.CreateAndWriteAttribute("bool", true);
+
+        objectWithAttributes.CreateAndWriteAttribute("byte-min", byte.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("byte", (byte)5);
+        objectWithAttributes.CreateAndWriteAttribute("byte-max", byte.MaxValue);
+        
+        objectWithAttributes.CreateAndWriteAttribute("int16-min", short.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("int16", (short)5);
+        objectWithAttributes.CreateAndWriteAttribute("int16-max", short.MaxValue);
+
+        objectWithAttributes.CreateAndWriteAttribute("uint16-min", ushort.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("uint16", (ushort)6);
+        objectWithAttributes.CreateAndWriteAttribute("uint16-max", ushort.MaxValue);
+
+        objectWithAttributes.CreateAndWriteAttribute("int32-min", int.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("int32", 7);
+        objectWithAttributes.CreateAndWriteAttribute("int32-max", int.MaxValue);
+
+        objectWithAttributes.CreateAndWriteAttribute("uint32-min", uint.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("uint32", 8u);
+        objectWithAttributes.CreateAndWriteAttribute("uint32-max", uint.MaxValue);
+
+        objectWithAttributes.CreateAndWriteAttribute("long-min", long.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("long", 9L);
+        objectWithAttributes.CreateAndWriteAttribute("long-max", long.MaxValue);
+        
+        objectWithAttributes.CreateAndWriteAttribute("ulong-min", ulong.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("ulong", 10ul);
+        objectWithAttributes.CreateAndWriteAttribute("ulong-max", ulong.MaxValue);
+        
+        objectWithAttributes.CreateAndWriteAttribute("float-min", float.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("float", 11.0f);
+        objectWithAttributes.CreateAndWriteAttribute("float-max", float.MaxValue);
+        
+        objectWithAttributes.CreateAndWriteAttribute("double-min", double.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("double", 12.0d);
+        objectWithAttributes.CreateAndWriteAttribute("double-max", double.MaxValue);
+
+        // TODO: decimal
 
         var names = new List<string> {
             "dateTime",
             //"bool",
+            "byte-min",
             "byte",
+            "byte-max",
             "string",
-            "truncated",
+            "int16-min",
             "int16",
+            "int16-max",
+            "uint16-min",
             "uint16",
+            "uint16-max",
+            "int32-min",
             "int32",
+            "int32-max",
+            "uint32-min",
             "uint32",
+            "uint32-max",
+            "long-min",
             "long",
+            "long-max",
+            "ulong-min",
             "ulong",
+            "ulong-max",
+            "float-min",
             "float",
-            "double"
-        };
+            "float-max",
+            "double-min",
+            "double",
+            "double-max"
+        }
+        .OrderBy(a => a)
+        .ToList();
 
-        var attributeNames = objectWithAttributes.AttributeNames;
+        var attributeNames = objectWithAttributes.AttributeNames.OrderBy(a => a).ToList();
 
-        Assert.IsTrue(!names.Except(attributeNames).Any());
-        Assert.IsTrue(!attributeNames.Except(names).Any());
-        Assert.AreEqual(names.Count, objectWithAttributes.NumberOfAttributes);
+        Assert.IsTrue(names.SequenceEqual(attributeNames));
     }
 
     internal static void CreateWriteReadDeleteAttributesSucceeds(IH5ObjectWithAttributes location)
