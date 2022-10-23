@@ -146,12 +146,6 @@ namespace HDF5.Api.NativeMethods
 #pragma warning restore CS8604 // Possible null reference argument.
             }
 
-            // Try to load it with the file name only
-            if (TryLoadDirect(fileName))
-            {
-                return true;
-            }
-
             // Look under the current AppDomain's base directory
             if (TryLoadFromDirectory(fileName, AppDomain.CurrentDomain.BaseDirectory))
             {
