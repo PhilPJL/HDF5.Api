@@ -161,7 +161,8 @@ internal static unsafe class H5AAdapter
     internal static string GetName(H5Attribute attribute)
     {
 #if NET7_0_OR_GREATER
-        return MarshalHelpers.GetName(attribute, (long attr_id, Span<byte> name, nint size) => get_name(attr_id, size, name));
+        return MarshalHelpers.GetName(attribute, 
+            (long attr_id, Span<byte> name, nint size) => get_name(attr_id, size, name));
 #else
         return MarshalHelpers.GetName(attribute,
             (long attr_id, byte* name, nint size) => get_name(attr_id, size, name));
@@ -231,13 +232,13 @@ internal static unsafe class H5AAdapter
                 d.UpperLimit >
                 1)) // NOTE: dims.Count could be > 0 with count == 1 where we have an array of [1]..[1] with one element
         {
-            throw new Hdf5Exception("Attribute is not scalar.");
+            throw new H5Exception("Attribute is not scalar.");
         }
 
         var cls = type.GetClass();
         if (cls != DataTypeClass.String)
         {
-            throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
+            throw new H5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
         }
 
         if (type.IsVariableLengthString())
@@ -283,7 +284,7 @@ internal static unsafe class H5AAdapter
                             }
                             else
                             {
-                                throw new Hdf5Exception(
+                                throw new H5Exception(
                                     $"Unable to locate end of string within first {H5Global.MaxVariableLengthStringBuffer} bytes." +
                                     " If required increase the value in {nameof(H5Global)}.{nameof(H5Global.MaxVariableLengthStringBuffer)}).");
                             }
@@ -338,9 +339,22 @@ internal static unsafe class H5AAdapter
         }
     }
 
-    internal static T Read<T>(H5Attribute attribute) where T : unmanaged
+    internal static bool ReadBool(H5Attribute attribute)
+    {
+        using var type = H5Type.GetNativeType<bool>();
+
+        // hack to try to get bool working - failed
+        return Read<byte>(attribute, type, false) != default;
+    }
+
+    internal static T Read<T>(H5Attribute attribute) where T : unmanaged, IEquatable<T>
     {
         using var type = attribute.GetH5Type();
+        return Read<T>(attribute, type);
+    }
+
+    internal static T Read<T>(H5Attribute attribute, H5Type type, bool checkClass = true) where T : unmanaged, IEquatable<T>
+    {
         using var space = attribute.GetSpace();
 
         long count = space.GetSimpleExtentNPoints();
@@ -351,17 +365,17 @@ internal static unsafe class H5AAdapter
 
         if (count != 1 || dims.Count != 0)
         {
-            throw new Hdf5Exception("Attribute is not scalar.");
+            throw new H5Exception("Attribute is not scalar.");
         }
 
-        var cls = type.GetClass();
+        var cls = type.GetClass(); 
 
         using var nativeType = H5Type.GetNativeType<T>();
         var expectedCls = H5TAdapter.GetClass(nativeType);
 
-        if (cls != expectedCls)
+        if (checkClass && cls != expectedCls)
         {
-            throw new Hdf5Exception($"Attribute is of class {cls} when expecting {expectedCls}.");
+            throw new H5Exception($"Attribute is of class {cls} when expecting {expectedCls}.");
         }
 
         int attributeStorageSize = attribute.StorageSize;
@@ -388,11 +402,7 @@ internal static unsafe class H5AAdapter
         int attributeStorageSize = attribute.StorageSize;
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
-        // No need to pin 
-        void* p = &value;
-        {
-            Write(attribute, type, new IntPtr(p));
-        }
+        Write(attribute, type, new IntPtr(&value));     
     }
 
     internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
@@ -402,7 +412,7 @@ internal static unsafe class H5AAdapter
         err.ThrowIfError();
     }
 
-    internal static void WriteString(H5Attribute attribute, string value)
+    internal static void Write(H5Attribute attribute, string value)
     {
         // TODO: handle array of strings
 
@@ -414,13 +424,13 @@ internal static unsafe class H5AAdapter
 
         if (count != 1 || dims.Count != 0)
         {
-            throw new Hdf5Exception("Attribute is not scalar.");
+            throw new H5Exception("Attribute is not scalar.");
         }
 
         var cls = type.GetClass();
         if (cls != DataTypeClass.String)
         {
-            throw new Hdf5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
+            throw new H5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
         }
 
         var characterSet = type.CharacterSet;

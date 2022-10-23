@@ -726,6 +726,23 @@ internal static unsafe partial class H5T
     /// <param name="value">Pointer to the value of the new member.</param>
     /// <returns>Returns a non-negative value if successful; otherwise
     /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tenum_insert",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t enum_insert
+        (hid_t dtype_id, byte* name, IntPtr value);
+
+    /// <summary>
+    /// Inserts a new enumeration datatype member.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-EnumInsert
+    /// </summary>
+    /// <param name="dtype_id">Datatype identifier for the enumeration
+    /// datatype.</param>
+    /// <param name="name">Name of the new member.</param>
+    /// <param name="value">Pointer to the value of the new member.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
     /// <remarks>ASCII strings ONLY!</remarks>
     [DllImport(Constants.DLLFileName, EntryPoint = "H5Tenum_insert",
         CallingConvention = CallingConvention.Cdecl,
@@ -755,6 +772,25 @@ internal static unsafe partial class H5T
         (hid_t dtype_id, IntPtr value, [In][Out] StringBuilder name, size_t size);
 
     /// <summary>
+    /// Returns the symbol name corresponding to a specified member of an
+    /// enumeration datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-EnumNameOf
+    /// </summary>
+    /// <param name="dtype_id">Enumeration datatype identifier.</param>
+    /// <param name="value">Value of the enumeration datatype.</param>
+    /// <param name="name">Buffer for output of the symbol name.</param>
+    /// <param name="size">The capacity of the buffer, in bytes
+    /// (characters).</param>
+    /// <returns>Returns a non-negative value if successful. Otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tenum_nameof",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t enum_nameof
+        (hid_t dtype_id, IntPtr value, byte* name, size_t size);
+
+    /// <summary>
     /// Returns the value corresponding to a specified member of an
     /// enumeration datatype.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-EnumValueOf
@@ -772,6 +808,24 @@ internal static unsafe partial class H5T
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t enum_valueof
         (hid_t dtype_id, string name, IntPtr value);
+
+    /// <summary>
+    /// Returns the value corresponding to a specified member of an
+    /// enumeration datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-EnumValueOf
+    /// </summary>
+    /// <param name="dtype_id">Enumeration datatype identifier.</param>
+    /// <param name="name">Symbol name of the enumeration datatype.</param>
+    /// <param name="value">Buffer for output of the value of the
+    /// enumeration datatype.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tenum_valueof",
+        CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Ansi),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t enum_valueof
+        (hid_t dtype_id, byte* name, IntPtr value);
 
     /// <summary>
     /// Determines whether two datatype identifiers refer to the same

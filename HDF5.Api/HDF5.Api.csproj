@@ -14,7 +14,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>HDF5.Api</Title>
-    <Version>0.1.36-alpha</Version>
+    <Version>0.1.1.39-alpha</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
@@ -39,4 +39,7 @@
     <Content Include="runtimes\win-x86\native\*" CopyToOutputDirectory="Always" Pack="true" PackagePath="runtimes\win-x86\native" />
   </ItemGroup>
 
+  <Target Name="PostPackNugetDeploy" AfterTargets="Pack" Condition="'$(Configuration)'=='Debug'">
+    <Exec Command="dotnet nuget push $(OutputPath)$(PackageId).$(PackageVersion).nupkg -s local"/>
+  </Target>
 </Project>

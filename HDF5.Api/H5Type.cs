@@ -13,14 +13,6 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 
     private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
 
-    protected override void GuardAreAttributesAllowed()
-    {
-        if(!Committed)
-        {
-            throw new Hdf5Exception($"An instance of {nameof(H5Type)} must be commited before using the attributes API.");
-        }
-    }
-
     #region Equality and hashcode
 
     public bool IsEqualTo([AllowNull] H5Type? other)
@@ -92,11 +84,6 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         return this;
     }
 
-    public bool IsVariableLengthString()
-    {
-        return H5TAdapter.IsVariableLengthString(this);
-    }
-
     public static H5Type CreateDoubleArrayType(int size)
     {
         return H5TAdapter.CreateDoubleArrayType(size);
@@ -141,21 +128,9 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         return H5TAdapter.CreateVariableLengthByteArrayType();
     }
 
-    public static H5Type CreateFixedLengthStringType(int length)
+    public static H5EnumType<T> CreateEnumType<T>() where T : unmanaged, Enum
     {
-        return H5TAdapter.CreateFixedLengthStringType(length);
-    }
-
-    internal CharacterSet CharacterSet
-    {
-        get => H5TAdapter.GetCharacterSet(this);
-        set => H5TAdapter.SetCharacterSet(this, value);
-    }
-
-    internal StringPadding StringPadding
-    {
-        get => H5TAdapter.GetPadding(this);
-        set => H5TAdapter.SetPadding(this, value);
+        return H5TAdapter.CreateEnumType<T>();
     }
 
     public int Size
@@ -179,4 +154,21 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     }
 
     public string Name => H5IAdapter.GetName(this);
+
+    public bool IsVariableLengthString()
+    {
+        return H5TAdapter.IsVariableLengthString(this);
+    }
+
+    internal CharacterSet CharacterSet
+    {
+        get => H5TAdapter.GetCharacterSet(this);
+        set => H5TAdapter.SetCharacterSet(this, value);
+    }
+
+    internal StringPadding StringPadding
+    {
+        get => H5TAdapter.GetPadding(this);
+        set => H5TAdapter.SetPadding(this, value);
+    }
 }

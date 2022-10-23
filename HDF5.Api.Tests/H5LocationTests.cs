@@ -91,7 +91,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         Assert.IsTrue(location.GroupExists(grp1Name));
 
         // Try to open
-        Assert.ThrowsException<Hdf5Exception>(() => location.OpenGroup("grp2"));
+        Assert.ThrowsException<H5Exception>(() => location.OpenGroup("grp2"));
     }
 
     protected static void CreateGroupEmptyNameFails<T>(H5Location<T> location) where T : H5Object<T>
@@ -103,7 +103,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
     protected static void CreateDuplicateGroupFails<T>(H5Location<T> location) where T : H5Object<T>
     {
         using var group = location.CreateGroup("test");
-        Assert.ThrowsException<Hdf5Exception>(() => location.CreateGroup("test"));
+        Assert.ThrowsException<H5Exception>(() => location.CreateGroup("test"));
     }
 
     protected static void GroupExistsReturnsTrueForGroup<T>(H5Location<T> location) where T : H5Object<T>
@@ -124,8 +124,8 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
 
         Assert.IsTrue(location.GroupExists("subgroup"));
 
-        Assert.ThrowsException<Hdf5Exception>(() => location.GroupExists("test/subgroup"));
-        Assert.ThrowsException<Hdf5Exception>(() => location.GroupExists("/test"));
+        Assert.ThrowsException<H5Exception>(() => location.GroupExists("test/subgroup"));
+        Assert.ThrowsException<H5Exception>(() => location.GroupExists("/test"));
     }
 
     protected static void GroupPathExistsSucceeds<T>(H5Location<T> location) where T : H5Object<T>

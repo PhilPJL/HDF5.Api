@@ -109,25 +109,25 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             // Create duplicate attribute on file
             file.CreateAndWriteAttribute(attributeName, 1);
-            Assert.ThrowsException<Hdf5Exception>(() => file.CreateAndWriteAttribute(attributeName, 2));
+            Assert.ThrowsException<H5Exception>(() => file.CreateAndWriteAttribute(attributeName, 2));
 
             // Create duplicate attribute on group
             group.CreateAndWriteAttribute(attributeName, 1);
-            Assert.ThrowsException<Hdf5Exception>(() => group.CreateAndWriteAttribute(attributeName, 2));
+            Assert.ThrowsException<H5Exception>(() => group.CreateAndWriteAttribute(attributeName, 2));
 
             // Create test dataset on file
             using var datasetFile = H5DataSetTests.CreateTestDataset(file, "aDataSet");
 
             // Create duplicate attribute on data set on file
             datasetFile.CreateAndWriteAttribute(attributeName, 1);
-            Assert.ThrowsException<Hdf5Exception>(() => datasetFile.CreateAndWriteAttribute(attributeName, 2));
+            Assert.ThrowsException<H5Exception>(() => datasetFile.CreateAndWriteAttribute(attributeName, 2));
 
             // Create test dataset on group
             using var datasetGroup = H5DataSetTests.CreateTestDataset(group, "aDataSet");
 
             // Create duplicate attribute on data set on group
             datasetGroup.CreateAndWriteAttribute(attributeName, 1);
-            Assert.ThrowsException<Hdf5Exception>(() => datasetGroup.CreateAndWriteAttribute(attributeName, 2));
+            Assert.ThrowsException<H5Exception>(() => datasetGroup.CreateAndWriteAttribute(attributeName, 2));
 
             // File + Group + 2 x DataSet
             Assert.AreEqual(4, file.GetObjectCount());
@@ -180,8 +180,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             int i1 = group.ReadAttribute<int>("int");
             Assert.AreEqual(1, i1);
 
-            Assert.ThrowsException<Hdf5Exception>(() => group.ReadStringAttribute("int"));
-            Assert.ThrowsException<Hdf5Exception>(() => group.ReadAttribute<int>("string"));
+            Assert.ThrowsException<H5Exception>(() => group.ReadStringAttribute("int"));
+            Assert.ThrowsException<H5Exception>(() => group.ReadAttribute<int>("string"));
         });
     }
 
@@ -190,7 +190,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     {
         objectWithAttributes.CreateAndWriteAttribute("string", "This is a string 12345.", 50);
         objectWithAttributes.CreateAndWriteAttribute("dateTime", DateTime.Now);
-        //objectWithAttributes.CreateAndWriteAttribute("bool", true);
+        objectWithAttributes.CreateAndWriteAttribute("bool-true", true);
+        objectWithAttributes.CreateAndWriteAttribute("bool-false", false);
 
         objectWithAttributes.CreateAndWriteAttribute("byte-min", byte.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("byte", (byte)5);
@@ -232,7 +233,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
         var names = new List<string> {
             "dateTime",
-            //"bool",
+            "bool-true",
+            "bool-false",
             "byte-min",
             "byte",
             "byte-max",
@@ -276,7 +278,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteAttribute((short)15, (short)99);
         CreateWriteReadUpdateDeleteAttribute((ushort)15, (ushort)77);
         CreateWriteReadUpdateDeleteAttribute((byte)15, (byte)0xff);
-        //CreateWriteReadUpdateDeleteAttribute(true, false);
+        //CreateWriteReadUpdateDeleteBoolAttribute(true, false);
         CreateWriteReadUpdateDeleteAttribute(15, 1234);
         CreateWriteReadUpdateDeleteAttribute(15u, 4567u);
         CreateWriteReadUpdateDeleteAttribute(15L, long.MaxValue);
@@ -340,7 +342,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.IsFalse(location.AttributeExists(name));
         }
 
-        void CreateWriteReadUpdateDeleteAttribute<T>(T value, T newValue) where T : unmanaged
+        void CreateWriteReadUpdateDeleteAttribute<T>(T value, T newValue) where T : unmanaged, IEquatable<T>
         {
             string name = $"dt{typeof(T).Name}";
 
@@ -356,6 +358,28 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             a.Write(newValue);
             var readValue3 = location.ReadAttribute<T>(name);
+            Assert.AreEqual(newValue, readValue3);
+
+            location.DeleteAttribute(name);
+            Assert.IsFalse(location.AttributeExists(name));
+        }
+
+        void CreateWriteReadUpdateDeleteBoolAttribute(bool value, bool newValue)
+        {
+            string name = $"dt{typeof(bool).Name}";
+
+            location.CreateAndWriteAttribute(name, value);
+            Assert.IsTrue(location.AttributeExists(name));
+
+            var readValue = location.ReadBoolAttribute(name);
+            Assert.AreEqual(value, readValue);
+
+            using var a = location.OpenAttribute(name);
+            var readValue2 = location.ReadBoolAttribute(name);
+            Assert.AreEqual(value, readValue2);
+
+            a.Write(newValue);
+            var readValue3 = location.ReadBoolAttribute(name);
             Assert.AreEqual(newValue, readValue3);
 
             location.DeleteAttribute(name);
@@ -400,7 +424,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             {
                 using var attribute2 = file.CreateStringAttribute("duplicate", 100);
             }
-            catch (Hdf5Exception ex)
+            catch (H5Exception ex)
             {
                 Assert.IsNull(ex.InnerException);
 
@@ -409,7 +433,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 Debug.WriteLine(msg);
                 Debug.WriteLine(toString);
 
-                Assert.AreEqual("0:unable to create attribute/1:attribute already exists", msg);
+                Assert.AreEqual("attribute already exists→unable to create attribute", msg);
             }
         });
     }

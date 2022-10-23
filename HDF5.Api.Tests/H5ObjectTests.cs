@@ -11,12 +11,12 @@
                 using var file = CreateFile();
 
                 file.AssertHasHandleType(HandleType.File);
-                Assert.ThrowsException<Hdf5Exception>(() => file.AssertHasHandleType(HandleType.Group));
-                Assert.ThrowsException<Hdf5Exception>(() => file.AssertHasHandleType(HandleType.Attribute));
-                Assert.ThrowsException<Hdf5Exception>(() => file.AssertHasHandleType(HandleType.DataSet));
-                Assert.ThrowsException<Hdf5Exception>(() => file.AssertHasHandleType(HandleType.PropertyList));
-                Assert.ThrowsException<Hdf5Exception>(() => file.AssertHasHandleType(HandleType.Type));
-                Assert.ThrowsException<Hdf5Exception>(() => file.AssertHasHandleType(HandleType.Space));
+                Assert.ThrowsException<H5Exception>(() => file.AssertHasHandleType(HandleType.Group));
+                Assert.ThrowsException<H5Exception>(() => file.AssertHasHandleType(HandleType.Attribute));
+                Assert.ThrowsException<H5Exception>(() => file.AssertHasHandleType(HandleType.DataSet));
+                Assert.ThrowsException<H5Exception>(() => file.AssertHasHandleType(HandleType.PropertyList));
+                Assert.ThrowsException<H5Exception>(() => file.AssertHasHandleType(HandleType.Type));
+                Assert.ThrowsException<H5Exception>(() => file.AssertHasHandleType(HandleType.Space));
 
                 // Create group
                 using var group = file.CreateGroup("group");

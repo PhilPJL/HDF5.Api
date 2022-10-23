@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-
+﻿
 namespace HDF5.Api.Attributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
@@ -15,6 +14,15 @@ namespace HDF5.Api.Attributes
         public int AllocatedStorageInBytes { get; set; }
     }
 
+    // TODO: is it useful allowing enum members to be renamed?
+/*    [AttributeUsage(AttributeTargets.Enum)]
+    public sealed class H5EnumMemberAttribute : Attribute
+    {
+        public H5EnumMemberAttribute() { Name = string.Empty; }
+
+        public string Name { get; set; }
+    }
+*/
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Interface,
             AllowMultiple = false, Inherited = false)]
     public sealed class H5ContractAttribute : Attribute

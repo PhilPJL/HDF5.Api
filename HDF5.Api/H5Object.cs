@@ -85,7 +85,7 @@ public class H5Object<T> : Disposable where T : H5Object<T>
             if ((long)t == type) { return; }
         }
 
-        throw new Hdf5Exception($"Handle type '{(HandleType)type}' is not valid.  Expecting one of: {string.Join(", ", types.OrderBy(s => s))}.");
+        throw new H5Exception($"Handle type '{(HandleType)type}' is not valid.  Expecting one of: {string.Join(", ", types.OrderBy(s => s))}.");
     }
 
     internal void AssertHasHandleType(params HandleType[] types)

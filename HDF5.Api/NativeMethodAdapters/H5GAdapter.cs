@@ -81,7 +81,7 @@ internal static unsafe class H5GAdapter
 
         if (!IsSimpleName(name))
         {
-            throw new Hdf5Exception($"Only simple group names are allowed, not '{name}'.");
+            throw new H5Exception($"Only simple group names are allowed, not '{name}'.");
         }
 
         // H5L.exists can only check for a direct child of locationId

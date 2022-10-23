@@ -34,7 +34,7 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AAdapter.ReadString(this);
     }
 
-    public T Read<T>() where T : unmanaged
+    public T Read<T>() where T : unmanaged, IEquatable<T>
     {
         return H5AAdapter.Read<T>(this);
     }
@@ -48,7 +48,7 @@ public class H5Attribute : H5Object<H5Attribute>
     {
         Guard.IsNotNull(value);
 
-        H5AAdapter.WriteString(this, value);
+        H5AAdapter.Write(this, value);
     }
 
     public void Write<T>(T value) where T : unmanaged

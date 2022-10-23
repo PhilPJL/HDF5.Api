@@ -110,6 +110,72 @@ internal static partial class H5T
     public static partial hid_t create(class_t cls, size_t size);
 
     /// <summary>
+    /// Creates a new enumeration datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-EnumCreate
+    /// </summary>
+    /// <param name="dtype_id">Datatype identifier for the base datatype. 
+    /// Must be an integer datatype.</param>
+    /// <returns>Returns the datatype identifier for the new enumeration
+    /// datatype if successful; otherwise returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tenum_create"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial hid_t enum_create(hid_t dtype_id);
+
+    /// <summary>
+    /// Inserts a new enumeration datatype member.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-EnumInsert
+    /// </summary>
+    /// <param name="dtype_id">Datatype identifier for the enumeration
+    /// datatype.</param>
+    /// <param name="name">Name of the new member.</param>
+    /// <param name="value">Pointer to the value of the new member.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tenum_insert", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t enum_insert
+        (hid_t dtype_id, string name, IntPtr value);
+
+    /// <summary>
+    /// Returns the symbol name corresponding to a specified member of an
+    /// enumeration datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-EnumNameOf
+    /// </summary>
+    /// <param name="dtype_id">Enumeration datatype identifier.</param>
+    /// <param name="value">Value of the enumeration datatype.</param>
+    /// <param name="name">Buffer for output of the symbol name.</param>
+    /// <param name="size">The capacity of the buffer, in bytes
+    /// (characters).</param>
+    /// <returns>Returns a non-negative value if successful. Otherwise
+    /// returns a negative value.</returns>
+    /// <remarks>ASCII strings ONLY!</remarks>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tenum_nameof"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t enum_nameof
+        (hid_t dtype_id, IntPtr value, Span<byte> name, size_t size);
+
+    /// <summary>
+    /// Returns the value corresponding to a specified member of an
+    /// enumeration datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-EnumValueOf
+    /// </summary>
+    /// <param name="dtype_id">Enumeration datatype identifier.</param>
+    /// <param name="name">Symbol name of the enumeration datatype.</param>
+    /// <param name="value">Buffer for output of the value of the
+    /// enumeration datatype.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    /// <remarks>ASCII strings ONLY!</remarks>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tenum_valueof", StringMarshalling = StringMarshalling.Custom, StringMarshallingCustomType = typeof(Utf8StringMarshaller)),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t enum_valueof
+        (hid_t dtype_id, string name, IntPtr value);
+
+    /// <summary>
     /// Determines whether two datatype identifiers refer to the same
     /// datatype.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Equal

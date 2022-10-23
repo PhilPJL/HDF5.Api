@@ -1,6 +1,10 @@
 ﻿using CommunityToolkit.Diagnostics;
+#if NET7_0_OR_GREATER
+using CommunityToolkit.HighPerformance.Buffers;
+#endif
 using HDF5.Api.NativeMethods;
 using System.Linq;
+using System.Reflection;
 using static HDF5.Api.NativeMethods.H5T;
 
 namespace HDF5.Api.NativeMethodAdapters;
@@ -99,31 +103,96 @@ internal static unsafe class H5TAdapter
         return new H5Type(h);
     }
 
-    internal static H5Type CreateFixedLengthStringType(int storageLengthBytes)
+    internal static H5StringType CreateFixedLengthStringType(int storageLengthBytes)
     {
         long h = copy(C_S1);
         h.ThrowIfInvalidHandleValue();
         int err = set_size(h, new IntPtr(storageLengthBytes));
         err.ThrowIfError();
-        return new H5Type(h);
+        return new H5StringType(h);
     }
 
-    internal static H5Type CreateVariableLengthStringType()
+    internal static H5StringType CreateVariableLengthStringType()
     {
         long h = create(class_t.STRING, VARIABLE);
-        return new H5Type(h);
+        h.ThrowIfInvalidHandleValue();
+        return new H5StringType(h);
     }
 
-    internal static void Insert(H5Type typeId, string name, ssize_t offset, long nativeTypeId)
+    internal static void InsertEnumMember<T>(H5Type type, string name, T value)
+        where T : unmanaged, Enum
     {
         int err;
 
 #if NET7_0_OR_GREATER
-        err = insert(typeId, name, offset, nativeTypeId);
+        err = enum_insert(type, name, new IntPtr(&value));
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = insert(typeId, nameBytesPtr, offset, nativeTypeId);
+            err = enum_insert(type, nameBytesPtr, new IntPtr(&value));
+        }
+#endif
+
+        err.ThrowIfError();
+    }
+
+    internal static string NameOfEnumMember<T>(H5Type type, T value)
+        where T : unmanaged, Enum
+    {
+        const int length = 512;
+
+#if NET7_0_OR_GREATER
+        using var bufferOwner = SpanOwner<byte>.Allocate(length);
+        var buffer = bufferOwner.Span;
+        int err = enum_nameof(type, new nint(&value), buffer, length);
+        err.ThrowIfError();
+        int nullTerminatorIndex = MemoryExtensions.IndexOf(buffer, (byte)0);
+        nullTerminatorIndex = nullTerminatorIndex < 0 ? length : nullTerminatorIndex;
+        return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
+#else
+        var buffer = new byte[length];
+        fixed (byte* bufferPtr = buffer)
+        {
+            int err = enum_nameof(type, new IntPtr(&value), bufferPtr, new IntPtr(length));
+            err.ThrowIfError();
+            Span<byte> bytes = buffer;
+            var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
+            nullTerminatorIndex = nullTerminatorIndex < 0 ? length : nullTerminatorIndex;
+            return Encoding.UTF8.GetString(bufferPtr, nullTerminatorIndex);
+        }
+#endif
+    }
+
+    internal static T ValueOfEnumMember<T>(H5Type type, string name)
+        where T : unmanaged, Enum
+    {
+        T value = default;
+
+        int retval;
+
+#if NET7_0_OR_GREATER
+        retval = enum_valueof(type, name, new nint(&value));
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            retval = enum_valueof(type, nameBytesPtr, new IntPtr(&value));
+        }
+#endif
+        retval.ThrowIfError();
+
+        return value;
+    }
+
+    internal static void Insert(H5Type type, string name, ssize_t offset, long nativeTypeId)
+    {
+        int err;
+
+#if NET7_0_OR_GREATER
+        err = insert(type, name, offset, nativeTypeId);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            err = insert(type, nameBytesPtr, offset, nativeTypeId);
         }
 #endif
 
@@ -140,6 +209,57 @@ internal static unsafe class H5TAdapter
         int err = is_variable_str(typeId);
         err.ThrowIfError();
         return err > 0;
+    }
+
+    internal static H5EnumType<T> CreateEnumType<T>() where T : unmanaged, Enum
+    {
+        var h5EnumType = CreateBaseEnumType<T>();
+
+        try
+        {
+            foreach (var enumInfo in typeof(T)
+                .GetMembers(BindingFlags.Public | BindingFlags.Static)
+                .Select(m => new
+                {
+                    m.Name,
+#if NET7_0_OR_GREATER
+                    Value = Enum.Parse<T>(m.Name)
+#else
+                    Value = (T)Enum.Parse(typeof(T), m.Name)
+#endif
+                }))
+            {
+                InsertEnumMember(h5EnumType, enumInfo.Name, enumInfo.Value);
+            }
+        }
+        catch
+        {
+            h5EnumType.Dispose();
+            throw;
+        }
+
+        return h5EnumType;
+    }
+
+    internal static H5EnumType<T> CreateBaseEnumType<T>() where T : unmanaged, Enum
+    {
+        var underlyingType = Enum.GetUnderlyingType(typeof(T)).Name;
+
+        long baseType = underlyingType switch
+        {
+            "Int64" => NATIVE_INT64,
+            "UInt64" => NATIVE_UINT64,
+            "Int32" => NATIVE_INT32,
+            "UInt32" => NATIVE_UINT32,
+            "Int16" => NATIVE_INT16,
+            "UInt16" => NATIVE_UINT16,
+            "Byte" => NATIVE_UINT8,
+            _ => throw new ArgumentException($"Unable to create Enum for underlying type '{underlyingType}'."),
+        };
+
+        long h = enum_create(baseType);
+        h.ThrowIfInvalidHandleValue();
+        return new H5EnumType<T>(h);
     }
 
     internal static long GetNativeType<T>() where T : unmanaged
@@ -168,7 +288,7 @@ internal static unsafe class H5TAdapter
 
             // add more mappings as required
 
-            _ => throw new Hdf5Exception($"No mapping defined from {typeof(T).Name} to native type.")
+            _ => throw new H5Exception($"No mapping defined from {typeof(T).Name} to native type.")
         };
     }
 

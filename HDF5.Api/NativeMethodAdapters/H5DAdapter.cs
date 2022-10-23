@@ -62,14 +62,14 @@ internal static unsafe class H5DAdapter
 
         if (cls != DataTypeClass.Compound)
         {
-            throw new Hdf5Exception($"DataSet is of class {cls} when expecting {DataTypeClass.Compound}.");
+            throw new H5Exception($"DataSet is of class {cls} when expecting {DataTypeClass.Compound}.");
         }
 
         long size = (long)GetStorageSize(dataSet);
 
         if (size != count * Marshal.SizeOf<T>())
         {
-            throw new Hdf5Exception(
+            throw new H5Exception(
                 $"Attribute storage size is {size}, which does not match the expected size for {count} items of type {typeof(T).Name} of {count * Marshal.SizeOf<T>()}.");
         }
 

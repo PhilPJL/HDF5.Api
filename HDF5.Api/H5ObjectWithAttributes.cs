@@ -11,20 +11,9 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     {
     }
 
-    // H5Type is different, it only supports attributes once committed.
-    protected virtual void GuardAreAttributesAllowed() { }
-
     public int NumberOfAttributes => (int)H5OAdapter.GetInfo(this).num_attrs;
 
-    public IEnumerable<string> AttributeNames
-    {
-        get
-        {
-            GuardAreAttributesAllowed();
-
-            return H5AAdapter.GetAttributeNames(this);
-        }
-    }
+    public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
 
     /// <summary>
     ///     Create an Attribute for this location
@@ -37,7 +26,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
-        GuardAreAttributesAllowed();
 
         return H5AAdapter.Create(this, name, type, space);
     }
@@ -45,7 +33,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public H5Attribute CreateAttribute<TA>([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
-        GuardAreAttributesAllowed();
 
         return H5AAdapter.Create<T, TA>(this, name);
     }
@@ -65,7 +52,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         int fixedStorageLength = 0, CharacterSet characterSet = CharacterSet.Utf8, StringPadding padding = StringPadding.NullTerminate)
     {
         Guard.IsNotNullOrWhiteSpace(name);
-        GuardAreAttributesAllowed();
 
         return H5AAdapter.CreateStringAttribute(this, name, fixedStorageLength, characterSet, padding);
     }
@@ -76,7 +62,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public H5Attribute OpenAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
-        GuardAreAttributesAllowed();
 
         return H5AAdapter.Open(this, name);
     }
@@ -84,7 +69,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public void DeleteAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
-        GuardAreAttributesAllowed();
 
         H5AAdapter.Delete(this, name);
     }
@@ -92,15 +76,13 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public bool AttributeExists([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
-        GuardAreAttributesAllowed();
 
         return H5AAdapter.Exists(this, name);
     }
 
-    public TA ReadAttribute<TA>([DisallowNull] string name) where TA : unmanaged
+    public TA ReadAttribute<TA>([DisallowNull] string name) where TA : unmanaged, IEquatable<TA>
     {
         Guard.IsNotNullOrWhiteSpace(name);
-        GuardAreAttributesAllowed();
 
         using var attribute = H5AAdapter.Open(this, name);
         return H5AAdapter.Read<TA>(attribute);
@@ -109,16 +91,22 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public string ReadStringAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
-        GuardAreAttributesAllowed();
 
         using var attribute = H5AAdapter.Open(this, name);
         return H5AAdapter.ReadString(attribute);
     }
 
+    public bool ReadBoolAttribute([DisallowNull] string name)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        using var attribute = H5AAdapter.Open(this, name);
+        return H5AAdapter.ReadBool(attribute);
+    }
+
     public DateTime ReadDateTimeAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
-        GuardAreAttributesAllowed();
 
         using var attribute = H5AAdapter.Open(this, name);
         return H5AAdapter.ReadDateTime(attribute);
@@ -126,8 +114,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
 
     public void Enumerate(Action<H5Attribute> action)
     {
-        GuardAreAttributesAllowed();
-
         foreach (var name in AttributeNames)
         {
             using var h5Object = OpenAttribute(name);
@@ -135,13 +121,27 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         }
     }
 
-    public void CreateAndWriteAttribute<TA>([DisallowNull] string name, TA value) where TA : unmanaged
+    public void CreateAndWriteAttribute<TA>([DisallowNull] string name, TA value) 
+        where TA : unmanaged, IEquatable<TA>
     {
         Guard.IsNotNullOrWhiteSpace(name);
-        GuardAreAttributesAllowed();
 
-        // Add CreateScalarAttribute
         using var type = H5Type.GetNativeType<TA>();
+
+        if (typeof(TA) == typeof(bool))
+        {
+            CreateAndWriteAttribute(type, name, (byte)(value.Equals(default) ? 1 : 0));
+        }
+        else
+        {
+            CreateAndWriteAttribute(type, name, value);
+        }
+    }
+
+    private void CreateAndWriteAttribute<TA>(H5Type type, [DisallowNull] string name, TA value) where TA : unmanaged
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
         using var memorySpace = H5Space.CreateScalar();
         using var attribute = CreateAttribute(name, type, memorySpace);
         H5AAdapter.Write(attribute, type, value);
@@ -150,7 +150,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public void CreateAndWriteAttribute([DisallowNull] string name, DateTime value)
     {
         Guard.IsNotNullOrWhiteSpace(name);
-        GuardAreAttributesAllowed();
 
         CreateAndWriteAttribute(name, value.ToOADate());
     }
@@ -164,10 +163,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(value);
-        GuardAreAttributesAllowed();
 
         using var attribute = CreateStringAttribute(name, fixedStorageLength, characterSet, padding);
-
-        H5AAdapter.WriteString(attribute, value);
+        attribute.Write(value);
     }
 }

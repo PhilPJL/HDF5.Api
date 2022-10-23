@@ -4,9 +4,9 @@ using System.Linq;
 namespace HDF5.Api;
 
 [Serializable]
-public sealed class Hdf5Exception : Exception
+public sealed class H5Exception : Exception
 {
-    public Hdf5Exception(string message) : base(message)
+    public H5Exception(string message) : base(message)
     {
         H5Errors = H5Error.WalkStack();
     }
@@ -17,7 +17,9 @@ public sealed class Hdf5Exception : Exception
         {
             if (H5Errors.Count > 0)
             {
-                return string.Join("/", H5Errors.Select(e => $"{e.Number}:{e.Description}"));
+                return string.Join("→", H5Errors
+                    .OrderByDescending(e => e.Number)
+                    .Select(e => e.Description));
             }
 
             return base.Message;

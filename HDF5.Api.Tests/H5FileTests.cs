@@ -40,7 +40,7 @@ public class H5FileTests : H5LocationTests<H5FileTests>
             using (CreateFile()) { }
 
             // Create and throw if exists
-            Assert.ThrowsException<Hdf5Exception>(() => CreateFile(failIfExists: true));
+            Assert.ThrowsException<H5Exception>(() => CreateFile(failIfExists: true));
         });
     }
 
@@ -53,7 +53,7 @@ public class H5FileTests : H5LocationTests<H5FileTests>
             using (CreateFile()) // leave file open - don't dispose until after second open attempt
             {
                 // Try to create new file and overwrite existing
-                Assert.ThrowsException<Hdf5Exception>(() => CreateFile());
+                Assert.ThrowsException<H5Exception>(() => CreateFile());
             }
         });
     }
@@ -127,7 +127,7 @@ public class H5FileTests : H5LocationTests<H5FileTests>
             Assert.IsFalse(File.Exists(path));
 
             // Try to open missing existing file read-only
-            Assert.ThrowsException<Hdf5Exception>(() => H5File.Open(path, true));
+            Assert.ThrowsException<H5Exception>(() => H5File.Open(path, true));
         });
     }
 
@@ -154,7 +154,7 @@ public class H5FileTests : H5LocationTests<H5FileTests>
             using var file = OpenFile(readOnly: true);
 
             // Try to write to file should fail (assumes CreateGroup is valid)
-            Assert.ThrowsException<Hdf5Exception>(() => file.CreateGroup("test"));
+            Assert.ThrowsException<H5Exception>(() => file.CreateGroup("test"));
         });
     }
 

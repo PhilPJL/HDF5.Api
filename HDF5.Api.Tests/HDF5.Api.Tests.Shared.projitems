@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)GeneralTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)H5AttributeTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)H5DataSetTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)H5EnumTypeTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)H5FileTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)H5FilterTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)H5GlobalTests.cs" />

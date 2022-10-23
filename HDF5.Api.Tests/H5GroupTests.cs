@@ -336,13 +336,13 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
 
             using var lcpl = H5Link.CreateCreationPropertyList(createIntermediateGroups: false);
 
-            Assert.ThrowsException<Hdf5Exception>(() =>
+            Assert.ThrowsException<H5Exception>(() =>
             {
                 try
                 {
                     H5GAdapter.Create(file, groupPath, lcpl, null);
                 }
-                catch(Hdf5Exception e)
+                catch(H5Exception e)
                 {
                     Debug.WriteLine(e.Message);
                     throw;

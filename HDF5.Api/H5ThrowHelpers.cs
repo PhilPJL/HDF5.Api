@@ -8,10 +8,10 @@ internal static class H5ThrowHelpers
         {
             if (string.IsNullOrWhiteSpace(methodName))
             {
-                throw new Hdf5Exception($"Bad handle [{handle}].");
+                throw new H5Exception($"Bad handle [{handle}].");
             }
 
-            throw new Hdf5Exception($"Bad handle [{handle}] in method: {methodName}.");
+            throw new H5Exception($"Bad handle [{handle}] in method: {methodName}.");
         }
     }
 
@@ -19,7 +19,7 @@ internal static class H5ThrowHelpers
     {
         if (handle <= H5Handle.DefaultHandleValue)
         {
-            throw new Hdf5Exception($"Bad handle [{handle}] when: {message}.");
+            throw new H5Exception($"Bad handle [{handle}] when: {message}.");
         }
     }
 
@@ -29,10 +29,10 @@ internal static class H5ThrowHelpers
         {
             if (string.IsNullOrWhiteSpace(methodName))
             {
-                throw new Hdf5Exception($"Error: {err}.");
+                throw new H5Exception($"Error: {err}.");
             }
 
-            throw new Hdf5Exception($"Error {err} calling: {methodName}.");
+            throw new H5Exception($"Error {err} calling: {methodName}.");
         }
     }
 
@@ -42,10 +42,10 @@ internal static class H5ThrowHelpers
         {
             if (string.IsNullOrWhiteSpace(methodName))
             {
-                throw new Hdf5Exception($"Error: {err}.");
+                throw new H5Exception($"Error: {err}.");
             }
 
-            throw new Hdf5Exception($"Error {err} calling: {methodName}.");
+            throw new H5Exception($"Error {err} calling: {methodName}.");
         }
     }
 
@@ -53,7 +53,7 @@ internal static class H5ThrowHelpers
     {
         if (marshalSize != attributeStorageSize)
         {
-            throw new Hdf5Exception(
+            throw new H5Exception(
               $"Attribute storage size is {attributeStorageSize}, which does not match the marshalable size for type {typeof(T).Name} of {marshalSize}.");
         }
     }
