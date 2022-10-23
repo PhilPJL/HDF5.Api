@@ -81,7 +81,8 @@ public abstract class H5Test<T> where T : H5Test<T>
     internal static H5File CreateOrOpenFile(
         [CallerMemberName] string? path = null,
         bool readOnly = false,
-        H5FileCreationPropertyList? fileCreationPropertyList = null)
+        H5FileCreationPropertyList? fileCreationPropertyList = null,
+        H5FileAccessPropertyList? fileAccessPropertyList = null)
     {
         Guard.IsNotNull(path);
 
@@ -92,7 +93,7 @@ public abstract class H5Test<T> where T : H5Test<T>
             fullpath,
             readOnly,
             fileCreationPropertyList,
-            null);
+            fileAccessPropertyList);
 
         Assert.IsTrue(File.Exists(fullpath));
 

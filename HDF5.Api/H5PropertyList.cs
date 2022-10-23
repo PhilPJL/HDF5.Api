@@ -180,6 +180,16 @@ internal class H5FileAccessPropertyList : H5PropertyList
     {
     }
 
+    internal void SetLibraryVersionBounds(LibraryVersion low, LibraryVersion high)
+    {
+        H5PAdapter.SetLibraryVersionBounds(this, low, high);
+    }
+
+    internal (LibraryVersion low, LibraryVersion high) GetLibraryVersionBounds()
+    {
+        return H5PAdapter.GetLibraryVersionBounds(this);
+    }
+
     // TODO: add properties and then make public
 }
 

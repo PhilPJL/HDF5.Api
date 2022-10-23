@@ -208,3 +208,23 @@ public enum CharacterSet
     Ascii = H5T.cset_t.ASCII,
     Utf8 = H5T.cset_t.UTF8
 }
+
+public enum LibraryVersion
+{
+    /// <summary>
+    /// Use the earliest possible format for storing objects
+    /// </summary>
+    Earliest = H5F.libver_t.EARLIEST,
+    /// <summary>
+    /// Use the latest v18 format for storing objects
+    /// </summary>
+    Version18 = H5F.libver_t.V18,
+    /// <summary>
+    /// Use the latest v110 format for storing objects
+    /// </summary>
+    Version110 = H5F.libver_t.V110,
+    /// <summary>
+    /// Use the latest possible format for storing objects
+    /// </summary>
+    Latest = Version110
+}

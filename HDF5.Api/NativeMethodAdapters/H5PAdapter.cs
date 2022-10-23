@@ -109,4 +109,21 @@ internal static class H5PAdapter
         cls.ThrowIfError();
         return cls;
     }
+
+    internal static void SetLibraryVersionBounds(H5PropertyList propertyList, LibraryVersion low, LibraryVersion high)
+    {
+        int retval = set_libver_bounds(propertyList, (H5F.libver_t)low, (H5F.libver_t)high);
+        retval.ThrowIfError();
+    }
+
+    internal static (LibraryVersion low, LibraryVersion high) GetLibraryVersionBounds(H5PropertyList propertyList)
+    {
+        H5F.libver_t low = default;
+        H5F.libver_t high = default;
+
+        int retval = get_libver_bounds(propertyList, ref low, ref high);
+        retval.ThrowIfError();
+
+        return ((LibraryVersion)low, (LibraryVersion)high);
+    }
 }

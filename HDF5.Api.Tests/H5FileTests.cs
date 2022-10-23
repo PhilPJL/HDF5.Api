@@ -81,6 +81,36 @@ public class H5FileTests : H5LocationTests<H5FileTests>
         });
     }
 
+    [TestMethod]
+    [DataRow(LibraryVersion.Earliest, LibraryVersion.Version18)]
+    [DataRow(LibraryVersion.Earliest, LibraryVersion.Version110)]
+    [DataRow(LibraryVersion.Version18, LibraryVersion.Version18)]
+    [DataRow(LibraryVersion.Version18, LibraryVersion.Version110)]
+    [DataRow(LibraryVersion.Version110, LibraryVersion.Version110)]
+    public void SetLibraryVersionEarliestSucceeds(LibraryVersion low, LibraryVersion high)
+    {
+        HandleCheck(() =>
+        {
+            using var acpl = H5File.CreateAccessPropertyList();
+            acpl.SetLibraryVersionBounds(low, high);
+
+            // Create new file
+            using var file = CreateOrOpenFile(fileAccessPropertyList: acpl);
+
+            using var acpl2 = file.GetAccessPropertyList();
+            var (low2, high2) = acpl2.GetLibraryVersionBounds();
+
+            Assert.AreEqual(low, low2);
+            Assert.AreEqual(high, high2);
+
+            file.SetLibraryVersionBounds(LibraryVersion.Version110, LibraryVersion.Version110);
+            
+            var (low3, high3) = file.GetLibraryVersionBounds();
+            Assert.AreEqual(LibraryVersion.Version110, low3);
+            Assert.AreEqual(LibraryVersion.Version110, high3);
+        });
+    }
+
     #endregion
 
     #region Open file tests

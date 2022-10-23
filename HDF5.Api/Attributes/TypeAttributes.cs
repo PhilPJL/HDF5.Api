@@ -3,35 +3,33 @@
 namespace HDF5.Api.Attributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class H5IncludeAttribute : Attribute
+    public sealed class H5MemberAttribute : Attribute
     {
-        public H5IncludeAttribute()
-        {
-            Title = string.Empty;
-        }
+        public H5MemberAttribute() { Name = string.Empty; }
 
-        public string Title { get; set; }
+        public string Name { get; set; }
+
+        // For strings only
+        public CharacterSet? CharacterSet { get; set; }
+        public StringPadding? StringPadding { get; set; }
+        public int AllocatedStorageInBytes { get; set; }
+    }
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Interface,
+            AllowMultiple = false, Inherited = false)]
+    public sealed class H5ContractAttribute : Attribute
+    {
+        public H5ContractAttribute() { Name = string.Empty; }
+
+        public string Name { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class H5IgnoreAttribute : Attribute
-    {}
+    public class H5IgnoreAttribute : Attribute { }
 
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class H5StringAttribute : H5IncludeAttribute
-    {
-        public H5StringAttribute()
-        {
-            CharacterSet = CharacterSet.Utf8;
-            StringPadding = StringPadding.NullTerminate;
-        }
 
-        public CharacterSet CharacterSet { get; set; }
-        public StringPadding StringPadding { get; set; }
-        public int AllocatedStorageInBytes { get; }
-    }
-
-    public class H5Dimensions : H5IncludeAttribute
+/*    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+    public class H5Dimensions : Attribute
     {
         public H5Dimensions(params long[] dimensions)
         {
@@ -44,5 +42,5 @@ namespace HDF5.Api.Attributes
         }
 
         public IEnumerable<Dimension> Dimensions { get; }
-    }
+    }*/
 }

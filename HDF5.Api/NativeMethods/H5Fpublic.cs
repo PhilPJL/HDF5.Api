@@ -1052,5 +1052,29 @@ internal static unsafe partial class H5F
         CallingConvention = CallingConvention.Cdecl),
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     public static extern herr_t unmount(hid_t loc, string name);
+
+    /// <summary>
+    /// Sets bounds on library versions, and indirectly format versions,
+    /// to be used when creating objects.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetLibverBounds
+    /// </summary>
+    /// <param name="plist">File access property list identifier</param>
+    /// <param name="low">The earliest version of the library that will be
+    /// used for writing objects, indirectly specifying the earliest object
+    /// format version that can be used when creating objects in the file.
+    /// </param>
+    /// <param name="high">The latest version of the library that will be
+    /// used for writing objects, indirectly specifying the latest object
+    /// format version that can be used when creating objects in the file.
+    /// </param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Fset_libver_bounds",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t set_libver_bounds
+        (hid_t file_id,
+        H5F.libver_t low = H5F.libver_t.EARLIEST,
+        H5F.libver_t high = H5F.libver_t.LATEST);
 #endif
 }

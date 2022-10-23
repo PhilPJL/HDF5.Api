@@ -92,4 +92,11 @@ internal static unsafe class H5FAdapter
 
         return new H5File(h);
     }
+
+    // NOTE: get_libver_bounds isn't available - use file access property list instead
+    internal static void SetLibraryVersionBounds(H5File file, LibraryVersion low, LibraryVersion high)
+    {
+        int retval = set_libver_bounds(file, (libver_t)low, (libver_t)high);
+        retval.ThrowIfError();
+    }
 }
