@@ -13,11 +13,11 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 
     private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
 
-    protected override void GuardAttributesAllowed()
+    protected override void GuardAreAttributesAllowed()
     {
         if(!Committed)
         {
-            throw new Hdf5Exception("The type must be commited in order to use attributes.");
+            throw new Hdf5Exception($"An instance of {nameof(H5Type)} must be commited before using the attributes API.");
         }
     }
 
