@@ -50,7 +50,7 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T>, IH5Location whe
         }
     }
 
-    public IEnumerable<(string name, H5ObjectType type)> Members => H5LAdapter.GetMembers(this);
+    public IEnumerable<(string name, ObjectType type)> Members => H5LAdapter.GetMembers(this);
 
     /// <summary>
     ///     Create a Group in this location

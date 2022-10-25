@@ -43,12 +43,12 @@ internal static unsafe class H5LAdapter
 #endif
     }
 
-    private static IEnumerable<(string name, H5ObjectType type)> GetMembers<T>(H5Location<T> location, H5O.type_t type)
+    private static IEnumerable<(string name, ObjectType type)> GetMembers<T>(H5Location<T> location, H5O.type_t type)
         where T : H5Object<T>
     {
         ulong idx = 0;
 
-        var names = new List<(string, H5ObjectType)>();
+        var names = new List<(string, ObjectType)>();
 
         iterate(location, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero).ThrowIfError();
 
@@ -75,7 +75,7 @@ internal static unsafe class H5LAdapter
 
                     if (oinfo.type == type || type == H5O.type_t.UNKNOWN)
                     {
-                        names.Add((name, (H5ObjectType)oinfo.type));
+                        names.Add((name, (ObjectType)oinfo.type));
                     }
                 }
 
@@ -98,7 +98,7 @@ internal static unsafe class H5LAdapter
     internal static IEnumerable<string> GetNamedDataTypeNames<T>(H5Location<T> location)
         where T : H5Object<T> => GetMembers(location, H5O.type_t.NAMED_DATATYPE).Select(m => m.name);
 
-    internal static IEnumerable<(string name, H5ObjectType type)> GetMembers<T>(H5Location<T> location)
+    internal static IEnumerable<(string name, ObjectType type)> GetMembers<T>(H5Location<T> location)
         where T : H5Object<T> => GetMembers(location, H5O.type_t.UNKNOWN);
 
     /// <summary>

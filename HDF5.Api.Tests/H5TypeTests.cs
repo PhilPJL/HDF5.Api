@@ -50,6 +50,22 @@ public class H5TypeTests : H5Test<H5TypeTests>
     }
 
     [TestMethod]
+    public void CreateEnumerateCompoundDataTypeSucceeds()
+    {
+        HandleCheck((file) =>
+        {
+            using var type = H5Type.CreateCompoundType<CompoundType>()
+                .Insert<CompoundType, int>(nameof(CompoundType.Id))
+                .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
+                .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό));
+
+            Assert.AreEqual(3, type.NumberOfMembers);
+
+            // TODO: enumerate/get member/etc
+        });
+    }
+
+    [TestMethod]
     [DataRow("TypeWithUtf8PropertyAndAsciiName")]
     [DataRow("TypeWithUtf8PropertyAndUf8Name_᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫")]
     public void CreateAndOpenCompoundDataTypeAsciiSucceeds(string name)

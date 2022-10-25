@@ -361,7 +361,7 @@ internal static unsafe class H5TAdapter
         return new H5Type(h);
     }
 
-    internal static int GetNumberOfMember(H5Type type)
+    internal static int GetNumberOfMembers(H5Type type)
     {
         return get_nmembers(type).ThrowIfError();
     }

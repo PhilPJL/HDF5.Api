@@ -48,7 +48,7 @@ internal static unsafe class H5FAdapter
         return (long)size;
     }
 
-    internal static long GetObjectCount(H5File file, H5FObjectType types)
+    internal static long GetObjectCount(H5File file, FileObjectType types)
     {
 #if NET7_0_OR_GREATER
         return get_obj_count(file, (uint)types);

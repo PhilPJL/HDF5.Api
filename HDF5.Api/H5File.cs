@@ -29,7 +29,7 @@ public class H5File : H5Location<H5File>
     /// </summary>
     /// <param name="types"></param>
     /// <returns></returns>
-    public long GetObjectCount(H5FObjectType types = H5FObjectType.All)
+    public long GetObjectCount(FileObjectType types = FileObjectType.All)
     {
         return H5FAdapter.GetObjectCount(this, types);
     }

@@ -91,7 +91,7 @@ public static class H5Global
 }
 
 [Flags]
-public enum H5FObjectType : uint
+public enum FileObjectType : uint
 {
     All = H5F.OBJ_ALL,
     Attribute = H5F.OBJ_ATTR,
@@ -102,7 +102,7 @@ public enum H5FObjectType : uint
     Local = H5F.OBJ_LOCAL
 }
 
-public enum H5ObjectType
+public enum ObjectType
 {
     Group = H5O.type_t.GROUP,
     DataSet = H5O.type_t.DATASET,

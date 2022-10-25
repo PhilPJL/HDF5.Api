@@ -171,4 +171,6 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         get => H5TAdapter.GetPadding(this);
         set => H5TAdapter.SetPadding(this, value);
     }
+
+    internal int NumberOfMembers => H5TAdapter.GetNumberOfMembers(this);
 }
