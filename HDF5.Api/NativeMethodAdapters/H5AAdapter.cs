@@ -45,7 +45,6 @@ internal static unsafe class H5AAdapter
         }
 #endif
 
-        h.ThrowIfInvalidHandleValue();
         return new H5Attribute(h);
     }
 
@@ -74,15 +73,14 @@ internal static unsafe class H5AAdapter
         int result;
 
 #if NET7_0_OR_GREATER
-        result = exists(h5Object, name);
+        result = exists(h5Object, name).ThrowIfError();
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            result = exists(h5Object, nameBytesPtr);
+            result = exists(h5Object, nameBytesPtr).ThrowIfError();
         }
 #endif
 
-        result.ThrowIfError();
         return result > 0;
     }
 
@@ -94,10 +92,7 @@ internal static unsafe class H5AAdapter
 
         var names = new List<string>();
 
-        int result = iterate(h5Object,
-            H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
-
-        result.ThrowIfError();
+        iterate(h5Object, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero).ThrowIfError();
 
         return names;
 
@@ -169,11 +164,7 @@ internal static unsafe class H5AAdapter
 
     internal static H5Space GetSpace(H5Attribute attribute)
     {
-        var space = get_space(attribute);
-
-        space.ThrowIfError();
-
-        return new H5Space(space);
+        return new H5Space(get_space(attribute));
     }
 
     internal static int GetStorageSize(H5Attribute attribute)
@@ -184,9 +175,7 @@ internal static unsafe class H5AAdapter
 
     internal static H5Type GetType(H5Attribute attribute)
     {
-        long typeHandle = get_type(attribute);
-        typeHandle.ThrowIfInvalidHandleValue();
-        return new H5Type(typeHandle);
+        return new H5Type(get_type(attribute));
     }
 
     internal static H5Attribute Open<T>(H5Object<T> h5Object, string name)
@@ -335,6 +324,7 @@ internal static unsafe class H5AAdapter
         }
     }
 
+    [Obsolete]
     internal static bool ReadBool(H5Attribute attribute)
     {
         using var type = H5Type.GetNativeType<bool>();
@@ -380,8 +370,7 @@ internal static unsafe class H5AAdapter
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
         T value = default;
-        int result = read(attribute, type, new IntPtr(&value));
-        result.ThrowIfError();
+        read(attribute, type, new IntPtr(&value)).ThrowIfError();
         return value;
     }
 

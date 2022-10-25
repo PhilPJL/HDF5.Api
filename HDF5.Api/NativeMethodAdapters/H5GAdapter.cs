@@ -42,8 +42,6 @@ internal static unsafe class H5GAdapter
         }
 #endif
 
-        h.ThrowIfInvalidHandleValue();
-
         return new H5Group(h);
     }
 
@@ -61,8 +59,6 @@ internal static unsafe class H5GAdapter
             h = open(location, nameBytesPtr, propListGroupAccess);
         }
 #endif
-
-        h.ThrowIfInvalidHandleValue();
 
         return new H5Group(h);
     }
@@ -126,6 +122,7 @@ internal static unsafe class H5GAdapter
             result = get_info_by_name(location, pathBytesPtr, ref ginfo, linkAccessPropertyList);
         }
 #endif
+        // TODO: maybe use Exists and traverse path down to bottom (slower)
 
         // NOTE: we don't throw on error here since we're relying 
         // on result <= 0 to mean 'path not found'.  

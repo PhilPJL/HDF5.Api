@@ -44,8 +44,6 @@ internal static unsafe class H5DAdapter
         }
 #endif
 
-        h.ThrowIfInvalidHandleValue();
-
         return new H5DataSet(h);
     }
 

@@ -18,20 +18,14 @@ internal static unsafe class H5LAdapter
     {
         location.AssertHasLocationHandleType();
 
-        int result;
-
 #if NET7_0_OR_GREATER
-        result = exists(location, name, linkAccessPropertyList);
+        return exists(location, name, linkAccessPropertyList).ThrowIfError() > 0;
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            result = exists(location, nameBytesPtr, linkAccessPropertyList);
+            return exists(location, nameBytesPtr, linkAccessPropertyList).ThrowIfError() > 0;
         }
 #endif
-
-        result.ThrowIfError();
-
-        return result > 0;
     }
 
     internal static void Delete<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList)
@@ -39,18 +33,14 @@ internal static unsafe class H5LAdapter
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet, HandleType.Attribute);
 
-        int result;
-
 #if NET7_0_OR_GREATER
-         result = delete(location, name, linkAccessPropertyList);
+        delete(location, name, linkAccessPropertyList).ThrowIfError();
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            result = delete(location, nameBytesPtr, linkAccessPropertyList);
+            delete(location, nameBytesPtr, linkAccessPropertyList).ThrowIfError();
         }
 #endif
-
-        result.ThrowIfError();
     }
 
     private static IEnumerable<(string name, H5ObjectType type)> GetMembers<T>(H5Location<T> location, H5O.type_t type)
@@ -60,9 +50,7 @@ internal static unsafe class H5LAdapter
 
         var names = new List<(string, H5ObjectType)>();
 
-        int result = iterate(location, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
-
-        result.ThrowIfError();
+        iterate(location, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero).ThrowIfError();
 
         return names;
 

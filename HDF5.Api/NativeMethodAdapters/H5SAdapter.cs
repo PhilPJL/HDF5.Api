@@ -25,10 +25,7 @@ internal static unsafe class H5SAdapter
         ulong[] dims = dimensions.Select(d => d.InitialSize).ToArray();
         ulong[] maxDims = dimensions.Select(d => d.UpperLimit).ToArray();
 
-        long h = create_simple(dimensions.Length, dims, maxDims);
-
-        h.ThrowIfInvalidHandleValue();
-        return new H5Space(h);
+        return new H5Space(create_simple(dimensions.Length, dims, maxDims));
     }
 
     internal static H5Space CreateSimple(params long[] dimensions)
@@ -38,9 +35,7 @@ internal static unsafe class H5SAdapter
 
     internal static H5Space CreateScalar()
     {
-        long h = create(class_t.SCALAR);
-        h.ThrowIfInvalidHandleValue();
-        return new H5Space(h);
+        return new H5Space(create(class_t.SCALAR));
     }
 
     internal static void SelectHyperslab(H5Space space, long offset, long count)
@@ -54,9 +49,7 @@ internal static unsafe class H5SAdapter
 
     internal static long GetSimpleExtentNPoints(H5Space space)
     {
-        long v = get_simple_extent_npoints(space);
-        v.ThrowIfError();
-        return v;
+        return get_simple_extent_npoints(space).ThrowIfError();
     }
 
     internal static int GetSimpleExtentNDims(H5Space space)
@@ -91,8 +84,7 @@ internal static unsafe class H5SAdapter
 
         IReadOnlyList<Dimension> GetSimpleExtentDims(Span<ulong> dims, Span<ulong> maxDims)
         {
-            int result = get_simple_extent_dims(space, dims, maxDims);
-            result.ThrowIfError();
+            get_simple_extent_dims(space, dims, maxDims).ThrowIfError();
 
             var dimensions = new List<Dimension>();
             for (int i = 0; i < rank; i++)

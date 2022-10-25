@@ -17,13 +17,14 @@ internal static class H5PAdapter
 
     internal static TPList Create<TPList>(long classId, Func<long, TPList> createPropertyList) where TPList : H5PropertyList
     {
-        long h = create(classId);
-
-        h.ThrowIfInvalidHandleValue();
-
-        return createPropertyList(h);
+        return createPropertyList(create(classId));
     }
 
+    /// <summary>
+    /// Create an object with a given class.  Doesn't require wrapping in an H5Object.
+    /// </summary>
+    /// <param name="classId"></param>
+    /// <returns></returns>
     internal static long Create(long classId)
     {
         long h = create(classId);
@@ -45,11 +46,7 @@ internal static class H5PAdapter
 
     internal static bool AreEqual(long propertyListId1, long propertyListId2)
     {
-        int result = equal(propertyListId1, propertyListId2);
-
-        result.ThrowIfError();
-
-        return result != 0;
+        return equal(propertyListId1, propertyListId2).ThrowIfError() != 0;
     }
 
     internal static bool AreEqual(H5PropertyList propertyList1, H5PropertyList propertyList2)
@@ -62,18 +59,13 @@ internal static class H5PAdapter
         where T : H5Object<T>
         where TPList : H5PropertyList
     {
-        long h = get_plist(obj);
-
-        h.ThrowIfInvalidHandleValue();
-
-        return createPropertyList(h);
+        return createPropertyList(get_plist(obj));
     }
 
     internal static CharacterSet GetCharacterEncoding(H5PropertyList propertyList)
     {
         H5T.cset_t encoding = default;
-        int result = get_char_encoding(propertyList, ref encoding);
-        result.ThrowIfError();
+        get_char_encoding(propertyList, ref encoding).ThrowIfError();
         return (CharacterSet)encoding;
     }
 
@@ -90,16 +82,13 @@ internal static class H5PAdapter
     internal static bool GetCreateIntermediateGroups(H5PropertyList propertyList)
     {
         uint value = 0;
-        int result = get_create_intermediate_group(propertyList, ref value);
-        result.ThrowIfError();
+        get_create_intermediate_group(propertyList, ref value).ThrowIfError();
         return value != 0;
     }
 
     internal static long GetClassId(H5PropertyList propertyList)
     {
-        long cls = get_class(propertyList);
-        cls.ThrowIfError();
-        return cls;
+        return get_class(propertyList).ThrowIfError();
     }
 
     internal static void SetLibraryVersionBounds(H5PropertyList propertyList, LibraryVersion low, LibraryVersion high)

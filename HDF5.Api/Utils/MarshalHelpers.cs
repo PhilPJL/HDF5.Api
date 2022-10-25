@@ -21,6 +21,7 @@ namespace HDF5.Api.Utils
                 
                 for (size = 0; Marshal.ReadByte(ptr, size) > 0; size++)
                 {
+                    // empty
                 }
 
                 return size;
@@ -31,8 +32,7 @@ namespace HDF5.Api.Utils
         public static string GetName<T>(H5Object<T> h5Object, get_name_del getNameFunc) where T : H5Object<T>
         {
             // get length of buffer required
-            int length = (int)getNameFunc(h5Object, null, IntPtr.Zero);
-            length.ThrowIfError();
+            int length = ((int)getNameFunc(h5Object, null, IntPtr.Zero)).ThrowIfError();
 
             if(length == 0)
             {
@@ -53,8 +53,7 @@ namespace HDF5.Api.Utils
 
             string GetName(Span<byte> buffer)
             {
-                var result = (int)getNameFunc(h5Object, buffer, length + 1);
-                result.ThrowIfError();
+                ((int)getNameFunc(h5Object, buffer, length + 1)).ThrowIfError();
                 int nullTerminatorIndex = MemoryExtensions.IndexOf(buffer, (byte)0);
                 nullTerminatorIndex = nullTerminatorIndex < 0 ? length : nullTerminatorIndex;
                 return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
@@ -63,8 +62,7 @@ namespace HDF5.Api.Utils
             var buffer = new byte[length + 1];
             fixed (byte* bufferPtr = buffer)
             {
-                int result = (int)getNameFunc(h5Object, bufferPtr, new IntPtr(length + 1));
-                result.ThrowIfError();
+                ((int)getNameFunc(h5Object, bufferPtr, new IntPtr(length + 1))).ThrowIfError();
 
                 Span<byte> bytes = buffer;
                 var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);

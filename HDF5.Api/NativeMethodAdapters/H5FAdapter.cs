@@ -28,16 +28,12 @@ internal static unsafe class H5FAdapter
         }
 #endif
 
-        h.ThrowIfInvalidHandleValue();
-
         return new H5File(h);
     }
 
     internal static void Flush(H5File file, bool flushGlobal)
     {
-        int result = flush(file, flushGlobal ? scope_t.GLOBAL : scope_t.LOCAL);
-
-        result.ThrowIfError();
+        flush(file, flushGlobal ? scope_t.GLOBAL : scope_t.LOCAL).ThrowIfError();
     }
 
     internal static string GetName(H5File file)
@@ -48,8 +44,7 @@ internal static unsafe class H5FAdapter
     internal static long GetSize(H5File file)
     {
         ulong size = 0;
-        int result = get_filesize(file, ref size);
-        result.ThrowIfError();
+        get_filesize(file, ref size).ThrowIfError();
         return (long)size;
     }
 
@@ -84,11 +79,7 @@ internal static unsafe class H5FAdapter
 
     internal static H5File Open(string path, bool readOnly, H5FileAccessPropertyList? fileAccessPropertyList = null)
     {
-        long h = open(path, readOnly ? ACC_RDONLY : ACC_RDWR, fileAccessPropertyList);
-
-        h.ThrowIfInvalidHandleValue();
-
-        return new H5File(h);
+        return new H5File(open(path, readOnly ? ACC_RDONLY : ACC_RDWR, fileAccessPropertyList));
     }
 
     // NOTE: get_libver_bounds isn't available - use file access property list instead
