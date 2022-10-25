@@ -14,9 +14,7 @@ internal static unsafe class H5SAdapter
 {
     public static void Close(H5Space attribute)
     {
-        int err = close(attribute);
-
-        err.ThrowIfError();
+        close(attribute).ThrowIfError();
     }
 
     internal static H5Space CreateSimple(params Dimension[] dimensions)
@@ -41,7 +39,6 @@ internal static unsafe class H5SAdapter
     internal static H5Space CreateScalar()
     {
         long h = create(class_t.SCALAR);
-
         h.ThrowIfInvalidHandleValue();
         return new H5Space(h);
     }
@@ -51,10 +48,8 @@ internal static unsafe class H5SAdapter
         // NOTE: assuming .NET standard marshalling is doing the right thing here
         // pin?
 
-        int err = select_hyperslab(
-            space, seloper_t.SET, new[] { (ulong)offset }, null!, new[] { (ulong)count }, null!);
-
-        err.ThrowIfError();
+        select_hyperslab(space, seloper_t.SET, new[] { (ulong)offset }, null!, new[] { (ulong)count }, null!)
+            .ThrowIfError();
     }
 
     internal static long GetSimpleExtentNPoints(H5Space space)
@@ -66,18 +61,14 @@ internal static unsafe class H5SAdapter
 
     internal static int GetSimpleExtentNDims(H5Space space)
     {
-        int rank = get_simple_extent_ndims(space);
-
-        rank.ThrowIfError();
-
-        return rank;
+        return get_simple_extent_ndims(space).ThrowIfError();
     }
 
     internal static IReadOnlyList<Dimension> GetSimpleExtentDims(H5Space space)
     {
         var rank = GetSimpleExtentNDims(space);
 
-        if(rank == 0)
+        if (rank == 0)
         {
             return Array.Empty<Dimension>();
         }
@@ -100,8 +91,8 @@ internal static unsafe class H5SAdapter
 
         IReadOnlyList<Dimension> GetSimpleExtentDims(Span<ulong> dims, Span<ulong> maxDims)
         {
-            int err = get_simple_extent_dims(space, dims, maxDims);
-            err.ThrowIfError();
+            int result = get_simple_extent_dims(space, dims, maxDims);
+            result.ThrowIfError();
 
             var dimensions = new List<Dimension>();
             for (int i = 0; i < rank; i++)
@@ -120,8 +111,8 @@ internal static unsafe class H5SAdapter
         fixed (ulong* dimsPtr = dims)
         fixed (ulong* maxDimsPtr = maxDims)
         {
-            int err = get_simple_extent_dims(space, dimsPtr, maxDimsPtr);
-            err.ThrowIfError();
+            int result = get_simple_extent_dims(space, dimsPtr, maxDimsPtr);
+            result.ThrowIfError();
             return Enumerable.Zip(dims, maxDims, (f, s) => new Dimension(f, s)).ToList();
         }
 #endif

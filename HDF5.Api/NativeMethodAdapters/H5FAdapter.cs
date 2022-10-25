@@ -11,9 +11,7 @@ internal static unsafe class H5FAdapter
 {
     internal static void Close(H5File file)
     {
-        int err = close(file);
-
-        err.ThrowIfError();
+        close(file).ThrowIfError();
     }
 
     internal static H5File Create(string path, bool failIfExists = false,
@@ -37,9 +35,9 @@ internal static unsafe class H5FAdapter
 
     internal static void Flush(H5File file, bool flushGlobal)
     {
-        int err = flush(file, flushGlobal ? scope_t.GLOBAL : scope_t.LOCAL);
+        int result = flush(file, flushGlobal ? scope_t.GLOBAL : scope_t.LOCAL);
 
-        err.ThrowIfError();
+        result.ThrowIfError();
     }
 
     internal static string GetName(H5File file)
@@ -50,8 +48,8 @@ internal static unsafe class H5FAdapter
     internal static long GetSize(H5File file)
     {
         ulong size = 0;
-        int err = get_filesize(file, ref size);
-        err.ThrowIfError();
+        int result = get_filesize(file, ref size);
+        result.ThrowIfError();
         return (long)size;
     }
 
@@ -96,7 +94,6 @@ internal static unsafe class H5FAdapter
     // NOTE: get_libver_bounds isn't available - use file access property list instead
     internal static void SetLibraryVersionBounds(H5File file, LibraryVersion low, LibraryVersion high)
     {
-        int retval = set_libver_bounds(file, (libver_t)low, (libver_t)high);
-        retval.ThrowIfError();
+        set_libver_bounds(file, (libver_t)low, (libver_t)high).ThrowIfError();
     }
 }

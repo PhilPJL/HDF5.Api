@@ -62,9 +62,9 @@ public static class H5Global
         uint minor = 0;
         uint revision = 0;
 
-        int err = get_libversion(ref major, ref minor, ref revision);
+        int result = get_libversion(ref major, ref minor, ref revision);
 
-        err.ThrowIfError();
+        result.ThrowIfError();
 
         return new Version((int)major, (int)minor, 0, (int)revision);
     }
@@ -75,9 +75,9 @@ public static class H5Global
     public static bool IsThreadSafe()
     {
         uint is_ts = 0;
-        int err = is_library_threadsafe(ref is_ts);
+        int result = is_library_threadsafe(ref is_ts);
 
-        err.ThrowIfError();
+        result.ThrowIfError();
 
         return is_ts != 0;
     }

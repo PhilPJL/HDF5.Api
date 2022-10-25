@@ -18,20 +18,20 @@ internal static unsafe class H5LAdapter
     {
         location.AssertHasLocationHandleType();
 
-        int err;
+        int result;
 
 #if NET7_0_OR_GREATER
-        err = exists(location, name, linkAccessPropertyList);
+        result = exists(location, name, linkAccessPropertyList);
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = exists(location, nameBytesPtr, linkAccessPropertyList);
+            result = exists(location, nameBytesPtr, linkAccessPropertyList);
         }
 #endif
 
-        err.ThrowIfError();
+        result.ThrowIfError();
 
-        return err > 0;
+        return result > 0;
     }
 
     internal static void Delete<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList)
@@ -39,18 +39,18 @@ internal static unsafe class H5LAdapter
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet, HandleType.Attribute);
 
-        int err;
+        int result;
 
 #if NET7_0_OR_GREATER
-         err = delete(location, name, linkAccessPropertyList);
+         result = delete(location, name, linkAccessPropertyList);
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = delete(location, nameBytesPtr, linkAccessPropertyList);
+            result = delete(location, nameBytesPtr, linkAccessPropertyList);
         }
 #endif
 
-        err.ThrowIfError();
+        result.ThrowIfError();
     }
 
     private static IEnumerable<(string name, H5ObjectType type)> GetMembers<T>(H5Location<T> location, H5O.type_t type)
@@ -60,9 +60,9 @@ internal static unsafe class H5LAdapter
 
         var names = new List<(string, H5ObjectType)>();
 
-        int err = iterate(location, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
+        int result = iterate(location, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
 
-        err.ThrowIfError();
+        result.ThrowIfError();
 
         return names;
 

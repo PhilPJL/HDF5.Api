@@ -15,9 +15,7 @@ internal static unsafe class H5DAdapter
 {
     internal static void Close(H5DataSet dataSet)
     {
-        int err = close(dataSet);
-
-        err.ThrowIfError();
+        close(dataSet).ThrowIfError();
     }
 
     internal static ulong GetStorageSize(H5DataSet dataSetId)
@@ -87,12 +85,12 @@ internal static unsafe class H5DAdapter
             return buf.Span.ToArray();
         }
 #else
-        var result = new T[count];
-        fixed (T* ptr = result)
+        var value = new T[count];
+        fixed (T* ptr = value)
         {
-            int err = read(dataSet, type, space, space, 0, new IntPtr(ptr));
-            err.ThrowIfError();
-            return result;
+            int result = read(dataSet, type, space, space, 0, new IntPtr(ptr));
+            result.ThrowIfError();
+            return value;
         }
 #endif
     }
@@ -124,24 +122,18 @@ internal static unsafe class H5DAdapter
 
     internal static void SetExtent(H5DataSet dataSetId, params long[] dimensions)
     {
-        int err = set_extent(dataSetId, dimensions.Select(d => (ulong)d).ToArray());
-
-        err.ThrowIfError();
+        set_extent(dataSetId, dimensions.Select(d => (ulong)d).ToArray()).ThrowIfError();
     }
 
     internal static void Write(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, IntPtr buffer, H5PropertyList? transferPropertyList) 
     {
-        int err = write(dataSet, type, memorySpace, fileSpace, transferPropertyList, buffer);
-
-        err.ThrowIfError();
+        write(dataSet, type, memorySpace, fileSpace, transferPropertyList, buffer).ThrowIfError();
     }
 
 #if NET7_0_OR_GREATER
     internal static void Write<T>(H5DataSet dataSet, H5Type type, H5Space memorySpace, H5Space fileSpace, Span<byte> buffer, H5PropertyList? transferPropertyList) 
     {
-        int err = write(dataSet, type, memorySpace, fileSpace, transferPropertyList, buffer);
-
-        err.ThrowIfError(nameof(write));
+        write(dataSet, type, memorySpace, fileSpace, transferPropertyList, buffer).ThrowIfError(nameof(write));
     }
 #endif
 
@@ -185,21 +177,19 @@ internal static unsafe class H5DAdapter
 
     internal static void ReclaimVariableLengthMemory(H5Type type, H5Space space, H5PropertyList? propertyList, byte* buffer)
     {
-        int err = vlen_reclaim(type, space, propertyList, buffer);
-        err.ThrowIfError();
+        vlen_reclaim(type, space, propertyList, buffer).ThrowIfError();
     }
 
     internal static void ReclaimVariableLengthMemory(H5Type type, H5Space space, byte** buffer)
     {
-        int err = vlen_reclaim(type, space, H5P.DEFAULT, buffer);
-        err.ThrowIfError();
+        vlen_reclaim(type, space, H5P.DEFAULT, buffer).ThrowIfError();
     }
 
     internal static long GetVariableLengthBufferSize(H5DataSet dataSet, H5Type type, H5Space space)
     {
         ulong size = default;
-        int err = vlen_get_buf_size(dataSet, type, space, ref size);
-        err.ThrowIfError();
+        int result = vlen_get_buf_size(dataSet, type, space, ref size);
+        result.ThrowIfError();
         return (long)size;
     }
 }

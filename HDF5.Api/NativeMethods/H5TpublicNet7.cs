@@ -214,7 +214,20 @@ internal static partial class H5T
     SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial cset_t get_cset(hid_t dtype_id);
-    
+  
+    /// <summary>
+    /// Retrieves the number of elements in a compound or enumeration
+    /// datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-GetNmembers
+    /// </summary>
+    /// <param name="dtype_id">Identifier of datatype to query.</param>
+    /// <returns>Returns the number of elements if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tget_nmembers"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial int get_nmembers(hid_t dtype_id);
+
     /// <summary>
     /// Returns the size of a datatype.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-GetSize

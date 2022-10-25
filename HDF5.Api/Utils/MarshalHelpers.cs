@@ -53,8 +53,8 @@ namespace HDF5.Api.Utils
 
             string GetName(Span<byte> buffer)
             {
-                var err = (int)getNameFunc(h5Object, buffer, length + 1);
-                err.ThrowIfError();
+                var result = (int)getNameFunc(h5Object, buffer, length + 1);
+                result.ThrowIfError();
                 int nullTerminatorIndex = MemoryExtensions.IndexOf(buffer, (byte)0);
                 nullTerminatorIndex = nullTerminatorIndex < 0 ? length : nullTerminatorIndex;
                 return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
@@ -63,8 +63,8 @@ namespace HDF5.Api.Utils
             var buffer = new byte[length + 1];
             fixed (byte* bufferPtr = buffer)
             {
-                int err = (int)getNameFunc(h5Object, bufferPtr, new IntPtr(length + 1));
-                err.ThrowIfError();
+                int result = (int)getNameFunc(h5Object, bufferPtr, new IntPtr(length + 1));
+                result.ThrowIfError();
 
                 Span<byte> bytes = buffer;
                 var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);

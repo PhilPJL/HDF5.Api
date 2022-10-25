@@ -10,9 +10,7 @@ internal static unsafe class H5GAdapter
 {
     internal static void Close(H5Group attribute)
     {
-        int err = close(attribute);
-
-        err.ThrowIfError();
+        close(attribute).ThrowIfError();
     }
 
     // Overload used by default which enabled intermediate group creation and UTF8 names.
@@ -118,22 +116,22 @@ internal static unsafe class H5GAdapter
         location.AssertHasLocationHandleType();
 
         info_t ginfo = default;
-        int err;
+        int result;
 
 #if NET7_0_OR_GREATER
-        err = get_info_by_name(location, path, ref ginfo, linkAccessPropertyList);
+        result = get_info_by_name(location, path, ref ginfo, linkAccessPropertyList);
 #else
         fixed (byte* pathBytesPtr = Encoding.UTF8.GetBytes(path))
         {
-            err = get_info_by_name(location, pathBytesPtr, ref ginfo, linkAccessPropertyList);
+            result = get_info_by_name(location, pathBytesPtr, ref ginfo, linkAccessPropertyList);
         }
 #endif
 
         // NOTE: we don't throw on error here since we're relying 
-        // on err <= 0 to mean 'path not found'.  
+        // on result <= 0 to mean 'path not found'.  
         // Not satisfying. 
 
-        return err >= 0;
+        return result >= 0;
     }
 
     internal static H5GroupCreationPropertyList CreateCreationPropertyList()

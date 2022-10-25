@@ -12,9 +12,7 @@ internal static class H5PAdapter
 {
     internal static void Close(H5PropertyList propertyList)
     {
-        int err = close(propertyList);
-
-        err.ThrowIfError();
+        close(propertyList).ThrowIfError();
     }
 
     internal static TPList Create<TPList>(long classId, Func<long, TPList> createPropertyList) where TPList : H5PropertyList
@@ -37,25 +35,21 @@ internal static class H5PAdapter
 
     internal static void SetChunk(H5PropertyList propertyList, int rank, IEnumerable<long> dims)
     {
-        int err = set_chunk(propertyList, rank, dims.Select(d => (ulong)d).ToArray());
-
-        err.ThrowIfError();
+        set_chunk(propertyList, rank, dims.Select(d => (ulong)d).ToArray()).ThrowIfError();
     }
 
     internal static void SetDeflate(H5PropertyList propertyList, int level)
     {
-        int err = set_deflate(propertyList, (uint)level);
-
-        err.ThrowIfError();
+        set_deflate(propertyList, (uint)level).ThrowIfError();
     }
 
     internal static bool AreEqual(long propertyListId1, long propertyListId2)
     {
-        int err = equal(propertyListId1, propertyListId2);
+        int result = equal(propertyListId1, propertyListId2);
 
-        err.ThrowIfError();
+        result.ThrowIfError();
 
-        return err != 0;
+        return result != 0;
     }
 
     internal static bool AreEqual(H5PropertyList propertyList1, H5PropertyList propertyList2)
@@ -78,28 +72,26 @@ internal static class H5PAdapter
     internal static CharacterSet GetCharacterEncoding(H5PropertyList propertyList)
     {
         H5T.cset_t encoding = default;
-        int err = get_char_encoding(propertyList, ref encoding);
-        err.ThrowIfError();
+        int result = get_char_encoding(propertyList, ref encoding);
+        result.ThrowIfError();
         return (CharacterSet)encoding;
     }
 
     internal static void SetCharacterEncoding(H5PropertyList propertyList, CharacterSet encoding)
     {
-        int err = set_char_encoding(propertyList, (H5T.cset_t)encoding);
-        err.ThrowIfError();
+        set_char_encoding(propertyList, (H5T.cset_t)encoding).ThrowIfError();
     }
 
     internal static void SetCreateIntermediateGroups(H5PropertyList propertyList, bool value)
     {
-        int err = set_create_intermediate_group(propertyList, value ? 1 : (uint)0);
-        err.ThrowIfError();
+        set_create_intermediate_group(propertyList, value ? 1 : (uint)0).ThrowIfError();
     }
 
     internal static bool GetCreateIntermediateGroups(H5PropertyList propertyList)
     {
         uint value = 0;
-        int err = get_create_intermediate_group(propertyList, ref value);
-        err.ThrowIfError();
+        int result = get_create_intermediate_group(propertyList, ref value);
+        result.ThrowIfError();
         return value != 0;
     }
 
@@ -112,8 +104,7 @@ internal static class H5PAdapter
 
     internal static void SetLibraryVersionBounds(H5PropertyList propertyList, LibraryVersion low, LibraryVersion high)
     {
-        int retval = set_libver_bounds(propertyList, (H5F.libver_t)low, (H5F.libver_t)high);
-        retval.ThrowIfError();
+        set_libver_bounds(propertyList, (H5F.libver_t)low, (H5F.libver_t)high).ThrowIfError();
     }
 
     internal static (LibraryVersion low, LibraryVersion high) GetLibraryVersionBounds(H5PropertyList propertyList)
@@ -121,8 +112,7 @@ internal static class H5PAdapter
         H5F.libver_t low = default;
         H5F.libver_t high = default;
 
-        int retval = get_libver_bounds(propertyList, ref low, ref high);
-        retval.ThrowIfError();
+        get_libver_bounds(propertyList, ref low, ref high).ThrowIfError();
 
         return ((LibraryVersion)low, (LibraryVersion)high);
     }

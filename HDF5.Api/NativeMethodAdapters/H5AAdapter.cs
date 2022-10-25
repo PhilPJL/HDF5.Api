@@ -16,9 +16,7 @@ internal static unsafe class H5AAdapter
 {
     internal static void Close(H5Attribute attribute)
     {
-        int err = close(attribute);
-
-        err.ThrowIfError();
+        close(attribute).ThrowIfError();
     }
 
     internal static H5Attribute Create<T, TA>(H5Object<T> h5Object, string name) where T : H5Object<T>
@@ -55,37 +53,37 @@ internal static unsafe class H5AAdapter
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        int err;
+        int result;
 
 #if NET7_0_OR_GREATER
-        err = delete(h5Object, name);
+        result = delete(h5Object, name);
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = delete(h5Object, nameBytesPtr);
+            result = delete(h5Object, nameBytesPtr);
         }
 #endif
 
-        err.ThrowIfError();
+        result.ThrowIfError();
     }
 
     internal static bool Exists<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        int err;
+        int result;
 
 #if NET7_0_OR_GREATER
-        err = exists(h5Object, name);
+        result = exists(h5Object, name);
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = exists(h5Object, nameBytesPtr);
+            result = exists(h5Object, nameBytesPtr);
         }
 #endif
 
-        err.ThrowIfError();
-        return err > 0;
+        result.ThrowIfError();
+        return result > 0;
     }
 
     internal static IEnumerable<string> GetAttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
@@ -96,10 +94,10 @@ internal static unsafe class H5AAdapter
 
         var names = new List<string>();
 
-        int err = iterate(h5Object,
+        int result = iterate(h5Object,
             H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
 
-        err.ThrowIfError();
+        result.ThrowIfError();
 
         return names;
 
@@ -180,6 +178,7 @@ internal static unsafe class H5AAdapter
 
     internal static int GetStorageSize(H5Attribute attribute)
     {
+        // NOTE: get_storage_size doesn't return an error (-1) if it fails
         return (int)get_storage_size(attribute);
     }
 
@@ -264,8 +263,7 @@ internal static unsafe class H5AAdapter
                     var ptr = new IntPtr(bufferPtr);
                     try
                     {
-                        int err = read(attribute, type, ptr);
-                        err.ThrowIfError();
+                        read(attribute, type, ptr).ThrowIfError();
 
                         if (buffer[0] == 0)
                         {
@@ -316,8 +314,7 @@ internal static unsafe class H5AAdapter
 
             string ReadString(Span<byte> buffer)
             {
-                int err = read(attribute, type, buffer);
-                err.ThrowIfError();
+                read(attribute, type, buffer).ThrowIfError();
 
                 var nullTerminatorIndex = MemoryExtensions.IndexOf(buffer, (byte)0);
                 nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
@@ -327,8 +324,7 @@ internal static unsafe class H5AAdapter
             var buffer = new byte[storageSize + 1];
             fixed (byte* bufferPtr = buffer)
             {
-                int err = read(attribute, type, bufferPtr);
-                err.ThrowIfError();
+                read(attribute, type, bufferPtr).ThrowIfError();
 
                 Span<byte> bytes = buffer;
                 var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
@@ -383,10 +379,10 @@ internal static unsafe class H5AAdapter
 
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
-        T result = default;
-        int err = read(attribute, type, new IntPtr(&result));
-        err.ThrowIfError();
-        return result;
+        T value = default;
+        int result = read(attribute, type, new IntPtr(&value));
+        result.ThrowIfError();
+        return value;
     }
 
     internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
@@ -407,9 +403,7 @@ internal static unsafe class H5AAdapter
 
     internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
     {
-        int err = write(attribute, type, buffer);
-
-        err.ThrowIfError();
+        write(attribute, type, buffer).ThrowIfError();
     }
 
     internal static void Write(H5Attribute attribute, string value)

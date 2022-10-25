@@ -16,16 +16,14 @@ internal static unsafe class H5TAdapter
 {
     internal static bool AreEqual(H5Type type1, H5Type type2)
     {
-        int err = equal(type1, type2);
-        err.ThrowIfError();
-        return err > 0;
+        int result = equal(type1, type2);
+        result.ThrowIfError();
+        return result > 0;
     }
 
     internal static void Close(H5Type type)
     {
-        int err = close(type);
-
-        err.ThrowIfError();
+        close(type).ThrowIfError();
     }
 
     internal static DataTypeClass GetClass(H5Type type)
@@ -35,8 +33,7 @@ internal static unsafe class H5TAdapter
 
     internal static void SetCharacterSet(H5Type type, CharacterSet cset)
     {
-        int err = set_cset(type, (cset_t)cset);
-        err.ThrowIfError();
+        set_cset(type, (cset_t)cset).ThrowIfError();
     }
 
     internal static CharacterSet GetCharacterSet(H5Type type)
@@ -107,8 +104,8 @@ internal static unsafe class H5TAdapter
     {
         long h = copy(C_S1);
         h.ThrowIfInvalidHandleValue();
-        int err = set_size(h, new IntPtr(storageLengthBytes));
-        err.ThrowIfError();
+        int result = set_size(h, new IntPtr(storageLengthBytes));
+        result.ThrowIfError();
         return new H5StringType(h);
     }
 
@@ -122,18 +119,18 @@ internal static unsafe class H5TAdapter
     internal static void InsertEnumMember<T>(H5Type type, string name, T value)
         where T : unmanaged, Enum
     {
-        int err;
+        int result;
 
 #if NET7_0_OR_GREATER
-        err = enum_insert(type, name, new IntPtr(&value));
+        result = enum_insert(type, name, new IntPtr(&value));
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = enum_insert(type, nameBytesPtr, new IntPtr(&value));
+            result = enum_insert(type, nameBytesPtr, new IntPtr(&value));
         }
 #endif
 
-        err.ThrowIfError();
+        result.ThrowIfError();
     }
 
     internal static string NameOfEnumMember<T>(H5Type type, T value)
@@ -144,8 +141,8 @@ internal static unsafe class H5TAdapter
 #if NET7_0_OR_GREATER
         using var bufferOwner = SpanOwner<byte>.Allocate(length);
         var buffer = bufferOwner.Span;
-        int err = enum_nameof(type, new nint(&value), buffer, length);
-        err.ThrowIfError();
+        int result = enum_nameof(type, new nint(&value), buffer, length);
+        result.ThrowIfError();
         int nullTerminatorIndex = MemoryExtensions.IndexOf(buffer, (byte)0);
         nullTerminatorIndex = nullTerminatorIndex < 0 ? length : nullTerminatorIndex;
         return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
@@ -153,8 +150,8 @@ internal static unsafe class H5TAdapter
         var buffer = new byte[length];
         fixed (byte* bufferPtr = buffer)
         {
-            int err = enum_nameof(type, new IntPtr(&value), bufferPtr, new IntPtr(length));
-            err.ThrowIfError();
+            int result = enum_nameof(type, new IntPtr(&value), bufferPtr, new IntPtr(length));
+            result.ThrowIfError();
             Span<byte> bytes = buffer;
             var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
             nullTerminatorIndex = nullTerminatorIndex < 0 ? length : nullTerminatorIndex;
@@ -185,18 +182,18 @@ internal static unsafe class H5TAdapter
 
     internal static void Insert(H5Type type, string name, ssize_t offset, long nativeTypeId)
     {
-        int err;
+        int result;
 
 #if NET7_0_OR_GREATER
-        err = insert(type, name, offset, nativeTypeId);
+        result = insert(type, name, offset, nativeTypeId);
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = insert(type, nameBytesPtr, offset, nativeTypeId);
+            result = insert(type, nameBytesPtr, offset, nativeTypeId);
         }
 #endif
 
-        err.ThrowIfError();
+        result.ThrowIfError();
     }
 
     internal static void Insert(H5Type typeId, string name, ssize_t offset, H5Type dataTypeId)
@@ -206,9 +203,9 @@ internal static unsafe class H5TAdapter
 
     internal static bool IsVariableLengthString(H5Type typeId)
     {
-        int err = is_variable_str(typeId);
-        err.ThrowIfError();
-        return err > 0;
+        int result = is_variable_str(typeId);
+        result.ThrowIfError();
+        return result > 0;
     }
 
     internal static H5EnumType<T> CreateEnumType<T>() where T : unmanaged, Enum
@@ -294,8 +291,7 @@ internal static unsafe class H5TAdapter
 
     internal static void SetPadding(H5Type h5Type, StringPadding padding)
     {
-        int err = set_strpad(h5Type, (str_t)padding);
-        err.ThrowIfError();
+        set_strpad(h5Type, (str_t)padding).ThrowIfError();
     }
 
     internal static StringPadding GetPadding(H5Type h5Type)
@@ -307,8 +303,7 @@ internal static unsafe class H5TAdapter
 
     internal static void SetSize(H5Type h5Type, int size)
     {
-        int err = set_size(h5Type, new IntPtr(size));
-        err.ThrowIfError();
+        set_size(h5Type, new IntPtr(size)).ThrowIfError();
     }
 
     internal static int GetSize(H5Type h5Type)
@@ -340,20 +335,20 @@ internal static unsafe class H5TAdapter
 
         using var linkCreationPropertyList = H5Link.CreateCreationPropertyList();
 
-        int err;
+        int result;
 
 #if NET7_0_OR_GREATER
-        err = commit(h5Object, name, h5Type,
+        result = commit(h5Object, name, h5Type,
             linkCreationPropertyList, dataTypeCreationPropertyList, dataTypeAccessPropertyList);
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = commit(h5Object, nameBytesPtr, h5Type,
+            result = commit(h5Object, nameBytesPtr, h5Type,
                 linkCreationPropertyList, dataTypeCreationPropertyList, dataTypeAccessPropertyList);
         }
 #endif
 
-        err.ThrowIfError();
+        result.ThrowIfError();
     }
 
     internal static H5DataTypeCreationPropertyList CreateCreationPropertyList()
@@ -368,8 +363,7 @@ internal static unsafe class H5TAdapter
 
     internal static void Lock(H5Type type)
     {
-        int err = lock_datatype(type);
-        err.ThrowIfError();
+        lock_datatype(type).ThrowIfError();
     }
 
     internal static H5Type Open<T>(
@@ -396,5 +390,12 @@ internal static unsafe class H5TAdapter
         h.ThrowIfInvalidHandleValue();
 
         return new H5Type(h);
+    }
+
+    internal static int GetNumberOfMember(H5Type type)
+    {
+        int result = get_nmembers(type);
+        result.ThrowIfError();
+        return result;
     }
 }

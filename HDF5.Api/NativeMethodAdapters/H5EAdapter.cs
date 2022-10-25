@@ -11,17 +11,16 @@ internal static class H5EAdapter
 {
     internal static void DisableErrorPrinting()
     {
-        int err = set_auto(DEFAULT, null!, IntPtr.Zero);
-        err.ThrowIfError();
+        set_auto(DEFAULT, null!, IntPtr.Zero).ThrowIfError();
     }
 
     internal static ICollection<H5ErrorInfo> WalkStack()
     {
         List<H5ErrorInfo> errors = new();
 
-        int err = walk(DEFAULT, direction_t.H5E_WALK_DOWNWARD, Callback, IntPtr.Zero);
+        int result = walk(DEFAULT, direction_t.H5E_WALK_DOWNWARD, Callback, IntPtr.Zero);
 
-        if (err < 0)
+        if (result < 0)
         {
             Trace.WriteLine("Error calling H5E.walk");
         }

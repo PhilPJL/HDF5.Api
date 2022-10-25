@@ -17,9 +17,9 @@ internal static class H5ZAdapter
             case FilterType.SZip:
             case FilterType.NBit:
             case FilterType.ScaleOffset:
-                int err = filter_avail((filter_t)filterType);
-                err.ThrowIfError();
-                return err > 0;
+                int result = filter_avail((filter_t)filterType);
+                result.ThrowIfError();
+                return result > 0;
             default:
                 throw new InvalidEnumArgumentException(nameof(filterType), (int)filterType, typeof(FilterType));
         }
