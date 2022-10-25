@@ -8,10 +8,8 @@ public class H5TypeTests : H5Test<H5TypeTests>
     [TestMethod]
     public void CreateCommittedDataTypeAsciiSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             const string bigString = "bigstring";
 
             using var bigStringType = H5StringType.CreateFixedLengthStringType(1000);
@@ -32,10 +30,8 @@ public class H5TypeTests : H5Test<H5TypeTests>
     [TestMethod]
     public void CreateCommittedDataTypeUtf8Succeeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             const string bigString = "Χαρακτηριστικό";
 
             using var bigStringType = H5StringType.CreateFixedLengthStringType(1000);
@@ -58,10 +54,8 @@ public class H5TypeTests : H5Test<H5TypeTests>
     [DataRow("TypeWithUtf8PropertyAndUf8Name_᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫")]
     public void CreateAndOpenCompoundDataTypeAsciiSucceeds(string name)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(name);
-
             using (var type = H5Type.CreateCompoundType<CompoundType>()
                 .Insert<CompoundType, int>(nameof(CompoundType.Id))
                 .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
@@ -74,16 +68,15 @@ public class H5TypeTests : H5Test<H5TypeTests>
             {
                 Assert.AreEqual("/" + name, type.Name);
             }
-        });
+        },
+        name);
     }
 
     [TestMethod]
     public void OpenInvalidCompoundDataTypeFails()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             Assert.ThrowsException<H5Exception>(() => file.OpenType("TypeWithUtf8"));
         });
 
@@ -94,10 +87,8 @@ public class H5TypeTests : H5Test<H5TypeTests>
     [TestMethod]
     public void CreateWriteReadDeleteAttributesSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             using var type = H5Type.CreateCompoundType<CompoundType>()
                 .Insert<CompoundType, int>(nameof(CompoundType.Id))
                 .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
@@ -112,10 +103,8 @@ public class H5TypeTests : H5Test<H5TypeTests>
     [TestMethod]
     public void AttributeOnUncommittedTypeThrows()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             using var type = H5Type.CreateCompoundType<CompoundType>()
                 .Insert<CompoundType, int>(nameof(CompoundType.Id))
                 .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
@@ -128,10 +117,8 @@ public class H5TypeTests : H5Test<H5TypeTests>
     [TestMethod]
     public void CreateIterateAttributesSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             using var type = H5Type.CreateCompoundType<CompoundType>()
                 .Insert<CompoundType, int>(nameof(CompoundType.Id))
                 .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))

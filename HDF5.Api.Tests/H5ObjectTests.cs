@@ -6,10 +6,8 @@
         [TestMethod]
         public void HasHandleTypeTest()
         {
-            HandleCheck(() =>
+            HandleCheck((file) =>
             {
-                using var file = CreateFile();
-
                 file.AssertHasHandleType(HandleType.File);
                 Assert.ThrowsException<H5Exception>(() => file.AssertHasHandleType(HandleType.Group));
                 Assert.ThrowsException<H5Exception>(() => file.AssertHasHandleType(HandleType.Attribute));
@@ -58,14 +56,24 @@
         [TestMethod]
         public void DisposeAlreadyDisposedObjectDoesntThrow()
         {
-            HandleCheck(() =>
-            {
-                var file = CreateFile();
+            // Note: don't use HandleCheck since it uses the disposed file and then throws an ObjectDisposedExcepton
+            using var file = CreateFile();
 
-                Assert.IsFalse(file.IsDisposed);
-                file.Dispose();
-                Assert.IsTrue(file.IsDisposed);
-                file.Dispose();
+            Assert.IsFalse(file.IsDisposed);
+            file.Dispose();
+            Assert.IsTrue(file.IsDisposed);
+            file.Dispose();
+        }
+
+        [TestMethod]
+        public void UsingDisposedObjectThrows()
+        {
+            HandleCheck((file) =>
+            {
+                var group = file.CreateGroup("test-group");
+                group.Dispose();
+
+                Assert.ThrowsException<ObjectDisposedException>(() => group.CreateGroup("sub-group"));
             });
         }
     }

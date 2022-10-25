@@ -60,7 +60,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void CreateAndExerciseIntBaseEnumTypeSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
             using var enumType = H5TAdapter.CreateBaseEnumType<TestInt>();
 
@@ -87,7 +87,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void CreateAndExerciseIntEnumTypeSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
             using var enumType = H5Type.CreateEnumType<TestInt>();
 
@@ -108,7 +108,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void IntEnumTypesAreEqual()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
             using var enumType1 = H5Type.CreateEnumType<TestInt>();
             using var enumType2 = H5Type.CreateEnumType<TestInt>();
@@ -122,7 +122,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void CreateAndExerciseShortEnumTypeSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
             using var enumType = H5TAdapter.CreateBaseEnumType<TestShort>();
 
@@ -149,7 +149,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void CreateIntEnumTypesSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
             using var e1 = H5TAdapter.CreateBaseEnumType<TestByte>();
             using var e2 = H5TAdapter.CreateBaseEnumType<TestShort>();
@@ -164,7 +164,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void CreateDuplicateEnumNameFails()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
             using var enumType = H5TAdapter.CreateBaseEnumType<TestShort>();
 
@@ -177,7 +177,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void CreateDuplicateEnumValueFails()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
             using var enumType = H5TAdapter.CreateBaseEnumType<TestShort>();
 

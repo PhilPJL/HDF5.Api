@@ -6,10 +6,8 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
     [TestMethod]
     public void FileCreationPropertyList()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Is create list the same as default?
             using var fpc1 = new H5FileCreationPropertyList();
             using var fpc2 = H5File.CreateCreationPropertyList();
@@ -24,10 +22,8 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
     [TestMethod]
     public void FileAccessPropertyList()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Is create list the same as default?
             using var fpc1 = new H5FileAccessPropertyList();
             using var fpc2 = H5File.CreateAccessPropertyList();
@@ -39,10 +35,8 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
     [TestMethod]
     public void PropertyListHelpersTest()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // file property lists
             using var fpc1 = file.GetCreationPropertyList();
             using var fpc2 = H5File.CreateCreationPropertyList();

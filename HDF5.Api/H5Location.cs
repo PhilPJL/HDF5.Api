@@ -57,8 +57,6 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T>, IH5Location whe
     /// </summary>
     public H5Group CreateGroup([DisallowNull] string name)
     {
-        Guard.IsNotNullOrWhiteSpace(name);
-
         return CreateGroup(name, null);
     }
 

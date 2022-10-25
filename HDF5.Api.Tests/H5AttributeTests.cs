@@ -14,10 +14,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     [DataRow("utf8_space", CharacterSet.Utf8, StringPadding.Space)]
     public void ReadWriteFixedLengthStringAttributeSucceeds(string fileNameSuffix, CharacterSet characterSet, StringPadding padding)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(fileNameSuffix);
-
             Test(file, "fixed_null", null, 10, characterSet, padding);
             Test(file, "fixed_empty", "", 10, characterSet, padding);
             Test(file, "fixed_22", "12345678912345678912", 32, characterSet, padding);
@@ -45,7 +43,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
                 Assert.AreEqual(name, attribute.Name);
             }
-        });
+        }, 
+        fileNameSuffix);
     }
 
     [TestMethod]
@@ -57,10 +56,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     [DataRow("v_utf8_space", CharacterSet.Utf8, StringPadding.Space)]
     public void ReadWriteVariableLengthStringAttributeSucceeds(string fileNameSuffix, CharacterSet characterSet, StringPadding padding)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(fileNameSuffix);
-
             Test(file, "variable_null", null, 0, characterSet, padding);
             Test(file, "variable_empty", "", 0, characterSet, padding);
             Test(file, "variable_short", "12345678912345678912", 0, characterSet, padding);
@@ -92,7 +89,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                     Assert.AreEqual(name, attribute.Name);
                 }
             }
-        });
+        },
+        fileNameSuffix);
     }
 
     [TestMethod]
@@ -100,10 +98,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     [DataRow("utf8", "Χαρακτηριστικό")]
     public void CreateDuplicateAttributeNameThrows(string filename, string attributeName)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(filename);
-
             // Create group
             using var group = file.CreateGroup("group");
 
@@ -131,16 +127,15 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             // File + Group + 2 x DataSet
             Assert.AreEqual(4, file.GetObjectCount());
-        });
+        },
+        filename);
     }
 
     [TestMethod]
     public void RewriteStringAttributeSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create group
             using var group = file.CreateGroup("group");
 
@@ -164,10 +159,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     [TestMethod]
     public void ReadInvalidAttributeTypeFails()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create group
             using var group = file.CreateGroup("group");
 

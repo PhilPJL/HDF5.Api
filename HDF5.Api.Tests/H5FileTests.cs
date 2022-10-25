@@ -165,10 +165,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void CreateGroupInFileSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             CreateGroupSucceeds(file);
         });
     }
@@ -176,10 +174,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void CreateAndOpenGroupInFileSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             CreateAndOpenGroupSucceeds(file);
         });
     }
@@ -187,10 +183,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void CreateOpenDeleteGroupInFileSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             CreateOpenDeleteGroupSucceeds(file);
         });
     }
@@ -198,10 +192,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void OpenExistingGroupPathSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             OpenExistingGroupPathSucceeds(file);
         });
     }
@@ -209,10 +201,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void OpenNonExistingGroupThrows()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             OpenNonExistingGroupThrows(file);
         });
     }
@@ -220,10 +210,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void CreateGroupEmptyNameFails()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             CreateGroupEmptyNameFails(file);
         });
     }
@@ -231,10 +219,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void CreateDuplicateGroupFails()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             CreateDuplicateGroupFails(file);
         });
     }
@@ -250,10 +236,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void GroupExistsReturnsFalseForNoGroup()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             GroupExistsReturnsFalseForNoGroup(file);
         });
     }
@@ -261,10 +245,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void GroupExistsThrowsForGroupPathName()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             GroupExistsThrowsForGroupPathName(file);
         });
     }
@@ -272,10 +254,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void GroupPathExistsSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             GroupPathExistsSucceeds(file);
         });
     }
@@ -283,10 +263,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void GetChildrenSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             GetChildGroupsSucceeds(file);
         });
     }
@@ -294,10 +272,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void EnumerateChildrenSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             EnumerateGroupsSucceeds(file);
         });
     }
@@ -309,10 +285,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void CreateWriteReadDeleteAttributesSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             H5AttributeTests.CreateWriteReadDeleteAttributesSucceeds(file);
         });
     }
@@ -320,10 +294,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void CreateIterateAttributesSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             H5AttributeTests.CreateIterateAttributesSucceeds(file);
         });
     }
@@ -335,10 +307,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void CreateDataSetSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             CreateDataSetSucceeds(file);
 
             Assert.AreEqual(1, file.GetObjectCount());
@@ -348,10 +318,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void CreateAndOpenDataSetSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             CreateAndOpenDataSetSucceeds(file);
 
             Assert.AreEqual(1, file.GetObjectCount());
@@ -366,21 +334,18 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [DataRow("Χαρακτηριστικό")]
     public void GetNameSucceeds(string suffix)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(suffix);
-
             Assert.AreEqual(GetFileName2(suffix), file.Name);
-        });
+        },
+        suffix);
     }
 
     [TestMethod]
     public void GetSizeSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             Assert.AreNotEqual(0, file.Size);
         });
     }
@@ -388,10 +353,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void FlushSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             file.CreateAndWriteAttribute("test", "1111111111111111111111111111111111", 50);
 
             // Flush just for code coverage

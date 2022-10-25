@@ -12,7 +12,7 @@ public abstract class H5Test<T> where T : H5Test<T>
     public void TestInitialize()
     {
         H5Error.DisableErrorPrinting();
-        
+
         if (!Directory.Exists(TestFolder))
         {
             Directory.CreateDirectory(TestFolder);
@@ -34,6 +34,62 @@ public abstract class H5Test<T> where T : H5Test<T>
         }
 #endif
         Assert.AreEqual(expectedHandlesOpen, H5Handle.OpenHandleCount);
+
+        // TODO: verify H5 allocated memory has been released
+    }
+
+    /// <summary>
+    ///     Verify all handles have been closed after completion of test.
+    /// </summary>
+    /// <param name="action">The action to run.</param>
+    /// <param name="expectedHandlesOpen">The number of handles expected to be open after the action has run.</param>
+    internal static void HandleCheck(Action<H5File> action,
+        [CallerMemberName] string? path = null, bool failIfExists = false, H5FileCreationPropertyList? fileCreationPropertyList = null,
+        int expectedHandlesOpen = 0)
+    {
+        using var file = CreateFile(path, failIfExists, fileCreationPropertyList);
+
+        action(file);
+
+#if DEBUG
+        if (expectedHandlesOpen == 0 && H5Handle.OpenHandleCount > 1)
+        {
+            H5Handle.DumpOpenHandles();
+        }
+#endif
+
+        Assert.AreEqual(file.GetObjectCount(), 1);
+        Assert.AreEqual(file.GetObjectCount(), H5Handle.OpenHandleCount);
+        Assert.AreEqual(expectedHandlesOpen + 1, H5Handle.OpenHandleCount);
+
+        // TODO: verify H5 allocated memory has been released
+    }
+
+    /// <summary>
+    ///     Verify all handles have been closed after completion of test.
+    /// </summary>
+    /// <param name="action">The action to run.</param>
+    /// <param name="expectedHandlesOpen">The number of handles expected to be open after the action has run.</param>
+    internal static void HandleCheck2(Action<H5File> action,
+        string suffix,
+        [CallerMemberName] string? path = null, bool failIfExists = false, H5FileCreationPropertyList? fileCreationPropertyList = null,
+        int expectedHandlesOpen = 0)
+    {
+        using var file = CreateFile2(suffix, path, failIfExists, fileCreationPropertyList);
+
+        action(file);
+
+#if DEBUG
+        if (expectedHandlesOpen == 0 && H5Handle.OpenHandleCount > 1)
+        {
+            H5Handle.DumpOpenHandles();
+        }
+#endif
+        Assert.AreEqual(file.GetObjectCount(), 1);
+        Assert.AreEqual(file.GetObjectCount(), H5Handle.OpenHandleCount);
+        Assert.AreEqual(expectedHandlesOpen + 1, H5Handle.OpenHandleCount);
+
+        // TODO: verify H5 allocated memory has been released
     }
 
     protected string GetFileName([CallerMemberName] string? path = null)
