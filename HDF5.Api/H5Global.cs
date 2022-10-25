@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using static HDF5.Api.NativeMethods.H5;
+using static HDF5.Api.NativeMethods.H5T;
 
 namespace HDF5.Api;
 
@@ -62,9 +63,9 @@ public static class H5Global
         uint minor = 0;
         uint revision = 0;
 
-        int err = get_libversion(ref major, ref minor, ref revision);
+        int result = get_libversion(ref major, ref minor, ref revision);
 
-        err.ThrowIfError();
+        result.ThrowIfError();
 
         return new Version((int)major, (int)minor, 0, (int)revision);
     }
@@ -75,9 +76,9 @@ public static class H5Global
     public static bool IsThreadSafe()
     {
         uint is_ts = 0;
-        int err = is_library_threadsafe(ref is_ts);
+        int result = is_library_threadsafe(ref is_ts);
 
-        err.ThrowIfError();
+        result.ThrowIfError();
 
         return is_ts != 0;
     }
@@ -91,7 +92,7 @@ public static class H5Global
 }
 
 [Flags]
-public enum H5FObjectType : uint
+public enum FileObjectType : uint
 {
     All = H5F.OBJ_ALL,
     Attribute = H5F.OBJ_ATTR,
@@ -102,7 +103,7 @@ public enum H5FObjectType : uint
     Local = H5F.OBJ_LOCAL
 }
 
-public enum H5ObjectType
+public enum ObjectType
 {
     Group = H5O.type_t.GROUP,
     DataSet = H5O.type_t.DATASET,
@@ -162,18 +163,18 @@ public readonly struct Dimension
 
 public enum DataTypeClass
 {
-    None = -1,
-    Integer = 0,
-    Float = 1,
-    Time = 2,
-    String = 3,
-    BitField = 4,
-    Opaque = 5,
-    Compound = 6,
-    Reference = 7,
-    Enum = 8,
-    VariableLength = 9,
-    Array = 10,
+    None = class_t.NO_CLASS,
+    Integer = class_t.INTEGER,
+    Float = class_t.FLOAT,
+    Time = class_t.TIME,
+    String = class_t.STRING,
+    BitField = class_t.BITFIELD,
+    Opaque = class_t.OPAQUE,
+    Compound = class_t.COMPOUND,
+    Reference = class_t.REFERENCE,
+    Enum = class_t.ENUM,
+    VariableLength = class_t.VLEN,
+    Array = class_t.ARRAY,
     NClasses
 }
 

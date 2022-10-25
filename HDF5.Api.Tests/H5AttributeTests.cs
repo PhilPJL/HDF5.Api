@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using HDF5.Api.NativeMethodAdapters;
+using System.Diagnostics;
 
 namespace HDF5.Api.Tests;
 
@@ -14,10 +15,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     [DataRow("utf8_space", CharacterSet.Utf8, StringPadding.Space)]
     public void ReadWriteFixedLengthStringAttributeSucceeds(string fileNameSuffix, CharacterSet characterSet, StringPadding padding)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(fileNameSuffix);
-
             Test(file, "fixed_null", null, 10, characterSet, padding);
             Test(file, "fixed_empty", "", 10, characterSet, padding);
             Test(file, "fixed_22", "12345678912345678912", 32, characterSet, padding);
@@ -39,13 +38,14 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 }
 
                 var r = attribute.ReadString();
-                
+
                 // NOTE: assuming that if no value is written ReadString will return string.Empty
                 Assert.AreEqual(value ?? string.Empty, r);
 
                 Assert.AreEqual(name, attribute.Name);
             }
-        });
+        },
+        fileNameSuffix);
     }
 
     [TestMethod]
@@ -57,10 +57,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     [DataRow("v_utf8_space", CharacterSet.Utf8, StringPadding.Space)]
     public void ReadWriteVariableLengthStringAttributeSucceeds(string fileNameSuffix, CharacterSet characterSet, StringPadding padding)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(fileNameSuffix);
-
             Test(file, "variable_null", null, 0, characterSet, padding);
             Test(file, "variable_empty", "", 0, characterSet, padding);
             Test(file, "variable_short", "12345678912345678912", 0, characterSet, padding);
@@ -92,7 +90,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                     Assert.AreEqual(name, attribute.Name);
                 }
             }
-        });
+        },
+        fileNameSuffix);
     }
 
     [TestMethod]
@@ -100,10 +99,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     [DataRow("utf8", "Χαρακτηριστικό")]
     public void CreateDuplicateAttributeNameThrows(string filename, string attributeName)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(filename);
-
             // Create group
             using var group = file.CreateGroup("group");
 
@@ -131,16 +128,15 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             // File + Group + 2 x DataSet
             Assert.AreEqual(4, file.GetObjectCount());
-        });
+        },
+        filename);
     }
 
     [TestMethod]
     public void RewriteStringAttributeSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create group
             using var group = file.CreateGroup("group");
 
@@ -164,10 +160,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     [TestMethod]
     public void ReadInvalidAttributeTypeFails()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create group
             using var group = file.CreateGroup("group");
 
@@ -196,7 +190,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         objectWithAttributes.CreateAndWriteAttribute("byte-min", byte.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("byte", (byte)5);
         objectWithAttributes.CreateAndWriteAttribute("byte-max", byte.MaxValue);
-        
+
         objectWithAttributes.CreateAndWriteAttribute("int16-min", short.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("int16", (short)5);
         objectWithAttributes.CreateAndWriteAttribute("int16-max", short.MaxValue);
@@ -216,15 +210,15 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         objectWithAttributes.CreateAndWriteAttribute("long-min", long.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("long", 9L);
         objectWithAttributes.CreateAndWriteAttribute("long-max", long.MaxValue);
-        
+
         objectWithAttributes.CreateAndWriteAttribute("ulong-min", ulong.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("ulong", 10ul);
         objectWithAttributes.CreateAndWriteAttribute("ulong-max", ulong.MaxValue);
-        
+
         objectWithAttributes.CreateAndWriteAttribute("float-min", float.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("float", 11.0f);
         objectWithAttributes.CreateAndWriteAttribute("float-max", float.MaxValue);
-        
+
         objectWithAttributes.CreateAndWriteAttribute("double-min", double.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("double", 12.0d);
         objectWithAttributes.CreateAndWriteAttribute("double-max", double.MaxValue);
@@ -278,7 +272,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteAttribute((short)15, (short)99);
         CreateWriteReadUpdateDeleteAttribute((ushort)15, (ushort)77);
         CreateWriteReadUpdateDeleteAttribute((byte)15, (byte)0xff);
-        //CreateWriteReadUpdateDeleteBoolAttribute(true, false);
+//        CreateWriteReadUpdateDeleteBoolAttribute(true, false);
         CreateWriteReadUpdateDeleteAttribute(15, 1234);
         CreateWriteReadUpdateDeleteAttribute(15u, 4567u);
         CreateWriteReadUpdateDeleteAttribute(15L, long.MaxValue);
@@ -439,6 +433,62 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     }
 
     [TestMethod]
+    public void BoolAttribute()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+
+            using var type = H5Type.GetEquivalentNativeType<bool>();
+            Debug.WriteLine(type.GetClass());
+            using var size = H5Space.CreateScalar();
+
+            using var attributeTrue = file.CreateAttribute("boolTestTrue", type, size);
+            attributeTrue.Write(true);
+            Debug.WriteLine(H5AAdapter.ReadBool(attributeTrue));
+
+            using var attributeFalse = file.CreateAttribute("boolTestFalse", type, size);
+            attributeFalse.Write(false);
+            Debug.WriteLine(H5AAdapter.ReadBool(attributeFalse));
+        });
+    }
+
+    [TestMethod]
+    public void CreateReadWriteEnumAttributesSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+            using var size = H5Space.CreateScalar();
+
+            CreateValue(TestInt.Min, TestInt.Max);
+            CreateValue(TestUInt.Min, TestUInt.Max);
+            CreateValue(TestLong.Min, TestLong.Max);
+            CreateValue(TestULong.Min, TestULong.Max);
+            CreateValue(TestShort.Min, TestShort.Max);
+            CreateValue(TestUShort.Min, TestUShort.Max);
+            CreateValue(TestByte.Min, TestByte.Max);
+            CreateValue(TestSByte.Min, TestSByte.Max);
+
+            void CreateValue<T>(T valueMin, T valueMax) where T : unmanaged, Enum
+            {
+                using var type = H5Type.CreateEnumType<T>();
+                using var attMin = file.CreateAttribute($"{typeof(T).Name}:{valueMin}", type, size);
+                attMin.Write(valueMin);
+
+                var min = attMin.ReadEnum<T>();
+                Assert.AreEqual(valueMin, min);
+
+                using var attMax = file.CreateAttribute($"{typeof(T).Name}:{valueMax}", type, size);
+                attMax.Write(valueMax);
+
+                var max = attMax.ReadEnum<T>();
+                Assert.AreEqual(valueMax, max);
+            }
+        });
+    }
+
+    [TestMethod]
     public void EmptyAttributeNameThrows()
     {
         HandleCheck(() =>
@@ -474,4 +524,56 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => attribute.Write("012345678901234567890")); // does throw
         });
     }
+}
+
+enum TestInt
+{
+    None = 0,
+    Min = int.MinValue,
+    Max = int.MaxValue,
+}
+
+enum TestUInt : uint
+{
+    Min = uint.MinValue,
+    Max = uint.MaxValue,
+}
+
+enum TestLong : long
+{
+    None = 0,
+    Min = long.MinValue,
+    Max = long.MaxValue
+}
+
+enum TestULong : ulong
+{
+    Min = ulong.MinValue,
+    Max = ulong.MaxValue
+}
+
+enum TestShort : short
+{
+    None = 0,
+    Min = short.MinValue,
+    Max = short.MaxValue
+}
+
+enum TestUShort : ushort
+{
+    Min = ushort.MinValue,
+    Max = ushort.MaxValue
+}
+
+enum TestByte : byte
+{
+    Min = byte.MinValue,
+    Max = byte.MaxValue
+}
+
+enum TestSByte : sbyte
+{
+    None = 0,
+    Min = sbyte.MinValue,
+    Max = sbyte.MaxValue
 }

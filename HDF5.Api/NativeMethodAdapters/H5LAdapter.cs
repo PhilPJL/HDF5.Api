@@ -18,20 +18,14 @@ internal static unsafe class H5LAdapter
     {
         location.AssertHasLocationHandleType();
 
-        int err;
-
 #if NET7_0_OR_GREATER
-        err = exists(location, name, linkAccessPropertyList);
+        return exists(location, name, linkAccessPropertyList).ThrowIfError() > 0;
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = exists(location, nameBytesPtr, linkAccessPropertyList);
+            return exists(location, nameBytesPtr, linkAccessPropertyList).ThrowIfError() > 0;
         }
 #endif
-
-        err.ThrowIfError();
-
-        return err > 0;
     }
 
     internal static void Delete<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList)
@@ -39,30 +33,24 @@ internal static unsafe class H5LAdapter
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet, HandleType.Attribute);
 
-        int err;
-
 #if NET7_0_OR_GREATER
-         err = delete(location, name, linkAccessPropertyList);
+        delete(location, name, linkAccessPropertyList).ThrowIfError();
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = delete(location, nameBytesPtr, linkAccessPropertyList);
+            delete(location, nameBytesPtr, linkAccessPropertyList).ThrowIfError();
         }
 #endif
-
-        err.ThrowIfError();
     }
 
-    private static IEnumerable<(string name, H5ObjectType type)> GetMembers<T>(H5Location<T> location, H5O.type_t type)
+    private static IEnumerable<(string name, ObjectType type)> GetMembers<T>(H5Location<T> location, H5O.type_t type)
         where T : H5Object<T>
     {
         ulong idx = 0;
 
-        var names = new List<(string, H5ObjectType)>();
+        var names = new List<(string, ObjectType)>();
 
-        int err = iterate(location, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
-
-        err.ThrowIfError();
+        iterate(location, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero).ThrowIfError();
 
         return names;
 
@@ -87,7 +75,7 @@ internal static unsafe class H5LAdapter
 
                     if (oinfo.type == type || type == H5O.type_t.UNKNOWN)
                     {
-                        names.Add((name, (H5ObjectType)oinfo.type));
+                        names.Add((name, (ObjectType)oinfo.type));
                     }
                 }
 
@@ -110,7 +98,7 @@ internal static unsafe class H5LAdapter
     internal static IEnumerable<string> GetNamedDataTypeNames<T>(H5Location<T> location)
         where T : H5Object<T> => GetMembers(location, H5O.type_t.NAMED_DATATYPE).Select(m => m.name);
 
-    internal static IEnumerable<(string name, H5ObjectType type)> GetMembers<T>(H5Location<T> location)
+    internal static IEnumerable<(string name, ObjectType type)> GetMembers<T>(H5Location<T> location)
         where T : H5Object<T> => GetMembers(location, H5O.type_t.UNKNOWN);
 
     /// <summary>

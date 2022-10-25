@@ -17,4 +17,6 @@ public class H5StringType : H5Type
     {
         return H5TAdapter.CreateVariableLengthStringType();
     }
+
+    // TODO: move CharacterSet etc here
 }

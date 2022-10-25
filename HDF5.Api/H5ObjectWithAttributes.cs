@@ -126,11 +126,12 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        using var type = H5Type.GetNativeType<TA>();
+        using var type = H5Type.GetEquivalentNativeType<TA>();
 
         if (typeof(TA) == typeof(bool))
         {
-            CreateAndWriteAttribute(type, name, (byte)(value.Equals(default) ? 1 : 0));
+            var byteValue = (byte)(value.Equals(default) ? 0 : 0x01);
+            CreateAndWriteAttribute(type, name, byteValue);
         }
         else
         {

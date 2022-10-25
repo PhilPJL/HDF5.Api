@@ -9,10 +9,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void CreateGroupInGroupSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -24,10 +22,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void CreateAndOpenGroupInGroupSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -39,10 +35,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void CreateOpenDeleteGroupInGroupSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -54,10 +48,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void OpenExistingGroupPathSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -69,10 +61,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void OpenNonExistingGroupThrows()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -84,10 +74,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void CreateGroupEmptyNameFails()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -99,10 +87,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void CreateDuplicateGroupFails()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -114,22 +100,21 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void GroupExistsReturnsTrueForGroup()
     {
-        using var file = CreateFile();
+        HandleCheck((file) =>
+        {
+            // Create new group
+            using var group = file.CreateGroup("parent");
+            Assert.IsTrue(file.GroupExists("parent"));
 
-        // Create new group
-        using var group = file.CreateGroup("parent");
-        Assert.IsTrue(file.GroupExists("parent"));
-
-        GroupExistsReturnsTrueForGroup(group);
+            GroupExistsReturnsTrueForGroup(group);
+        });
     }
 
     [TestMethod]
     public void GroupExistsReturnsFalseForNoGroup()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -141,10 +126,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void GroupExistsThrowsForGroupPathName()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -156,10 +139,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void GroupPathExistsSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -171,10 +152,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void GetChildrenSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -186,10 +165,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void EnumerateChildrenSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             EnumerateGroupsSucceeds(file);
         });
     }
@@ -199,10 +176,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void CreateWriteReadDeleteAttributesSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create group
             using var group = file.CreateGroup("group");
 
@@ -213,10 +188,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void CreateIterateAttributesSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create group
             using var group = file.CreateGroup("group");
 
@@ -230,10 +203,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void CreateDataSetSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -245,10 +216,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void CreateAndOpenDataSetSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             // Create new group
             using var group = file.CreateGroup("parent");
             Assert.IsTrue(file.GroupExists("parent"));
@@ -264,9 +233,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [DataRow("utf8", "Χαρακτηριστικό")]
     public void CreateGroupAndCheckNameSucceeds(string suffix, string name)
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile2(suffix);
             using var group = file.CreateGroup(name);
 
             Assert.IsTrue(file.GroupNames.Contains(name));
@@ -274,7 +242,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
 
             // group.Name returns rooted path name
             Assert.AreEqual("/" + name, group.Name);
-        });
+        },
+        suffix);
     }
 
     [TestMethod]
@@ -282,9 +251,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [DataRow("utf8", "Χαρακτηριστικό")]
     public void CreateGroupAndCheckNameSucceeds2(string suffix, string name)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(suffix);
             using var parent = file.CreateGroup("parent");
             using var group = parent.CreateGroup(name);
 
@@ -293,16 +261,15 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
 
             // group.Name returns rooted path name
             Assert.AreEqual("/parent/" + name, group.Name);
-        });
+        },
+        suffix);
     }
 
     [TestMethod]
     public void CreateIntermediateGroupsSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             const string groupPath = "parent/child/grandchild";
 
             using var grandChild = file.CreateGroup(groupPath);
@@ -328,10 +295,8 @@ public class H5GroupTests : H5LocationTests<H5GroupTests>
     [TestMethod]
     public void CreateIntermediateGroupsThrows()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile();
-
             const string groupPath = "parent/child/grandchild";
 
             using var lcpl = H5Link.CreateCreationPropertyList(createIntermediateGroups: false);

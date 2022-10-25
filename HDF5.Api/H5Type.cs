@@ -13,6 +13,8 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 
     private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
 
+    internal static H5Type CreateNonTracked(long handle) => new(handle, null);
+
     #region Equality and hashcode
 
     public bool IsEqualTo([AllowNull] H5Type? other)
@@ -50,11 +52,26 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 
     #endregion
 
-    public static H5Type GetNativeType<T>() where T : unmanaged
+    /// <summary>
+    /// Gets the equivalent native type for a primitive .NET type
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="H5Exception"></exception>
+    public static H5Type GetEquivalentNativeType<T>() where T : unmanaged
     {
-        long nativeHandle = H5TAdapter.GetNativeType<T>();
+        return H5TAdapter.GetEquivalentNativeType<T>();
+    }
 
-        return new H5Type(nativeHandle, null);
+    /// <summary>
+    /// Gets the equivalent native type for an H5 type
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="H5Exception"></exception>
+    public static H5Type GetEquivalentNativeType(H5Type type)
+    {
+        return H5TAdapter.GetEquivalentNativeType(type);
     }
 
     public H5Type Insert([DisallowNull] string name, int offset, [DisallowNull] H5Type dataType)
@@ -80,7 +97,8 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         Guard.IsNotNullOrWhiteSpace(name);
 
         var offset = Marshal.OffsetOf<TS>(name);
-        H5TAdapter.Insert(this, name, offset, GetNativeType<TP>());
+        using var type = GetEquivalentNativeType<TP>();
+        H5TAdapter.Insert(this, name, offset, type);
         return this;
     }
 
@@ -97,20 +115,18 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     /// <summary>
     ///     Create a Compound type in order to hold an <typeparamref name="T" />
     /// </summary>
-    public static H5Type CreateCompoundType<T>() where T : struct
+    public static H5Type CreateCompoundType<T>() where T : unmanaged
     {
-        int size = Marshal.SizeOf<T>();
-        return CreateCompoundType(size);
+        return H5TAdapter.CreateCompoundType<T>();
     }
 
     /// <summary>
     ///     Create a Compound type in order to hold an <typeparamref name="T" /> plus additional space as defined by
     ///     <paramref name="extraSpace" />
     /// </summary>
-    public static H5Type CreateCompoundType<T>(int extraSpace) where T : struct
+    public static H5Type CreateCompoundType<T>(int extraSpace) where T : unmanaged
     {
-        int size = Marshal.SizeOf<T>() + extraSpace;
-        return CreateCompoundType(size);
+        return H5TAdapter.CreateCompoundType<T>(extraSpace);
     }
 
     public static H5Type CreateByteArrayType(int size)
@@ -171,4 +187,6 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         get => H5TAdapter.GetPadding(this);
         set => H5TAdapter.SetPadding(this, value);
     }
+
+    internal int NumberOfMembers => H5TAdapter.GetNumberOfMembers(this);
 }

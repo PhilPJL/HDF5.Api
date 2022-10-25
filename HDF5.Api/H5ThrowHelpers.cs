@@ -2,7 +2,7 @@
 
 internal static class H5ThrowHelpers
 {
-    public static void ThrowIfInvalidHandleValue(this long handle, [CallerMemberName] string? methodName = null)
+    public static long ThrowIfInvalidHandleValue(this long handle, [CallerMemberName] string? methodName = null)
     {
         if (handle <= H5Handle.InvalidHandleValue)
         {
@@ -13,40 +13,48 @@ internal static class H5ThrowHelpers
 
             throw new H5Exception($"Bad handle [{handle}] in method: {methodName}.");
         }
+
+        return handle;
     }
 
-    public static void ThrowIfDefaultOrInvalidHandleValue(this long handle, string message)
+    public static long ThrowIfDefaultOrInvalidHandleValue(this long handle, string message)
     {
         if (handle <= H5Handle.DefaultHandleValue)
         {
             throw new H5Exception($"Bad handle [{handle}] when: {message}.");
         }
+
+        return handle;
     }
 
-    public static void ThrowIfError(this int err, [CallerMemberName] string? methodName = null)
+    public static int ThrowIfError(this int result, [CallerMemberName] string? methodName = null)
     {
-        if (err < 0)
+        if (result < 0)
         {
             if (string.IsNullOrWhiteSpace(methodName))
             {
-                throw new H5Exception($"Error: {err}.");
+                throw new H5Exception($"Error: {result}.");
             }
 
-            throw new H5Exception($"Error {err} calling: {methodName}.");
+            throw new H5Exception($"Error {result} calling: {methodName}.");
         }
+
+        return result;
     }
 
-    public static void ThrowIfError(this long err, [CallerMemberName] string? methodName = null)
+    public static long ThrowIfError(this long result, [CallerMemberName] string? methodName = null)
     {
-        if (err < 0)
+        if (result < 0)
         {
             if (string.IsNullOrWhiteSpace(methodName))
             {
-                throw new H5Exception($"Error: {err}.");
+                throw new H5Exception($"Error: {result}.");
             }
 
-            throw new H5Exception($"Error {err} calling: {methodName}.");
+            throw new H5Exception($"Error {result} calling: {methodName}.");
         }
+
+        return result;
     }
 
     public static void ThrowOnAttributeStorageMismatch<T>(int attributeStorageSize, int marshalSize)

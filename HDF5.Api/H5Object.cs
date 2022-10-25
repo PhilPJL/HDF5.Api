@@ -16,11 +16,11 @@ public class H5Object<T> : Disposable where T : H5Object<T>
 
     internal H5Object(long handle, HandleType handleType, Action<T>? closeHandle)
     {
+        handle.ThrowIfDefaultOrInvalidHandleValue($"Constructing {handleType}");
+
 #if DEBUG
         AssertHasHandleType(handle, handleType);
 #endif
-
-        handle.ThrowIfDefaultOrInvalidHandleValue($"Constructing {handleType}");
 
         _handle = handle;
         _closeHandle = closeHandle;
@@ -90,6 +90,7 @@ public class H5Object<T> : Disposable where T : H5Object<T>
 
     internal void AssertHasHandleType(params HandleType[] types)
     {
+        AssertNotDisposed();
         AssertHasHandleType(_handle, types);
     }
 

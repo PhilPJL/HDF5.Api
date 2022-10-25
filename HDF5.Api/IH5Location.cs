@@ -39,7 +39,7 @@ public interface IH5Location
         [DisallowNull] H5Type h5Type);
 
     // General
-    IEnumerable<(string name, H5ObjectType type)> Members { get; }
+    IEnumerable<(string name, ObjectType type)> Members { get; }
 
     string Name { get; }
 }

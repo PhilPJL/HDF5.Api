@@ -60,9 +60,9 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void CreateAndExerciseIntBaseEnumTypeSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var enumType = H5TAdapter.CreateBaseEnumType<TestInt>();
+            using var enumType = H5TAdapter.GetBaseEnumType<TestInt>();
 
             H5TAdapter.InsertEnumMember(enumType, nameof(TestInt.one), TestInt.one);
             H5TAdapter.InsertEnumMember(enumType, nameof(TestInt.two), TestInt.two);
@@ -87,7 +87,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void CreateAndExerciseIntEnumTypeSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
             using var enumType = H5Type.CreateEnumType<TestInt>();
 
@@ -108,7 +108,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void IntEnumTypesAreEqual()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
             using var enumType1 = H5Type.CreateEnumType<TestInt>();
             using var enumType2 = H5Type.CreateEnumType<TestInt>();
@@ -122,9 +122,9 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void CreateAndExerciseShortEnumTypeSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var enumType = H5TAdapter.CreateBaseEnumType<TestShort>();
+            using var enumType = H5TAdapter.GetBaseEnumType<TestShort>();
 
             H5TAdapter.InsertEnumMember(enumType, nameof(TestShort.one), TestShort.one);
             H5TAdapter.InsertEnumMember(enumType, nameof(TestShort.two), TestShort.two);
@@ -149,24 +149,24 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void CreateIntEnumTypesSucceeds()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var e1 = H5TAdapter.CreateBaseEnumType<TestByte>();
-            using var e2 = H5TAdapter.CreateBaseEnumType<TestShort>();
-            using var e3 = H5TAdapter.CreateBaseEnumType<TestUShort>();
-            using var e4 = H5TAdapter.CreateBaseEnumType<TestInt>();
-            using var e5 = H5TAdapter.CreateBaseEnumType<TestUInt>();
-            using var e6 = H5TAdapter.CreateBaseEnumType<TestLong>();
-            using var e7 = H5TAdapter.CreateBaseEnumType<TestULong>();
+            using var e1 = H5TAdapter.GetBaseEnumType<TestByte>();
+            using var e2 = H5TAdapter.GetBaseEnumType<TestShort>();
+            using var e3 = H5TAdapter.GetBaseEnumType<TestUShort>();
+            using var e4 = H5TAdapter.GetBaseEnumType<TestInt>();
+            using var e5 = H5TAdapter.GetBaseEnumType<TestUInt>();
+            using var e6 = H5TAdapter.GetBaseEnumType<TestLong>();
+            using var e7 = H5TAdapter.GetBaseEnumType<TestULong>();
         });
     }
 
     [TestMethod]
     public void CreateDuplicateEnumNameFails()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var enumType = H5TAdapter.CreateBaseEnumType<TestShort>();
+            using var enumType = H5TAdapter.GetBaseEnumType<TestShort>();
 
             H5TAdapter.InsertEnumMember(enumType, nameof(TestShort.one), TestShort.one);
             Assert.ThrowsException<H5Exception>(() =>
@@ -177,9 +177,9 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     [TestMethod]
     public void CreateDuplicateEnumValueFails()
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var enumType = H5TAdapter.CreateBaseEnumType<TestShort>();
+            using var enumType = H5TAdapter.GetBaseEnumType<TestShort>();
 
             H5TAdapter.InsertEnumMember(enumType, nameof(TestShort.one), TestShort.one);
             Assert.ThrowsException<H5Exception>(() =>

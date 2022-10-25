@@ -1,4 +1,6 @@
-﻿namespace HDF5.Api.TestHarness
+﻿using HDF5.Api.Attributes;
+
+namespace HDF5.Api.TestHarness
 {
     internal static class Program
     {
@@ -60,5 +62,15 @@
                 DumpLocation(gp, indent + 2);
             }
         }
+    }
+
+    [H5Contract("AType")]
+    public class SomeType
+    {
+        [H5Member(name: "AProperty")]
+        public int IntProperty { get; set; }
+
+        [H5StringMember(characterSet: CharacterSet.Utf8, allocatedStorageInBytes: 1000)]
+        public string StringProperty { get; set; } = string.Empty;
     }
 }

@@ -34,9 +34,14 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AAdapter.ReadString(this);
     }
 
-    public T Read<T>() where T : unmanaged, IEquatable<T>
+    public T Read<T>() where T : unmanaged
     {
         return H5AAdapter.Read<T>(this);
+    }
+
+    public T ReadEnum<T>() where T : unmanaged, Enum
+    {
+        return H5AAdapter.ReadEnum<T>(this);
     }
 
     public DateTime ReadDateTime()

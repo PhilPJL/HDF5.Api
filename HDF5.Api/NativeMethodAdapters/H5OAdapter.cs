@@ -10,16 +10,14 @@ internal static unsafe class H5OAdapter
     internal static info_t GetInfoByName(long locationId, string name)
     {
         info_t oinfo = default;
-        int err;
 #if NET7_0_OR_GREATER
-        err = get_info_by_name(locationId, name, ref oinfo);
+        get_info_by_name(locationId, name, ref oinfo).ThrowIfError();
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = get_info_by_name(locationId, nameBytesPtr, ref oinfo);
+            get_info_by_name(locationId, nameBytesPtr, ref oinfo).ThrowIfError();
         }
 #endif
-        err.ThrowIfError();
         return oinfo;
     }
 
@@ -35,8 +33,7 @@ internal static unsafe class H5OAdapter
         h5Object.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet, HandleType.Type, HandleType.Attribute);
 
         info_t oinfo = default;
-        int err = get_info(h5Object, ref oinfo);
-        err.ThrowIfError();
+        get_info(h5Object, ref oinfo).ThrowIfError();
         return oinfo;
     }
 }

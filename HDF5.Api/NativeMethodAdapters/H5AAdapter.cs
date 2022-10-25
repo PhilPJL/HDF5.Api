@@ -16,9 +16,7 @@ internal static unsafe class H5AAdapter
 {
     internal static void Close(H5Attribute attribute)
     {
-        int err = close(attribute);
-
-        err.ThrowIfError();
+        close(attribute).ThrowIfError();
     }
 
     internal static H5Attribute Create<T, TA>(H5Object<T> h5Object, string name) where T : H5Object<T>
@@ -47,7 +45,6 @@ internal static unsafe class H5AAdapter
         }
 #endif
 
-        h.ThrowIfInvalidHandleValue();
         return new H5Attribute(h);
     }
 
@@ -55,37 +52,36 @@ internal static unsafe class H5AAdapter
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        int err;
+        int result;
 
 #if NET7_0_OR_GREATER
-        err = delete(h5Object, name);
+        result = delete(h5Object, name);
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = delete(h5Object, nameBytesPtr);
+            result = delete(h5Object, nameBytesPtr);
         }
 #endif
 
-        err.ThrowIfError();
+        result.ThrowIfError();
     }
 
     internal static bool Exists<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        int err;
+        int result;
 
 #if NET7_0_OR_GREATER
-        err = exists(h5Object, name);
+        result = exists(h5Object, name).ThrowIfError();
 #else
         fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
         {
-            err = exists(h5Object, nameBytesPtr);
+            result = exists(h5Object, nameBytesPtr).ThrowIfError();
         }
 #endif
 
-        err.ThrowIfError();
-        return err > 0;
+        return result > 0;
     }
 
     internal static IEnumerable<string> GetAttributeNames<T>(H5Object<T> h5Object) where T : H5Object<T>
@@ -96,10 +92,7 @@ internal static unsafe class H5AAdapter
 
         var names = new List<string>();
 
-        int err = iterate(h5Object,
-            H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero);
-
-        err.ThrowIfError();
+        iterate(h5Object, H5.index_t.NAME, H5.iter_order_t.INC, ref idx, Callback, IntPtr.Zero).ThrowIfError();
 
         return names;
 
@@ -171,23 +164,18 @@ internal static unsafe class H5AAdapter
 
     internal static H5Space GetSpace(H5Attribute attribute)
     {
-        var space = get_space(attribute);
-
-        space.ThrowIfError();
-
-        return new H5Space(space);
+        return new H5Space(get_space(attribute));
     }
 
     internal static int GetStorageSize(H5Attribute attribute)
     {
+        // NOTE: get_storage_size doesn't return an error (-1) if it fails
         return (int)get_storage_size(attribute);
     }
 
     internal static H5Type GetType(H5Attribute attribute)
     {
-        long typeHandle = get_type(attribute);
-        typeHandle.ThrowIfInvalidHandleValue();
-        return new H5Type(typeHandle);
+        return new H5Type(get_type(attribute));
     }
 
     internal static H5Attribute Open<T>(H5Object<T> h5Object, string name)
@@ -205,8 +193,6 @@ internal static unsafe class H5AAdapter
             h = open(h5Object, nameBytesPtr);
         }
 #endif
-
-        h.ThrowIfInvalidHandleValue();
 
         return new H5Attribute(h);
     }
@@ -264,8 +250,7 @@ internal static unsafe class H5AAdapter
                     var ptr = new IntPtr(bufferPtr);
                     try
                     {
-                        int err = read(attribute, type, ptr);
-                        err.ThrowIfError();
+                        read(attribute, type, ptr).ThrowIfError();
 
                         if (buffer[0] == 0)
                         {
@@ -316,8 +301,7 @@ internal static unsafe class H5AAdapter
 
             string ReadString(Span<byte> buffer)
             {
-                int err = read(attribute, type, buffer);
-                err.ThrowIfError();
+                read(attribute, type, buffer).ThrowIfError();
 
                 var nullTerminatorIndex = MemoryExtensions.IndexOf(buffer, (byte)0);
                 nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
@@ -327,8 +311,7 @@ internal static unsafe class H5AAdapter
             var buffer = new byte[storageSize + 1];
             fixed (byte* bufferPtr = buffer)
             {
-                int err = read(attribute, type, bufferPtr);
-                err.ThrowIfError();
+                read(attribute, type, bufferPtr).ThrowIfError();
 
                 Span<byte> bytes = buffer;
                 var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
@@ -341,19 +324,24 @@ internal static unsafe class H5AAdapter
 
     internal static bool ReadBool(H5Attribute attribute)
     {
-        using var type = H5Type.GetNativeType<bool>();
-
-        // hack to try to get bool working - failed
+        using var type = H5Type.GetEquivalentNativeType<bool>();
         return Read<byte>(attribute, type, false) != default;
     }
 
-    internal static T Read<T>(H5Attribute attribute) where T : unmanaged, IEquatable<T>
+    internal static T Read<T>(H5Attribute attribute) where T : unmanaged
     {
         using var type = attribute.GetH5Type();
         return Read<T>(attribute, type);
     }
 
-    internal static T Read<T>(H5Attribute attribute, H5Type type, bool checkClass = true) where T : unmanaged, IEquatable<T>
+    internal static T ReadEnum<T>(H5Attribute attribute) where T : unmanaged, Enum
+    {
+        using var nativeType = H5TAdapter.GetBaseEnumType<T>();
+        using var type = attribute.GetH5Type();
+        return ReadImpl<T>(attribute, type, nativeType);
+    }
+
+    private static T ReadImpl<T>(H5Attribute attribute, H5Type type, H5Type nativeType, bool checkClass = true) where T : unmanaged
     {
         using var space = attribute.GetSpace();
 
@@ -368,9 +356,8 @@ internal static unsafe class H5AAdapter
             throw new H5Exception("Attribute is not scalar.");
         }
 
-        var cls = type.GetClass(); 
+        var cls = type.GetClass();
 
-        using var nativeType = H5Type.GetNativeType<T>();
         var expectedCls = H5TAdapter.GetClass(nativeType);
 
         if (checkClass && cls != expectedCls)
@@ -379,37 +366,48 @@ internal static unsafe class H5AAdapter
         }
 
         int attributeStorageSize = attribute.StorageSize;
-        int marshalSize = Marshal.SizeOf<T>();
+        int marshalSize = sizeof(T);
 
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
-        T result = default;
-        int err = read(attribute, type, new IntPtr(&result));
-        err.ThrowIfError();
-        return result;
+        T value = default;
+        read(attribute, type, new IntPtr(&value)).ThrowIfError();
+        return value;
+    }
+
+    internal static T Read<T>(H5Attribute attribute, H5Type type, bool checkClass = true) where T : unmanaged
+    {
+        using var nativeType = H5Type.GetEquivalentNativeType<T>();
+        return ReadImpl<T>(attribute, type, nativeType, checkClass);
     }
 
     internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
     {
         using var type = attribute.GetH5Type();
 
-        Write(attribute, type, value);
+        if (typeof(T) == typeof(bool))
+        {
+            var byteValue = (byte)(value.Equals(default) ? 0 : 0x01);
+            Write(attribute, type, byteValue);
+        }
+        else
+        {
+            Write(attribute, type, value);
+        }
     }
 
     internal static void Write<T>(H5Attribute attribute, H5Type type, T value) where T : unmanaged
     {
-        var marshalSize = Marshal.SizeOf<T>();
+        var size = sizeof(T);
         int attributeStorageSize = attribute.StorageSize;
-        H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
+        H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, size);
 
         Write(attribute, type, new IntPtr(&value));     
     }
 
     internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
     {
-        int err = write(attribute, type, buffer);
-
-        err.ThrowIfError();
+        write(attribute, type, buffer).ThrowIfError();
     }
 
     internal static void Write(H5Attribute attribute, string value)

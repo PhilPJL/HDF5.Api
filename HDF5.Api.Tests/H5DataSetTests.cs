@@ -13,7 +13,7 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
         // Enable chunking. From the user guide: "HDF5 requires the use of chunking when defining extendable datasets."
         propertyList.SetChunk(chunkSize);
 
-        using var type = H5Type.GetNativeType<long>();
+        using var type = H5Type.GetEquivalentNativeType<long>();
 
         return location.CreateDataSet(dataSetName, type, memorySpace, propertyList);
     }
@@ -23,17 +23,16 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
     [DataRow("utf8", "data-set-name-utf8-ᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠ")]
     public void CreateOnFile(string fileNameSuffix, string dataSetName)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(fileNameSuffix);
-
             // Create test ds
             using var ds = CreateTestDataset(file, dataSetName);
 
             Assert.IsTrue(file.DataSetExists(dataSetName));
             Assert.IsTrue(file.DataSetNames.Contains(dataSetName));
             Assert.AreEqual("/" + dataSetName, ds.Name);
-        });
+        },
+        fileNameSuffix);
     }
 
     [TestMethod]
@@ -41,10 +40,8 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
     [DataRow("utf8", "data-set-name-utf8-ᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠ")]
     public void CreateDeleteOnFile(string fileNameSuffix, string dataSetName)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(fileNameSuffix);
-
             // Create test ds
             using var ds = CreateTestDataset(file, dataSetName);
 
@@ -52,7 +49,8 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
 
             Assert.IsFalse(file.DataSetExists(dataSetName));
             Assert.IsFalse(file.DataSetNames.Contains(dataSetName));
-        });
+        },
+        fileNameSuffix);
     }
 
     [TestMethod]
@@ -60,10 +58,8 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
     [DataRow("utf8", "data-set-name-utf8-ᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠ")]
     public void GetCreationPropertyListSucceeds(string fileNameSuffix, string dataSetName)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(fileNameSuffix);
-
             // Create test ds
             using var ds = CreateTestDataset(file, dataSetName);
 
@@ -76,7 +72,8 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
             cpl1.SetChunk(1);
 
             Assert.IsTrue(cpl1.Equals(dscpl));
-        });
+        },
+        fileNameSuffix);
     }
 
     [TestMethod]
@@ -84,10 +81,8 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
     [DataRow("utf8", "data-set-name-utf8-ᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠ")]
     public void CreateOnGroup(string fileNameSuffix, string dataSetName)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(fileNameSuffix);
-
             using var group = file.CreateGroup("aGroup");
 
             // Create test ds on file/group
@@ -112,7 +107,8 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
 
             // 1 file, 2 groups, 2 data-sets
             Assert.AreEqual(5, file.GetObjectCount());
-        });
+        },
+        fileNameSuffix);
     }
 
     [TestMethod]
@@ -120,10 +116,8 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
     [DataRow("utf8", "data-set-name-utf8-ᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠ")]
     public void CreateDeleteOnGroup(string fileNameSuffix, string dataSetName)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(fileNameSuffix);
-
             using var group = file.CreateGroup("aGroup");
 
             // Create test ds on file/group
@@ -133,7 +127,8 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
 
             Assert.IsFalse(group.DataSetExists(dataSetName));
             Assert.IsFalse(group.DataSetExists(dataSetName + "x"));
-        });
+        },
+        fileNameSuffix);
     }
 
     #region Attributes
@@ -143,15 +138,14 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
     [DataRow("utf8", "data-set-name-utf8-ᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠ")]
     public void CreateWriteReadDeleteAttributesSucceeds(string fileNameSuffix, string dataSetName)
     {
-        HandleCheck(() =>
+        HandleCheck2((file) =>
         {
-            using var file = CreateFile2(fileNameSuffix);
-
             // Create test ds
             using var ds = CreateTestDataset(file, dataSetName);
 
             H5AttributeTests.CreateWriteReadDeleteAttributesSucceeds(ds);
-        });
+        },
+        fileNameSuffix);
     }
 
     [TestMethod]
@@ -159,15 +153,14 @@ public class H5DataSetTests : H5Test<H5DataSetTests>
     [DataRow("utf8", "data-set-name-utf8-ᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠ")]
     public void CreateIterateAttributesSucceeds(string fileNameSuffix, string dataSetName)
     {
-        HandleCheck(() =>
+        HandleCheck((file) =>
         {
-            using var file = CreateFile2(fileNameSuffix);
-
             // Create test ds
             using var ds = CreateTestDataset(file, dataSetName);
 
             H5AttributeTests.CreateIterateAttributesSucceeds(ds);
-        });
+        },
+        fileNameSuffix);
     }
 
     #endregion
