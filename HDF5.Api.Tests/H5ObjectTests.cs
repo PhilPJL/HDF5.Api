@@ -29,7 +29,7 @@
                 type.AssertHasHandleType(HandleType.Type);
 
                 // Create attribute
-                using var att = group.CreateAttribute("att", type, space);
+                using var att = group.CreateStringAttribute("att");
                 att.AssertHasHandleType(HandleType.Attribute);
 
                 // Create data set

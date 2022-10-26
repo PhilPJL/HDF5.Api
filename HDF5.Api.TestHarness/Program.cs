@@ -27,22 +27,23 @@ namespace HDF5.Api.TestHarness
             {
                 Console.WriteLine(sIndent + "A: " + a);
 
-                using var att = location.OpenAttribute(a);
+                using var att = location.OpenStringAttribute(a);
                 using var type = att.GetH5Type();
 
-                switch (type.GetClass())
+                // TODO:
+/*                switch (type.GetClass())
                 {
                     case DataTypeClass.Integer:
                         Console.WriteLine(sIndent + "->V: " + att.Read<int>());
                         break;
                     case DataTypeClass.String:
-                        Console.WriteLine(sIndent + "->V: " + att.ReadString());
+                        Console.WriteLine(sIndent + "->V: " + att.Read());
                         break;
                     case DataTypeClass.Float:
                         Console.WriteLine(sIndent + "->V: " + att.Read<double>());
                         break;
                 }
-            }
+*/            }
 
             foreach (var d in location.DataSetNames)
             {

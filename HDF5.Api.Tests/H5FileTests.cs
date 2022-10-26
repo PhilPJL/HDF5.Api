@@ -285,19 +285,13 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     [TestMethod]
     public void CreateWriteReadDeleteAttributesSucceeds()
     {
-        HandleCheck((file) =>
-        {
-            H5AttributeTests.CreateWriteReadDeleteAttributesSucceeds(file);
-        });
+        HandleCheck(H5AttributeTests.CreateWriteReadDeleteAttributesSucceeds);
     }
 
     [TestMethod]
     public void CreateIterateAttributesSucceeds()
     {
-        HandleCheck((file) =>
-        {
-            H5AttributeTests.CreateIterateAttributesSucceeds(file);
-        });
+        HandleCheck(H5AttributeTests.CreateIterateAttributesSucceeds);
     }
 
     #endregion

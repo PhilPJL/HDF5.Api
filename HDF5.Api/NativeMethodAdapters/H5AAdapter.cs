@@ -19,16 +19,14 @@ internal static unsafe class H5AAdapter
         close(attribute).ThrowIfError();
     }
 
-    internal static H5Attribute Create<T, TA>(H5Object<T> h5Object, string name) where T : H5Object<T>
-    {
-        throw new NotImplementedException();
-    }
-
-    internal static H5Attribute Create<T>(
+    internal static TA Create<T, TA>(
         H5Object<T> h5Object,
         string name,
         H5Type type,
-        H5Space space) where T : H5Object<T>
+        H5Space space,
+        Func<long, TA> attributeCtor) 
+        where T : H5Object<T> 
+        where TA : H5Attribute
     {
         h5Object.AssertHasWithAttributesHandleType();
 
@@ -45,7 +43,7 @@ internal static unsafe class H5AAdapter
         }
 #endif
 
-        return new H5Attribute(h);
+        return attributeCtor(h);
     }
 
     internal static void Delete<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
@@ -173,13 +171,14 @@ internal static unsafe class H5AAdapter
         return (int)get_storage_size(attribute);
     }
 
-    internal static H5Type GetType(H5Attribute attribute)
+    internal static TT GetType<TT>(H5Attribute attribute, Func<long, TT> typeCtor) where TT : H5Type
     {
-        return new H5Type(get_type(attribute));
+        return typeCtor(get_type(attribute));
     }
 
-    internal static H5Attribute Open<T>(H5Object<T> h5Object, string name)
+    internal static TA Open<T, TA>(H5Object<T> h5Object, string name, Func<long, TA> attributeCtor)
         where T : H5Object<T>
+        where TA : H5Attribute
     {
         h5Object.AssertHasWithAttributesHandleType();
 
@@ -196,17 +195,22 @@ internal static unsafe class H5AAdapter
 
         h.ThrowIfInvalidHandleValue();
 
-        return new H5Attribute(h);
+        return attributeCtor(h);
     }
 
-    internal static DateTime ReadDateTime(H5Attribute attribute)
+    internal static TE ReadEnum<TE>(H5EnumAttribute<TE> attribute) where TE : unmanaged, Enum
     {
-        return DateTime.FromOADate(Read<double>(attribute));
+        // TODO:
+        return default;
     }
 
-    internal static string ReadString(H5Attribute attribute)
+    internal static string ReadString(H5StringAttribute attribute)
     {
+#if NET7_0_OR_GREATER
         using var type = attribute.GetH5Type();
+#else
+        using var type = (H5StringType)attribute.GetH5Type();
+#endif
         using var space = attribute.GetSpace();
 
         var count = space.GetSimpleExtentNPoints();
@@ -229,7 +233,7 @@ internal static unsafe class H5AAdapter
             throw new H5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
         }
 
-        if (type.IsVariableLengthString())
+        if (type.IsVariableLength())
         {
             if (count < 256 / sizeof(nint))
             {
@@ -325,7 +329,7 @@ internal static unsafe class H5AAdapter
     }
 
     [Obsolete]
-    internal static bool ReadBool(H5Attribute attribute)
+    internal static bool ReadBoolean(H5Attribute attribute)
     {
         using var type = H5Type.GetNativeType<bool>();
 
@@ -333,13 +337,14 @@ internal static unsafe class H5AAdapter
         return Read<byte>(attribute, type, false) != default;
     }
 
-    internal static T Read<T>(H5Attribute attribute) where T : unmanaged, IEquatable<T>
+    internal static T Read<T>(H5Attribute attribute) where T : unmanaged
     {
         using var type = attribute.GetH5Type();
+
         return Read<T>(attribute, type);
     }
 
-    internal static T Read<T>(H5Attribute attribute, H5Type type, bool checkClass = true) where T : unmanaged, IEquatable<T>
+    internal static T Read<T>(H5Attribute attribute, H5Type type, bool checkClass = true) where T : unmanaged
     {
         using var space = attribute.GetSpace();
 
@@ -354,7 +359,7 @@ internal static unsafe class H5AAdapter
             throw new H5Exception("Attribute is not scalar.");
         }
 
-        var cls = type.GetClass(); 
+        var cls = type.GetClass();
 
         using var nativeType = H5Type.GetNativeType<T>();
         var expectedCls = H5TAdapter.GetClass(nativeType);
@@ -387,7 +392,7 @@ internal static unsafe class H5AAdapter
         int attributeStorageSize = attribute.StorageSize;
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
-        Write(attribute, type, new IntPtr(&value));     
+        Write(attribute, type, new IntPtr(&value));
     }
 
     internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
@@ -395,11 +400,15 @@ internal static unsafe class H5AAdapter
         write(attribute, type, buffer).ThrowIfError();
     }
 
-    internal static void Write(H5Attribute attribute, string value)
+    internal static void Write(H5StringAttribute attribute, string value)
     {
         // TODO: handle array of strings
 
+#if NET7_0_OR_GREATER
         using var type = attribute.GetH5Type();
+#else
+        using var type = (H5StringType)attribute.GetH5Type();
+#endif
         using var space = attribute.GetSpace();
 
         var count = space.GetSimpleExtentNPoints();
@@ -428,7 +437,7 @@ internal static unsafe class H5AAdapter
             _ => throw new InvalidEnumArgumentException($"Unknown CharacterSet:{characterSet}.")
         };
 
-        if (type.IsVariableLengthString())
+        if (type.IsVariableLength())
         {
             fixed (void* fixedBytes = bytes)
             {
@@ -462,7 +471,7 @@ internal static unsafe class H5AAdapter
         Write(attribute, value.ToOADate());
     }
 
-    internal static H5Attribute CreateStringAttribute<T>(
+    internal static H5StringAttribute CreateStringAttribute<T>(
         H5Object<T> h5Object, string name, int fixedStorageLength,
         CharacterSet cset, StringPadding padding) where T : H5Object<T>
     {
@@ -476,6 +485,6 @@ internal static unsafe class H5AAdapter
         type.StringPadding = padding;
 
         using var memorySpace = H5SAdapter.CreateScalar();
-        return Create(h5Object, name, type, memorySpace);
+        return Create(h5Object, name, type, memorySpace, h => new H5StringAttribute(h));
     }
 }

@@ -24,6 +24,11 @@ internal static unsafe class H5TAdapter
         close(type).ThrowIfError();
     }
 
+    internal static H5Type Copy(H5Type type)
+    {
+        return new (copy(type).ThrowIfError());
+    }
+
     internal static DataTypeClass GetClass(H5Type type)
     {
         return (DataTypeClass)get_class(type);

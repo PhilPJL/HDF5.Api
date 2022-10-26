@@ -1,12 +1,11 @@
-﻿using CommunityToolkit.Diagnostics;
-using HDF5.Api.NativeMethodAdapters;
+﻿using HDF5.Api.NativeMethodAdapters;
 namespace HDF5.Api;
 
 /// <summary>
 ///     <para>.NET wrapper for H5A (Attribute) API.</para>
 ///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
 /// </summary>
-public class H5Attribute : H5Object<H5Attribute>
+public abstract class H5Attribute : H5Object<H5Attribute>
 {
     internal H5Attribute(long handle) : base(handle, HandleType.Attribute, H5AAdapter.Close)
     {
@@ -17,10 +16,7 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AAdapter.GetSpace(this);
     }
 
-    public H5Type GetH5Type()
-    {
-        return H5AAdapter.GetType(this);
-    }
+    public abstract H5Type GetH5Type();
 
     internal H5AttributeCreationPropertyList GetCreationPropertyList()
     {
@@ -28,38 +24,6 @@ public class H5Attribute : H5Object<H5Attribute>
     }
 
     public int StorageSize => H5AAdapter.GetStorageSize(this);
-
-    public string ReadString()
-    {
-        return H5AAdapter.ReadString(this);
-    }
-
-    public T Read<T>() where T : unmanaged, IEquatable<T>
-    {
-        return H5AAdapter.Read<T>(this);
-    }
-
-    public DateTime ReadDateTime()
-    {
-        return H5AAdapter.ReadDateTime(this);
-    }
-
-    public void Write([DisallowNull] string value)
-    {
-        Guard.IsNotNull(value);
-
-        H5AAdapter.Write(this, value);
-    }
-
-    public void Write<T>(T value) where T : unmanaged
-    {
-        H5AAdapter.Write(this, value);
-    }
-
-    public void Write(DateTime value)
-    {
-        H5AAdapter.Write(this, value);
-    }
 
     internal static H5AttributeCreationPropertyList CreateCreationPropertyList(CharacterSet encoding = CharacterSet.Utf8)
     {
@@ -69,25 +33,25 @@ public class H5Attribute : H5Object<H5Attribute>
     public string Name => H5AAdapter.GetName(this);
 }
 
-public class H5Attribute<T> : H5Attribute where T : new()
+public abstract class H5Attribute<T> : H5Attribute
 {
     internal H5Attribute(long handle) : base(handle)
     {
     }
 
-    public void Write([DisallowNull] T value)
-    {
-        Guard.IsNotNull(value);
+    public abstract void Write([DisallowNull] T value);
 
-        //...
-        throw new NotImplementedException();
+#if NET7_0_OR_GREATER
+    public override H5Type<T>
+#else
+    public override H5Type
+#endif       
+    GetH5Type()
+    {
+        return H5AAdapter.GetType(this, h => new H5Type<T>(h));
     }
 
-    public T Read()
-    {
-        throw new NotImplementedException();
-        //return new T();
-    }
+    public abstract T Read();
 
     [DisallowNull]
     public T Value
@@ -95,5 +59,4 @@ public class H5Attribute<T> : H5Attribute where T : new()
         get => Read();
         set => Write(value);
     }
-
 }

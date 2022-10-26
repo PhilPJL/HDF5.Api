@@ -82,7 +82,7 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
 
             // attribute
             file.CreateAndWriteAttribute("IntAttribute", 1);
-            using var att = file.OpenAttribute("IntAttribute");
+            using var att = file.OpenPrimitiveAttribute<int>("IntAttribute");
             using var apc1 = att.GetCreationPropertyList();
             using var apc2 = H5Attribute.CreateCreationPropertyList();
             using var apc3 = new H5AttributeCreationPropertyList();

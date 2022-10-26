@@ -3,6 +3,13 @@ using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api;
 
+public class H5Type<T> : H5Type
+{
+    internal H5Type(long handle) : base(handle)
+    {
+    }
+}
+
 /// <summary>
 ///     <para>.NET wrapper for H5T (Type) API.</para>
 ///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_t.html"/>
@@ -49,6 +56,12 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     }
 
     #endregion
+
+    // TODO: make abstract - implement in concrete classes
+/*    public H5Type Copy()
+    {
+        return H5TAdapter.Copy(this);
+    }*/
 
     public static H5Type GetNativeType<T>() where T : unmanaged
     {
@@ -154,23 +167,6 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     }
 
     public string Name => H5IAdapter.GetName(this);
-
-    public bool IsVariableLengthString()
-    {
-        return H5TAdapter.IsVariableLengthString(this);
-    }
-
-    internal CharacterSet CharacterSet
-    {
-        get => H5TAdapter.GetCharacterSet(this);
-        set => H5TAdapter.SetCharacterSet(this, value);
-    }
-
-    internal StringPadding StringPadding
-    {
-        get => H5TAdapter.GetPadding(this);
-        set => H5TAdapter.SetPadding(this, value);
-    }
 
     internal int NumberOfMembers => H5TAdapter.GetNumberOfMembers(this);
 }
