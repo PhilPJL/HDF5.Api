@@ -328,23 +328,23 @@ internal static unsafe class H5AAdapter
         }
     }
 
-    [Obsolete]
-    internal static bool ReadBoolean(H5Attribute attribute)
+    internal static bool ReadBoolean(H5BooleanAttribute attribute)
     {
         using var type = H5Type.GetNativeType<bool>();
 
-        // hack to try to get bool working - failed
-        return Read<byte>(attribute, type, false) != default;
+        // TODO: hack to try to get bool working - failed
+        // Need to support bit fields
+        return Read(attribute, type, false) != default;
     }
 
-    internal static T Read<T>(H5Attribute attribute) where T : unmanaged
+    internal static T Read<T>(H5Attribute<T> attribute) where T : unmanaged
     {
         using var type = attribute.GetH5Type();
 
-        return Read<T>(attribute, type);
+        return Read(attribute, type);
     }
 
-    internal static T Read<T>(H5Attribute attribute, H5Type type, bool checkClass = true) where T : unmanaged
+    internal static T Read<T>(H5Attribute<T> attribute, H5Type type, bool checkClass = true) where T : unmanaged
     {
         using var space = attribute.GetSpace();
 
@@ -379,14 +379,14 @@ internal static unsafe class H5AAdapter
         return value;
     }
 
-    internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
+    internal static void Write<T>(H5Attribute<T> attribute, T value) where T : unmanaged
     {
         using var type = attribute.GetH5Type();
 
         Write(attribute, type, value);
     }
 
-    internal static void Write<T>(H5Attribute attribute, H5Type type, T value) where T : unmanaged
+    internal static void Write<T>(H5Attribute<T> attribute, H5Type type, T value) where T : unmanaged
     {
         var marshalSize = Marshal.SizeOf<T>();
         int attributeStorageSize = attribute.StorageSize;
@@ -464,11 +464,6 @@ internal static unsafe class H5AAdapter
                 Write(attribute, type, new IntPtr(fixedBytes));
             }
         }
-    }
-
-    internal static void Write(H5Attribute attribute, DateTime value)
-    {
-        Write(attribute, value.ToOADate());
     }
 
     internal static H5StringAttribute CreateStringAttribute<T>(

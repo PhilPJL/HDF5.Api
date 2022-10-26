@@ -19,13 +19,15 @@ public class H5PrimitiveAttribute<T> : H5Attribute<T> where T : unmanaged
 
     public override T Read()
     {
-        return H5AAdapter.Read<T>(this);
+        return H5AAdapter.Read(this);
     }
 
-    public override void Write([DisallowNull] T value)
+    public override H5Attribute<T> Write([DisallowNull] T value)
     {
         Guard.IsNotNull(value);
 
         H5AAdapter.Write(this, value);
+
+        return this;
     }
 }

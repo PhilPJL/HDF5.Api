@@ -24,10 +24,12 @@ public class H5EnumAttribute<T> : H5Attribute<T>
         throw new NotImplementedException();
     }
 
-    public override void Write(T value)
+    public override H5Attribute<T> Write(T value)
     {
         Guard.IsNotNull(value);
 
         H5AAdapter.Write(this, value);
+
+        return this;
     }
 }

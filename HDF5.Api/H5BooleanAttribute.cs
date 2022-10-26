@@ -19,13 +19,15 @@ public class H5BooleanAttribute : H5Attribute<bool>
 
     public override bool Read()
     {
-        return H5AAdapter.Read<bool>(this);
+        return H5AAdapter.Read(this);
     }
 
-    public override void Write([DisallowNull] bool value)
+    public override H5Attribute<bool> Write([DisallowNull] bool value)
     {
         Guard.IsNotNull(value);
 
         H5AAdapter.Write(this, value);
+
+        return this;
     }
 }

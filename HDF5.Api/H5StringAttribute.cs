@@ -22,10 +22,16 @@ public class H5StringAttribute : H5Attribute<string>
         return H5AAdapter.ReadString(this);
     }
 
-    public override void Write([DisallowNull] string value)
+#if NET7_0_OR_GREATER
+    public override H5StringAttribute Write([DisallowNull] string value)
+#else
+    public override H5Attribute<string> Write([DisallowNull] string value)
+#endif
     {
         Guard.IsNotNull(value);
 
         H5AAdapter.Write(this, value);
+
+        return this;
     }
 }

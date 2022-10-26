@@ -11,24 +11,22 @@ public abstract class H5Attribute : H5Object<H5Attribute>
     {
     }
 
-    public H5Space GetSpace()
-    {
-        return H5AAdapter.GetSpace(this);
-    }
-
-    public abstract H5Type GetH5Type();
-
     internal H5AttributeCreationPropertyList GetCreationPropertyList()
     {
         return H5AAdapter.GetCreationPropertyList(this);
     }
 
-    public int StorageSize => H5AAdapter.GetStorageSize(this);
-
     internal static H5AttributeCreationPropertyList CreateCreationPropertyList(CharacterSet encoding = CharacterSet.Utf8)
     {
         return H5AAdapter.CreateCreationPropertyList(encoding);
     }
+
+    public H5Space GetSpace()
+    {
+        return H5AAdapter.GetSpace(this);
+    }
+
+    public int StorageSize => H5AAdapter.GetStorageSize(this);
 
     public string Name => H5AAdapter.GetName(this);
 }
@@ -39,12 +37,12 @@ public abstract class H5Attribute<T> : H5Attribute
     {
     }
 
-    public abstract void Write([DisallowNull] T value);
+    public abstract H5Attribute<T> Write([DisallowNull] T value);
 
 #if NET7_0_OR_GREATER
-    public override H5Type<T>
+    public virtual H5Type<T>
 #else
-    public override H5Type
+    public virtual H5Type
 #endif       
     GetH5Type()
     {

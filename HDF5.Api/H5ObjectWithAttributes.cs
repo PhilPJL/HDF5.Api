@@ -16,22 +16,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
 
     /// <summary>
-    ///     Create an Attribute for this location
-    /// </summary>
-    private H5Attribute CreateAttribute<TA>(
-        [DisallowNull] string name,
-        [DisallowNull] H5Type type,
-        [DisallowNull] H5Space space,
-        Func<long, TA> attributeCtor) where TA : H5Attribute
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-        Guard.IsNotNull(type);
-        Guard.IsNotNull(space);
-
-        return H5AAdapter.Create(this, name, type, space, attributeCtor);
-    }
-
-    /// <summary>
     /// Create and configure string attribute in the target location.
     /// </summary>
     /// <param name="name">Attribute name. This can be unicode and isn't impacted by the <paramref name="fixedStorageLength"/> value.</param>
@@ -131,8 +115,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         {
             using var type = H5Type.GetNativeType<bool>();
 
-            // TODO: native type isn't correct
-            CreateAndWriteAttribute(type, name, boolValue ? 1 : 0, h => new H5BooleanAttribute(h));
+            CreateAndWriteAttribute(type, name, boolValue, h => new H5BooleanAttribute(h));
         }
         else if (value is DateTime dtValue)
         {
@@ -149,16 +132,30 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     }
 
     private void CreateAndWriteAttribute<TT, TA>(H5Type type, [DisallowNull] string name, TT value, Func<long, TA> attributeCtor) 
+        where TA : H5Attribute<TT>
         where TT : unmanaged
-        where TA : H5Attribute
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
         using var memorySpace = H5Space.CreateScalar();
-        using var attribute = CreateAttribute(name, type, memorySpace, attributeCtor);
-        H5AAdapter.Write(attribute, type, value);
+        //using var attribute = CreateAttribute<TA, TT>(name, type, memorySpace, attributeCtor);
+
+        using var attribute = H5AAdapter
+            .Create(this, name, type, memorySpace, attributeCtor)
+            .Write(value);
     }
 
+/*    private H5Attribute<TT> CreateAttribute<TA, TT>(string name, H5Type type, H5Space memorySpace, Func<long, TA> attributeCtor)
+        where TA : H5Attribute<TT>
+        where TT : unmanaged
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(type);
+        Guard.IsNotNull(memorySpace);
+
+        return H5AAdapter.Create(this, name, type, memorySpace, attributeCtor);
+    }
+*/
     public void CreateAndWriteAttribute([DisallowNull] string name, DateTime value)
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -176,7 +173,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(value);
 
-        using var attribute = CreateStringAttribute(name, fixedStorageLength, characterSet, padding);
-        attribute.Write(value);
+        using var attribute = 
+            CreateStringAttribute(name, fixedStorageLength, characterSet, padding)
+            .Write(value);
     }
 }
