@@ -2,7 +2,7 @@
 
 namespace HDF5.Api;
 
-public class H5StringType : H5Type<string> 
+public class H5StringType : H5Type<string>
 {
     internal H5StringType(long handle) : base(handle)
     {

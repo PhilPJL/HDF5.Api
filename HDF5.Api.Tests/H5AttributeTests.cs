@@ -37,13 +37,13 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 }
 
                 var r = attribute.Read();
-                
+
                 // NOTE: assuming that if no value is written ReadString will return string.Empty
                 Assert.AreEqual(value ?? string.Empty, r);
 
                 Assert.AreEqual(name, attribute.Name);
             }
-        }, 
+        },
         fileNameSuffix);
     }
 
@@ -191,7 +191,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         objectWithAttributes.CreateAndWriteAttribute("byte-min", byte.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("byte", (byte)5);
         objectWithAttributes.CreateAndWriteAttribute("byte-max", byte.MaxValue);
-        
+
         objectWithAttributes.CreateAndWriteAttribute("int16-min", short.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("int16", (short)5);
         objectWithAttributes.CreateAndWriteAttribute("int16-max", short.MaxValue);
@@ -211,15 +211,15 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         objectWithAttributes.CreateAndWriteAttribute("long-min", long.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("long", 9L);
         objectWithAttributes.CreateAndWriteAttribute("long-max", long.MaxValue);
-        
+
         objectWithAttributes.CreateAndWriteAttribute("ulong-min", ulong.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("ulong", 10ul);
         objectWithAttributes.CreateAndWriteAttribute("ulong-max", ulong.MaxValue);
-        
+
         objectWithAttributes.CreateAndWriteAttribute("float-min", float.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("float", 11.0f);
         objectWithAttributes.CreateAndWriteAttribute("float-max", float.MaxValue);
-        
+
         objectWithAttributes.CreateAndWriteAttribute("double-min", double.MinValue);
         objectWithAttributes.CreateAndWriteAttribute("double", 12.0d);
         objectWithAttributes.CreateAndWriteAttribute("double-max", double.MaxValue);
@@ -288,30 +288,30 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteStringAttribute(new string('A', 1000), new string('B', 500), 1200);
         Assert.AreEqual(0, location.NumberOfAttributes);
 
-/*        void CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime value, DateTime newValue)
-        {
-            const string name = "dtDateTime";
+        /*        void CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime value, DateTime newValue)
+                {
+                    const string name = "dtDateTime";
 
-            location.CreateAndWriteAttribute(name, value);
-            Assert.IsTrue(location.AttributeExists(name));
+                    location.CreateAndWriteAttribute(name, value);
+                    Assert.IsTrue(location.AttributeExists(name));
 
-            var readValue = location.ReadDateTimeAttribute(name);
-            // There is some loss of precision since we're storing DateTime as a double
-            Assert.IsTrue(Math.Abs((value - readValue).TotalMilliseconds) < 1);
+                    var readValue = location.ReadDateTimeAttribute(name);
+                    // There is some loss of precision since we're storing DateTime as a double
+                    Assert.IsTrue(Math.Abs((value - readValue).TotalMilliseconds) < 1);
 
-            using var a = location.OpenPrimitiveAttribute<double>(name);
-            a.Write(newValue);
+                    using var a = location.OpenPrimitiveAttribute<double>(name);
+                    a.Write(newValue);
 
-            var readValue2 = location.ReadDateTimeAttribute(name);
-            Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
+                    var readValue2 = location.ReadDateTimeAttribute(name);
+                    Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
-            var readValue3 = a.Read();
-            Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
+                    var readValue3 = a.Read();
+                    Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
-            location.DeleteAttribute(name);
-            Assert.IsFalse(location.AttributeExists(name));
-        }
-*/
+                    location.DeleteAttribute(name);
+                    Assert.IsFalse(location.AttributeExists(name));
+                }
+        */
         void CreateWriteReadUpdateDeleteStringAttribute(string value, string newValue, int fixedStorageLength = 0)
         {
             const string name = "dtString";
@@ -353,10 +353,10 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.AreEqual(value, readValue2);
 
             // TODO:
-/*            a.Write(newValue);
-            var readValue3 = location.ReadAttribute<T>(name);
-            Assert.AreEqual(newValue, readValue3);
-*/
+            /*            a.Write(newValue);
+                        var readValue3 = location.ReadAttribute<T>(name);
+                        Assert.AreEqual(newValue, readValue3);
+            */
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
         }
@@ -472,4 +472,19 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => attribute.Write("012345678901234567890")); // does throw
         });
     }
-}
+
+/*    [TestMethod]
+    public void MismatchedTypeThrows()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+            Assert.ThrowsException<NotImplementedException>(() =>
+            {
+
+                file.CreateAndWriteAttribute("int", 1);
+            });
+            //Assert.ThrowsException<NotImplementedException>(() => file.OpenPrimitiveAttribute<long>("int"));
+        });
+    }
+*/}

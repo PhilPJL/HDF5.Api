@@ -6,6 +6,14 @@ public class H5StringAttribute : H5Attribute<string>
 {
     internal H5StringAttribute(long handle) : base(handle)
     {
+/*        using var type = GetH5Type();
+
+        var typeClass = type.GetClass();
+
+        if(typeClass != DataTypeClass.String)
+        {
+            throw new H5Exception($"The attribute should be of class {DataTypeClass.String} but is of class {typeClass}.");
+        }*/
     }
 
 #if NET7_0_OR_GREATER

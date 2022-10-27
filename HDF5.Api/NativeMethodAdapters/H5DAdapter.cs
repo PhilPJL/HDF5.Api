@@ -108,8 +108,6 @@ internal static unsafe class H5DAdapter
         }
 #endif
 
-        h.ThrowIfInvalidHandleValue();
-
         return new H5DataSet(h);
     }
 
@@ -137,20 +135,12 @@ internal static unsafe class H5DAdapter
 
     internal static H5Space GetSpace(H5DataSet dataSet)
     {
-        long h = get_space(dataSet);
-
-        h.ThrowIfInvalidHandleValue();
-
-        return new H5Space(h);
+        return new H5Space(get_space(dataSet));
     }
 
     internal static H5Type GetType(H5DataSet dataSet)
     {
-        long h = get_type(dataSet);
-
-        h.ThrowIfInvalidHandleValue();
-
-        return new H5Type(h);
+        return new H5Type(get_type(dataSet));
     }
  
     internal static H5DataSetCreationPropertyList CreateCreationPropertyList()

@@ -193,8 +193,6 @@ internal static unsafe class H5AAdapter
         }
 #endif
 
-        h.ThrowIfInvalidHandleValue();
-
         return attributeCtor(h);
     }
 

@@ -6,6 +6,27 @@ public class H5PrimitiveAttribute<T> : H5Attribute<T> where T : unmanaged
 {
     internal H5PrimitiveAttribute(long handle) : base(handle)
     {
+/*        using var type = GetH5Type();
+        using var nativeType = H5Type.GetNativeType<T>();
+
+        var typeClass = type.GetClass();
+        var nativeTypeClass = nativeType.GetClass();
+
+*//*        if (typeClass != nativeTypeClass)
+        {
+            // TODO: improve exception
+            throw new H5Exception($"The attribute should be of class {nativeTypeClass} but is of class {typeClass}.");
+        }
+*//*
+        if (!type.Equals(nativeType))
+        {
+            // TODO: improve exception
+            throw new H5Exception($"The attribute type doesn't match the expected native type of {typeof(T).Name}.");
+        }
+    
+    
+        throw new NotImplementedException();
+        */
     }
 
 #if NET7_0_OR_GREATER

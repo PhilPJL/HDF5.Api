@@ -27,11 +27,7 @@ internal static class H5PAdapter
     /// <returns></returns>
     internal static long Create(long classId)
     {
-        long h = create(classId);
-
-        h.ThrowIfInvalidHandleValue();
-
-        return h;
+        return create(classId);
     }
 
     internal static void SetChunk(H5PropertyList propertyList, int rank, IEnumerable<long> dims)

@@ -92,10 +92,7 @@ internal static unsafe class H5TAdapter
 
     internal static H5StringType CreateFixedLengthStringType(int storageLengthBytes)
     {
-        long h = copy(C_S1);
-        h.ThrowIfInvalidHandleValue();
-
-        var type = new H5StringType(h);
+        var type = new H5StringType(copy(C_S1));
 
         try
         {
@@ -238,9 +235,7 @@ internal static unsafe class H5TAdapter
             _ => throw new ArgumentException($"Unable to create Enum for underlying type '{underlyingType}'."),
         };
 
-        long h = enum_create(baseType);
-        h.ThrowIfInvalidHandleValue();
-        return new H5EnumType<T>(h);
+        return new H5EnumType<T>(enum_create(baseType));
     }
 
     internal static long GetNativeType<T>() where T : unmanaged
