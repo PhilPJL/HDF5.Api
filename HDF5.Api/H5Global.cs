@@ -199,15 +199,15 @@ public enum PropertyListClass
 
 public enum StringPadding
 {
-    Space = H5T.str_t.SPACEPAD,
-    NullPad = H5T.str_t.NULLPAD,
-    NullTerminate = H5T.str_t.NULLTERM
+    Space = str_t.SPACEPAD,
+    NullPad = str_t.NULLPAD,
+    NullTerminate = str_t.NULLTERM
 }
 
 public enum CharacterSet
 {
-    Ascii = H5T.cset_t.ASCII,
-    Utf8 = H5T.cset_t.UTF8
+    Ascii = cset_t.ASCII,
+    Utf8 = cset_t.UTF8
 }
 
 public enum LibraryVersion

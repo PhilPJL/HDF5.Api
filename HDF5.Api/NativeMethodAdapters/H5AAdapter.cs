@@ -334,10 +334,20 @@ internal static unsafe class H5AAdapter
         return Read<T>(attribute, type);
     }
 
-    internal static T ReadEnum<T>(H5Attribute attribute) where T : unmanaged, Enum
+    internal static T ReadEnum<T>(H5Attribute attribute, bool verifyType = false) where T : unmanaged, Enum
     {
         using var nativeType = H5TAdapter.GetBaseEnumType<T>();
         using var type = attribute.GetH5Type();
+
+        if (verifyType)
+        {
+            using var enumType = H5Type.CreateEnumType<T>();
+            if (!enumType.IsEqualTo(type))
+            {
+                throw new H5Exception($"{attribute.Name} does not have an equivalent HDF5 enumeration of {typeof(T)}.");
+            }
+        }
+
         return ReadImpl<T>(attribute, type, nativeType);
     }
 
@@ -402,7 +412,7 @@ internal static unsafe class H5AAdapter
         int attributeStorageSize = attribute.StorageSize;
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, size);
 
-        Write(attribute, type, new IntPtr(&value));     
+        Write(attribute, type, new IntPtr(&value));
     }
 
     internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)

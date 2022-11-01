@@ -74,6 +74,7 @@ public class H5Attribute : H5Object<H5Attribute>
     public string Name => H5AAdapter.GetName(this);
 }
 
+[Obsolete]
 public class H5Attribute<T> : H5Attribute where T : new()
 {
     internal H5Attribute(long handle) : base(handle)

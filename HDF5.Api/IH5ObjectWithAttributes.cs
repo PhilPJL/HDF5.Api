@@ -7,6 +7,7 @@ public interface IH5ObjectWithAttributes
     // Create
     H5Attribute CreateAttribute(string name, H5Type typeId, H5Space space);
     void CreateAndWriteAttribute<TA>([DisallowNull] string name, TA value) where TA : unmanaged, IEquatable<TA>;
+    void CreateAndWriteEnumAttribute<TA>([DisallowNull] string name, TA value) where TA : unmanaged, Enum;
     void CreateAndWriteAttribute([DisallowNull] string name, DateTime value);
     void CreateAndWriteAttribute(
         [DisallowNull] string name,
@@ -27,6 +28,7 @@ public interface IH5ObjectWithAttributes
     string ReadStringAttribute(string name);
     DateTime ReadDateTimeAttribute(string name);
     bool ReadBoolAttribute(string name);
+    T ReadEnumAttribute<T>(string name, bool verifyType = false) where T : unmanaged, Enum;
 
     // Enumeration
     IEnumerable<string> AttributeNames { get; }

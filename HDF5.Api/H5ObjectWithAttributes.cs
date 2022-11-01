@@ -88,6 +88,14 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         return H5AAdapter.Read<TA>(attribute);
     }
 
+    public TA ReadEnumAttribute<TA>([DisallowNull] string name, bool verifyType = false) where TA : unmanaged, Enum
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        using var attribute = H5AAdapter.Open(this, name);
+        return H5AAdapter.ReadEnum<TA>(attribute, verifyType);
+    }
+
     public string ReadStringAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -121,7 +129,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         }
     }
 
-    public void CreateAndWriteAttribute<TA>([DisallowNull] string name, TA value) 
+    public void CreateAndWriteAttribute<TA>([DisallowNull] string name, TA value)
         where TA : unmanaged, IEquatable<TA>
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -137,6 +145,16 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         {
             CreateAndWriteAttribute(type, name, value);
         }
+    }
+
+    public void CreateAndWriteEnumAttribute<TA>([DisallowNull] string name, TA value) where TA : unmanaged, Enum
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        using var memorySpace = H5Space.CreateScalar();
+        using var type = H5Type.CreateEnumType<TA>();
+        using var attribute = CreateAttribute(name, type, memorySpace);
+        H5AAdapter.Write(attribute, type, value);
     }
 
     private void CreateAndWriteAttribute<TA>(H5Type type, [DisallowNull] string name, TA value) where TA : unmanaged

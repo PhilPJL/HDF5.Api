@@ -179,6 +179,25 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         });
     }
 
+    [TestMethod]
+    public void ReadingVerifiedMismatchedEnumTypeThrows()
+    {
+        HandleCheck((file) =>
+        {
+            file.CreateAndWriteEnumAttribute<TestULong>("test-ulong.min", TestULong.Min);
+
+            var value = file.ReadEnumAttribute<TestULong>("test-ulong.min");
+            Assert.AreEqual(value, TestULong.Min);
+
+            // should work 
+            var value2 = file.ReadEnumAttribute<TestLong>("test-ulong.min");
+            Assert.AreEqual((int)value, 0);
+
+            // should throw
+            Assert.ThrowsException<H5Exception>(() => file.ReadEnumAttribute<TestLong>("test-ulong.min", true));
+        });
+    }
+
     // Helper methods
     internal static void CreateIterateAttributesSucceeds(IH5ObjectWithAttributes objectWithAttributes)
     {
@@ -223,6 +242,10 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         objectWithAttributes.CreateAndWriteAttribute("double", 12.0d);
         objectWithAttributes.CreateAndWriteAttribute("double-max", double.MaxValue);
 
+        objectWithAttributes.CreateAndWriteEnumAttribute("enumlong-min", TestLong.Min);
+        objectWithAttributes.CreateAndWriteEnumAttribute("enumlong", TestLong.None);
+        objectWithAttributes.CreateAndWriteEnumAttribute("enumlong-max", TestLong.Max);
+
         // TODO: decimal
 
         var names = new List<string> {
@@ -256,7 +279,10 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             "float-max",
             "double-min",
             "double",
-            "double-max"
+            "double-max",
+            "enumlong-min",
+            "enumlong",
+            "enumlong-max"
         }
         .OrderBy(a => a)
         .ToList();
@@ -272,7 +298,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteAttribute((short)15, (short)99);
         CreateWriteReadUpdateDeleteAttribute((ushort)15, (ushort)77);
         CreateWriteReadUpdateDeleteAttribute((byte)15, (byte)0xff);
-//        CreateWriteReadUpdateDeleteBoolAttribute(true, false);
+        //        CreateWriteReadUpdateDeleteBoolAttribute(true, false);
         CreateWriteReadUpdateDeleteAttribute(15, 1234);
         CreateWriteReadUpdateDeleteAttribute(15u, 4567u);
         CreateWriteReadUpdateDeleteAttribute(15L, long.MaxValue);
@@ -285,6 +311,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddMinutes(5));
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddYears(5));
         CreateWriteReadUpdateDeleteStringAttribute(new string('A', 1000), new string('B', 500), 1200);
+        CreateWriteReadUpdateDeleteEnumAttribute(TestLong.Min, TestLong.Max);
+        CreateWriteReadUpdateDeleteEnumAttribute(TestByte.Min, TestByte.Max);
         Assert.AreEqual(0, location.NumberOfAttributes);
 
         void CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime value, DateTime newValue)
@@ -352,6 +380,28 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             a.Write(newValue);
             var readValue3 = location.ReadAttribute<T>(name);
+            Assert.AreEqual(newValue, readValue3);
+
+            location.DeleteAttribute(name);
+            Assert.IsFalse(location.AttributeExists(name));
+        }
+
+        void CreateWriteReadUpdateDeleteEnumAttribute<T>(T value, T newValue) where T : unmanaged, Enum
+        {
+            string name = $"dt{typeof(T).Name}";
+
+            location.CreateAndWriteEnumAttribute(name, value);
+            Assert.IsTrue(location.AttributeExists(name));
+
+            var readValue = location.ReadEnumAttribute<T>(name);
+            Assert.AreEqual(value, readValue);
+
+            using var a = location.OpenAttribute(name);
+            var readValue2 = location.ReadEnumAttribute<T>(name);
+            Assert.AreEqual(value, readValue2);
+
+            a.Write(newValue);
+            var readValue3 = location.ReadEnumAttribute<T>(name);
             Assert.AreEqual(newValue, readValue3);
 
             location.DeleteAttribute(name);
