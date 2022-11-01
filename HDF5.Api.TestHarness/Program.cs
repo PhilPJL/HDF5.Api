@@ -19,7 +19,7 @@ namespace HDF5.Api.TestHarness
             Console.WriteLine(H5Global.GetLibraryVersion());
         }
 
-        private static void DumpLocation<T>(H5Location<T> location, int indent) where T : H5Object<T>
+        private static void DumpLocation<T>(H5Location<T> location, int indent) where T : H5Location<T>
         {
             string sIndent = new string(' ', indent * 2);
 

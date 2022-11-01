@@ -10,7 +10,7 @@ namespace HDF5.Api;
 /// <remarks>
 ///     Implements operations that can be carried out equally on files and groups.
 /// </remarks>
-public abstract class H5Location<T> : H5ObjectWithAttributes<T>, IH5Location where T : H5Object<T>
+public abstract class H5Location<T> : H5ObjectWithAttributes<T> where T : H5Location<T>
 {
     internal H5Location(long handle, HandleType handleType, Action<T>? closeHandle)
         : base(handle, handleType, closeHandle)
@@ -19,35 +19,41 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T>, IH5Location whe
 
     public IEnumerable<string> GroupNames => H5LAdapter.GetGroupNames(this);
 
-    public void Enumerate(Action<H5Group> action)
+    public T Enumerate(Action<H5Group> action)
     {
         foreach (var name in GroupNames)
         {
             using var h5Object = OpenGroup(name);
             action(h5Object);
         }
+
+        return (T)this;
     }
 
     public IEnumerable<string> DataSetNames => H5LAdapter.GetDataSetNames(this);
 
-    public void Enumerate(Action<H5DataSet> action)
+    public T Enumerate(Action<H5DataSet> action)
     {
         foreach (var name in DataSetNames)
         {
             using var h5Object = OpenDataSet(name);
             action(h5Object);
         }
+
+        return (T)this;
     }
 
     public IEnumerable<string> DataTypeNames => H5LAdapter.GetNamedDataTypeNames(this);
 
-    public void Enumerate(Action<H5Type> action)
+    public T Enumerate(Action<H5Type> action)
     {
         foreach (var name in DataTypeNames)
         {
             using var h5Object = OpenType(name);
             action(h5Object);
         }
+
+        return (T)this;
     }
 
     public IEnumerable<(string name, ObjectType type)> Members => H5LAdapter.GetMembers(this);
@@ -95,11 +101,12 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T>, IH5Location whe
         return H5GAdapter.PathExists(this, path, null);
     }
 
-    public void DeleteGroup([DisallowNull] string path)
+    public H5Location<T> DeleteGroup([DisallowNull] string path)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
         H5LAdapter.Delete(this, path, null);
+        return this;
     }
 
     /// <summary>
@@ -152,18 +159,20 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T>, IH5Location whe
         return H5DAdapter.Exists(this, name, null);
     }
 
-    public void DeleteDataSet([DisallowNull] string path)
+    public T DeleteDataSet([DisallowNull] string path)
     {
         Guard.IsNotNullOrWhiteSpace(path);
 
         H5LAdapter.Delete(this, path, null);
+
+        return (T)this;
     }
 
-    public void Commit(
-        [DisallowNull] string name,
-        [DisallowNull] H5Type h5Type)
+    public T Commit([DisallowNull] string name, [DisallowNull] H5Type h5Type)
     {
         H5TAdapter.Commit(this, name, h5Type, null, null);
+
+        return (T)this;
     }
 
     public H5Type OpenType(string name)

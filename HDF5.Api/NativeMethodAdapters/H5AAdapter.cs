@@ -336,7 +336,7 @@ internal static unsafe class H5AAdapter
 
     internal static T ReadEnum<T>(H5Attribute attribute, bool verifyType = false) where T : unmanaged, Enum
     {
-        using var nativeType = H5TAdapter.GetBaseEnumType<T>();
+        using var nativeType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
         using var type = attribute.GetH5Type();
 
         if (verifyType)

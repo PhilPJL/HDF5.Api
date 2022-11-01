@@ -60,7 +60,7 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     /// <exception cref="H5Exception"></exception>
     public static H5Type GetEquivalentNativeType<T>() where T : unmanaged
     {
-        return H5TAdapter.GetEquivalentNativeType<T>();
+        return H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<T>();
     }
 
     /// <summary>

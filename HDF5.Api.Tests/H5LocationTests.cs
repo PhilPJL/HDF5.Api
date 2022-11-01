@@ -1,10 +1,10 @@
 ﻿namespace HDF5.Api.Tests;
 
-public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5LocationTests<TLoc>
+public abstract class H5LocationTests<TTest> : H5Test<TTest> where TTest : H5LocationTests<TTest>
 {
     #region Groups
 
-    protected static void CreateGroupSucceeds<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void CreateGroupSucceeds<T>(H5Location<T> location) where T : H5Location<T>
     {
         // Ascii
         const string grp1Name = "grp1";
@@ -31,7 +31,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         Assert.IsTrue(location.GroupPathExists($"{grp3Name}/{grp4Name}"));
     }
 
-    protected static void CreateAndOpenGroupSucceeds<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void CreateAndOpenGroupSucceeds<T>(H5Location<T> location) where T : H5Location<T>
     {
         // Create group
         const string grp1Name = "grp1";
@@ -42,7 +42,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         using var group2 = location.OpenGroup(grp1Name);
     }
 
-    protected static void CreateOpenDeleteGroupSucceeds<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void CreateOpenDeleteGroupSucceeds<T>(H5Location<T> location) where T : H5Location<T>
     {
         // Create group
         const string grp1Name = "grp1";
@@ -58,7 +58,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         Assert.IsFalse(location.GroupExists(grp1Name));
     }
 
-    protected static void OpenExistingGroupPathSucceeds<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void OpenExistingGroupPathSucceeds<T>(H5Location<T> location) where T : H5Location<T>
     {
         // Create group
         const string grp1Name = "grp1";
@@ -83,7 +83,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         using var group2 = location.OpenGroup(grp1Name);
     }
 
-    protected static void OpenNonExistingGroupThrows<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void OpenNonExistingGroupThrows<T>(H5Location<T> location) where T : H5Location<T>
     {
         // Create group
         const string grp1Name = "grp1";
@@ -94,31 +94,31 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         Assert.ThrowsException<H5Exception>(() => location.OpenGroup("grp2"));
     }
 
-    protected static void CreateGroupEmptyNameFails<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void CreateGroupEmptyNameFails<T>(H5Location<T> location) where T : H5Location<T>
     {
         Assert.ThrowsException<ArgumentNullException>(() => location.CreateGroup(null!));
         Assert.ThrowsException<ArgumentException>(() => location.CreateGroup(string.Empty));
     }
 
-    protected static void CreateDuplicateGroupFails<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void CreateDuplicateGroupFails<T>(H5Location<T> location) where T : H5Location<T>
     {
         using var group = location.CreateGroup("test");
         Assert.ThrowsException<H5Exception>(() => location.CreateGroup("test"));
     }
 
-    protected static void GroupExistsReturnsTrueForGroup<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void GroupExistsReturnsTrueForGroup<T>(H5Location<T> location) where T : H5Location<T>
     {
         using var group = location.CreateGroup("test");
         Assert.IsTrue(location.GroupExists("test"));
     }
 
-    protected static void GroupExistsReturnsFalseForNoGroup<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void GroupExistsReturnsFalseForNoGroup<T>(H5Location<T> location) where T : H5Location<T>
     {
         using var group = location.CreateGroup("test");
         Assert.IsFalse(location.GroupExists("test1"));
     }
 
-    protected static void GroupExistsThrowsForGroupPathName<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void GroupExistsThrowsForGroupPathName<T>(H5Location<T> location) where T : H5Location<T>
     {
         using var subgroup = location.CreateGroup("subgroup");
 
@@ -128,7 +128,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         Assert.ThrowsException<H5Exception>(() => location.GroupExists("/test"));
     }
 
-    protected static void GroupPathExistsSucceeds<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void GroupPathExistsSucceeds<T>(H5Location<T> location) where T : H5Location<T>
     {
         // Create group
         const string grp1Name = "grp1";
@@ -147,7 +147,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         Assert.IsTrue(grp2.GroupPathExists($"{grp3Name}"));
     }
 
-    protected static void GetChildGroupsSucceeds<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void GetChildGroupsSucceeds<T>(H5Location<T> location) where T : H5Location<T>
     {
         var groupNames = location.GroupNames;
         Assert.IsTrue(!groupNames.Any());
@@ -175,7 +175,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         Assert.IsTrue(groupNames.Any(c => c == grp10Name));
     }
 
-    protected static void EnumerateGroupsSucceeds<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void EnumerateGroupsSucceeds<T>(H5Location<T> location) where T : H5Location<T>
     {
         var groupNames = location.GroupNames;
         Assert.IsTrue(!groupNames.Any());
@@ -205,7 +205,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
 
     #region DataSet
 
-    protected static void CreateDataSetSucceeds<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void CreateDataSetSucceeds<T>(H5Location<T> location) where T : H5Location<T>
     {
         const string ds1Name = "ds1";
 
@@ -216,7 +216,7 @@ public abstract class H5LocationTests<TLoc> : H5Test<TLoc> where TLoc : H5Locati
         Assert.IsTrue(location.DataSetExists(ds1Name));
     }
 
-    protected static void CreateAndOpenDataSetSucceeds<T>(H5Location<T> location) where T : H5Object<T>
+    protected static void CreateAndOpenDataSetSucceeds<T>(H5Location<T> location) where T : H5Location<T>
     {
         const string ds1Name = "ds1";
 

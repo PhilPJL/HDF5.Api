@@ -49,21 +49,23 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AAdapter.ReadDateTime(this);
     }
 
-    public void Write([DisallowNull] string value)
+    public H5Attribute Write([DisallowNull] string value)
     {
         Guard.IsNotNull(value);
-
         H5AAdapter.Write(this, value);
+        return this;
     }
 
-    public void Write<T>(T value) where T : unmanaged
+    public H5Attribute Write<T>(T value) where T : unmanaged
     {
         H5AAdapter.Write(this, value);
+        return this;
     }
 
-    public void Write(DateTime value)
+    public H5Attribute Write(DateTime value)
     {
         H5AAdapter.Write(this, value);
+        return this;
     }
 
     internal static H5AttributeCreationPropertyList CreateCreationPropertyList(CharacterSet encoding = CharacterSet.Utf8)
@@ -72,34 +74,4 @@ public class H5Attribute : H5Object<H5Attribute>
     }
 
     public string Name => H5AAdapter.GetName(this);
-}
-
-[Obsolete]
-public class H5Attribute<T> : H5Attribute where T : new()
-{
-    internal H5Attribute(long handle) : base(handle)
-    {
-    }
-
-    public void Write([DisallowNull] T value)
-    {
-        Guard.IsNotNull(value);
-
-        //...
-        throw new NotImplementedException();
-    }
-
-    public T Read()
-    {
-        throw new NotImplementedException();
-        //return new T();
-    }
-
-    [DisallowNull]
-    public T Value
-    {
-        get => Read();
-        set => Write(value);
-    }
-
 }
