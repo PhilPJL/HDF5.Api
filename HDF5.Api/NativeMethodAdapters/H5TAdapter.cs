@@ -130,6 +130,7 @@ internal static unsafe class H5TAdapter
         {
             enum_nameof(type, new IntPtr(&value), bufferPtr, new IntPtr(length)).ThrowIfError();
             Span<byte> bytes = buffer;
+            // ReSharper disable once InvokeAsExtensionMethod
             var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
             nullTerminatorIndex = nullTerminatorIndex < 0 ? length : nullTerminatorIndex;
             return Encoding.UTF8.GetString(bufferPtr, nullTerminatorIndex);
@@ -178,7 +179,7 @@ internal static unsafe class H5TAdapter
 
     internal static H5EnumType<T> CreateEnumType<T>() where T : unmanaged, Enum
     {
-        var h5EnumType = GetBaseEnumType<T>();
+        var h5EnumType = ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
 
         try
         {
@@ -206,27 +207,31 @@ internal static unsafe class H5TAdapter
         return h5EnumType;
     }
 
-    internal static H5EnumType<T> GetBaseEnumType<T>() where T : unmanaged, Enum
+    internal static H5EnumType<T> ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>() where T : unmanaged, Enum
     {
-        var baseType = GetEquivalentEnumNativeType();
+        var baseType = GetNativeType();
 
         return new H5EnumType<T>(enum_create(baseType));
 
-        static long GetEquivalentEnumNativeType()
+        static long GetNativeType()
         {
             var underlyingType = Enum.GetUnderlyingType(typeof(T)).Name;
 
             return underlyingType switch
             {
-                "Int64" => NATIVE_INT64,
-                "UInt64" => NATIVE_UINT64,
-                "Int32" => NATIVE_INT32,
-                "UInt32" => NATIVE_UINT32,
+                "Byte" => NATIVE_UINT8,
+                "SByte" => NATIVE_INT8,
+
                 "Int16" => NATIVE_INT16,
                 "UInt16" => NATIVE_UINT16,
-                "SByte" => NATIVE_INT8,
-                "Byte" => NATIVE_UINT8,
-                _ => throw new ArgumentException($"Unable to create Enum for underlying type '{underlyingType}'."),
+
+                "Int32" => NATIVE_INT32,
+                "UInt32" => NATIVE_UINT32,
+
+                "Int64" => NATIVE_INT64,
+                "UInt64" => NATIVE_UINT64,
+
+                _ => throw new ArgumentException($"Unable to create Enum for underlying type '{underlyingType}'.")
             };
         }
     }
@@ -237,7 +242,7 @@ internal static unsafe class H5TAdapter
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="H5Exception"></exception>
-    internal static H5Type GetEquivalentNativeType<T>() where T : unmanaged
+    internal static H5Type ConvertDotNetPrimitiveToH5NativeType<T>() where T : unmanaged /* primitive would be nice */
     {
         if (!typeof(T).IsPrimitive)
         {
@@ -252,10 +257,7 @@ internal static unsafe class H5TAdapter
             sbyte => NATIVE_INT8,
 
             short => NATIVE_INT16,
-            ushort => NATIVE_USHORT,
-
-            // TODO: check sizes 
-            //           char => NATIVE_CHAR,
+            ushort => NATIVE_UINT16,
 
             int => NATIVE_INT32,
             uint => NATIVE_UINT32,
@@ -266,12 +268,14 @@ internal static unsafe class H5TAdapter
             float => NATIVE_FLOAT,
             double => NATIVE_DOUBLE,
 
-            // add more mappings as required
+            // .NET char is 16 bit (UTF-16-ish)
+            char => NATIVE_UCHAR,
 
             _ => throw new H5Exception($"No mapping defined from {typeof(T).Name} to native type.")
         };
 
-        return H5Type.CreateNonTracked(handle);
+        // Copy the static handle so we can track and close it
+        return new H5Type(copy(handle));
     }
 
     internal static H5Type GetEquivalentNativeType(H5Type type)

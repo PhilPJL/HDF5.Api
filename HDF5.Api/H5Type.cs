@@ -11,9 +11,9 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 {
     internal H5Type(long handle) : base(handle, HandleType.Type, H5TAdapter.Close) { }
 
-    private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
+    //private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
 
-    internal static H5Type CreateNonTracked(long handle) => new(handle, null);
+    //internal static H5Type CreateNonTracked(long handle) => new(handle, null);
 
     #region Equality and hashcode
 
@@ -60,14 +60,12 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     /// <exception cref="H5Exception"></exception>
     public static H5Type GetEquivalentNativeType<T>() where T : unmanaged
     {
-        return H5TAdapter.GetEquivalentNativeType<T>();
+        return H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<T>();
     }
 
     /// <summary>
     /// Gets the equivalent native type for an H5 type
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
     /// <exception cref="H5Exception"></exception>
     public static H5Type GetEquivalentNativeType(H5Type type)
     {

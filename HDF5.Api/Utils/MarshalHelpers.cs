@@ -65,6 +65,7 @@ namespace HDF5.Api.Utils
                 ((int)getNameFunc(h5Object, bufferPtr, new IntPtr(length + 1))).ThrowIfError();
 
                 Span<byte> bytes = buffer;
+                // ReSharper disable once InvokeAsExtensionMethod
                 var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
                 nullTerminatorIndex = nullTerminatorIndex < 0 ? length : nullTerminatorIndex;
                 return Encoding.UTF8.GetString(bufferPtr, nullTerminatorIndex);

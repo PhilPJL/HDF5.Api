@@ -28,7 +28,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 Test(file, "fixed_500", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 500, characterSet, padding);
             }
 
-            static void Test(IH5ObjectWithAttributes file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+            static void Test<T>(H5ObjectWithAttributes<T> file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+                 where T : H5ObjectWithAttributes<T>
             {
                 using var attribute = file.CreateStringAttribute(name, fixedStorageLength, characterSet, padding);
 
@@ -70,7 +71,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 Test(file, "variable_long", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 0, characterSet, padding);
             }
 
-            static void Test(IH5ObjectWithAttributes file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+            static void Test<T>(H5ObjectWithAttributes<T> file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+                where T : H5ObjectWithAttributes<T>
             {
                 using (var attribute = file.CreateStringAttribute(name, fixedStorageLength, characterSet, padding))
                 {
@@ -184,14 +186,14 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     {
         HandleCheck((file) =>
         {
-            file.CreateAndWriteEnumAttribute<TestULong>("test-ulong.min", TestULong.Min);
+            file.CreateAndWriteEnumAttribute("test-ulong.min", TestULong.Min);
 
-            var value = file.ReadEnumAttribute<TestULong>("test-ulong.min");
-            Assert.AreEqual(value, TestULong.Min);
+            var valueTestUlongMin = file.ReadEnumAttribute<TestULong>("test-ulong.min", true);
+            Assert.AreEqual(valueTestUlongMin, TestULong.Min);
 
-            // should work 
-            var value2 = file.ReadEnumAttribute<TestLong>("test-ulong.min");
-            Assert.AreEqual((int)value, 0);
+            // mismatched type but should work because the value is zero
+            TestLong valueTestLong = file.ReadEnumAttribute<TestLong>("test-ulong.min", false);
+            Assert.AreEqual(valueTestLong, TestLong.None);
 
             // should throw
             Assert.ThrowsException<H5Exception>(() => file.ReadEnumAttribute<TestLong>("test-ulong.min", true));
@@ -199,52 +201,56 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     }
 
     // Helper methods
-    internal static void CreateIterateAttributesSucceeds(IH5ObjectWithAttributes objectWithAttributes)
+    internal static void CreateIterateAttributesSucceeds<T>(H5ObjectWithAttributes<T> location) where T : H5ObjectWithAttributes<T>
     {
-        objectWithAttributes.CreateAndWriteAttribute("string", "This is a string 12345.", 50);
-        objectWithAttributes.CreateAndWriteAttribute("dateTime", DateTime.Now);
-        objectWithAttributes.CreateAndWriteAttribute("bool-true", true);
-        objectWithAttributes.CreateAndWriteAttribute("bool-false", false);
+        location.CreateAndWriteAttribute("string", "This is a string 12345.", 50);
+        location.CreateAndWriteAttribute("dateTime", DateTime.Now);
+        location.CreateAndWriteAttribute("bool-true", true);
+        location.CreateAndWriteAttribute("bool-false", false);
 
-        objectWithAttributes.CreateAndWriteAttribute("byte-min", byte.MinValue);
-        objectWithAttributes.CreateAndWriteAttribute("byte", (byte)5);
-        objectWithAttributes.CreateAndWriteAttribute("byte-max", byte.MaxValue);
+        location.CreateAndWriteAttribute("byte-min", byte.MinValue);
+        location.CreateAndWriteAttribute("byte", (byte)5);
+        location.CreateAndWriteAttribute("byte-max", byte.MaxValue);
 
-        objectWithAttributes.CreateAndWriteAttribute("int16-min", short.MinValue);
-        objectWithAttributes.CreateAndWriteAttribute("int16", (short)5);
-        objectWithAttributes.CreateAndWriteAttribute("int16-max", short.MaxValue);
+        location.CreateAndWriteAttribute("int16-min", short.MinValue);
+        location.CreateAndWriteAttribute("int16", (short)5);
+        location.CreateAndWriteAttribute("int16-max", short.MaxValue);
 
-        objectWithAttributes.CreateAndWriteAttribute("uint16-min", ushort.MinValue);
-        objectWithAttributes.CreateAndWriteAttribute("uint16", (ushort)6);
-        objectWithAttributes.CreateAndWriteAttribute("uint16-max", ushort.MaxValue);
+        location.CreateAndWriteAttribute("uint16-min", ushort.MinValue);
+        location.CreateAndWriteAttribute("uint16", (ushort)6);
+        location.CreateAndWriteAttribute("uint16-max", ushort.MaxValue);
 
-        objectWithAttributes.CreateAndWriteAttribute("int32-min", int.MinValue);
-        objectWithAttributes.CreateAndWriteAttribute("int32", 7);
-        objectWithAttributes.CreateAndWriteAttribute("int32-max", int.MaxValue);
+        location.CreateAndWriteAttribute("int32-min", int.MinValue);
+        location.CreateAndWriteAttribute("int32", 7);
+        location.CreateAndWriteAttribute("int32-max", int.MaxValue);
 
-        objectWithAttributes.CreateAndWriteAttribute("uint32-min", uint.MinValue);
-        objectWithAttributes.CreateAndWriteAttribute("uint32", 8u);
-        objectWithAttributes.CreateAndWriteAttribute("uint32-max", uint.MaxValue);
+        location.CreateAndWriteAttribute("uint32-min", uint.MinValue);
+        location.CreateAndWriteAttribute("uint32", 8u);
+        location.CreateAndWriteAttribute("uint32-max", uint.MaxValue);
 
-        objectWithAttributes.CreateAndWriteAttribute("long-min", long.MinValue);
-        objectWithAttributes.CreateAndWriteAttribute("long", 9L);
-        objectWithAttributes.CreateAndWriteAttribute("long-max", long.MaxValue);
+        location.CreateAndWriteAttribute("long-min", long.MinValue);
+        location.CreateAndWriteAttribute("long", 9L);
+        location.CreateAndWriteAttribute("long-max", long.MaxValue);
 
-        objectWithAttributes.CreateAndWriteAttribute("ulong-min", ulong.MinValue);
-        objectWithAttributes.CreateAndWriteAttribute("ulong", 10ul);
-        objectWithAttributes.CreateAndWriteAttribute("ulong-max", ulong.MaxValue);
+        location.CreateAndWriteAttribute("ulong-min", ulong.MinValue);
+        location.CreateAndWriteAttribute("ulong", 10ul);
+        location.CreateAndWriteAttribute("ulong-max", ulong.MaxValue);
 
-        objectWithAttributes.CreateAndWriteAttribute("float-min", float.MinValue);
-        objectWithAttributes.CreateAndWriteAttribute("float", 11.0f);
-        objectWithAttributes.CreateAndWriteAttribute("float-max", float.MaxValue);
+        location.CreateAndWriteAttribute("float-min", float.MinValue);
+        location.CreateAndWriteAttribute("float", 11.0f);
+        location.CreateAndWriteAttribute("float-max", float.MaxValue);
 
-        objectWithAttributes.CreateAndWriteAttribute("double-min", double.MinValue);
-        objectWithAttributes.CreateAndWriteAttribute("double", 12.0d);
-        objectWithAttributes.CreateAndWriteAttribute("double-max", double.MaxValue);
+        location.CreateAndWriteAttribute("double-min", double.MinValue);
+        location.CreateAndWriteAttribute("double", 12.0d);
+        location.CreateAndWriteAttribute("double-max", double.MaxValue);
 
-        objectWithAttributes.CreateAndWriteEnumAttribute("enumlong-min", TestLong.Min);
-        objectWithAttributes.CreateAndWriteEnumAttribute("enumlong", TestLong.None);
-        objectWithAttributes.CreateAndWriteEnumAttribute("enumlong-max", TestLong.Max);
+        //location.CreateAndWriteAttribute("decimal-min", decimal.MinValue);
+        //location.CreateAndWriteAttribute("decimal", 12.0m);
+        //location.CreateAndWriteAttribute("decimal-max", decimal.MaxValue);
+
+        location.CreateAndWriteEnumAttribute("enumlong-min", TestLong.Min);
+        location.CreateAndWriteEnumAttribute("enumlong", TestLong.None);
+        location.CreateAndWriteEnumAttribute("enumlong-max", TestLong.Max);
 
         // TODO: decimal
 
@@ -287,18 +293,18 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         .OrderBy(a => a)
         .ToList();
 
-        var attributeNames = objectWithAttributes.AttributeNames.OrderBy(a => a).ToList();
+        var attributeNames = location.AttributeNames.OrderBy(a => a).ToList();
 
         Assert.IsTrue(names.SequenceEqual(attributeNames));
     }
 
-    internal static void CreateWriteReadDeleteAttributesSucceeds(IH5ObjectWithAttributes location)
+    internal static void CreateWriteReadDeleteAttributesSucceeds<T>(H5ObjectWithAttributes<T> location) where T : H5ObjectWithAttributes<T>
     {
         // Create attributes
         CreateWriteReadUpdateDeleteAttribute((short)15, (short)99);
         CreateWriteReadUpdateDeleteAttribute((ushort)15, (ushort)77);
         CreateWriteReadUpdateDeleteAttribute((byte)15, (byte)0xff);
-        //        CreateWriteReadUpdateDeleteBoolAttribute(true, false);
+        CreateWriteReadUpdateDeleteBoolAttribute(true, false);
         CreateWriteReadUpdateDeleteAttribute(15, 1234);
         CreateWriteReadUpdateDeleteAttribute(15u, 4567u);
         CreateWriteReadUpdateDeleteAttribute(15L, long.MaxValue);
@@ -364,44 +370,44 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.IsFalse(location.AttributeExists(name));
         }
 
-        void CreateWriteReadUpdateDeleteAttribute<T>(T value, T newValue) where T : unmanaged, IEquatable<T>
+        void CreateWriteReadUpdateDeleteAttribute<TValue>(TValue value, TValue newValue) where TValue : unmanaged, IEquatable<TValue>
         {
-            string name = $"dt{typeof(T).Name}";
+            string name = $"dt{typeof(TValue).Name}";
 
             location.CreateAndWriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
-            var readValue = location.ReadAttribute<T>(name);
+            var readValue = location.ReadAttribute<TValue>(name);
             Assert.AreEqual(value, readValue);
 
             using var a = location.OpenAttribute(name);
-            var readValue2 = location.ReadAttribute<T>(name);
+            var readValue2 = location.ReadAttribute<TValue>(name);
             Assert.AreEqual(value, readValue2);
 
             a.Write(newValue);
-            var readValue3 = location.ReadAttribute<T>(name);
+            var readValue3 = location.ReadAttribute<TValue>(name);
             Assert.AreEqual(newValue, readValue3);
 
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
         }
 
-        void CreateWriteReadUpdateDeleteEnumAttribute<T>(T value, T newValue) where T : unmanaged, Enum
+        void CreateWriteReadUpdateDeleteEnumAttribute<TValue>(TValue value, TValue newValue) where TValue : unmanaged, Enum
         {
-            string name = $"dt{typeof(T).Name}";
+            string name = $"dt{typeof(TValue).Name}";
 
             location.CreateAndWriteEnumAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
-            var readValue = location.ReadEnumAttribute<T>(name);
+            var readValue = location.ReadEnumAttribute<TValue>(name, true);
             Assert.AreEqual(value, readValue);
 
             using var a = location.OpenAttribute(name);
-            var readValue2 = location.ReadEnumAttribute<T>(name);
+            var readValue2 = location.ReadEnumAttribute<TValue>(name, true);
             Assert.AreEqual(value, readValue2);
 
             a.Write(newValue);
-            var readValue3 = location.ReadEnumAttribute<T>(name);
+            var readValue3 = location.ReadEnumAttribute<TValue>(name, true);
             Assert.AreEqual(newValue, readValue3);
 
             location.DeleteAttribute(name);
@@ -495,11 +501,11 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             using var attributeTrue = file.CreateAttribute("boolTestTrue", type, size);
             attributeTrue.Write(true);
-            Debug.WriteLine(H5AAdapter.ReadBool(attributeTrue));
+            Assert.IsTrue(H5AAdapter.ReadBool(attributeTrue));
 
             using var attributeFalse = file.CreateAttribute("boolTestFalse", type, size);
             attributeFalse.Write(false);
-            Debug.WriteLine(H5AAdapter.ReadBool(attributeFalse));
+            Assert.IsFalse(H5AAdapter.ReadBool(attributeFalse));
         });
     }
 
@@ -526,13 +532,13 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 using var attMin = file.CreateAttribute($"{typeof(T).Name}:{valueMin}", type, size);
                 attMin.Write(valueMin);
 
-                var min = attMin.ReadEnum<T>();
+                var min = attMin.ReadEnum<T>(true);
                 Assert.AreEqual(valueMin, min);
 
                 using var attMax = file.CreateAttribute($"{typeof(T).Name}:{valueMax}", type, size);
                 attMax.Write(valueMax);
 
-                var max = attMax.ReadEnum<T>();
+                var max = attMax.ReadEnum<T>(true);
                 Assert.AreEqual(valueMax, max);
             }
         });

@@ -52,15 +52,16 @@ public class H5DataSet : H5ObjectWithAttributes<H5DataSet>
         return H5DAdapter.Read<T>(this);
     }
 
-    public void SetExtent([DisallowNull] params long[] dims)
+    public H5DataSet SetExtent([DisallowNull] params long[] dims)
     {
         Guard.IsNotNull(dims);
 
         H5DAdapter.SetExtent(this, dims);
+        return this;
     }
 
     // TODO: get rid of IntPtr
-    public void Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] IntPtr buffer)
+    public H5DataSet Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] IntPtr buffer)
     {
         Guard.IsNotNull(type);
         Guard.IsNotNull(memorySpace);
@@ -68,5 +69,6 @@ public class H5DataSet : H5ObjectWithAttributes<H5DataSet>
         Guard.IsNotNull(buffer);
 
         H5DAdapter.Write(this, type, memorySpace, fileSpace, buffer, null);
+        return this;
     }
 }

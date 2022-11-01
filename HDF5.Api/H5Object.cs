@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using CommunityToolkit.Diagnostics;
+using System.Linq;
 
 namespace HDF5.Api;
 
@@ -12,10 +13,11 @@ public class H5Object<T> : Disposable where T : H5Object<T>
 
     private long _handle;
 
-    private readonly Action<T>? _closeHandle;
+    private readonly Action<T> _closeHandle;
 
-    internal H5Object(long handle, HandleType handleType, Action<T>? closeHandle)
+    internal H5Object(long handle, HandleType handleType, [DisallowNull] Action<T> closeHandle)
     {
+        Guard.IsNotNull(closeHandle, nameof(closeHandle));
         handle.ThrowIfDefaultOrInvalidHandleValue($"Constructing {handleType}");
 
 #if DEBUG
@@ -25,10 +27,7 @@ public class H5Object<T> : Disposable where T : H5Object<T>
         _handle = handle;
         _closeHandle = closeHandle;
 
-        if (_closeHandle != null)
-        {
-            H5Handle.TrackHandle(handle);
-        }
+        H5Handle.TrackHandle(handle);
     }
 
     public bool IsDisposed => _handle == H5Handle.InvalidHandleValue;
@@ -36,10 +35,10 @@ public class H5Object<T> : Disposable where T : H5Object<T>
     /// <summary>
     /// Disposes unmanaged handle by calling appropriate 'H5X.close' method.
     /// </summary>
-    /// <param name="_">We don't have any unmanaged resources so ignored 'disposing' param.</param>
-    protected override void Dispose(bool _)
+    /// <param name="disposing">We don't have any managed resources.</param>
+    protected override void Dispose(bool disposing)
     {
-        if (_closeHandle == null || _handle == H5Handle.DefaultHandleValue)
+        if (_handle == H5Handle.DefaultHandleValue)
         {
             // native or default(0) handle shouldn't be disposed
             return;

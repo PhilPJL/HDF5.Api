@@ -16,7 +16,7 @@ internal static unsafe class H5GAdapter
     // Overload used by default which enabled intermediate group creation and UTF8 names.
     internal static H5Group Create<T>(
         H5Location<T> location, string name,
-        H5GroupCreationPropertyList? propListGroupCreation) where T : H5Object<T>
+        H5GroupCreationPropertyList? propListGroupCreation) where T : H5Location<T>
     {
         using var propListLinkCreation = H5Link.CreateCreationPropertyList();
 
@@ -27,7 +27,7 @@ internal static unsafe class H5GAdapter
     internal static H5Group Create<T>(
         H5Location<T> location, string name,
         H5LinkCreationPropertyList? propListLinkCreation,
-        H5GroupCreationPropertyList? propListGroupCreation) where T : H5Object<T>
+        H5GroupCreationPropertyList? propListGroupCreation) where T : H5Location<T>
     {
         location.AssertHasLocationHandleType();
 
@@ -45,7 +45,7 @@ internal static unsafe class H5GAdapter
         return new H5Group(h);
     }
 
-    internal static H5Group Open<T>(H5Location<T> location, string name, H5PropertyList? propListGroupAccess) where T : H5Object<T>
+    internal static H5Group Open<T>(H5Location<T> location, string name, H5PropertyList? propListGroupAccess) where T : H5Location<T>
     {
         location.AssertHasLocationHandleType();
 
@@ -69,7 +69,7 @@ internal static unsafe class H5GAdapter
     /// <param name="location">A file or group id</param>
     /// <param name="name">A simple object name, e.g. 'group' not 'group/sub-group'.</param>
     /// <param name="linkAccessPropertyList"></param>
-    internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList) where T : H5Object<T>
+    internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList) where T : H5Location<T>
     {
         location.AssertHasLocationHandleType();
 
@@ -107,7 +107,7 @@ internal static unsafe class H5GAdapter
     /// <param name="location">A file or group id</param>
     /// <param name="path">e.g. /group/sub-group/sub-sub-group</param>
     /// <param name="linkAccessPropertyList"></param>
-    internal static bool PathExists<T>(H5Location<T> location, string path, H5PropertyList? linkAccessPropertyList = null) where T : H5Object<T>
+    internal static bool PathExists<T>(H5Location<T> location, string path, H5PropertyList? linkAccessPropertyList = null) where T : H5Location<T>
     {
         location.AssertHasLocationHandleType();
 

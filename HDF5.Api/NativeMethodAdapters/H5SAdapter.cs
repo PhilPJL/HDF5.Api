@@ -105,7 +105,7 @@ internal static unsafe class H5SAdapter
         {
             int result = get_simple_extent_dims(space, dimsPtr, maxDimsPtr);
             result.ThrowIfError();
-            return Enumerable.Zip(dims, maxDims, (f, s) => new Dimension(f, s)).ToList();
+            return dims.Zip(maxDims, (f, s) => new Dimension(f, s)).ToList();
         }
 #endif
     }

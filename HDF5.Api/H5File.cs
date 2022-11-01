@@ -19,9 +19,10 @@ public class H5File : H5Location<H5File>
     /// Flush the file to disk.
     /// </summary>
     /// <param name="flushGlobal"></param>
-    public void Flush(bool flushGlobal = false)
+    public H5File Flush(bool flushGlobal = false)
     {
         H5FAdapter.Flush(this, flushGlobal);
+        return this;
     }
 
     /// <summary>
@@ -172,14 +173,22 @@ public class H5File : H5Location<H5File>
         return H5FAdapter.Create(path, failIfExists, fileCreationPropertyList, fileAccessPropertyList);
     }
 
-    public void SetLibraryVersionBounds(LibraryVersion low = LibraryVersion.Earliest, LibraryVersion high = LibraryVersion.Latest)
+    public H5File SetLibraryVersionBounds(LibraryVersion low = LibraryVersion.Earliest, LibraryVersion high = LibraryVersion.Latest)
     {
         H5FAdapter.SetLibraryVersionBounds(this, low, high);
+        return this;
     }
 
     public (LibraryVersion low, LibraryVersion high) GetLibraryVersionBounds()
     {
         using var fapl = GetAccessPropertyList();
         return fapl.GetLibraryVersionBounds();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        // TODO: optionally automatically dispose and close all handles tracked by this file
+
+        base.Dispose(disposing);
     }
 }

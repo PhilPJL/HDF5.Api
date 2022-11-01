@@ -5,8 +5,9 @@
 /// </summary>
 public static class H5DataSetWriter
 {
-    public static IH5DataSetWriter<TInput> CreateOneDimensionalDataSetWriter<TInput>
-        (IH5Location location, string dataSetName, IH5TypeAdapter<TInput> converter, int chunkSize, int compressionLevel = 0)
+    public static IH5DataSetWriter<TInput> CreateOneDimensionalDataSetWriter<TInput, TLocation>
+        (H5Location<TLocation> location, string dataSetName, IH5TypeAdapter<TInput> converter, int chunkSize, int compressionLevel = 0)
+        where TLocation : H5Location<TLocation>
     {
         // Single dimension (rank 1), unlimited length, chunk size.
         using var memorySpace = H5Space.Create(chunkSize);

@@ -103,7 +103,7 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
             Assert.IsTrue(((object)lc1).Equals(lc2));
         });
 
-        static H5DataSet CreateTestDataset(IH5Location location, string dataSetName)
+        static H5DataSet CreateTestDataset<T>(H5Location<T> location, string dataSetName) where T : H5Location<T>
         {
             const int chunkSize = 1;
 

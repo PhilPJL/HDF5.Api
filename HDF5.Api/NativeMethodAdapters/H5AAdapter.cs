@@ -6,6 +6,7 @@ using HDF5.Api.NativeMethods;
 using System.Collections.Generic;
 using static HDF5.Api.NativeMethods.H5A;
 using System.Linq;
+using CommunityToolkit.HighPerformance;
 
 namespace HDF5.Api.NativeMethodAdapters;
 
@@ -17,11 +18,6 @@ internal static unsafe class H5AAdapter
     internal static void Close(H5Attribute attribute)
     {
         close(attribute).ThrowIfError();
-    }
-
-    internal static H5Attribute Create<T, TA>(H5Object<T> h5Object, string name) where T : H5Object<T>
-    {
-        throw new NotImplementedException();
     }
 
     internal static H5Attribute Create<T>(
@@ -154,7 +150,7 @@ internal static unsafe class H5AAdapter
     internal static string GetName(H5Attribute attribute)
     {
 #if NET7_0_OR_GREATER
-        return MarshalHelpers.GetName(attribute, 
+        return MarshalHelpers.GetName(attribute,
             (long attr_id, Span<byte> name, nint size) => get_name(attr_id, size, name));
 #else
         return MarshalHelpers.GetName(attribute,
@@ -197,11 +193,6 @@ internal static unsafe class H5AAdapter
         return new H5Attribute(h);
     }
 
-    internal static DateTime ReadDateTime(H5Attribute attribute)
-    {
-        return DateTime.FromOADate(Read<double>(attribute));
-    }
-
     internal static string ReadString(H5Attribute attribute)
     {
         using var type = attribute.GetH5Type();
@@ -235,12 +226,13 @@ internal static unsafe class H5AAdapter
                 return ReadVariableStrings(buffer);
             }
 
-#if NET7_0_OR_GREATER
-            using var spanOwner = SpanOwner<nint>.Allocate((int)count);
-            return ReadVariableStrings(spanOwner.Span);
-#else
+            // TODO: performance check
+            //#if NET7_0_OR_GREATER
+            //            using var spanOwner = SpanOwner<nint>.Allocate((int)count);
+            //            return ReadVariableStrings(spanOwner.Span);
+            //#else
             return ReadVariableStrings(new Span<nint>(new nint[count]));
-#endif
+            //#endif
 
             string ReadVariableStrings(Span<nint> buffer)
             {
@@ -262,7 +254,8 @@ internal static unsafe class H5AAdapter
                             // NOTE: no way to retrieve size of variable length buffer.
                             // Only search for null up to a fixed length.
                             Span<byte> bytes = new((byte*)buffer[0], H5Global.MaxVariableLengthStringBuffer);
-                            var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
+                            // ReSharper disable once InvokeAsExtensionMethod
+                            var nullTerminatorIndex = System.MemoryExtensions.IndexOf(bytes, (byte)0);
                             if (nullTerminatorIndex != -1)
                             {
                                 return Encoding.UTF8.GetString((byte*)buffer[0], nullTerminatorIndex);
@@ -283,6 +276,7 @@ internal static unsafe class H5AAdapter
                 }
             }
         }
+        // ReSharper disable once RedundantIfElseBlock
         else
         {
             int storageSize = attribute.StorageSize;
@@ -303,7 +297,7 @@ internal static unsafe class H5AAdapter
             {
                 read(attribute, type, buffer).ThrowIfError();
 
-                var nullTerminatorIndex = MemoryExtensions.IndexOf(buffer, (byte)0);
+                var nullTerminatorIndex = System.MemoryExtensions.IndexOf(buffer, (byte)0);
                 nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
                 return Encoding.UTF8.GetString(buffer[0..nullTerminatorIndex]);
             }
@@ -314,7 +308,8 @@ internal static unsafe class H5AAdapter
                 read(attribute, type, bufferPtr).ThrowIfError();
 
                 Span<byte> bytes = buffer;
-                var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
+                // ReSharper disable once InvokeAsExtensionMethod
+                var nullTerminatorIndex = System.MemoryExtensions.IndexOf(bytes, (byte)0);
                 nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
                 return Encoding.UTF8.GetString(bufferPtr, nullTerminatorIndex);
             }
@@ -324,8 +319,9 @@ internal static unsafe class H5AAdapter
 
     internal static bool ReadBool(H5Attribute attribute)
     {
+        // TODO: make bool use bitfield
         using var type = H5Type.GetEquivalentNativeType<bool>();
-        return Read<byte>(attribute, type, false) != default;
+        return Read<byte>(attribute, type) != default;
     }
 
     internal static T Read<T>(H5Attribute attribute) where T : unmanaged
@@ -334,9 +330,15 @@ internal static unsafe class H5AAdapter
         return Read<T>(attribute, type);
     }
 
+    internal static T Read<T>(H5Attribute attribute, H5Type type) where T : unmanaged
+    {
+        using var nativeType = H5Type.GetEquivalentNativeType<T>();
+        return ReadImpl<T>(attribute, type, nativeType);
+    }
+
     internal static T ReadEnum<T>(H5Attribute attribute, bool verifyType = false) where T : unmanaged, Enum
     {
-        using var nativeType = H5TAdapter.GetBaseEnumType<T>();
+        using var nativeType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
         using var type = attribute.GetH5Type();
 
         if (verifyType)
@@ -351,7 +353,7 @@ internal static unsafe class H5AAdapter
         return ReadImpl<T>(attribute, type, nativeType);
     }
 
-    private static T ReadImpl<T>(H5Attribute attribute, H5Type type, H5Type nativeType, bool checkClass = true) where T : unmanaged
+    private static T ReadImpl<T>(H5Attribute attribute, H5Type type, H5Type nativeType) where T : unmanaged
     {
         using var space = attribute.GetSpace();
 
@@ -370,7 +372,7 @@ internal static unsafe class H5AAdapter
 
         var expectedCls = H5TAdapter.GetClass(nativeType);
 
-        if (checkClass && cls != expectedCls)
+        if (cls != expectedCls)
         {
             throw new H5Exception($"Attribute is of class {cls} when expecting {expectedCls}.");
         }
@@ -385,20 +387,23 @@ internal static unsafe class H5AAdapter
         return value;
     }
 
-    internal static T Read<T>(H5Attribute attribute, H5Type type, bool checkClass = true) where T : unmanaged
-    {
-        using var nativeType = H5Type.GetEquivalentNativeType<T>();
-        return ReadImpl<T>(attribute, type, nativeType, checkClass);
-    }
-
     internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
     {
         using var type = attribute.GetH5Type();
 
-        if (typeof(T) == typeof(bool))
+        /*        if (verifyType)
+                {
+                    using var nativeType = H5Type.GetEquivalentNativeType<T>();
+                    if (!type.IsEqualTo(nativeType))
+                    {
+
+                    }
+                }
+        */
+        
+        if (value is bool flag)
         {
-            var byteValue = (byte)(value.Equals(default) ? 0 : 0x01);
-            Write(attribute, type, byteValue);
+            Write(attribute, type, flag.ToByte());
         }
         else
         {
@@ -444,6 +449,7 @@ internal static unsafe class H5AAdapter
         var characterSet = type.CharacterSet;
 
         // TODO: optionally throw if writing a string containing non-ASCII characters when characterSet = Ascii
+        // TODO: optionally silently truncate to nearest character (not byte)
 
         var bytes = characterSet switch
         {
@@ -480,11 +486,6 @@ internal static unsafe class H5AAdapter
                 Write(attribute, type, new IntPtr(fixedBytes));
             }
         }
-    }
-
-    internal static void Write(H5Attribute attribute, DateTime value)
-    {
-        Write(attribute, value.ToOADate());
     }
 
     internal static H5Attribute CreateStringAttribute<T>(

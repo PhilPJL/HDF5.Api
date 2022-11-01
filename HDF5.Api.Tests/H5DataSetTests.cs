@@ -3,7 +3,7 @@
 [TestClass]
 public class H5DataSetTests : H5Test<H5DataSetTests>
 {
-    internal static H5DataSet CreateTestDataset(IH5Location location, string dataSetName)
+    internal static H5DataSet CreateTestDataset<T>(H5Location<T> location, string dataSetName) where T : H5Location<T>
     {
         const int chunkSize = 1;
 

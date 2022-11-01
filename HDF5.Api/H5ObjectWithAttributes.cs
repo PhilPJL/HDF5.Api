@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace HDF5.Api;
 
-public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttributes where T : H5Object<T>
+public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5ObjectWithAttributes<T>
 {
     internal H5ObjectWithAttributes(long handle, HandleType handleType, Action<T>? closeHandle)
         : base(handle, handleType, closeHandle)
@@ -28,13 +28,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         Guard.IsNotNull(space);
 
         return H5AAdapter.Create(this, name, type, space);
-    }
-
-    public H5Attribute CreateAttribute<TA>([DisallowNull] string name)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-
-        return H5AAdapter.Create<T, TA>(this, name);
     }
 
     /// <summary>
@@ -117,7 +110,15 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         Guard.IsNotNullOrWhiteSpace(name);
 
         using var attribute = H5AAdapter.Open(this, name);
-        return H5AAdapter.ReadDateTime(attribute);
+        return DateTime.FromBinary(H5AAdapter.Read<long>(attribute));
+    }
+
+    public TimeSpan ReadTimeSpanAttribute([DisallowNull] string name)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        using var attribute = H5AAdapter.Open(this, name);
+        return TimeSpan.FromTicks(H5AAdapter.Read<long>(attribute));
     }
 
     public void Enumerate(Action<H5Attribute> action)
@@ -138,6 +139,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
 
         if (typeof(TA) == typeof(bool))
         {
+            // TODO: use bitfield for bool
             var byteValue = (byte)(value.Equals(default) ? 0 : 0x01);
             CreateAndWriteAttribute(type, name, byteValue);
         }
@@ -170,7 +172,14 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        CreateAndWriteAttribute(name, value.ToOADate());
+        CreateAndWriteAttribute(name, value.ToBinary());
+    }
+
+    public void CreateAndWriteAttribute([DisallowNull] string name, TimeSpan value)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        CreateAndWriteAttribute(name, value.Ticks);
     }
 
     public void CreateAndWriteAttribute(

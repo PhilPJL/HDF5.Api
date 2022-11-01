@@ -25,7 +25,7 @@ internal static unsafe class H5DAdapter
 
     internal static H5DataSet Create<T>(H5Location<T> location, string name, H5Type type, H5Space space,
         H5DataSetCreationPropertyList? dataSetCreationPropertyList,
-        H5DataSetAccessPropertyList? dataSetAccessPropertyList) where T : H5Object<T>
+        H5DataSetAccessPropertyList? dataSetAccessPropertyList) where T : H5Location<T>
     {
         location.AssertHasLocationHandleType();
 
@@ -93,7 +93,7 @@ internal static unsafe class H5DAdapter
 #endif
     }
 
-    internal static H5DataSet Open<T>(H5Location<T> location, string name, H5PropertyList? dataSetAccessPropertyList) where T : H5Object<T>
+    internal static H5DataSet Open<T>(H5Location<T> location, string name, H5PropertyList? dataSetAccessPropertyList) where T : H5Location<T>
     {
         location.AssertHasLocationHandleType();
 
@@ -111,7 +111,7 @@ internal static unsafe class H5DAdapter
         return new H5DataSet(h);
     }
 
-    internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList) where T : H5Object<T>
+    internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList) where T : H5Location<T>
     {
         return H5LAdapter.Exists(location, name, linkAccessPropertyList);
     }

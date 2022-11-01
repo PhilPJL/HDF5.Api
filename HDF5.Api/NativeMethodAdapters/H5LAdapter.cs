@@ -14,7 +14,7 @@ namespace HDF5.Api.NativeMethodAdapters;
 internal static unsafe class H5LAdapter
 {
     internal static bool Exists<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList)
-        where T : H5Object<T>
+        where T : H5Location<T>
     {
         location.AssertHasLocationHandleType();
 
@@ -29,7 +29,7 @@ internal static unsafe class H5LAdapter
     }
 
     internal static void Delete<T>(H5Location<T> location, string name, H5PropertyList? linkAccessPropertyList)
-        where T : H5Object<T>
+        where T : H5Location<T>
     {
         location.AssertHasHandleType(HandleType.File, HandleType.Group, HandleType.DataSet, HandleType.Attribute);
 
@@ -44,7 +44,7 @@ internal static unsafe class H5LAdapter
     }
 
     private static IEnumerable<(string name, ObjectType type)> GetMembers<T>(H5Location<T> location, H5O.type_t type)
-        where T : H5Object<T>
+        where T : H5Location<T>
     {
         ulong idx = 0;
 
@@ -90,16 +90,16 @@ internal static unsafe class H5LAdapter
     }
 
     internal static IEnumerable<string> GetGroupNames<T>(H5Location<T> location)
-        where T : H5Object<T> => GetMembers(location, H5O.type_t.GROUP).Select(m => m.name);
+        where T : H5Location<T> => GetMembers(location, H5O.type_t.GROUP).Select(m => m.name);
 
     internal static IEnumerable<string> GetDataSetNames<T>(H5Location<T> location)
-        where T : H5Object<T> => GetMembers(location, H5O.type_t.DATASET).Select(m => m.name);
+        where T : H5Location<T> => GetMembers(location, H5O.type_t.DATASET).Select(m => m.name);
 
     internal static IEnumerable<string> GetNamedDataTypeNames<T>(H5Location<T> location)
-        where T : H5Object<T> => GetMembers(location, H5O.type_t.NAMED_DATATYPE).Select(m => m.name);
+        where T : H5Location<T> => GetMembers(location, H5O.type_t.NAMED_DATATYPE).Select(m => m.name);
 
     internal static IEnumerable<(string name, ObjectType type)> GetMembers<T>(H5Location<T> location)
-        where T : H5Object<T> => GetMembers(location, H5O.type_t.UNKNOWN);
+        where T : H5Location<T> => GetMembers(location, H5O.type_t.UNKNOWN);
 
     /// <summary>
     /// Create a new link creation property list

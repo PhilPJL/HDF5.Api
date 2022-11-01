@@ -51,6 +51,7 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
     /// </summary>
     public void Write(IEnumerable<TInput> recordsChunk)
     {
+        // ReSharper disable once PossibleMultipleEnumeration
         int numRecords = recordsChunk.Count();
 
         // Extend the dataset to accept this chunk
@@ -65,6 +66,7 @@ public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
             using var recordSpace = H5SAdapter.CreateSimple(numRecords);
 
             // Configure most parameters for DataSet.WriteChunk and then pass the curried method as an Action<IntPtr> to Converter which only needs to supply the last param.
+            // ReSharper disable once PossibleMultipleEnumeration
             Converter.Write(WriteAdapter(DataSet, Type, recordSpace, fileSpace), recordsChunk);
 
             RowsWritten += numRecords;
