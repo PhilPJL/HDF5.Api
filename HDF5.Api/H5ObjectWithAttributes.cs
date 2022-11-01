@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace HDF5.Api;
 
-public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttributes where T : H5Object<T>
+public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5ObjectWithAttributes<T>
 {
     internal H5ObjectWithAttributes(long handle, HandleType handleType, Action<T>? closeHandle)
         : base(handle, handleType, closeHandle)
