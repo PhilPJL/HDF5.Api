@@ -1,4 +1,5 @@
 ﻿using HDF5.Api.Attributes;
+using System.Diagnostics.CodeAnalysis;
 
 namespace HDF5.Api.TestHarness
 {
@@ -22,6 +23,8 @@ namespace HDF5.Api.TestHarness
         private static void DumpLocation<T>(H5Location<T> location, int indent) where T : H5Object<T>
         {
             string sIndent = new string(' ', indent * 2);
+
+            location.Enumerate(HandleAttribute);
 
             foreach (var a in location.AttributeNames)
             {
@@ -63,7 +66,29 @@ namespace HDF5.Api.TestHarness
                 DumpLocation(gp, indent + 2);
             }
         }
+
+        static void HandleAttribute(H5Attribute attribute)
+        {
+            if(attribute is H5StringAttribute sa)
+            {
+                ProcessStringAttribute(sa);
+            }
+            else if(attribute is H5EnumAttribute<Test> ta) 
+            {
+                ProcessEnumAttribute(ta);
+            }
+            else if(attribute is H5PrimitiveAttribute<int> ti)
+            {
+                ProcessPrimitiveAttribute(ti);
+            }
+
+            void ProcessStringAttribute(H5StringAttribute attribute) { }
+            void ProcessEnumAttribute<T>(H5EnumAttribute<T> attribute) where T : unmanaged, Enum{ }
+            void ProcessPrimitiveAttribute<T>(H5PrimitiveAttribute<T> attribute) where T : unmanaged { }
+        }
     }
+
+    enum Test { }
 
     [H5Contract("AType")]
     public class SomeType

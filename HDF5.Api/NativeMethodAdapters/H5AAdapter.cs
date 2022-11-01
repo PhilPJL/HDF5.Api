@@ -480,4 +480,9 @@ internal static unsafe class H5AAdapter
         using var memorySpace = H5SAdapter.CreateScalar();
         return Create(h5Object, name, type, memorySpace, h => new H5StringAttribute(h));
     }
+
+    internal static void GetAttributeInfo(string name)
+    {
+
+    }
 }
