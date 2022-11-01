@@ -19,10 +19,12 @@ internal static unsafe class H5AAdapter
         close(attribute).ThrowIfError();
     }
 
+    /*
     internal static H5Attribute Create<T, TA>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
         throw new NotImplementedException();
     }
+    */
 
     internal static H5Attribute Create<T>(
         H5Object<T> h5Object,
@@ -262,6 +264,7 @@ internal static unsafe class H5AAdapter
                             // NOTE: no way to retrieve size of variable length buffer.
                             // Only search for null up to a fixed length.
                             Span<byte> bytes = new((byte*)buffer[0], H5Global.MaxVariableLengthStringBuffer);
+                            // ReSharper disable once InvokeAsExtensionMethod
                             var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
                             if (nullTerminatorIndex != -1)
                             {
@@ -283,6 +286,7 @@ internal static unsafe class H5AAdapter
                 }
             }
         }
+        // ReSharper disable once RedundantIfElseBlock
         else
         {
             int storageSize = attribute.StorageSize;
@@ -314,6 +318,7 @@ internal static unsafe class H5AAdapter
                 read(attribute, type, bufferPtr).ThrowIfError();
 
                 Span<byte> bytes = buffer;
+                // ReSharper disable once InvokeAsExtensionMethod
                 var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
                 nullTerminatorIndex = nullTerminatorIndex < 0 ? storageSize : nullTerminatorIndex;
                 return Encoding.UTF8.GetString(bufferPtr, nullTerminatorIndex);

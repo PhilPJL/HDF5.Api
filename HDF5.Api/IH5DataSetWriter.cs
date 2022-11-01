@@ -6,7 +6,7 @@ namespace HDF5.Api;
 ///     Interface that needs to be implemented by an IH5DataSetWriter.
 /// </summary>
 /// <typeparam name="TInput"></typeparam>
-public interface IH5DataSetWriter<TInput> : IDisposable
+public interface IH5DataSetWriter<in TInput> : IDisposable
 {
     void Write(IEnumerable<TInput> recordsChunk);
     long RowsWritten { get; }

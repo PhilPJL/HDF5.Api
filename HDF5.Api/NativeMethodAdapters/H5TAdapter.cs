@@ -130,6 +130,7 @@ internal static unsafe class H5TAdapter
         {
             enum_nameof(type, new IntPtr(&value), bufferPtr, new IntPtr(length)).ThrowIfError();
             Span<byte> bytes = buffer;
+            // ReSharper disable once InvokeAsExtensionMethod
             var nullTerminatorIndex = MemoryExtensions.IndexOf(bytes, (byte)0);
             nullTerminatorIndex = nullTerminatorIndex < 0 ? length : nullTerminatorIndex;
             return Encoding.UTF8.GetString(bufferPtr, nullTerminatorIndex);
@@ -230,7 +231,7 @@ internal static unsafe class H5TAdapter
                 "Int64" => NATIVE_INT64,
                 "UInt64" => NATIVE_UINT64,
 
-                _ => throw new ArgumentException($"Unable to create Enum for underlying type '{underlyingType}'."),
+                _ => throw new ArgumentException($"Unable to create Enum for underlying type '{underlyingType}'.")
             };
         }
     }

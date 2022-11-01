@@ -30,13 +30,13 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T>, IH5ObjectWithAttr
         return H5AAdapter.Create(this, name, type, space);
     }
 
-    public H5Attribute CreateAttribute<TA>([DisallowNull] string name)
+/*    public H5Attribute CreateAttribute<TA>([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
         return H5AAdapter.Create<T, TA>(this, name);
     }
-
+*/
     /// <summary>
     /// Create and configure string attribute in the target location.
     /// </summary>

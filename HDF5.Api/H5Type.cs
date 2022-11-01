@@ -66,8 +66,6 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     /// <summary>
     /// Gets the equivalent native type for an H5 type
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
     /// <exception cref="H5Exception"></exception>
     public static H5Type GetEquivalentNativeType(H5Type type)
     {
