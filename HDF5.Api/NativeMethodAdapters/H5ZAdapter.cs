@@ -9,17 +9,11 @@ internal static class H5ZAdapter
 {
     internal static bool IsFilterAvailable(FilterType filterType)
     {
-        switch (filterType)
+        return filterType switch
         {
-            case FilterType.Deflate:
-            case FilterType.Shuffle:
-            case FilterType.Fletcher32:
-            case FilterType.SZip:
-            case FilterType.NBit:
-            case FilterType.ScaleOffset:
-                return filter_avail((filter_t)filterType).ThrowIfError() > 0;
-            default:
-                throw new InvalidEnumArgumentException(nameof(filterType), (int)filterType, typeof(FilterType));
-        }
+            FilterType.Deflate or FilterType.Shuffle or FilterType.Fletcher32 or FilterType.SZip or FilterType.NBit or FilterType.ScaleOffset
+            => filter_avail((filter_t)filterType).ThrowIfError() > 0,
+            _ => throw new InvalidEnumArgumentException(nameof(filterType), (int)filterType, typeof(FilterType)),
+        };
     }
 }

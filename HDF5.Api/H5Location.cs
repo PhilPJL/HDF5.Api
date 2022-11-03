@@ -12,7 +12,7 @@ namespace HDF5.Api;
 /// </remarks>
 public abstract class H5Location<T> : H5ObjectWithAttributes<T> where T : H5Location<T>
 {
-    internal H5Location(long handle, HandleType handleType, Action<T>? closeHandle)
+    internal H5Location(long handle, HandleType handleType, Action<T> closeHandle)
         : base(handle, handleType, closeHandle)
     {
     }
