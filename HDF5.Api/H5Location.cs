@@ -36,6 +36,17 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T> where T : H5Loca
         return (T)this;
     }
 
+    public IEnumerable<string> DataTypeNames => H5LAdapter.GetNamedDataTypeNames(this);
+
+    public void Enumerate(Action<H5Type> action)
+    {
+        foreach (var name in DataTypeNames)
+        {
+            using var h5Object = OpenType(name);
+            action(h5Object);
+        }
+    }
+
     /// <summary>
     ///     Create a Group in this location
     /// </summary>
@@ -163,24 +174,9 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T> where T : H5Loca
         return (T)this;
     }
 
-    #endregion
-
-    #region DataType
-
-    public IEnumerable<string> DataTypeNames => H5LAdapter.GetNamedDataTypeNames(this);
-
-    public T Enumerate(Action<H5Type> action)
-    {
-        foreach (var name in DataTypeNames)
-        {
-            using var h5Object = OpenType(name);
-            action(h5Object);
-        }
-
-        return (T)this;
-    }
-
-    public T Commit([DisallowNull] string name, [DisallowNull] H5Type h5Type)
+    public H5Location<T> Commit(
+        [DisallowNull] string name,
+        [DisallowNull] H5Type h5Type)
     {
         H5TAdapter.Commit(this, name, h5Type, null, null);
 

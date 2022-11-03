@@ -399,15 +399,15 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             location.CreateAndWriteEnumAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
-            var readValue = location.ReadEnumAttribute<TValue>(name, true);
+            var readValue = location.ReadEnumAttribute<TValue>(name);
             Assert.AreEqual(value, readValue);
 
             using var a = location.OpenAttribute(name);
-            var readValue2 = location.ReadEnumAttribute<TValue>(name, true);
+            var readValue2 = location.ReadEnumAttribute<TValue>(name);
             Assert.AreEqual(value, readValue2);
 
             a.Write(newValue);
-            var readValue3 = location.ReadEnumAttribute<TValue>(name, true);
+            var readValue3 = location.ReadEnumAttribute<TValue>(name);
             Assert.AreEqual(newValue, readValue3);
 
             location.DeleteAttribute(name);
