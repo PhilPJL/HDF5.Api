@@ -79,7 +79,7 @@ internal static unsafe class H5TAdapter
 
     internal static H5Type CreateDateTimeOffsetType()
     {
-        using var type = CreateCompoundType<_DateTimeOffset>();
+        var type = CreateCompoundType<_DateTimeOffset>();
         type.Insert<_DateTimeOffset, long>(nameof(_DateTimeOffset.DateTime));
         type.Insert<_DateTimeOffset, int>(nameof(_DateTimeOffset.Offset));
         return type;
