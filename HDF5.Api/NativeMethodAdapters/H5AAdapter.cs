@@ -334,19 +334,19 @@ internal static unsafe class H5AAdapter
         return new DateTimeOffset(DateTime.FromBinary(value.DateTime), TimeSpan.FromMinutes(value.Offset));
     }
 
-    internal static T Read<T>(H5Attribute attribute) where T : unmanaged
+    internal static T Read<T>(H5Attribute attribute) // where T : unmanaged
     {
         using var type = attribute.GetH5Type();
         return Read<T>(attribute, type);
     }
 
-    internal static T Read<T>(H5Attribute attribute, H5Type type) where T : unmanaged
+    internal static T Read<T>(H5Attribute attribute, H5Type type) // where T : unmanaged
     {
         using var nativeType = H5Type.GetEquivalentNativeType<T>();
         return ReadImpl<T>(attribute, type, nativeType);
     }
 
-    internal static T ReadEnum<T>(H5Attribute attribute, bool verifyType = false) where T : unmanaged, Enum
+    internal static T ReadEnum<T>(H5Attribute attribute, bool verifyType = false) // where T : unmanaged, Enum
     {
         using var nativeType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
         using var type = attribute.GetH5Type();
@@ -363,8 +363,13 @@ internal static unsafe class H5AAdapter
         return ReadImpl<T>(attribute, type, nativeType);
     }
 
-    private static T ReadImpl<T>(H5Attribute attribute, H5Type type, H5Type expectedType) where T : unmanaged
+    private static T ReadImpl<T>(H5Attribute attribute, H5Type type, H5Type expectedType) //where T : unmanaged
     {
+        if (!typeof(T).IsUnmanaged())
+        {
+            throw new H5Exception($"ReadImpl can only handle unmanaged types not {typeof(T)}");
+        }
+
         using var space = attribute.GetSpace();
 
         long count = space.GetSimpleExtentNPoints();
@@ -398,9 +403,9 @@ internal static unsafe class H5AAdapter
 
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
-        T value = default;
+        T value = default!;
         read(attribute, type, new IntPtr(&value)).ThrowIfError();
-        return value;
+        return value!;
     }
 
     #endregion

@@ -58,7 +58,7 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="H5Exception"></exception>
-    public static H5Type GetEquivalentNativeType<T>() where T : unmanaged
+    public static H5Type GetEquivalentNativeType<T>() //where T : unmanaged
     {
         return H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<T>();
     }
@@ -142,7 +142,7 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         return H5TAdapter.CreateVariableLengthByteArrayType();
     }
 
-    public static H5EnumType<T> CreateEnumType<T>() where T : unmanaged, Enum
+    public static H5EnumType<T> CreateEnumType<T>() //where T : unmanaged, Enum
     {
         return H5TAdapter.CreateEnumType<T>();
     }

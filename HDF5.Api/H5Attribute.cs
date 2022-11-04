@@ -24,50 +24,115 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AAdapter.CreateCreationPropertyList(encoding);
     }
 
-    public H5Space GetSpace()
+    internal H5Space GetSpace()
     {
         return H5AAdapter.GetSpace(this);
     }
 
-    public H5Type GetH5Type()
+    internal H5Type GetH5Type()
     {
         return H5AAdapter.GetType(this);
     }
 
     public string Name => H5AAdapter.GetName(this);
 
-    public int StorageSize => H5AAdapter.GetStorageSize(this);
+    internal int StorageSize => H5AAdapter.GetStorageSize(this);
 
     #region Read
 
-    public string ReadString()
+    public T Read<T>()
     {
-        return H5AAdapter.ReadString(this);
-    }
+        if(typeof(T) == typeof(string))
+        {
+            return (T)ReadString();
+        }
 
-    public T Read<T>() where T : unmanaged
-    {
-        return H5AAdapter.Read<T>(this);
-    }
+        return default(T) switch
+        {
+            // primitive
+            bool => ReadPrimitive(),
+            char => ReadPrimitive(),
+            sbyte => ReadPrimitive(),
+            byte => ReadPrimitive(),
+            short => ReadPrimitive(),
+            ushort => ReadPrimitive(),
+            int => ReadPrimitive(),
+            uint => ReadPrimitive(),
+            long => ReadPrimitive(),
+            ulong => ReadPrimitive(),
+            float => ReadPrimitive(),
+            double => ReadPrimitive(),
 
-    public T ReadEnum<T>(bool verifyType = false) where T : unmanaged, Enum
-    {
-        return H5AAdapter.ReadEnum<T>(this, verifyType);
-    }
+            // decimal
+            decimal => (T)ReadDecimal(),
 
-    public DateTime ReadDateTime()
-    {
-        return DateTime.FromBinary(H5AAdapter.Read<long>(this));
-    }
+            // enum
+            Enum => ReadEnum(),
 
-    public DateTimeOffset ReadDateTimeOffset()
-    {
-        return H5AAdapter.ReadDateTimeOffset(this);
-    }
+            // date & time
+            DateTime => (T)ReadDateTime(),
+            DateTimeOffset => (T)ReadDateTimeOffset(),
+            TimeSpan => (T)ReadTimeSpan(),
 
-    public TimeSpan ReadTimeSpan()
-    {
-        return new TimeSpan(H5AAdapter.Read<long>(this));
+            // everything else
+            _ => ReadCompound()
+        };
+
+        T ReadPrimitive()
+        {
+            T value = H5AAdapter.Read<T>(this);
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+            return value;
+        }
+
+        object ReadString()
+        {
+            return H5AAdapter.ReadString(this);
+        }
+
+        T ReadEnum(bool verifyType = false)
+        {
+            return H5AAdapter.ReadEnum<T>(this, verifyType);
+        }
+
+        object ReadDateTime()
+        {
+            return DateTime.FromBinary(H5AAdapter.Read<long>(this));
+        }
+
+        object ReadDateTimeOffset()
+        {
+            return H5AAdapter.ReadDateTimeOffset(this);
+        }
+
+        object ReadTimeSpan()
+        {
+            return new TimeSpan(H5AAdapter.Read<long>(this));
+        }
+
+        object ReadDecimal()
+        {
+            throw new NotImplementedException();
+        }
+
+        T ReadCompound()
+        {
+            if (typeof(T).IsUnmanaged())
+            {
+                return ReadCompoundUnmanaged();
+            }
+
+            throw new NotImplementedException();
+
+            T ReadCompoundUnmanaged()
+            {
+                // TODO: optimised struct based
+                throw new NotImplementedException();
+            }
+        }
     }
 
     #endregion
@@ -94,6 +159,9 @@ public class H5Attribute : H5Object<H5Attribute>
             float number => WritePrimitive(number),
             double number => WritePrimitive(number),
 
+            // enum
+            Enum @enum => WriteEnum(@enum),
+
             // decimal
             decimal number => WriteDecimal(number),
 
@@ -104,7 +172,6 @@ public class H5Attribute : H5Object<H5Attribute>
             TimeSpan timeSpan => WriteTimeSpan(timeSpan),
             DateTime dateTime => WriteDateTime(dateTime),
             DateTimeOffset dateTimeOffset => WriteDateTimeOffset(dateTimeOffset),
-            Enum @enum => WriteEnum(@enum),
 
             // everything else
             _ => WriteCompound(value)

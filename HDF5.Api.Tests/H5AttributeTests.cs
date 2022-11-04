@@ -38,7 +38,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                     attribute.Write(value);
                 }
 
-                var r = attribute.ReadString();
+                var r = attribute.Read<string>();
 
                 // NOTE: assuming that if no value is written ReadString will return string.Empty
                 Assert.AreEqual(value ?? string.Empty, r);
@@ -84,7 +84,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
                 using (var attribute = file.OpenAttribute(name))
                 {
-                    var r = attribute.ReadString();
+                    var r = attribute.Read<string>();
 
                     // NOTE: assuming that if no value is written ReadString will return string.Empty
                     Assert.AreEqual(value ?? string.Empty, r);
@@ -343,7 +343,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             var readValue2 = location.ReadDateTimeAttribute(name);
             Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
-            var readValue3 = a.ReadDateTime();
+            var readValue3 = a.Read<DateTime>();
             Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
             location.DeleteAttribute(name);
@@ -366,7 +366,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             var readValue2 = location.ReadDateTimeOffsetAttribute(name);
             Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
-            var readValue3 = a.ReadDateTimeOffset();
+            var readValue3 = a.Read<DateTimeOffset>();
             Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
             location.DeleteAttribute(name);
@@ -480,7 +480,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             using var attribute = file.CreateStringAttribute(attributeName, value.Length * 4, encoding);
 
             attribute.Write(value);
-            var read = attribute.ReadString();
+            var read = attribute.Read<string>();
             Assert.AreEqual(value, read);
 
             Assert.IsTrue(file.AttributeExists(attributeName));
@@ -560,13 +560,13 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 using var attMin = file.CreateAttribute($"{typeof(T).Name}:{valueMin}", type, size);
                 attMin.Write(valueMin);
 
-                var min = attMin.ReadEnum<T>(true);
+                var min = attMin.Read<T>();
                 Assert.AreEqual(valueMin, min);
 
                 using var attMax = file.CreateAttribute($"{typeof(T).Name}:{valueMax}", type, size);
                 attMax.Write(valueMax);
 
-                var max = attMax.ReadEnum<T>(true);
+                var max = attMax.Read<T>();
                 Assert.AreEqual(valueMax, max);
             }
         });

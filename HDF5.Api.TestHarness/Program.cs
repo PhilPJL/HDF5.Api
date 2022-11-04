@@ -1,5 +1,4 @@
 ﻿using HDF5.Api.Attributes;
-using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.TestHarness
 {
@@ -42,7 +41,7 @@ namespace HDF5.Api.TestHarness
                         Console.WriteLine(sIndent + "->V: " + att.Read<int>());
                         break;
                     case DataTypeClass.String:
-                        Console.WriteLine(sIndent + "->V: " + att.ReadString());
+                        Console.WriteLine(sIndent + "->V: " + att.Read<string>());
                         break;
                     case DataTypeClass.Float:
                         Console.WriteLine(sIndent + "->V: " + att.Read<double>());

@@ -18,7 +18,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
     /// <summary>
     ///     Create an Attribute for this location
     /// </summary>
-    public H5Attribute CreateAttribute(
+    internal H5Attribute CreateAttribute(
         [DisallowNull] string name,
         [DisallowNull] H5Type type,
         [DisallowNull] H5Space space)
@@ -63,7 +63,12 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        H5AAdapter.Delete(this, name);
+        if (AttributeExists(name))
+        {
+            H5AAdapter.Delete(this, name);
+        }
+
+        // TODO: return status (not found, deleted)
     }
 
     public bool AttributeExists([DisallowNull] string name)
@@ -72,6 +77,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         return H5AAdapter.Exists(this, name);
     }
+
+    // TODO: consolidate into ReadAttribute<T>
 
     public TA ReadAttribute<TA>([DisallowNull] string name) where TA : unmanaged, IEquatable<TA>
     {
@@ -118,7 +125,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         Guard.IsNotNullOrWhiteSpace(name);
 
         using var attribute = H5AAdapter.Open(this, name);
-        return attribute.ReadDateTimeOffset();
+        return attribute.Read<DateTimeOffset>();
     }
 
     public TimeSpan ReadTimeSpanAttribute([DisallowNull] string name)
@@ -147,7 +154,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         if (typeof(TA) == typeof(bool))
         {
-            // TODO: use bitfield for bool
             var byteValue = (byte)(value.Equals(default) ? 0 : 0x01);
             CreateAndWriteAttribute(type, name, byteValue);
         }

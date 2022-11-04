@@ -57,6 +57,10 @@ internal static unsafe class H5TAdapter
         return CreateCompoundType(size);
     }
 
+    // TODO: create type from struct and/or class
+
+
+
     internal static H5Type CreateByteArrayType(params long[] dims)
     {
         return new H5Type(array_create(NATIVE_B8, (uint)dims.Length, dims.Select(d => (ulong)d).ToArray()));
@@ -108,7 +112,7 @@ internal static unsafe class H5TAdapter
     }
 
     internal static void InsertEnumMember<T>(H5Type type, string name, T value)
-        where T : unmanaged, Enum
+        //where T : unmanaged, Enum
     {
 #if NET7_0_OR_GREATER
         enum_insert(type, name, new IntPtr(&value)).ThrowIfError();
@@ -185,7 +189,7 @@ internal static unsafe class H5TAdapter
         return is_variable_str(typeId).ThrowIfError() > 0;
     }
 
-    internal static H5EnumType<T> CreateEnumType<T>() where T : unmanaged, Enum
+    internal static H5EnumType<T> CreateEnumType<T>() // where T : unmanaged, Enum
     {
         var h5EnumType = ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
 
@@ -197,7 +201,8 @@ internal static unsafe class H5TAdapter
                 {
                     m.Name,
 #if NET7_0_OR_GREATER
-                    Value = Enum.Parse<T>(m.Name)
+                    //Value = Enum.Parse<T>(m.Name)
+                    Value = (T)Enum.Parse(typeof(T), m.Name)
 #else
                     Value = (T)Enum.Parse(typeof(T), m.Name)
 #endif
@@ -215,7 +220,7 @@ internal static unsafe class H5TAdapter
         return h5EnumType;
     }
 
-    internal static H5EnumType<T> ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>() where T : unmanaged, Enum
+    internal static H5EnumType<T> ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>() // where T : unmanaged, Enum
     {
         var baseType = GetNativeType();
 
@@ -250,7 +255,7 @@ internal static unsafe class H5TAdapter
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="H5Exception"></exception>
-    internal static H5Type ConvertDotNetPrimitiveToH5NativeType<T>() where T : unmanaged /* primitive would be nice */
+    internal static H5Type ConvertDotNetPrimitiveToH5NativeType<T>() // where T : unmanaged /* primitive would be nice */
     {
         if (!typeof(T).IsPrimitive)
         {
