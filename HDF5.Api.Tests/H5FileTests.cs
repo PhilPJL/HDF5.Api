@@ -82,21 +82,18 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     }
 
     [TestMethod]
-    [DataRow(LibraryVersion.Earliest, LibraryVersion.Version18)]
-    [DataRow(LibraryVersion.Earliest, LibraryVersion.Version110)]
-    [DataRow(LibraryVersion.Version18, LibraryVersion.Version18)]
-    [DataRow(LibraryVersion.Version18, LibraryVersion.Version110)]
-    [DataRow(LibraryVersion.Version110, LibraryVersion.Version110)]
-    public void SetLibraryVersionEarliestSucceeds(LibraryVersion low, LibraryVersion high)
+    [DataRow("Earliest_18", LibraryVersion.Earliest, LibraryVersion.Version18)]
+    [DataRow("Earliest_110", LibraryVersion.Earliest, LibraryVersion.Version110)]
+    [DataRow("18_18",LibraryVersion.Version18, LibraryVersion.Version18)]
+    [DataRow("18_110", LibraryVersion.Version18, LibraryVersion.Version110)]
+    [DataRow("110_110", LibraryVersion.Version110, LibraryVersion.Version110)]
+    public void SetLibraryVersionEarliestSucceeds(string name, LibraryVersion low, LibraryVersion high)
     {
-        HandleCheck(() =>
+        using var acpl = H5File.CreateAccessPropertyList();
+        acpl.SetLibraryVersionBounds(low, high);
+
+        HandleCheck2((file) =>
         {
-            using var acpl = H5File.CreateAccessPropertyList();
-            acpl.SetLibraryVersionBounds(low, high);
-
-            // Create new file
-            using var file = CreateOrOpenFile(fileAccessPropertyList: acpl);
-
             using var acpl2 = file.GetAccessPropertyList();
             var (low2, high2) = acpl2.GetLibraryVersionBounds();
 
@@ -108,7 +105,8 @@ public class H5FileTests : H5LocationTests<H5FileTests>
             var (low3, high3) = file.GetLibraryVersionBounds();
             Assert.AreEqual(LibraryVersion.Version110, low3);
             Assert.AreEqual(LibraryVersion.Version110, high3);
-        });
+        },
+        name, expectedHandlesOpen: 1, fileAccessPropertyList: acpl);
     }
 
     #endregion

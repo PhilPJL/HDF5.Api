@@ -113,6 +113,14 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         return DateTime.FromBinary(H5AAdapter.Read<long>(attribute));
     }
 
+    public DateTimeOffset ReadDateTimeOffsetAttribute([DisallowNull] string name)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        using var attribute = H5AAdapter.Open(this, name);
+        return attribute.ReadDateTimeOffset();
+    }
+
     public TimeSpan ReadTimeSpanAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -153,9 +161,10 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        using var memorySpace = H5Space.CreateScalar();
         using var type = H5Type.CreateEnumType<TA>();
-        using var attribute = CreateAttribute(name, type, memorySpace);
+        using var space = H5Space.CreateScalar();
+        using var attribute = CreateAttribute(name, type, space);
+
         H5AAdapter.Write(attribute, type, value);
     }
 
@@ -166,6 +175,17 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         using var memorySpace = H5Space.CreateScalar();
         using var attribute = CreateAttribute(name, type, memorySpace);
         H5AAdapter.Write(attribute, type, value);
+    }
+
+    public void CreateAndWriteAttribute([DisallowNull] string name, DateTimeOffset value)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        using var type = H5TAdapter.CreateDateTimeOffsetType();
+        using var space = H5Space.CreateScalar();
+        using var attribute = H5AAdapter.Create(this, name, type, space);
+
+        H5AAdapter.Write(attribute, value);
     }
 
     public void CreateAndWriteAttribute([DisallowNull] string name, DateTime value)

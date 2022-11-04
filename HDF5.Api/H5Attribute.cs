@@ -1,9 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5.Api.NativeMethodAdapters;
-using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Reflection;
+using HDF5.Api.Utils;
 
 namespace HDF5.Api;
 
@@ -61,6 +58,11 @@ public class H5Attribute : H5Object<H5Attribute>
     public DateTime ReadDateTime()
     {
         return DateTime.FromBinary(H5AAdapter.Read<long>(this));
+    }
+
+    public DateTimeOffset ReadDateTimeOffset()
+    {
+        return H5AAdapter.ReadDateTimeOffset(this);
     }
 
     public TimeSpan ReadTimeSpan()
@@ -128,8 +130,8 @@ public class H5Attribute : H5Object<H5Attribute>
 
         H5Attribute WriteDateTimeOffset(DateTimeOffset value)
         {
-            // TODO: optionally write ticks + offset or value.ToString("O")
-            throw new NotImplementedException();
+            H5AAdapter.Write(this, value);
+            return this;
         }
 
         H5Attribute WritePrimitive<TP>(TP value) where TP : unmanaged
@@ -179,38 +181,4 @@ public class H5Attribute : H5Object<H5Attribute>
     }
 
     #endregion
-}
-
-static class TypeExtensions
-{
-    private static readonly ConcurrentDictionary<Type, bool> _memoized = new();
-
-    public static bool IsUnmanaged(this Type type)
-    {
-        // check if we already know the answer
-        if (!_memoized.TryGetValue(type, out var answer))
-        {
-            if (!type.IsValueType)
-            {
-                // not a struct -> false
-                answer = false;
-            }
-            else if (type.IsPrimitive || type.IsPointer || type.IsEnum)
-            {
-                // primitive, pointer or enum -> true
-                answer = true;
-            }
-            else
-            {
-                // otherwise check recursively
-                answer = type
-                    .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-                    .All(f => IsUnmanaged(f.FieldType));
-            }
-
-            _memoized[type] = answer;
-        }
-
-        return answer;
-    }
 }

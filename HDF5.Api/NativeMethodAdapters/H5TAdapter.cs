@@ -77,6 +77,14 @@ internal static unsafe class H5TAdapter
         return new H5Type(vlen_create(NATIVE_B8));
     }
 
+    internal static H5Type CreateDateTimeOffsetType()
+    {
+        using var type = CreateCompoundType<_DateTimeOffset>();
+        type.Insert<_DateTimeOffset, long>(nameof(_DateTimeOffset.DateTime));
+        type.Insert<_DateTimeOffset, int>(nameof(_DateTimeOffset.Offset));
+        return type;
+    }
+
     internal static H5StringType CreateFixedLengthStringType(int storageLengthBytes)
     {
         var type = new H5StringType(copy(C_S1));
@@ -380,4 +388,11 @@ internal static unsafe class H5TAdapter
     {
         return get_nmembers(type).ThrowIfError();
     }
+}
+
+// TODO: move this to suitable place
+struct _DateTimeOffset
+{
+    public long DateTime;
+    public short Offset;
 }

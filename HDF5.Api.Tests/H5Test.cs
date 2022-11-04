@@ -74,10 +74,13 @@ public abstract class H5Test<T> where T : H5Test<T>
     /// <param name="expectedHandlesOpen">The number of handles expected to be open after the action has run.</param>
     internal static void HandleCheck2(Action<H5File> action,
         string suffix,
-        [CallerMemberName] string? path = null, bool failIfExists = false, H5FileCreationPropertyList? fileCreationPropertyList = null,
-        int expectedHandlesOpen = 0)
+        [CallerMemberName] string? path = null, bool failIfExists = false,
+        H5FileCreationPropertyList? fileCreationPropertyList = null,
+        H5FileAccessPropertyList? fileAccessPropertyList = null,
+        int expectedHandlesOpen = 0,
+        int expectedFileObjectCount = 1)
     {
-        using var file = CreateFile2(suffix, path, failIfExists, fileCreationPropertyList);
+        using var file = CreateFile2(suffix, path, failIfExists, fileCreationPropertyList, fileAccessPropertyList);
 
         action(file);
 
@@ -87,8 +90,12 @@ public abstract class H5Test<T> where T : H5Test<T>
             H5Handle.DumpOpenHandles();
         }
 #endif
-        Assert.AreEqual(file.GetObjectCount(), 1);
-        Assert.AreEqual(file.GetObjectCount(), H5Handle.OpenHandleCount);
+        Assert.AreEqual(file.GetObjectCount(), expectedFileObjectCount);
+
+        // file.GetObjectCount() doesn't always match H5Handle.OpenHandleCount
+        // if object created outside of HandleCheck
+        //Assert.AreEqual(file.GetObjectCount(), H5Handle.OpenHandleCount);
+
         Assert.AreEqual(expectedHandlesOpen + 1, H5Handle.OpenHandleCount);
 
         // TODO: verify H5 allocated memory has been released
@@ -108,17 +115,19 @@ public abstract class H5Test<T> where T : H5Test<T>
         string suffix,
         [CallerMemberName] string? path = null,
         bool failIfExists = false,
-        H5FileCreationPropertyList? fileCreationPropertyList = null)
+        H5FileCreationPropertyList? fileCreationPropertyList = null,
+        H5FileAccessPropertyList? fileAccessPropertyList = null)
     {
         Guard.IsNotNull(path);
 
-        return CreateFile($"{path}_{suffix}", failIfExists, fileCreationPropertyList);
+        return CreateFile($"{path}_{suffix}", failIfExists, fileCreationPropertyList, fileAccessPropertyList);
     }
 
     internal static H5File CreateFile(
         [CallerMemberName] string? path = null,
         bool failIfExists = false,
-        H5FileCreationPropertyList? fileCreationPropertyList = null)
+        H5FileCreationPropertyList? fileCreationPropertyList = null,
+        H5FileAccessPropertyList? fileAccessPropertyList = null)
     {
         Guard.IsNotNull(path);
 
@@ -129,7 +138,7 @@ public abstract class H5Test<T> where T : H5Test<T>
             fullpath,
             failIfExists,
             fileCreationPropertyList,
-            null);
+            fileAccessPropertyList);
 
         Assert.IsTrue(File.Exists(fullpath));
 

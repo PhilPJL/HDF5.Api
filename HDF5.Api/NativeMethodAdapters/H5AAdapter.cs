@@ -193,6 +193,8 @@ internal static unsafe class H5AAdapter
         return new H5Attribute(h);
     }
 
+    #region Read
+
     internal static string ReadString(H5Attribute attribute)
     {
         using var type = attribute.GetH5Type();
@@ -317,9 +319,19 @@ internal static unsafe class H5AAdapter
 
     internal static bool ReadBool(H5Attribute attribute)
     {
-        // TODO: make bool use bitfield
-        using var type = H5Type.GetEquivalentNativeType<bool>();
+        using var type = attribute.GetH5Type();
         return Read<byte>(attribute, type) != default;
+    }
+
+    internal static DateTimeOffset ReadDateTimeOffset(H5Attribute attribute)
+    {
+        // TODO: optionally write ticks + offset or value.ToString("O")
+        using var type = attribute.GetH5Type();
+        using var expectedType = H5TAdapter.CreateDateTimeOffsetType();
+        // TODO: sort out the type/expectedType/cls stuff
+        var value = ReadImpl<_DateTimeOffset>(attribute, type, expectedType);
+
+        return new DateTimeOffset(DateTime.FromBinary(value.DateTime), TimeSpan.FromMinutes(value.Offset));
     }
 
     internal static T Read<T>(H5Attribute attribute) where T : unmanaged
@@ -351,7 +363,7 @@ internal static unsafe class H5AAdapter
         return ReadImpl<T>(attribute, type, nativeType);
     }
 
-    private static T ReadImpl<T>(H5Attribute attribute, H5Type type, H5Type nativeType) where T : unmanaged
+    private static T ReadImpl<T>(H5Attribute attribute, H5Type type, H5Type expectedType) where T : unmanaged
     {
         using var space = attribute.GetSpace();
 
@@ -366,9 +378,15 @@ internal static unsafe class H5AAdapter
             throw new H5Exception("Attribute is not scalar.");
         }
 
+        // TODO: fix for enums
+        //if (!type.IsEqualTo(expectedType))
+        //{
+        //    throw new H5Exception($"Attribute is not of expected type.");
+        //}
+
         var cls = type.GetClass();
 
-        var expectedCls = H5TAdapter.GetClass(nativeType);
+        var expectedCls = H5TAdapter.GetClass(expectedType);
 
         if (cls != expectedCls)
         {
@@ -385,20 +403,14 @@ internal static unsafe class H5AAdapter
         return value;
     }
 
+    #endregion
+
+    #region Write
+    
     internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
     {
         using var type = attribute.GetH5Type();
 
-        /*        if (verifyType)
-                {
-                    using var nativeType = H5Type.GetEquivalentNativeType<T>();
-                    if (!type.IsEqualTo(nativeType))
-                    {
-
-                    }
-                }
-        */
-        
         if (value is bool flag)
         {
             Write(attribute, type, flag.ToByte());
@@ -407,6 +419,18 @@ internal static unsafe class H5AAdapter
         {
             Write(attribute, type, value);
         }
+    }
+
+    internal static void Write(H5Attribute attribute, DateTimeOffset value)
+    {
+        // TODO: optionally write ticks + offset or value.ToString("O")
+        var _value = new _DateTimeOffset
+        {
+            DateTime = value.DateTime.ToBinary(),
+            Offset = (short)value.Offset.TotalMinutes
+        };
+
+        Write(attribute, _value);
     }
 
     internal static void Write<T>(H5Attribute attribute, H5Type type, T value) where T : unmanaged
@@ -430,18 +454,18 @@ internal static unsafe class H5AAdapter
         using var type = attribute.GetH5Type();
         using var space = attribute.GetSpace();
 
+        var cls = type.GetClass();
+        if (cls != DataTypeClass.String)
+        {
+            throw new H5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
+        }
+
         var count = space.GetSimpleExtentNPoints();
         var dims = space.GetSimpleExtentDims();
 
         if (count != 1 || dims.Count != 0)
         {
             throw new H5Exception("Attribute is not scalar.");
-        }
-
-        var cls = type.GetClass();
-        if (cls != DataTypeClass.String)
-        {
-            throw new H5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
         }
 
         var characterSet = type.CharacterSet;
@@ -485,6 +509,8 @@ internal static unsafe class H5AAdapter
             }
         }
     }
+    
+    #endregion
 
     internal static H5Attribute CreateStringAttribute<T>(
         H5Object<T> h5Object, string name, int fixedStorageLength,

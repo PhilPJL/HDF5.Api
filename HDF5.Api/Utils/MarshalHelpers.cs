@@ -2,6 +2,10 @@
 using CommunityToolkit.HighPerformance.Buffers;
 #endif
 
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Reflection;
+
 namespace HDF5.Api.Utils
 {
     internal static unsafe class MarshalHelpers
@@ -80,5 +84,36 @@ namespace HDF5.Api.Utils
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate ssize_t get_name_del(hid_t object_id, byte* name, size_t size);
 #endif
+
+        private static readonly ConcurrentDictionary<Type, bool> _memoized = new();
+
+        public static bool IsUnmanaged(this Type type)
+        {
+            // check if we already know the answer
+            if (!_memoized.TryGetValue(type, out var answer))
+            {
+                if (!type.IsValueType)
+                {
+                    // not a struct -> false
+                    answer = false;
+                }
+                else if (type.IsPrimitive || type.IsPointer || type.IsEnum)
+                {
+                    // primitive, pointer or enum -> true
+                    answer = true;
+                }
+                else
+                {
+                    // otherwise check recursively
+                    answer = type
+                        .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                        .All(f => IsUnmanaged(f.FieldType));
+                }
+
+                _memoized[type] = answer;
+            }
+
+            return answer;
+        }
     }
 }

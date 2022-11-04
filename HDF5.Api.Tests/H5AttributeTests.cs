@@ -205,6 +205,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     {
         location.CreateAndWriteAttribute("string", "This is a string 12345.", 50);
         location.CreateAndWriteAttribute("dateTime", DateTime.Now);
+        location.CreateAndWriteAttribute("dateTimeOffset", DateTimeOffset.Now);
+        location.CreateAndWriteAttribute("timeSpan", TimeSpan.FromMinutes(99));
         location.CreateAndWriteAttribute("bool-true", true);
         location.CreateAndWriteAttribute("bool-false", false);
 
@@ -256,6 +258,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
         var names = new List<string> {
             "dateTime",
+            "dateTimeOffset",
+            "timeSpan",
             "bool-true",
             "bool-false",
             "byte-min",
@@ -316,6 +320,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteStringAttribute("abcdefghijklmnopqrstuvwzyz", "", 27);
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddMinutes(5));
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddYears(5));
+        CreateWriteReadUpdateDeleteDateTimeOffsetAttribute(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddYears(5));
+        CreateWriteReadUpdateDeleteDateTimeOffsetAttribute(DateTimeOffset.Now, DateTimeOffset.Now.AddMonths(-5));
         CreateWriteReadUpdateDeleteStringAttribute(new string('A', 1000), new string('B', 500), 1200);
         CreateWriteReadUpdateDeleteEnumAttribute(TestLong.Min, TestLong.Max);
         CreateWriteReadUpdateDeleteEnumAttribute(TestByte.Min, TestByte.Max);
@@ -329,8 +335,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.IsTrue(location.AttributeExists(name));
 
             var readValue = location.ReadDateTimeAttribute(name);
-            // There is some loss of precision since we're storing DateTime as a double
-            Assert.IsTrue(Math.Abs((value - readValue).TotalMilliseconds) < 1);
+            Assert.AreEqual(value, readValue);
 
             using var a = location.OpenAttribute(name);
             a.Write(newValue);
@@ -339,6 +344,29 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
             var readValue3 = a.ReadDateTime();
+            Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
+
+            location.DeleteAttribute(name);
+            Assert.IsFalse(location.AttributeExists(name));
+        }
+
+        void CreateWriteReadUpdateDeleteDateTimeOffsetAttribute(DateTimeOffset value, DateTimeOffset newValue)
+        {
+            const string name = "dtDateTimeOffset";
+
+            location.CreateAndWriteAttribute(name, value);
+            Assert.IsTrue(location.AttributeExists(name));
+
+            var readValue = location.ReadDateTimeOffsetAttribute(name);
+            Assert.AreEqual(value, readValue);
+
+            using var a = location.OpenAttribute(name);
+            a.Write(newValue);
+
+            var readValue2 = location.ReadDateTimeOffsetAttribute(name);
+            Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
+
+            var readValue3 = a.ReadDateTimeOffset();
             Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
             location.DeleteAttribute(name);

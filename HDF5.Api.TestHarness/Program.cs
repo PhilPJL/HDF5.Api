@@ -1,4 +1,5 @@
 ﻿using HDF5.Api.Attributes;
+using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.TestHarness
 {
@@ -6,17 +7,22 @@ namespace HDF5.Api.TestHarness
     {
         private static void Main()
         {
-            H5Global.TryLoadLibraries(@"C:\Program Files\HDF_Group\HDF5\1.10.9_intel\bin");
-            H5Global.TryLoadLibraries();
+            //H5Global.TryLoadLibraries(@"C:\Program Files\HDF_Group\HDF5\1.10.9_intel\bin");
+            //H5Global.TryLoadLibraries();
 
             const string fileName = @"C:\Users\passp\Downloads\ex_table_11.h5";
             using var file = H5File.Open(fileName);
 
             Console.WriteLine(fileName);
 
-            Console.WriteLine(H5Global.GetLibraryVersion());
-            DumpLocation(file, 1);
-            Console.WriteLine(H5Global.GetLibraryVersion());
+            using var space = H5Space.CreateScalar();
+            using var type = H5Type.GetEquivalentNativeType<int>();
+            using var att = file.CreateAttribute("null", type, space);
+//            H5AAdapter.WriteNull<int>(att, type);
+
+            //Console.WriteLine(H5Global.GetLibraryVersion());
+            //DumpLocation(file, 1);
+            //Console.WriteLine(H5Global.GetLibraryVersion());
         }
 
         private static void DumpLocation<T>(H5Location<T> location, int indent) where T : H5Location<T>
