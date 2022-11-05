@@ -268,8 +268,10 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             "dateTimeOffset",
             "timeSpan-min",
             "timeSpan-max",
+#if NET7_0_OR_GREATER
             "timeOnly-min",
             "timeOnly-max",
+#endif
             "bool-true",
             "bool-false",
             "byte-min",

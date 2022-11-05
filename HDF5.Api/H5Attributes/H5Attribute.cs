@@ -1,5 +1,4 @@
-﻿using HDF5.Api.H5Types;
-using HDF5.Api.NativeMethodAdapters;
+﻿using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.H5Attributes;
 
@@ -31,27 +30,4 @@ public abstract class H5Attribute : H5Object<H5Attribute>
     }
 
     internal int StorageSize => H5AAdapter.GetStorageSize(this);
-}
-
-public abstract class H5Attribute<T, TA, TT> : H5Attribute
-    where TA : H5Attribute<T, TA, TT>
-    where TT : H5Type<T>
-{
-    internal H5Attribute(long handle) : base(handle)
-    {
-    }
-
-    public abstract TT GetH5Type();
-
-    public abstract T Read(bool verifyType = false);
-
-    // TODO: is there any point in returning TA?
-    public abstract TA Write([DisallowNull] T value);
-
-    [DisallowNull]
-    public T Value
-    {
-        get => Read();
-        set => Write(value);
-    }
 }

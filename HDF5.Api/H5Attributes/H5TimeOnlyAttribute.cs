@@ -32,10 +32,8 @@ public class H5TimeOnlyAttribute : H5Attribute<TimeOnly, H5TimeOnlyAttribute, H5
     {
         // TODO: optionally write value.ToString("O", CultureInfo.InvariantCulture)
 
-        //using var type = GetH5Type();
-        //using var expectedType = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
-
-        H5AAdapter.WritePrimitive(this, value.Ticks);
+        using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
+        H5AAdapter.Write(this, type, value.Ticks);
 
         return this;
     }

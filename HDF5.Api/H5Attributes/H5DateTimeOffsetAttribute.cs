@@ -16,12 +16,28 @@ public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset, H5DateTimeO
 
     public override DateTimeOffset Read(bool verifyType = false)
     {
-        return H5AAdapter.ReadDateTimeOffset(this);
+        // TODO: optionally write value.ToString("O")
+        using var type = GetH5Type();
+        using var expectedType = H5TAdapter.CreateDateTimeOffsetType();
+
+        // TODO: sort out the type/expectedType/cls stuff
+        var value = H5AAdapter.ReadImpl<DateTimeOffsetProxy>(this, type, expectedType);
+
+        return new DateTimeOffset(DateTime.FromBinary(value.DateTime), TimeSpan.FromMinutes(value.Offset));
     }
 
     public override H5DateTimeOffsetAttribute Write([DisallowNull] DateTimeOffset value)
     {
-        H5AAdapter.WriteDateTimeOffset(this, value);
+        var dt = new DateTimeOffsetProxy
+        {
+            DateTime = value.DateTime.ToBinary(),
+            Offset = (short)value.Offset.TotalMinutes
+        };
+
+        // TODO: optionally write value.ToString("O")
+        using var type = H5TAdapter.CreateDateTimeOffsetType();
+        H5AAdapter.Write(this, type, dt);
+
         return this;
     }
 }

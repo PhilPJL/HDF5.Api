@@ -9,6 +9,7 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
 {
     internal H5EnumAttribute(long handle) : base(handle)
     {
+        H5ThrowHelpers.ThrowIfManaged<T>();
     }
 
     public override H5EnumType<T> GetH5Type()
@@ -21,8 +22,20 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
     public override T Read(bool verifyType = false)
     {
         H5ThrowHelpers.ThrowIfManaged<T>();
-        
-        return H5AAdapter.ReadEnum<T>(this, verifyType);
+
+        using var nativeType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
+        using var type = GetH5Type();
+
+        if (verifyType)
+        {
+            using var enumType = H5Type.CreateEnumType<T>();
+            if (!enumType.IsEqualTo(type))
+            {
+                throw new H5Exception($"{Name} does not have an equivalent HDF5 enumeration of {typeof(T)}.");
+            }
+        }
+
+        return H5AAdapter.ReadImpl<T>(this, type, nativeType);
     }
 
     public override H5EnumAttribute<T> Write(T value)
@@ -52,7 +65,9 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
 
         H5Attribute WritePrimitive<TP>(TP value) where TP : unmanaged
         {
-            H5AAdapter.WriteEnum<T, TP>(this, value);
+            using var enumType = GetH5Type();
+            H5AAdapter.Write(this, enumType, value);
+
             return this;
         }
     }

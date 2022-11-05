@@ -16,12 +16,26 @@ public class H5TimeSpanAttribute : H5Attribute<TimeSpan, H5TimeSpanAttribute, H5
 
     public override TimeSpan Read(bool verifyType = false)
     {
-        return H5AAdapter.ReadTimeSpan(this);
+        // TODO: optionally write value.ToString("G", CultureInfo.InvariantCulture)
+        using var type = GetH5Type();
+
+        // TODO: sort out the type/expectedType/cls stuff
+        long timeSpan = H5AAdapter.ReadImpl<long>(this, type, type);
+        return TimeSpan.FromTicks(timeSpan);
     }
 
     public override H5TimeSpanAttribute Write([DisallowNull] TimeSpan value)
     {
-        H5AAdapter.WriteTimeSpan(this, value);
+        // TODO: optionally write value.ToString("G", CultureInfo.InvariantCulture)
+        /*        if (...)
+                {
+                    // Write fixed length string
+                    Write(attribute, value.ToString("G", CultureInfo.InvariantCulture))
+                }*/
+
+        using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
+        H5AAdapter.Write(this, type, value.Ticks);
+
         return this;
     }
 }

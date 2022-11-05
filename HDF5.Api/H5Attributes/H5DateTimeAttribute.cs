@@ -16,12 +16,20 @@ public class H5DateTimeAttribute : H5Attribute<DateTime, H5DateTimeAttribute, H5
 
     public override DateTime Read(bool verifyType = false)
     {
-        return H5AAdapter.ReadDateTime(this);
+        // TODO: optionally write value.ToString("O")
+        using var type = GetH5Type();
+
+        // TODO: sort out the type/expectedType/cls stuff
+        long dateTime = H5AAdapter.ReadImpl<long>(this, type, type);
+        return DateTime.FromBinary(dateTime);
     }
 
     public override H5DateTimeAttribute Write([DisallowNull] DateTime value)
     {
-        H5AAdapter.WriteDateTime(this, value);
+        // TODO: optionally write value.ToString("O")
+        using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
+        H5AAdapter.Write(this, type, value.ToBinary());
+
         return this;
     }
 }
