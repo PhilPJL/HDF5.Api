@@ -149,7 +149,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             const string s = "long-----------------------------------";
             group.CreateAndWriteAttribute("string", s, 100);
 
-            string s1 = group.ReadStringAttribute("string");
+            string s1 = group.ReadAttribute<string>("string");
             Assert.AreEqual(s, s1);
 
             // File + Group
@@ -168,13 +168,13 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             group.CreateAndWriteAttribute("int", 1);
             group.CreateAndWriteAttribute("string", "short", 10);
 
-            string s1 = group.ReadStringAttribute("string");
+            string s1 = group.ReadAttribute<string>("string");
             Assert.AreEqual("short", s1);
 
             int i1 = group.ReadAttribute<int>("int");
             Assert.AreEqual(1, i1);
 
-            Assert.ThrowsException<H5Exception>(() => group.ReadStringAttribute("int"));
+            Assert.ThrowsException<H5Exception>(() => group.ReadAttribute<string>("int"));
             Assert.ThrowsException<H5Exception>(() => group.ReadAttribute<int>("string"));
         });
     }
@@ -318,6 +318,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteStringAttribute("1234567890", "ABCDEFGH", 11);
         CreateWriteReadUpdateDeleteStringAttribute("", "ABCDEFGH", 10);
         CreateWriteReadUpdateDeleteStringAttribute("abcdefghijklmnopqrstuvwzyz", "", 27);
+        CreateWriteReadUpdateDeleteTimeSpanAttribute(TimeSpan.FromMinutes(1), TimeSpan.FromHours(2.34));
+        CreateWriteReadUpdateDeleteTimeSpanAttribute(TimeSpan.FromDays(5.61), TimeSpan.FromMilliseconds(16.345));
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddMinutes(5));
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddYears(5));
         CreateWriteReadUpdateDeleteDateTimeOffsetAttribute(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddYears(5));
@@ -327,6 +329,26 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteEnumAttribute(TestByte.Min, TestByte.Max);
         Assert.AreEqual(0, location.NumberOfAttributes);
 
+        void CreateWriteReadUpdateDeleteTimeSpanAttribute(TimeSpan value, TimeSpan newValue)
+        {
+            const string name = "dtTimeSpan";
+
+            location.CreateAndWriteAttribute(name, value);
+            Assert.IsTrue(location.AttributeExists(name));
+
+            using var a = location.OpenTimeSpanAttribute(name);
+            Assert.AreEqual(value, location.ReadAttribute<TimeSpan>(name));
+            Assert.AreEqual(value, a.Read());
+
+            a.Write(newValue);
+
+            Assert.AreEqual(newValue, location.ReadAttribute<TimeSpan>(name));
+            Assert.AreEqual(newValue, a.Read());
+
+            location.DeleteAttribute(name);
+            Assert.IsFalse(location.AttributeExists(name));
+        }
+
         void CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime value, DateTime newValue)
         {
             const string name = "dtDateTime";
@@ -335,12 +357,12 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenDateTimeAttribute(name);
-            Assert.AreEqual(value, location.ReadDateTimeAttribute(name));
+            Assert.AreEqual(value, location.ReadAttribute<DateTime>(name));
             Assert.AreEqual(value, a.Read());
 
             a.Write(newValue);
 
-            Assert.AreEqual(newValue, location.ReadDateTimeAttribute(name));
+            Assert.AreEqual(newValue, location.ReadAttribute<DateTime>(name));
             Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);
@@ -355,12 +377,12 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenDateTimeOffsetAttribute(name);
-            Assert.AreEqual(value, location.ReadDateTimeOffsetAttribute(name));
+            Assert.AreEqual(value, location.ReadAttribute<DateTimeOffset>(name));
             Assert.AreEqual(value, a.Read());
 
             a.Write(newValue);
 
-            Assert.AreEqual(newValue, location.ReadDateTimeOffsetAttribute(name));
+            Assert.AreEqual(newValue, location.ReadAttribute<DateTimeOffset>(name));
             Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);
@@ -376,12 +398,12 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             using var a = location.OpenStringAttribute(name);
 
-            Assert.AreEqual(value, location.ReadStringAttribute(name));
+            Assert.AreEqual(value, location.ReadAttribute<string>(name));
             Assert.AreEqual(value, a.Read());
 
             a.Write(newValue);
 
-            Assert.AreEqual(newValue, location.ReadStringAttribute(name));
+            Assert.AreEqual(newValue, location.ReadAttribute<string>(name));
             Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);
@@ -434,11 +456,11 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenBooleanAttribute(name);
-            Assert.AreEqual(value, location.ReadBoolAttribute(name));
+            Assert.AreEqual(value, location.ReadAttribute<bool>(name));
             Assert.AreEqual(value, a.Read());
 
             a.Write(newValue);
-            Assert.AreEqual(newValue, location.ReadBoolAttribute(name));
+            Assert.AreEqual(newValue, location.ReadAttribute<bool>(name));
             Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);

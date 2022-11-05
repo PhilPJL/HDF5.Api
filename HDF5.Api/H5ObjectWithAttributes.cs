@@ -17,21 +17,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
     public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
 
-/*    /// <summary>
-    ///     Create an Attribute for this location
-    /// </summary>
-    internal H5Attribute CreateAttribute(
-        [DisallowNull] string name,
-        [DisallowNull] H5Type type,
-        [DisallowNull] H5Space space)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-        Guard.IsNotNull(type);
-        Guard.IsNotNull(space);
-
-        return H5AAdapter.Create(this, name, type, space);
-    }
-*/
     /// <summary>
     /// Create and configure string attribute in the target location.
     /// </summary>
@@ -122,14 +107,71 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         return H5AAdapter.Exists(this, name);
     }
 
-    // TODO: consolidate into ReadAttribute<T>
-
-    public TA ReadAttribute<TA>([DisallowNull] string name) where TA : unmanaged, IEquatable<TA>
+    public TA ReadAttribute<TA>([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        using var attribute = H5AAdapter.Open(this, name, h => new H5PrimitiveAttribute<TA>(h));
-        return attribute.Read();
+        if (typeof(TA) == typeof(string))
+        {
+            return (TA)ReadStringAttribute(name);
+        }
+
+        return default(TA) switch
+        {
+            char or byte or sbyte or short or ushort or int or uint or long or ulong or float or double
+                => (TA)ReadPrimitiveAttribute(name),
+            decimal => throw new NotImplementedException(),
+            bool => (TA)ReadBoolAttribute(name),
+            //Enum => (TA)ReadEnumAttribute(name),
+            DateTime => (TA)ReadDateTimeAttribute(name),
+            DateTimeOffset => (TA)ReadDateTimeOffsetAttribute(name),
+            TimeSpan => (TA)ReadTimeSpanAttribute(name),
+            //TimeOnly => ReadTimeOnlyAttribute(name),
+            _ => throw new NotImplementedException($"{typeof(TA).Name}")
+        };
+
+        object ReadPrimitiveAttribute(string name)
+        {
+            using var attribute = H5AAdapter.Open(this, name, h => new H5PrimitiveAttribute<TA>(h));
+            return attribute.Read()!;
+        }
+
+        object ReadBoolAttribute(string name)
+        {
+            using var attribute = H5AAdapter.Open(this, name, h => new H5BooleanAttribute(h));
+            return attribute.Read();
+        }
+
+        object ReadStringAttribute(string name)
+        {
+            using var attribute = H5AAdapter.Open(this, name, h => new H5StringAttribute(h));
+            return attribute.Read();
+        }
+
+        /*        object ReadEnumAttribute(string name, bool verifyType = false) //where TA : unmanaged, Enum
+                {
+                    using var attribute = H5AAdapter.Open(this, name, h => new H5EnumAttribute<TA>(h));
+                    return attribute.Read(verifyType)!;
+                }
+        */
+
+        object ReadDateTimeAttribute(string name)
+        {
+            using var attribute = H5AAdapter.Open(this, name, h => new H5DateTimeAttribute(h));
+            return attribute.Read();
+        }
+
+        object ReadDateTimeOffsetAttribute(string name)
+        {
+            using var attribute = H5AAdapter.Open(this, name, h => new H5DateTimeOffsetAttribute(h));
+            return attribute.Read();
+        }
+
+        object ReadTimeSpanAttribute(string name)
+        {
+            using var attribute = H5AAdapter.Open(this, name, h => new H5TimeSpanAttribute(h));
+            return attribute.Read();
+        }
     }
 
     public TA ReadEnumAttribute<TA>([DisallowNull] string name, bool verifyType = false) where TA : unmanaged, Enum
@@ -140,55 +182,64 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         return attribute.Read(verifyType);
     }
 
-    public string ReadStringAttribute([DisallowNull] string name)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-
-        using var attribute = H5AAdapter.Open(this, name, h => new H5StringAttribute(h));
-        return attribute.Read();
-    }
-
-    public bool ReadBoolAttribute([DisallowNull] string name)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-
-        using var attribute = H5AAdapter.Open(this, name, h => new H5BooleanAttribute(h));
-        return attribute.Read();
-    }
-
-    public DateTime ReadDateTimeAttribute([DisallowNull] string name)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-
-        using var attribute = H5AAdapter.Open(this, name, h => new H5DateTimeAttribute(h));
-        return attribute.Read();
-    }
-
-    public DateTimeOffset ReadDateTimeOffsetAttribute([DisallowNull] string name)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-
-        using var attribute = H5AAdapter.Open(this, name, h => new H5DateTimeOffsetAttribute(h));
-        return attribute.Read();
-    }
-
-    public TimeSpan ReadTimeSpanAttribute([DisallowNull] string name)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-
-        using var attribute = H5AAdapter.Open(this, name, h => new H5TimeSpanAttribute(h));
-        return attribute.Read();
-    }
-
-    // TODO
-/*    public void Enumerate(Action<H5Attribute> action)
-    {
-        foreach (var name in AttributeNames)
+    // These methods would be faster - no (or less) boxing
+    /*    public TA ReadPrimitiveAttribute<TA>([DisallowNull] string name) where TA : unmanaged, IEquatable<TA>
         {
-            using var h5Object = H5AAdapter.Open()...;
-            action(h5Object);
+            Guard.IsNotNullOrWhiteSpace(name);
+
+            using var attribute = H5AAdapter.Open(this, name, h => new H5PrimitiveAttribute<TA>(h));
+            return attribute.Read()!;
         }
-    }*/
+
+        public string ReadStringAttribute([DisallowNull] string name)
+        {
+            Guard.IsNotNullOrWhiteSpace(name);
+
+            using var attribute = H5AAdapter.Open(this, name, h => new H5StringAttribute(h));
+            return attribute.Read();
+        }
+
+        public bool ReadBoolAttribute([DisallowNull] string name)
+        {
+            Guard.IsNotNullOrWhiteSpace(name);
+
+            using var attribute = H5AAdapter.Open(this, name, h => new H5BooleanAttribute(h));
+            return attribute.Read();
+        }
+
+        public DateTime ReadDateTimeAttribute([DisallowNull] string name)
+        {
+            Guard.IsNotNullOrWhiteSpace(name);
+
+            using var attribute = H5AAdapter.Open(this, name, h => new H5DateTimeAttribute(h));
+            return attribute.Read();
+        }
+
+        public DateTimeOffset ReadDateTimeOffsetAttribute([DisallowNull] string name)
+        {
+            Guard.IsNotNullOrWhiteSpace(name);
+
+            using var attribute = H5AAdapter.Open(this, name, h => new H5DateTimeOffsetAttribute(h));
+            return attribute.Read();
+        }
+
+        public TimeSpan ReadTimeSpanAttribute([DisallowNull] string name)
+        {
+            Guard.IsNotNullOrWhiteSpace(name);
+
+            using var attribute = H5AAdapter.Open(this, name, h => new H5TimeSpanAttribute(h));
+            return attribute.Read();
+        }
+    */
+    // TODO
+    /*    public void Enumerate(Action<H5Attribute> action)
+        {
+            foreach (var name in AttributeNames)
+            {
+                using var h5Object = H5AAdapter.Open()...;
+                action(h5Object);
+            }
+        }*/
 
 
     public void CreateAndWriteAttribute<TA>([DisallowNull] string name, TA value)

@@ -353,7 +353,7 @@ internal static unsafe class H5AAdapter
         using var type = attribute.GetH5Type();
         // TODO: sort out the type/expectedType/cls stuff
         long timeSpan = ReadImpl<long>(attribute, type, type);
-        return TimeSpan.FromMinutes(timeSpan);
+        return TimeSpan.FromTicks(timeSpan);
     }
 
     internal static DateTime ReadDateTime(H5DateTimeAttribute attribute)

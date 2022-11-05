@@ -66,13 +66,13 @@ public class GeneralTests : H5Test<H5AttributeTests>
             file.CreateAndWriteAttribute("shortstring", shortString, 101);
             file.CreateAndWriteAttribute("longstring", longString, 1001);
 
-            var dt2 = file.ReadDateTimeAttribute("DateTime");
+            var dt2 = file.ReadAttribute<DateTime>("DateTime");
             Assert.AreEqual(dt, dt2);
 
-            var shortString2 = file.ReadStringAttribute("shortstring");
+            var shortString2 = file.ReadAttribute<string>("shortstring");
             Assert.AreEqual(shortString, shortString2);
 
-            var longString2 = file.ReadStringAttribute("longstring");
+            var longString2 = file.ReadAttribute<string>("longstring");
             Assert.AreEqual(longString, longString2);
         });
     }

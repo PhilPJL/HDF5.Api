@@ -71,19 +71,19 @@ namespace HDF5.Api.Benchmark
         [Benchmark]
         public void ReadDateTime()
         {
-            _file?.ReadDateTimeAttribute("DateTime");
+            _file?.ReadAttribute<DateTime>("DateTime");
         }
 
         [Benchmark]
         public void ReadShortString()
         {
-            _file?.ReadStringAttribute("shortstring");
+            _file?.ReadAttribute<string>("shortstring");
         }
 
         [Benchmark]
         public void ReadLongString()
         {
-            _file?.ReadStringAttribute("longstring");
+            _file?.ReadAttribute<string>("longstring");
         }
     }
 
