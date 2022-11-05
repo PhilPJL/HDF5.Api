@@ -67,6 +67,15 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         return H5AAdapter.Open(this, name, h => new H5TimeSpanAttribute(h));
     }
 
+#if NET7_0_OR_GREATER
+    public H5TimeOnlyAttribute OpenTimeOnlyAttribute([DisallowNull] string name)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        return H5AAdapter.Open(this, name, h => new H5TimeOnlyAttribute(h));
+    }
+#endif
+
     public H5DateTimeAttribute OpenDateTimeAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -107,7 +116,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         return H5AAdapter.Exists(this, name);
     }
 
-    public TA ReadAttribute<TA>([DisallowNull] string name)
+    public TA ReadAttribute<TA>([DisallowNull] string name, bool verifyType = false)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
@@ -122,11 +131,13 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
                 => (TA)ReadPrimitiveAttribute(name),
             decimal => throw new NotImplementedException(),
             bool => (TA)ReadBoolAttribute(name),
-            //Enum => (TA)ReadEnumAttribute(name),
+            Enum => (TA)ReadEnumAttribute(name, verifyType),
             DateTime => (TA)ReadDateTimeAttribute(name),
             DateTimeOffset => (TA)ReadDateTimeOffsetAttribute(name),
             TimeSpan => (TA)ReadTimeSpanAttribute(name),
-            //TimeOnly => ReadTimeOnlyAttribute(name),
+#if NET7_0_OR_GREATER
+            TimeOnly => (TA)ReadTimeOnlyAttribute(name),
+#endif
             _ => throw new NotImplementedException($"{typeof(TA).Name}")
         };
 
@@ -148,18 +159,25 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
             return attribute.Read();
         }
 
-        /*        object ReadEnumAttribute(string name, bool verifyType = false) //where TA : unmanaged, Enum
-                {
-                    using var attribute = H5AAdapter.Open(this, name, h => new H5EnumAttribute<TA>(h));
-                    return attribute.Read(verifyType)!;
-                }
-        */
+        object ReadEnumAttribute(string name, bool verifyType = false) 
+        {
+            using var attribute = H5AAdapter.Open(this, name, h => new H5EnumAttribute<TA>(h));
+            return attribute.Read(verifyType)!;
+        }
 
         object ReadDateTimeAttribute(string name)
         {
             using var attribute = H5AAdapter.Open(this, name, h => new H5DateTimeAttribute(h));
             return attribute.Read();
         }
+
+#if NET7_0_OR_GREATER
+        object ReadTimeOnlyAttribute(string name)
+        {
+            using var attribute = H5AAdapter.Open(this, name, h => new H5TimeOnlyAttribute(h));
+            return attribute.Read();
+        }
+#endif
 
         object ReadDateTimeOffsetAttribute(string name)
         {
@@ -174,14 +192,14 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         }
     }
 
-    public TA ReadEnumAttribute<TA>([DisallowNull] string name, bool verifyType = false) where TA : unmanaged, Enum
+/*    public TA ReadEnumAttribute<TA>([DisallowNull] string name, bool verifyType = false) where TA : unmanaged, Enum
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
         using var attribute = H5AAdapter.Open(this, name, h => new H5EnumAttribute<TA>(h));
         return attribute.Read(verifyType);
     }
-
+*/
     // These methods would be faster - no (or less) boxing
     /*    public TA ReadPrimitiveAttribute<TA>([DisallowNull] string name) where TA : unmanaged, IEquatable<TA>
         {
@@ -297,6 +315,15 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         CreateAndWriteAttribute(name, value.Ticks);
     }
+
+#if NET7_0_OR_GREATER
+    public void CreateAndWriteAttribute([DisallowNull] string name, TimeOnly value)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        CreateAndWriteAttribute(name, value.Ticks);
+    }
+#endif
 
     public void CreateAndWriteAttribute(
         [DisallowNull] string name,

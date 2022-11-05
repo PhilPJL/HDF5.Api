@@ -186,15 +186,15 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             file.CreateAndWriteEnumAttribute("test-ulong.min", TestULong.Min);
 
-            var valueTestUlongMin = file.ReadEnumAttribute<TestULong>("test-ulong.min");
+            var valueTestUlongMin = file.ReadAttribute<TestULong>("test-ulong.min");
             Assert.AreEqual(valueTestUlongMin, TestULong.Min);
 
             // mismatched type but should work because the value is zero
-            TestLong valueTestLong = file.ReadEnumAttribute<TestLong>("test-ulong.min");
+            TestLong valueTestLong = file.ReadAttribute<TestLong>("test-ulong.min");
             Assert.AreEqual(valueTestLong, TestLong.None);
 
             // should throw
-            Assert.ThrowsException<H5Exception>(() => file.ReadEnumAttribute<TestLong>("test-ulong.min", true));
+            Assert.ThrowsException<H5Exception>(() => file.ReadAttribute<TestLong>("test-ulong.min", true));
         });
     }
 
@@ -202,9 +202,18 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     internal static void CreateIterateAttributesSucceeds<T>(H5ObjectWithAttributes<T> location) where T : H5ObjectWithAttributes<T>
     {
         location.CreateAndWriteAttribute("string", "This is a string 12345.", 50);
+
         location.CreateAndWriteAttribute("dateTime", DateTime.Now);
         location.CreateAndWriteAttribute("dateTimeOffset", DateTimeOffset.Now);
-        location.CreateAndWriteAttribute("timeSpan", TimeSpan.FromMinutes(99));
+        
+        location.CreateAndWriteAttribute("timeSpan-min", TimeSpan.MinValue);
+        location.CreateAndWriteAttribute("timeSpan-max", TimeSpan.MaxValue);
+
+#if NET7_0_OR_GREATER
+        location.CreateAndWriteAttribute("timeOnly-min", TimeOnly.MinValue);
+        location.CreateAndWriteAttribute("timeOnly-max", TimeOnly.MaxValue);
+#endif
+
         location.CreateAndWriteAttribute("bool-true", true);
         location.CreateAndWriteAttribute("bool-false", false);
 
@@ -257,7 +266,10 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         var names = new List<string> {
             "dateTime",
             "dateTimeOffset",
-            "timeSpan",
+            "timeSpan-min",
+            "timeSpan-max",
+            "timeOnly-min",
+            "timeOnly-max",
             "bool-true",
             "bool-false",
             "byte-min",
@@ -320,6 +332,9 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteStringAttribute("abcdefghijklmnopqrstuvwzyz", "", 27);
         CreateWriteReadUpdateDeleteTimeSpanAttribute(TimeSpan.FromMinutes(1), TimeSpan.FromHours(2.34));
         CreateWriteReadUpdateDeleteTimeSpanAttribute(TimeSpan.FromDays(5.61), TimeSpan.FromMilliseconds(16.345));
+#if NET7_0_OR_GREATER
+        CreateWriteReadUpdateDeleteTimeOnlyAttribute(TimeOnly.MinValue, TimeOnly.MaxValue);
+#endif
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddMinutes(5));
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddYears(5));
         CreateWriteReadUpdateDeleteDateTimeOffsetAttribute(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddYears(5));
@@ -328,6 +343,28 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteEnumAttribute(TestLong.Min, TestLong.Max);
         CreateWriteReadUpdateDeleteEnumAttribute(TestByte.Min, TestByte.Max);
         Assert.AreEqual(0, location.NumberOfAttributes);
+
+#if NET7_0_OR_GREATER
+        void CreateWriteReadUpdateDeleteTimeOnlyAttribute(TimeOnly value, TimeOnly newValue)
+        {
+            const string name = "dtTimeOnly";
+
+            location.CreateAndWriteAttribute(name, value);
+            Assert.IsTrue(location.AttributeExists(name));
+
+            using var a = location.OpenTimeOnlyAttribute(name);
+            Assert.AreEqual(value, location.ReadAttribute<TimeOnly>(name));
+            Assert.AreEqual(value, a.Read());
+
+            a.Write(newValue);
+
+            Assert.AreEqual(newValue, location.ReadAttribute<TimeOnly>(name));
+            Assert.AreEqual(newValue, a.Read());
+
+            location.DeleteAttribute(name);
+            Assert.IsFalse(location.AttributeExists(name));
+        }
+#endif
 
         void CreateWriteReadUpdateDeleteTimeSpanAttribute(TimeSpan value, TimeSpan newValue)
         {
@@ -437,11 +474,11 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenEnumAttribute<TValue>(name);
-            Assert.AreEqual(value, location.ReadEnumAttribute<TValue>(name));
+            Assert.AreEqual(value, location.ReadAttribute<TValue>(name));
             Assert.AreEqual(value, a.Read());
 
             a.Write(newValue);
-            Assert.AreEqual(newValue, location.ReadEnumAttribute<TValue>(name));
+            Assert.AreEqual(newValue, location.ReadAttribute<TValue>(name));
             Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);

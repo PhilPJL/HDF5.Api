@@ -144,7 +144,7 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         return H5TAdapter.CreateVariableLengthByteArrayType();
     }
 
-    public static H5EnumType<T> CreateEnumType<T>() where T : Enum // unmanaged
+    public static H5EnumType<T> CreateEnumType<T>() //where T : Enum // unmanaged
     {
         return H5TAdapter.CreateEnumType<T>();
     }

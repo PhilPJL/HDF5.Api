@@ -376,7 +376,7 @@ internal static unsafe class H5AAdapter
         return new DateTimeOffset(DateTime.FromBinary(value.DateTime), TimeSpan.FromMinutes(value.Offset));
     }
 
-    internal static T ReadEnum<T>(H5EnumAttribute<T> attribute, bool verifyType = false)  where T : Enum //unmanaged, 
+    internal static T ReadEnum<T>(H5EnumAttribute<T> attribute, bool verifyType = false)  //where T : Enum //unmanaged, 
     {
         using var nativeType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
         using var type = attribute.GetH5Type();
@@ -406,7 +406,7 @@ internal static unsafe class H5AAdapter
     }
 
     // TODO:should this be H5Attribute<T> attribute?
-    private static T ReadImpl<T>(H5Attribute attribute, H5Type type, H5Type expectedType) //where T : unmanaged
+    internal static T ReadImpl<T>(H5Attribute attribute, H5Type type, H5Type expectedType) //where T : unmanaged
     {
         H5ThrowHelpers.ThrowIfManaged<T>();
 
@@ -466,7 +466,7 @@ internal static unsafe class H5AAdapter
     }
 
     internal static void WriteEnum<T, TV>(H5EnumAttribute<T> attribute, TV value) 
-        where T : Enum 
+        //where T : Enum 
         where TV : unmanaged
     {
         //using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<T>();

@@ -5,7 +5,7 @@ using HDF5.Api.NativeMethodAdapters;
 namespace HDF5.Api.H5Attributes;
 
 public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<T>>
-    where T : Enum // unmanaged
+    //where T : Enum // unmanaged
 {
     internal H5EnumAttribute(long handle) : base(handle)
     {
@@ -36,7 +36,7 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
 
         H5Attribute WriteEnum()
         {
-            return value.GetTypeCode() switch
+            return ((Enum)(object)value).GetTypeCode() switch
             {
                 TypeCode.Byte => WritePrimitive(Convert.ToByte(value)),
                 TypeCode.SByte => WritePrimitive(Convert.ToSByte(value)),

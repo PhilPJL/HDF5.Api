@@ -113,7 +113,7 @@ internal static unsafe class H5TAdapter
     }
 
     internal static void InsertEnumMember<T>(H5Type type, string name, T value)
-        where T : Enum //unmanaged, 
+        //where T : Enum //unmanaged, 
     {
         // TODO: assert is unmanaged
 
@@ -194,7 +194,7 @@ internal static unsafe class H5TAdapter
         return is_variable_str(typeId).ThrowIfError() > 0;
     }
 
-    internal static H5EnumType<T> CreateEnumType<T>() where T : Enum // unmanaged, 
+    internal static H5EnumType<T> CreateEnumType<T>() //where T : Enum // unmanaged, 
     {
         var h5EnumType = ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
 
