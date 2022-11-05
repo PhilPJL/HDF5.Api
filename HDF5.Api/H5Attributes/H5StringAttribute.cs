@@ -15,7 +15,7 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
         return H5AAdapter.GetType(this, h => new H5StringType(h));
     }
 
-    public override string Read()
+    public override string Read(bool verifyType = false)
     {
         return H5AAdapter.ReadString(this);
     }

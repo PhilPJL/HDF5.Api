@@ -14,7 +14,7 @@ public class H5DateTimeAttribute : H5Attribute<DateTime, H5DateTimeAttribute, H5
         return H5AAdapter.GetType(this, h => new H5DateTimeType(h));
     }
 
-    public override DateTime Read()
+    public override DateTime Read(bool verifyType = false)
     {
         return H5AAdapter.ReadDateTime(this);
     }

@@ -2,7 +2,6 @@
 using HDF5.Api.H5Types;
 #if NET7_0_OR_GREATER
 using CommunityToolkit.HighPerformance.Buffers;
-using HDF5.Api.H5Types;
 #endif
 using HDF5.Api.NativeMethods;
 using System.Linq;
@@ -85,9 +84,9 @@ internal static unsafe class H5TAdapter
 
     internal static H5Type CreateDateTimeOffsetType()
     {
-        var type = CreateCompoundType<_DateTimeOffset>();
-        type.Insert<_DateTimeOffset, long>(nameof(_DateTimeOffset.DateTime));
-        type.Insert<_DateTimeOffset, int>(nameof(_DateTimeOffset.Offset));
+        var type = CreateCompoundType<DateTimeOffsetProxy>();
+        type.Insert<DateTimeOffsetProxy, long>(nameof(DateTimeOffsetProxy.DateTime));
+        type.Insert<DateTimeOffsetProxy, int>(nameof(DateTimeOffsetProxy.Offset));
         return type;
     }
 
@@ -402,7 +401,7 @@ internal static unsafe class H5TAdapter
 }
 
 // TODO: move this to suitable place
-struct _DateTimeOffset
+struct DateTimeOffsetProxy
 {
     public long DateTime;
     public short Offset;

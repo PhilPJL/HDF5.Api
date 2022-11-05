@@ -254,7 +254,7 @@ public abstract class H5Attribute<T, TA, TT> : H5Attribute
 
     public abstract TT GetH5Type();
 
-    public abstract T Read();
+    public abstract T Read(bool verifyType = false);
 
     [DisallowNull]
     public T Value

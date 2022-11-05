@@ -15,7 +15,7 @@ public class H5TimeOnlyAttribute : H5Attribute<TimeOnly, H5TimeOnlyAttribute, H5
         return H5AAdapter.GetType(this, h => new H5TimeOnlyType(h));
     }
 
-    public override TimeOnly Read()
+    public override TimeOnly Read(bool verifyType = false)
     {
         throw new NotImplementedException();
     }

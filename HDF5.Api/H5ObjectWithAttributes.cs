@@ -132,12 +132,12 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         return attribute.Read();
     }
 
-    public TA ReadEnumAttribute<TA>([DisallowNull] string name) where TA : unmanaged, Enum
+    public TA ReadEnumAttribute<TA>([DisallowNull] string name, bool verifyType = false) where TA : unmanaged, Enum
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
         using var attribute = H5AAdapter.Open(this, name, h => new H5EnumAttribute<TA>(h));
-        return attribute.Read();
+        return attribute.Read(verifyType);
     }
 
     public string ReadStringAttribute([DisallowNull] string name)

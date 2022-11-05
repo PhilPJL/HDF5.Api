@@ -14,7 +14,7 @@ public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset, H5DateTimeO
         return H5AAdapter.GetType(this, h => new H5DateTimeOffsetType(h));
     }
 
-    public override DateTimeOffset Read()
+    public override DateTimeOffset Read(bool verifyType = false)
     {
         return H5AAdapter.ReadDateTimeOffset(this);
     }

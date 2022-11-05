@@ -362,7 +362,7 @@ internal static unsafe class H5AAdapter
         using var type = attribute.GetH5Type();
         using var expectedType = H5TAdapter.CreateDateTimeOffsetType();
         // TODO: sort out the type/expectedType/cls stuff
-        var value = ReadImpl<_DateTimeOffset>(attribute, type, expectedType);
+        var value = ReadImpl<DateTimeOffsetProxy>(attribute, type, expectedType);
 
         return new DateTimeOffset(DateTime.FromBinary(value.DateTime), TimeSpan.FromMinutes(value.Offset));
     }
@@ -456,6 +456,17 @@ internal static unsafe class H5AAdapter
         Write(attribute, type, value);
     }
 
+    internal static void WriteEnum<T, TV>(H5EnumAttribute<T> attribute, TV value) 
+        where T : Enum 
+        where TV : unmanaged
+    {
+        //using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<T>();
+        // TODO: optionally verify types
+
+        using var enumType = attribute.GetH5Type();
+        Write(attribute, enumType, value);
+    }
+
     internal static void WriteBool(H5BooleanAttribute attribute, bool value)
     {
         // TODO: save as byte, bitmask or long?
@@ -465,27 +476,33 @@ internal static unsafe class H5AAdapter
 
     internal static void WriteDateTimeOffset(H5DateTimeOffsetAttribute attribute, DateTimeOffset value)
     {
-/*        var dt = new _DateTimeOffset
+        var dt = new DateTimeOffsetProxy
         {
             DateTime = value.DateTime.ToBinary(),
             Offset = (short)value.Offset.TotalMinutes
         };
 
-        using var type = 
-*/
-        throw new NotImplementedException();
+        // TODO: optionally write value.ToString("O")
+        using var type = H5TAdapter.CreateDateTimeOffsetType();
+        Write(attribute, type, dt);
     }
 
     internal static void WriteTimeSpan(H5TimeSpanAttribute attribute, TimeSpan value)
     {
-        // TODO: optionally write ticks or value.ToString("G", CultureInfo.InvariantCulture)
+        // TODO: optionally write value.ToString("G", CultureInfo.InvariantCulture)
+/*        if (...)
+        {
+            // Write fixed length string
+            Write(attribute, value.ToString("G", CultureInfo.InvariantCulture))
+        }*/
+
         using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
         Write(attribute, type, value.Ticks);
     }
 
     internal static void WriteDateTime(H5DateTimeAttribute attribute, DateTime value)
     {
-        // TODO: optionally write binary (ticks + kind) or value.ToString("O")
+        // TODO: optionally write value.ToString("O")
         using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
         Write(attribute, type, value.ToBinary());
     }

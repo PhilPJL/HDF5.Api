@@ -17,7 +17,7 @@ public class H5PrimitiveAttribute<T> : H5Attribute<T, H5PrimitiveAttribute<T>, H
         return H5AAdapter.GetType(this, h => new H5PrimitiveType<T>(h));
     }
 
-    public override T Read()
+    public override T Read(bool verifyType = false)
     {
         H5ThrowHelpers.ThrowIfManaged<T>();
 

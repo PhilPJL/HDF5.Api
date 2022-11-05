@@ -14,7 +14,7 @@ public class H5CompoundAttribute<T> : H5Attribute<T, H5CompoundAttribute<T>, H5C
         return H5AAdapter.GetType(this, h => new H5CompoundType<T>(h));
     }
 
-    public override T Read()
+    public override T Read(bool verifyType = false)
     {
         throw new NotImplementedException();
     }

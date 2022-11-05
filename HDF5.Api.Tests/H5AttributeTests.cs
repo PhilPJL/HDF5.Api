@@ -1,5 +1,4 @@
-﻿using HDF5.Api.NativeMethodAdapters;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace HDF5.Api.Tests;
 
@@ -196,7 +195,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.AreEqual(valueTestLong, TestLong.None);
 
             // should throw
-            Assert.ThrowsException<H5Exception>(() => file.ReadEnumAttribute<TestLong>("test-ulong.min"));
+            Assert.ThrowsException<H5Exception>(() => file.ReadEnumAttribute<TestLong>("test-ulong.min", true));
         });
     }
 
@@ -334,17 +333,15 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             location.CreateAndWriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
-            var readValue = location.ReadDateTimeAttribute(name);
-            Assert.AreEqual(value, readValue);
+            Assert.AreEqual(value, location.ReadDateTimeAttribute(name));
 
             using var a = location.OpenDateTimeAttribute(name);
+            Assert.AreEqual(value, a.Read());
+
             a.Write(newValue);
 
-            var readValue2 = location.ReadDateTimeAttribute(name);
-            Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
-
-            var readValue3 = a.Read();
-            Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
+            Assert.AreEqual(newValue, location.ReadDateTimeAttribute(name));
+            Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
@@ -357,17 +354,15 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             location.CreateAndWriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
-            var readValue = location.ReadDateTimeOffsetAttribute(name);
-            Assert.AreEqual(value, readValue);
+            Assert.AreEqual(value, location.ReadDateTimeOffsetAttribute(name));
 
             using var a = location.OpenDateTimeOffsetAttribute(name);
+            Assert.AreEqual(value, a.Read());
+
             a.Write(newValue);
 
-            var readValue2 = location.ReadDateTimeOffsetAttribute(name);
-            Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
-
-            var readValue3 = a.Read();
-            Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
+            Assert.AreEqual(newValue, location.ReadDateTimeOffsetAttribute(name));
+            Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
@@ -386,13 +381,17 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             using var a = location.OpenStringAttribute(name);
             string readValue2 = location.ReadStringAttribute(name);
+            string readValue2a = a.Read();
 
             Assert.AreEqual(value, readValue2);
+            Assert.AreEqual(value, readValue2a);
 
             a.Write(newValue);
 
             string readValue3 = location.ReadStringAttribute(name);
-            Assert.AreEqual(value, readValue);
+            string readValue3a = a.Read();
+            Assert.AreEqual(newValue, readValue3);
+            Assert.AreEqual(newValue, readValue3a);
 
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
@@ -556,20 +555,16 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             void CreateValue<T>(T valueMin, T valueMax) where T : unmanaged, Enum
             {
-                Assert.Fail("TODO"); 
-/*                using var type = H5Type.CreateEnumType<T>();
-                using var attMin = file.CreateAttribute($"{typeof(T).Name}:{valueMin}", type, size);
-                attMin.Write(valueMin);
+                var nameMin = $"{typeof(T).Name}:{valueMin}";
+                file.CreateAndWriteEnumAttribute<T>(nameMin, valueMin);
+                using var attMin = file.OpenEnumAttribute<T>(nameMin);
+                Assert.AreEqual(valueMin, attMin.Read());
 
-                var min = attMin.Read<T>();
-                Assert.AreEqual(valueMin, min);
-
-                using var attMax = file.CreateAttribute($"{typeof(T).Name}:{valueMax}", type, size);
-                attMax.Write(valueMax);
-
-                var max = attMax.Read<T>();
-                Assert.AreEqual(valueMax, max);
-*/            }
+                var nameMax = $"{typeof(T).Name}:{valueMax}";
+                file.CreateAndWriteEnumAttribute<T>(nameMax, valueMax);
+                using var attMax = file.OpenEnumAttribute<T>(nameMax);
+                Assert.AreEqual(valueMax, attMax.Read());
+            }
         });
     }
 

@@ -16,9 +16,9 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
         return H5AAdapter.GetType(this, h => new H5EnumType<T>(h));
     }
 
-    public override T Read()
+    public override T Read(bool verifyType = false)
     {
-        return H5AAdapter.ReadEnum<T>(this);
+        return H5AAdapter.ReadEnum<T>(this, verifyType);
     }
 
     public override H5EnumAttribute<T> Write(T value)
@@ -47,7 +47,7 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
 
         H5Attribute WritePrimitive<TP>(TP value) where TP : unmanaged
         {
-            H5AAdapter.WritePrimitive(this, value);
+            H5AAdapter.WriteEnum<T, TP>(this, value);
             return this;
         }
     }
