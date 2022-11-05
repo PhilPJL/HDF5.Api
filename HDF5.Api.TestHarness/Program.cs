@@ -1,4 +1,5 @@
 ﻿using HDF5.Api.Attributes;
+using HDF5.Api.H5Types;
 
 namespace HDF5.Api.TestHarness
 {

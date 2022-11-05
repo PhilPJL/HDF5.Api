@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using HDF5.Api.NativeMethodAdapters;
+using HDF5.Api.H5Types;
 
 namespace HDF5.Api;
 

@@ -1,4 +1,4 @@
-﻿namespace HDF5.Api;
+﻿namespace HDF5.Api.H5Types;
 
 public class H5EnumType<T> : H5Type<T> // where T : unmanaged, Enum
 {

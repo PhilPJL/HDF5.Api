@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using HDF5.Api.H5Types;
 
 namespace HDF5.Api.Tests;
 

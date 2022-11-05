@@ -523,20 +523,18 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             using var file = CreateFile();
 
-            Assert.Fail("TODO");
-            // TODO:
-/*            using var type = H5Type.GetEquivalentNativeType<bool>();
-            Debug.WriteLine(type.GetClass());
-            using var size = H5Space.CreateScalar();
+            file.CreateAndWriteAttribute("boolTestTrue", true);
+            using var attributeTrue = file.OpenBooleanAttribute("boolTestTrue");
+            Assert.IsTrue(attributeTrue.Read());
+            attributeTrue.Write(false);
+            Assert.IsFalse(attributeTrue.Read());
 
-            using var attributeTrue = file.CreateAttribute("boolTestTrue", type, size);
-            attributeTrue.Write(true);
-            Assert.IsTrue(H5AAdapter.ReadBool(attributeTrue));
-
-            using var attributeFalse = file.CreateAttribute("boolTestFalse", type, size);
-            attributeFalse.Write(false);
-            Assert.IsFalse(H5AAdapter.ReadBool(attributeFalse));
-*/        });
+            file.CreateAndWriteAttribute("boolTestFalse", false);
+            using var attributeFalse = file.OpenBooleanAttribute("boolTestFalse");
+            Assert.IsFalse(attributeFalse.Read());
+            attributeFalse.Write(true);
+            Assert.IsTrue(attributeFalse.Read());
+        });
     }
 
     [TestMethod]

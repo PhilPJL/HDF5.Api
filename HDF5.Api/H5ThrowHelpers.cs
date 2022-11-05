@@ -1,4 +1,7 @@
-﻿namespace HDF5.Api;
+﻿using HDF5.Api.Utils;
+using System.Diagnostics;
+
+namespace HDF5.Api;
 
 internal static class H5ThrowHelpers
 {
@@ -64,5 +67,15 @@ internal static class H5ThrowHelpers
             throw new H5Exception(
               $"Attribute storage size is {attributeStorageSize}, which does not match the marshalable size for type {typeof(T).Name} of {marshalSize}.");
         }
+    }
+
+    internal static void ThrowIfManaged<T>()
+    {
+#if DEBUG
+        if (!typeof(T).IsUnmanaged())
+        {
+            throw new InvalidOperationException($"{typeof(T).Name} is a managed type. Only unmanaged types are valid.");
+        }
+#endif
     }
 }

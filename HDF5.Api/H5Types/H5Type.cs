@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5.Api.NativeMethodAdapters;
 
-namespace HDF5.Api;
+namespace HDF5.Api.H5Types;
 
 /// <summary>
 ///     <para>.NET wrapper for H5T (Type) API.</para>
@@ -77,11 +77,11 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(dataType);
 
-        H5TAdapter.Insert(this, name, new IntPtr(offset), dataType);
+        H5TAdapter.Insert(this, name, new ssize_t(offset), dataType);
         return this;
     }
 
-    public H5Type Insert([DisallowNull] string name, IntPtr offset, [DisallowNull] H5Type dataType)
+    public H5Type Insert([DisallowNull] string name, ssize_t offset, [DisallowNull] H5Type dataType)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(dataType);
@@ -180,65 +180,6 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 public class H5Type<T> : H5Type
 {
     internal H5Type(long handle) : base(handle)
-    {
-    }
-}
-
-public class H5BooleanType : H5Type<bool>
-{
-    internal H5BooleanType(long handle) : base(handle)
-    {
-    }
-}
-
-public class H5TimeSpanType : H5Type<TimeSpan>
-{
-    internal H5TimeSpanType(long handle) : base(handle)
-    {
-    }
-}
-
-public class H5DecimalType : H5Type<decimal>
-{
-    internal H5DecimalType(long handle) : base(handle)
-    {
-    }
-}
-
-public class H5DateTimeType : H5Type<DateTime>
-{
-    internal H5DateTimeType(long handle) : base(handle)
-    {
-    }
-}
-
-public class H5DateTimeOffsetType : H5Type<DateTimeOffset>
-{
-    internal H5DateTimeOffsetType(long handle) : base(handle)
-    {
-    }
-}
-
-#if NET7_0_OR_GREATER
-public class H5TimeOnlyType : H5Type<TimeOnly>
-{
-    internal H5TimeOnlyType(long handle) : base(handle)
-    {
-    }
-}
-#endif
-
-public class H5PrimitiveType<T> : H5Type<T> //where T : unmanaged
-{
-    internal H5PrimitiveType(long handle) : base(handle)
-    {
-        // TODO: assert is unmanaged
-    }
-}
-
-public class H5CompoundType<T> : H5Type<T> 
-{
-    internal H5CompoundType(long handle) : base(handle)
     {
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace HDF5.Api.Tests;
+﻿using HDF5.Api.H5Types;
+
+namespace HDF5.Api.Tests;
 
 public abstract class H5LocationTests<TTest> : H5Test<TTest> where TTest : H5LocationTests<TTest>
 {

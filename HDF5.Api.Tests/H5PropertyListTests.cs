@@ -1,4 +1,7 @@
-﻿namespace HDF5.Api.Tests;
+﻿using HDF5.Api.H5Attributes;
+using HDF5.Api.H5Types;
+
+namespace HDF5.Api.Tests;
 
 [TestClass]
 public class H5PropertyListTests : H5Test<H5PropertyListTests>
@@ -81,13 +84,12 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
             Assert.IsTrue(dspa2.IsEqualTo(dspa3));
 
             // attribute
-            //file.CreateAndWriteAttribute("IntAttribute", 1);
-            //using var att = file.OpenAttribute("IntAttribute");
-            //using var apc1 = att.GetCreationPropertyList();
-            //using var apc2 = H5Attribute.CreateCreationPropertyList();
-            //using var apc3 = new H5AttributeCreationPropertyList();
-            //Assert.IsTrue(apc1.IsEqualTo(apc2));
-            Assert.Fail("TODO");
+            file.CreateAndWriteAttribute("IntAttribute", 1);
+            using var att = file.OpenPrimitiveAttribute<int>("IntAttribute");
+            using var apc1 = att.GetCreationPropertyList();
+            using var apc2 = H5Attribute.CreateCreationPropertyList();
+            using var apc3 = new H5AttributeCreationPropertyList();
+            Assert.IsTrue(apc1.IsEqualTo(apc2));
 
             // data type
             using var dtc1 = H5Type.CreateCreationPropertyList();

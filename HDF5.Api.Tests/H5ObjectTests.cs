@@ -1,4 +1,6 @@
-﻿namespace HDF5.Api.Tests
+﻿using HDF5.Api.H5Types;
+
+namespace HDF5.Api.Tests
 {
     [TestClass]
     public class H5ObjectTests : H5Test<H5ObjectTests>
@@ -29,9 +31,9 @@
                 type.AssertHasHandleType(HandleType.Type);
 
                 // Create attribute
-                Assert.Fail("TODO"); 
-                //using var att = group.CreateAttribute("att", type, space);
-                //att.AssertHasHandleType(HandleType.Attribute);
+                group.CreateAndWriteAttribute("att", 1);
+                using var att = group.OpenPrimitiveAttribute<int>("att");
+                att.AssertHasHandleType(HandleType.Attribute);
 
                 // Create data set
                 using var ds = CreateTestDataset(group, "ds");

@@ -1,4 +1,5 @@
-﻿using HDF5.Api.NativeMethodAdapters;
+﻿using HDF5.Api.H5Types;
+using HDF5.Api.NativeMethodAdapters;
 using System.Collections.Generic;
 using System.Linq;
 

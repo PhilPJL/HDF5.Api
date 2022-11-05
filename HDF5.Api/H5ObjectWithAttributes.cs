@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
+using HDF5.Api.H5Attributes;
+using HDF5.Api.H5Types;
 using HDF5.Api.NativeMethodAdapters;
 using System.Collections.Generic;
 

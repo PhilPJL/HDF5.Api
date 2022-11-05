@@ -1,4 +1,6 @@
-﻿namespace HDF5.Api.Tests;
+﻿using HDF5.Api.H5Types;
+
+namespace HDF5.Api.Tests;
 
 [TestClass]
 public class H5DataSetTests : H5Test<H5DataSetTests>

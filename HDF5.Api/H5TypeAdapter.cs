@@ -1,4 +1,5 @@
 ﻿using HDF5.Api.Disposables;
+using HDF5.Api.H5Types;
 using System.Collections.Generic;
 using System.Linq;
 

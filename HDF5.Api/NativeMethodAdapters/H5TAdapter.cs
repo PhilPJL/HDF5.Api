@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Diagnostics;
+using HDF5.Api.H5Types;
 #if NET7_0_OR_GREATER
 using CommunityToolkit.HighPerformance.Buffers;
+using HDF5.Api.H5Types;
 #endif
 using HDF5.Api.NativeMethods;
 using System.Linq;
