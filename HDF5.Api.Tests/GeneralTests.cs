@@ -62,9 +62,9 @@ public class GeneralTests : H5Test<H5AttributeTests>
                 "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
                 "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
 
-            file.CreateAndWriteAttribute("DateTime", dt);
-            file.CreateAndWriteAttribute("shortstring", shortString, 101);
-            file.CreateAndWriteAttribute("longstring", longString, 1001);
+            file.WriteAttribute("DateTime", dt);
+            file.WriteAttribute("shortstring", shortString, 101);
+            file.WriteAttribute("longstring", longString, 1001);
 
             var dt2 = file.ReadAttribute<DateTime>("DateTime");
             Assert.AreEqual(dt, dt2);

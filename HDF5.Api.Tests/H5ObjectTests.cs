@@ -31,7 +31,7 @@ namespace HDF5.Api.Tests
                 type.AssertHasHandleType(HandleType.Type);
 
                 // Create attribute
-                group.CreateAndWriteAttribute("att", 1);
+                group.WriteAttribute("att", 1);
                 using var att = group.OpenPrimitiveAttribute<int>("att");
                 att.AssertHasHandleType(HandleType.Attribute);
 

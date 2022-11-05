@@ -353,7 +353,7 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     {
         HandleCheck((file) =>
         {
-            file.CreateAndWriteAttribute("test", "1111111111111111111111111111111111", 50);
+            file.WriteAttribute("test", "1111111111111111111111111111111111", 50);
 
             // Flush just for code coverage
             file.Flush();

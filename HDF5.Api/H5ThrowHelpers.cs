@@ -69,13 +69,19 @@ internal static class H5ThrowHelpers
         }
     }
 
+    internal static void ThrowIfNotEnum<T>()
+    {
+        if (!typeof(T).IsEnum)
+        {
+            throw new InvalidOperationException($"{typeof(T).Name} must be an Enum.");
+        }
+    }
+
     internal static void ThrowIfManaged<T>()
     {
-#if DEBUG
         if (!typeof(T).IsUnmanaged())
         {
             throw new InvalidOperationException($"{typeof(T).Name} is a managed type. Only unmanaged types are valid.");
         }
-#endif
     }
 }

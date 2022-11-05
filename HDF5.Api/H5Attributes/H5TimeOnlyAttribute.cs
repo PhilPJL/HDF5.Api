@@ -11,14 +11,14 @@ public class H5TimeOnlyAttribute : H5Attribute<TimeOnly, H5TimeOnlyAttribute, H5
     {
     }
 
-    public override H5TimeOnlyType GetH5Type()
+    public override H5TimeOnlyType GetAttributeType()
     {
         return H5AAdapter.GetType(this, h => new H5TimeOnlyType(h));
     }
 
     public override TimeOnly Read(bool verifyType = false)
     {
-        using var type = GetH5Type();
+        using var type = GetAttributeType();
         using var expectedType = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
 
         // TODO: sort out the type/expectedType/cls stuff

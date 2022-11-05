@@ -9,7 +9,7 @@ public class H5DateTimeAttribute : H5Attribute<DateTime, H5DateTimeAttribute, H5
     {
     }
 
-    public override H5DateTimeType GetH5Type()
+    public override H5DateTimeType GetAttributeType()
     {
         return H5AAdapter.GetType(this, h => new H5DateTimeType(h));
     }
@@ -17,7 +17,7 @@ public class H5DateTimeAttribute : H5Attribute<DateTime, H5DateTimeAttribute, H5
     public override DateTime Read(bool verifyType = false)
     {
         // TODO: optionally write value.ToString("O")
-        using var type = GetH5Type();
+        using var type = GetAttributeType();
 
         // TODO: sort out the type/expectedType/cls stuff
         long dateTime = H5AAdapter.ReadImpl<long>(this, type, type);

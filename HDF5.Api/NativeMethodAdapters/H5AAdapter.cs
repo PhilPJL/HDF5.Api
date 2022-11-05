@@ -17,20 +17,24 @@ internal static unsafe class H5AAdapter
         close(attribute).ThrowIfError();
     }
 
-    internal static TA Create<T, TA>(
+    internal static TA Create<T, TA, TT>(
         H5Object<T> h5Object,
         string name,
-        H5Type type,
-        H5Space space,
+        Func<TT> typeCtor,
+        Func<H5Space> spaceCtor,
         Func<long, TA> attributeCtor)
         where T : H5Object<T>
         where TA : H5Attribute
+        where TT : H5Type
     {
         h5Object.AssertHasWithAttributesHandleType();
 
         using var creationPropertyList = CreateCreationPropertyList(CharacterSet.Utf8);
 
         long h;
+
+        using var type = typeCtor();
+        using var space = spaceCtor();
 
 #if NET7_0_OR_GREATER
         h = create(h5Object, name, type, space, creationPropertyList);
@@ -50,16 +54,56 @@ internal static unsafe class H5AAdapter
     {
         h5Object.AssertHasWithAttributesHandleType();
 
-        using var type = fixedStorageLength != 0
-            ? H5TAdapter.CreateFixedLengthStringType(fixedStorageLength)
-            : H5TAdapter.CreateVariableLengthStringType();
+        H5StringType typeCtor()
+        {
+            var type = fixedStorageLength != 0
+                ? H5TAdapter.CreateFixedLengthStringType(fixedStorageLength)
+                : H5TAdapter.CreateVariableLengthStringType();
 
-        type.CharacterSet = cset;
-        type.StringPadding = padding;
+            type.CharacterSet = cset;
+            type.StringPadding = padding;
 
-        using var memorySpace = H5SAdapter.CreateScalar();
-        return Create(h5Object, name, type, memorySpace, h => new H5StringAttribute(h));
+            return type;
+        }
+
+        return Create(h5Object, name, typeCtor, H5Space.CreateScalar, h => new H5StringAttribute(h));
     }
+
+    internal static TA Open<T, TA>(H5Object<T> h5Object, string name, Func<long, TA> attributeCtor)
+        where T : H5Object<T>
+        where TA : H5Attribute
+    {
+        h5Object.AssertHasWithAttributesHandleType();
+
+        long h = 0;
+
+#if NET7_0_OR_GREATER
+        h = open(h5Object, name);
+#else
+        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
+        {
+            h = open(h5Object, nameBytesPtr);
+        }
+#endif
+
+        return attributeCtor(h);
+    }
+
+/*    internal static TA CreateOrOpen<T, TA, TT>(
+        H5Object<T> h5Object, string name, Func<TT> typeCtor, Func<H5Space> spaceCtor, Func<long, TA> attributeCtor)
+        where T : H5Object<T>
+        where TA : H5Attribute
+        where TT : H5Type
+    {
+        if (Exists(h5Object, name))
+        {
+            return Open(h5Object, name, attributeCtor);
+        }
+        else
+        {
+            return Create(h5Object, name, typeCtor, spaceCtor, attributeCtor);
+        }
+    }*/
 
     internal static void Delete<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
@@ -189,26 +233,6 @@ internal static unsafe class H5AAdapter
     internal static TT GetType<TT>(H5Attribute attribute, Func<long, TT> typeCtor) where TT : H5Type
     {
         return typeCtor(get_type(attribute));
-    }
-
-    internal static TA Open<T, TA>(H5Object<T> h5Object, string name, Func<long, TA> attributeCtor)
-        where T : H5Object<T>
-        where TA : H5Attribute
-    {
-        h5Object.AssertHasWithAttributesHandleType();
-
-        long h = 0;
-
-#if NET7_0_OR_GREATER
-        h = open(h5Object, name);
-#else
-        fixed (byte* nameBytesPtr = Encoding.UTF8.GetBytes(name))
-        {
-            h = open(h5Object, nameBytesPtr);
-        }
-#endif
-
-        return attributeCtor(h);
     }
 
     #region Read

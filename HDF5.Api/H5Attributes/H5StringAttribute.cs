@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Diagnostics;
+#if NET7_0_OR_GREATER
 using CommunityToolkit.HighPerformance.Buffers;
+#endif
 using HDF5.Api.H5Types;
 using HDF5.Api.NativeMethodAdapters;
 using HDF5.Api.NativeMethods;
@@ -13,7 +15,7 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
     {
     }
 
-    public override H5StringType GetH5Type()
+    public override H5StringType GetAttributeType()
     {
         return H5AAdapter.GetType(this, h => new H5StringType(h));
     }
@@ -36,7 +38,7 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
     {
         // TODO: handle array of strings
 
-        using var type = (H5StringType)attribute.GetH5Type();
+        using var type = attribute.GetAttributeType();
         using var space = attribute.GetSpace();
 
         var cls = type.GetClass();
@@ -97,7 +99,7 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
 
     private static unsafe string Read(H5StringAttribute attribute)
     {
-        using var type = attribute.GetH5Type();
+        using var type = attribute.GetAttributeType();
         using var space = attribute.GetSpace();
 
         var count = space.GetSimpleExtentNPoints();

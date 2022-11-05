@@ -16,7 +16,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     {
         HandleCheck2((file) =>
         {
-            Test(file, "fixed_null", null, 10, characterSet, padding);
+            //Test(file, "fixed_null", null!, 10, characterSet, padding); // will throw
             Test(file, "fixed_empty", "", 10, characterSet, padding);
             Test(file, "fixed_22", "12345678912345678912", 32, characterSet, padding);
 
@@ -27,16 +27,12 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 Test(file, "fixed_500", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 500, characterSet, padding);
             }
 
-            static void Test<T>(H5ObjectWithAttributes<T> file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+            static void Test<T>(H5ObjectWithAttributes<T> file, string name, string value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
                  where T : H5ObjectWithAttributes<T>
             {
-                using var attribute = file.CreateStringAttribute(name, fixedStorageLength, characterSet, padding);
+                file.WriteAttribute(name, value, fixedStorageLength, characterSet, padding);
 
-                if (value != null)
-                {
-                    attribute.Write(value);
-                }
-
+                using var attribute = file.OpenStringAttribute(name);
                 var r = attribute.Read();
 
                 // NOTE: assuming that if no value is written ReadString will return string.Empty
@@ -58,7 +54,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     {
         HandleCheck2((file) =>
         {
-            Test(file, "variable_null", null, 0, characterSet, padding);
+            //Test(file, "variable_null", null, 0, characterSet, padding);
             Test(file, "variable_empty", "", 0, characterSet, padding);
             Test(file, "variable_short", "12345678912345678912", 0, characterSet, padding);
 
@@ -69,16 +65,10 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 Test(file, "variable_long", "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ᛬", 0, characterSet, padding);
             }
 
-            static void Test<T>(H5ObjectWithAttributes<T> file, string name, string? value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
+            static void Test<T>(H5ObjectWithAttributes<T> file, string name, string value, int fixedStorageLength, CharacterSet characterSet, StringPadding padding)
                 where T : H5ObjectWithAttributes<T>
             {
-                using (var attribute = file.CreateStringAttribute(name, fixedStorageLength, characterSet, padding))
-                {
-                    if (value != null)
-                    {
-                        attribute.Write(value);
-                    }
-                }
+                file.WriteAttribute(name, value, fixedStorageLength, characterSet, padding);
 
                 using (var attribute = file.OpenStringAttribute(name))
                 {
@@ -105,26 +95,26 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             using var group = file.CreateGroup("group");
 
             // Create duplicate attribute on file
-            file.CreateAndWriteAttribute(attributeName, 1);
-            Assert.ThrowsException<H5Exception>(() => file.CreateAndWriteAttribute(attributeName, 2));
+            file.WriteAttribute(attributeName, 1);
+            Assert.ThrowsException<H5Exception>(() => file.WriteAttribute(attributeName, 2, writeBehaviour: AttributeWriteBehaviour.ThrowIfAlreadyExists));
 
             // Create duplicate attribute on group
-            group.CreateAndWriteAttribute(attributeName, 1);
-            Assert.ThrowsException<H5Exception>(() => group.CreateAndWriteAttribute(attributeName, 2));
+            group.WriteAttribute(attributeName, 1);
+            Assert.ThrowsException<H5Exception>(() => group.WriteAttribute(attributeName, 2, writeBehaviour: AttributeWriteBehaviour.ThrowIfAlreadyExists));
 
             // Create test dataset on file
             using var datasetFile = H5DataSetTests.CreateTestDataset(file, "aDataSet");
 
             // Create duplicate attribute on data set on file
-            datasetFile.CreateAndWriteAttribute(attributeName, 1);
-            Assert.ThrowsException<H5Exception>(() => datasetFile.CreateAndWriteAttribute(attributeName, 2));
+            datasetFile.WriteAttribute(attributeName, 1);
+            Assert.ThrowsException<H5Exception>(() => datasetFile.WriteAttribute(attributeName, 2, writeBehaviour: AttributeWriteBehaviour.ThrowIfAlreadyExists));
 
             // Create test dataset on group
             using var datasetGroup = H5DataSetTests.CreateTestDataset(group, "aDataSet");
 
             // Create duplicate attribute on data set on group
-            datasetGroup.CreateAndWriteAttribute(attributeName, 1);
-            Assert.ThrowsException<H5Exception>(() => datasetGroup.CreateAndWriteAttribute(attributeName, 2));
+            datasetGroup.WriteAttribute(attributeName, 1);
+            Assert.ThrowsException<H5Exception>(() => datasetGroup.WriteAttribute(attributeName, 2, writeBehaviour: AttributeWriteBehaviour.ThrowIfAlreadyExists));
 
             // File + Group + 2 x DataSet
             Assert.AreEqual(4, file.GetObjectCount());
@@ -140,14 +130,14 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             // Create group
             using var group = file.CreateGroup("group");
 
-            group.CreateAndWriteAttribute("int", 1);
-            group.CreateAndWriteAttribute("string", "short", 10);
-            group.CreateAndWriteAttribute("long", 1L);
+            group.WriteAttribute("int", 1);
+            group.WriteAttribute("string", "short", 10);
+            group.WriteAttribute("long", 1L);
 
             group.DeleteAttribute("string");
 
             const string s = "long-----------------------------------";
-            group.CreateAndWriteAttribute("string", s, 100);
+            group.WriteAttribute("string", s, 100);
 
             string s1 = group.ReadAttribute<string>("string");
             Assert.AreEqual(s, s1);
@@ -165,8 +155,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             // Create group
             using var group = file.CreateGroup("group");
 
-            group.CreateAndWriteAttribute("int", 1);
-            group.CreateAndWriteAttribute("string", "short", 10);
+            group.WriteAttribute("int", 1);
+            group.WriteAttribute("string", "short", 10);
 
             string s1 = group.ReadAttribute<string>("string");
             Assert.AreEqual("short", s1);
@@ -184,7 +174,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     {
         HandleCheck((file) =>
         {
-            file.CreateAndWriteEnumAttribute("test-ulong.min", TestULong.Min);
+            file.WriteAttribute("test-ulong.min", TestULong.Min);
 
             var valueTestUlongMin = file.ReadAttribute<TestULong>("test-ulong.min");
             Assert.AreEqual(valueTestUlongMin, TestULong.Min);
@@ -201,70 +191,79 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     // Helper methods
     internal static void CreateIterateAttributesSucceeds<T>(H5ObjectWithAttributes<T> location) where T : H5ObjectWithAttributes<T>
     {
-        location.CreateAndWriteAttribute("string", "This is a string 12345.", 50);
+        location.WriteAttribute("string", "This is a string 12345.", 50);
 
-        location.CreateAndWriteAttribute("dateTime", DateTime.Now);
-        location.CreateAndWriteAttribute("dateTimeOffset", DateTimeOffset.Now);
+        location.WriteAttribute("dateTime-min", DateTime.MinValue);
+        location.WriteAttribute("dateTime", DateTime.Now);
+        location.WriteAttribute("dateTime-max", DateTime.MaxValue);
+
+        location.WriteAttribute("dateTimeOffset-min", DateTimeOffset.MinValue);
+        location.WriteAttribute("dateTimeOffset", DateTimeOffset.Now);
+        location.WriteAttribute("dateTimeOffset-max", DateTimeOffset.MaxValue);
         
-        location.CreateAndWriteAttribute("timeSpan-min", TimeSpan.MinValue);
-        location.CreateAndWriteAttribute("timeSpan-max", TimeSpan.MaxValue);
+        location.WriteAttribute("timeSpan-min", TimeSpan.MinValue);
+        location.WriteAttribute("timeSpan-max", TimeSpan.MaxValue);
 
 #if NET7_0_OR_GREATER
-        location.CreateAndWriteAttribute("timeOnly-min", TimeOnly.MinValue);
-        location.CreateAndWriteAttribute("timeOnly-max", TimeOnly.MaxValue);
+        location.WriteAttribute("timeOnly-min", TimeOnly.MinValue);
+        location.WriteAttribute("timeOnly-max", TimeOnly.MaxValue);
 #endif
 
-        location.CreateAndWriteAttribute("bool-true", true);
-        location.CreateAndWriteAttribute("bool-false", false);
+        location.WriteAttribute("bool-true", true);
+        location.WriteAttribute("bool-false", false);
 
-        location.CreateAndWriteAttribute("byte-min", byte.MinValue);
-        location.CreateAndWriteAttribute("byte", (byte)5);
-        location.CreateAndWriteAttribute("byte-max", byte.MaxValue);
+        location.WriteAttribute("byte-min", byte.MinValue);
+        location.WriteAttribute("byte", (byte)5);
+        location.WriteAttribute("byte-max", byte.MaxValue);
 
-        location.CreateAndWriteAttribute("int16-min", short.MinValue);
-        location.CreateAndWriteAttribute("int16", (short)5);
-        location.CreateAndWriteAttribute("int16-max", short.MaxValue);
+        location.WriteAttribute("int16-min", short.MinValue);
+        location.WriteAttribute("int16", (short)5);
+        location.WriteAttribute("int16-max", short.MaxValue);
 
-        location.CreateAndWriteAttribute("uint16-min", ushort.MinValue);
-        location.CreateAndWriteAttribute("uint16", (ushort)6);
-        location.CreateAndWriteAttribute("uint16-max", ushort.MaxValue);
+        location.WriteAttribute("uint16-min", ushort.MinValue);
+        location.WriteAttribute("uint16", (ushort)6);
+        location.WriteAttribute("uint16-max", ushort.MaxValue);
 
-        location.CreateAndWriteAttribute("int32-min", int.MinValue);
-        location.CreateAndWriteAttribute("int32", 7);
-        location.CreateAndWriteAttribute("int32-max", int.MaxValue);
+        location.WriteAttribute("int32-min", int.MinValue);
+        location.WriteAttribute("int32", 7);
+        location.WriteAttribute("int32-max", int.MaxValue);
 
-        location.CreateAndWriteAttribute("uint32-min", uint.MinValue);
-        location.CreateAndWriteAttribute("uint32", 8u);
-        location.CreateAndWriteAttribute("uint32-max", uint.MaxValue);
+        location.WriteAttribute("uint32-min", uint.MinValue);
+        location.WriteAttribute("uint32", 8u);
+        location.WriteAttribute("uint32-max", uint.MaxValue);
 
-        location.CreateAndWriteAttribute("long-min", long.MinValue);
-        location.CreateAndWriteAttribute("long", 9L);
-        location.CreateAndWriteAttribute("long-max", long.MaxValue);
+        location.WriteAttribute("long-min", long.MinValue);
+        location.WriteAttribute("long", 9L);
+        location.WriteAttribute("long-max", long.MaxValue);
 
-        location.CreateAndWriteAttribute("ulong-min", ulong.MinValue);
-        location.CreateAndWriteAttribute("ulong", 10ul);
-        location.CreateAndWriteAttribute("ulong-max", ulong.MaxValue);
+        location.WriteAttribute("ulong-min", ulong.MinValue);
+        location.WriteAttribute("ulong", 10ul);
+        location.WriteAttribute("ulong-max", ulong.MaxValue);
 
-        location.CreateAndWriteAttribute("float-min", float.MinValue);
-        location.CreateAndWriteAttribute("float", 11.0f);
-        location.CreateAndWriteAttribute("float-max", float.MaxValue);
+        location.WriteAttribute("float-min", float.MinValue);
+        location.WriteAttribute("float", 11.0f);
+        location.WriteAttribute("float-max", float.MaxValue);
 
-        location.CreateAndWriteAttribute("double-min", double.MinValue);
-        location.CreateAndWriteAttribute("double", 12.0d);
-        location.CreateAndWriteAttribute("double-max", double.MaxValue);
+        location.WriteAttribute("double-min", double.MinValue);
+        location.WriteAttribute("double", 12.0d);
+        location.WriteAttribute("double-max", double.MaxValue);
 
         //location.CreateAndWriteAttribute("decimal-min", decimal.MinValue);
         //location.CreateAndWriteAttribute("decimal", 12.0m);
         //location.CreateAndWriteAttribute("decimal-max", decimal.MaxValue);
 
-        location.CreateAndWriteEnumAttribute("enumlong-min", TestLong.Min);
-        location.CreateAndWriteEnumAttribute("enumlong", TestLong.None);
-        location.CreateAndWriteEnumAttribute("enumlong-max", TestLong.Max);
+        location.WriteAttribute("enumlong-min", TestLong.Min);
+        location.WriteAttribute("enumlong", TestLong.None);
+        location.WriteAttribute("enumlong-max", TestLong.Max);
 
         // TODO: decimal
 
         var names = new List<string> {
+            "dateTime-min",
+            "dateTime-max",
             "dateTime",
+            "dateTimeOffset-min",
+            "dateTimeOffset-max",
             "dateTimeOffset",
             "timeSpan-min",
             "timeSpan-max",
@@ -351,7 +350,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             const string name = "dtTimeOnly";
 
-            location.CreateAndWriteAttribute(name, value);
+            location.WriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenTimeOnlyAttribute(name);
@@ -372,7 +371,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             const string name = "dtTimeSpan";
 
-            location.CreateAndWriteAttribute(name, value);
+            location.WriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenTimeSpanAttribute(name);
@@ -392,7 +391,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             const string name = "dtDateTime";
 
-            location.CreateAndWriteAttribute(name, value);
+            location.WriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenDateTimeAttribute(name);
@@ -412,7 +411,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             const string name = "dtDateTimeOffset";
 
-            location.CreateAndWriteAttribute(name, value);
+            location.WriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenDateTimeOffsetAttribute(name);
@@ -432,7 +431,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             const string name = "dtString";
 
-            location.CreateAndWriteAttribute(name, value, fixedStorageLength);
+            location.WriteAttribute(name, value, fixedStorageLength);
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenStringAttribute(name);
@@ -453,7 +452,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             string name = $"dt{typeof(TValue).Name}";
 
-            location.CreateAndWriteAttribute(name, value);
+            location.WriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenPrimitiveAttribute<TValue>(name);
@@ -472,7 +471,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             string name = $"dt{typeof(TValue).Name}";
 
-            location.CreateAndWriteEnumAttribute(name, value);
+            location.WriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenEnumAttribute<TValue>(name);
@@ -491,7 +490,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             string name = $"dt{typeof(bool).Name}";
 
-            location.CreateAndWriteAttribute(name, value);
+            location.WriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
             using var a = location.OpenBooleanAttribute(name);
@@ -519,10 +518,11 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         HandleCheck(() =>
         {
             using var file = CreateFile2(fileSuffix);
-            using var attribute = file.CreateStringAttribute(attributeName, value.Length * 4, encoding);
+            file.WriteAttribute(attributeName, value, value.Length * 4, encoding);
 
-            attribute.Write(value);
+            using var attribute = file.OpenStringAttribute(attributeName);
             var read = attribute.Read();
+
             Assert.AreEqual(value, read);
 
             Assert.IsTrue(file.AttributeExists(attributeName));
@@ -538,11 +538,11 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         HandleCheck(() =>
         {
             using var file = CreateFile();
-            using var attribute = file.CreateStringAttribute("duplicate", 100);
+            file.WriteAttribute("duplicate", "", 100);
 
             try
             {
-                using var attribute2 = file.CreateStringAttribute("duplicate", 100);
+                file.WriteAttribute("duplicate", "", 100, writeBehaviour: AttributeWriteBehaviour.ThrowIfAlreadyExists);
             }
             catch (H5Exception ex)
             {
@@ -553,7 +553,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                 Debug.WriteLine(msg);
                 Debug.WriteLine(toString);
 
-                Assert.AreEqual("attribute already exists→unable to create attribute", msg);
+                Assert.AreEqual("Attribute 'duplicate' already exists.", msg);
             }
         });
     }
@@ -565,13 +565,13 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             using var file = CreateFile();
 
-            file.CreateAndWriteAttribute("boolTestTrue", true);
+            file.WriteAttribute("boolTestTrue", true);
             using var attributeTrue = file.OpenBooleanAttribute("boolTestTrue");
             Assert.IsTrue(attributeTrue.Read());
             attributeTrue.Write(false);
             Assert.IsFalse(attributeTrue.Read());
 
-            file.CreateAndWriteAttribute("boolTestFalse", false);
+            file.WriteAttribute("boolTestFalse", false);
             using var attributeFalse = file.OpenBooleanAttribute("boolTestFalse");
             Assert.IsFalse(attributeFalse.Read());
             attributeFalse.Write(true);
@@ -599,15 +599,41 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             void CreateValue<T>(T valueMin, T valueMax) where T : unmanaged, Enum
             {
                 var nameMin = $"{typeof(T).Name}:{valueMin}";
-                file.CreateAndWriteEnumAttribute<T>(nameMin, valueMin);
+                file.WriteAttribute<T>(nameMin, valueMin);
                 using var attMin = file.OpenEnumAttribute<T>(nameMin);
                 Assert.AreEqual(valueMin, attMin.Read());
 
                 var nameMax = $"{typeof(T).Name}:{valueMax}";
-                file.CreateAndWriteEnumAttribute<T>(nameMax, valueMax);
+                file.WriteAttribute<T>(nameMax, valueMax);
                 using var attMax = file.OpenEnumAttribute<T>(nameMax);
                 Assert.AreEqual(valueMax, attMax.Read());
             }
+        });
+    }
+
+    [TestMethod]
+    public void CreateReadWriteOverwriteAttributeSucceeds()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+
+            var status = file.DeleteAttribute("test");
+            Assert.AreEqual(DeleteAttributeStatus.NotFound, status);
+
+            file.WriteAttribute("test", 1);
+            Assert.AreEqual(1, file.ReadAttribute<int>("test"));
+
+            file.WriteAttribute("test", 2);
+            Assert.AreEqual(2, file.ReadAttribute<int>("test"));
+
+            file.WriteAttribute("test", 3.0, writeBehaviour: AttributeWriteBehaviour.OverwriteIfAlreadyExists);
+            Assert.AreEqual(3.0, file.ReadAttribute<double>("test"));
+
+            status = file.DeleteAttribute("test");
+            Assert.AreEqual(DeleteAttributeStatus.Deleted, status);
+
+            // TODO: more testing of AttributeWriteBehaviour and mismatched types
         });
     }
 
@@ -620,7 +646,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             try
             {
-                using var attribute = file.CreateStringAttribute("", 100);
+                file.WriteAttribute("", "", 100);
             }
             catch (ArgumentException ex)
             {
@@ -640,11 +666,12 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         HandleCheck(() =>
         {
             using var file = CreateFile();
-            using var attribute = file.CreateStringAttribute("too_long", 21);
+            file.WriteAttribute("too_long", "01234567890123456789", 21); // doesn't throw
 
-            attribute.Write("01234567890123456789"); // doesn't throw
-
+            using var attribute = file.OpenStringAttribute("too_long");
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => attribute.Write("012345678901234567890")); // does throw
+
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => file.WriteAttribute("too_long2", "012345678901234567890", 21)); // does throw
         });
     }
 }

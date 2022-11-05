@@ -6,6 +6,7 @@ public class H5StringType : H5Type<string>
 {
     internal H5StringType(long handle) : base(handle)
     {
+        // TODO: verify type
     }
 
     internal static H5StringType CreateFixedLengthStringType(int length)

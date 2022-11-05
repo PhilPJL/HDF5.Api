@@ -13,8 +13,7 @@
  * access to either file, you may request a copy from help@hdfgroup.org.     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-
+using HDF5.Api;
 
 namespace UnitTests;
 
@@ -36,27 +35,27 @@ internal static class Utilities
         hid_t fapl = H5P.create(H5P.FILE_ACCESS);
         if (fapl < 0)
         {
-            throw new ApplicationException("H5P.create failed.");
+            throw new H5Exception("H5P.create failed.");
         }
         if (H5P.set_libver_bounds(fapl, version) < 0)
         {
-            throw new ApplicationException("H5P.set_libver_bounds failed.");
+            throw new H5Exception("H5P.set_libver_bounds failed.");
         }
         // use the core VFD, 64K increments, no backing store
         if (H5P.set_fapl_core(fapl, new IntPtr(65536),
             (uint)(backing_store ? 1 : 0)) < 0)
         {
-            throw new ApplicationException("H5P.set_fapl_core failed.");
+            throw new H5Exception("H5P.set_fapl_core failed.");
         }
         fileName = Path.GetTempFileName();
         hid_t file = H5F.create(fileName, H5F.ACC_TRUNC, H5P.DEFAULT, fapl);
         if (file < 0)
         {
-            throw new ApplicationException("H5F.create failed.");
+            throw new H5Exception("H5F.create failed.");
         }
         if (H5P.close(fapl) < 0)
         {
-            throw new ApplicationException("H5P.close failed.");
+            throw new H5Exception("H5P.close failed.");
         }
         return file;
     }
@@ -70,25 +69,25 @@ internal static class Utilities
         hid_t fapl = H5P.create(H5P.FILE_ACCESS);
         if (fapl < 0)
         {
-            throw new ApplicationException("H5P.create failed.");
+            throw new H5Exception("H5P.create failed.");
         }
         if (H5P.set_libver_bounds(fapl, H5F.libver_t.LATEST) < 0)
         {
-            throw new ApplicationException("H5P.set_libver_bounds failed.");
+            throw new H5Exception("H5P.set_libver_bounds failed.");
         }
         if (H5P.set_fclose_degree(fapl, H5F.close_degree_t.STRONG) < 0)
         {
-            throw new ApplicationException("H5P.set_fclose_degree failed.");
+            throw new H5Exception("H5P.set_fclose_degree failed.");
         }
         fileName = Path.GetTempFileName();
         hid_t file = H5F.create(fileName, H5F.ACC_TRUNC, H5P.DEFAULT, fapl);
         if (file < 0)
         {
-            throw new ApplicationException("H5F.create failed.");
+            throw new H5Exception("H5F.create failed.");
         }
         if (H5P.close(fapl) < 0)
         {
-            throw new ApplicationException("H5P.close failed.");
+            throw new H5Exception("H5P.close failed.");
         }
         return file;
     }
@@ -102,26 +101,26 @@ internal static class Utilities
         hid_t fapl = H5P.create(H5P.FILE_ACCESS);
         if (fapl < 0)
         {
-            throw new ApplicationException("H5P.create failed.");
+            throw new H5Exception("H5P.create failed.");
         }
         if (H5P.set_libver_bounds(fapl, H5F.libver_t.LATEST) < 0)
         {
-            throw new ApplicationException("H5P.set_libver_bounds failed.");
+            throw new H5Exception("H5P.set_libver_bounds failed.");
         }
         if (H5P.set_fclose_degree(fapl, H5F.close_degree_t.STRONG) < 0)
         {
-            throw new ApplicationException("H5P.set_fclose_degree failed.");
+            throw new H5Exception("H5P.set_fclose_degree failed.");
         }
         fileName = Path.GetTempFileName();
         hid_t file = H5F.create(fileName, H5F.ACC_TRUNC | H5F.ACC_SWMR_WRITE,
             H5P.DEFAULT, fapl);
         if (file < 0)
         {
-            throw new ApplicationException("H5F.create failed.");
+            throw new H5Exception("H5F.create failed.");
         }
         if (H5P.close(fapl) < 0)
         {
-            throw new ApplicationException("H5P.close failed.");
+            throw new H5Exception("H5P.close failed.");
         }
         return file;
     }

@@ -37,7 +37,7 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T> where T : H5Loca
         return (T)this;
     }
 
-    public IEnumerable<string> DataTypeNames => H5LAdapter.GetNamedDataTypeNames(this);
+    internal IEnumerable<string> DataTypeNames => H5LAdapter.GetNamedDataTypeNames(this);
 
     public void Enumerate(Action<H5Type> action)
     {
@@ -175,7 +175,7 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T> where T : H5Loca
         return (T)this;
     }
 
-    public H5Location<T> Commit(
+    internal H5Location<T> Commit(
         [DisallowNull] string name,
         [DisallowNull] H5Type h5Type)
     {
@@ -184,7 +184,7 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T> where T : H5Loca
         return (T)this;
     }
 
-    public H5Type OpenType(string name)
+    internal H5Type OpenType(string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 

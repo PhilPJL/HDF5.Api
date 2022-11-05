@@ -55,7 +55,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
     {
         HandleCheck((file) =>
         {
-            using var type = H5Type.CreateCompoundType<CompoundType>()
+            using var type = H5Type.CreateCompoundType<CompoundType, H5CompoundType<CompoundType>>(h => new H5CompoundType<CompoundType>(h))
                 .Insert<CompoundType, int>(nameof(CompoundType.Id))
                 .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
                 .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό));
@@ -73,7 +73,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
     {
         HandleCheck2((file) =>
         {
-            using (var type = H5Type.CreateCompoundType<CompoundType>()
+            using (var type = H5Type.CreateCompoundType<CompoundType, H5CompoundType<CompoundType>>(h => new H5CompoundType<CompoundType>(h))
                 .Insert<CompoundType, int>(nameof(CompoundType.Id))
                 .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
                 .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό)))
@@ -120,7 +120,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
     {
         HandleCheck((file) =>
         {
-            using var type = H5Type.CreateCompoundType<CompoundType>()
+            using var type = H5Type.CreateCompoundType<CompoundType, H5CompoundType<CompoundType>>(h => new H5CompoundType<CompoundType>(h))
                 .Insert<CompoundType, int>(nameof(CompoundType.Id))
                 .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
                 .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό));
@@ -136,12 +136,12 @@ public class H5TypeTests : H5Test<H5TypeTests>
     {
         HandleCheck((file) =>
         {
-            using var type = H5Type.CreateCompoundType<CompoundType>()
+            using var type = H5Type.CreateCompoundType<CompoundType, H5CompoundType<CompoundType>>(h => new H5CompoundType<CompoundType>(h))
                 .Insert<CompoundType, int>(nameof(CompoundType.Id))
                 .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
                 .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό));
 
-            Assert.ThrowsException<H5Exception>(() => type.CreateAndWriteAttribute("test", 1));
+            Assert.ThrowsException<H5Exception>(() => type.WriteAttribute("test", 1));
         });
     }
 
@@ -150,7 +150,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
     {
         HandleCheck((file) =>
         {
-            using var type = H5Type.CreateCompoundType<CompoundType>()
+            using var type = H5Type.CreateCompoundType<CompoundType, H5CompoundType<CompoundType>>(h => new H5CompoundType<CompoundType>(h))
                 .Insert<CompoundType, int>(nameof(CompoundType.Id))
                 .Insert<CompoundType, short>(nameof(CompoundType.ShortProperty))
                 .Insert<CompoundType, long>(nameof(CompoundType.Χαρακτηριστικό));

@@ -9,7 +9,7 @@ public class H5DecimalAttribute : H5Attribute<decimal, H5DecimalAttribute, H5Dec
     {
     }
 
-    public override H5DecimalType GetH5Type()
+    public override H5DecimalType GetAttributeType()
     {
         return H5AAdapter.GetType(this, h => new H5DecimalType(h));
     }

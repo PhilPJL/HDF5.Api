@@ -7,6 +7,7 @@ using HDF5.Api.NativeMethods;
 using System.Linq;
 using System.Reflection;
 using static HDF5.Api.NativeMethods.H5T;
+using HDF5.Api.H5Attributes;
 
 namespace HDF5.Api.NativeMethodAdapters;
 
@@ -43,25 +44,18 @@ internal static unsafe class H5TAdapter
     internal static void SetUTF8(H5Type type) => SetCharacterSet(type, CharacterSet.Utf8);
     internal static void SetAscii(H5Type type) => SetCharacterSet(type, CharacterSet.Ascii);
 
-    internal static H5Type CreateCompoundType(int size)
-    {
-        return new H5Type(create((class_t)DataTypeClass.Compound, new ssize_t(size)));
-    }
-
     /// <summary>
     ///     Create a Compound type in order to hold an <typeparamref name="T" /> plus additional space as defined by
     ///     <paramref name="extraSpace" />
     /// </summary>
-    internal static H5Type CreateCompoundType<T>(int extraSpace = 0) where T : unmanaged
+    internal static TT CreateCompoundType<T, TT>(Func<long, TT> typeCtor, int extraSpace = 0)
+        where T : unmanaged
     {
         int size = sizeof(T) + extraSpace;
-        return CreateCompoundType(size);
+        return typeCtor(create((class_t)DataTypeClass.Compound, new ssize_t(size)));
     }
 
     // TODO: create type from struct and/or class
-
-
-
     internal static H5Type CreateByteArrayType(params long[] dims)
     {
         return new H5Type(array_create(NATIVE_B8, (uint)dims.Length, dims.Select(d => (ulong)d).ToArray()));
@@ -82,14 +76,6 @@ internal static unsafe class H5TAdapter
         return new H5Type(vlen_create(NATIVE_B8));
     }
 
-    internal static H5Type CreateDateTimeOffsetType()
-    {
-        var type = CreateCompoundType<DateTimeOffsetProxy>();
-        type.Insert<DateTimeOffsetProxy, long>(nameof(DateTimeOffsetProxy.DateTime));
-        type.Insert<DateTimeOffsetProxy, int>(nameof(DateTimeOffsetProxy.Offset));
-        return type;
-    }
-
     internal static H5StringType CreateFixedLengthStringType(int storageLengthBytes)
     {
         var type = new H5StringType(copy(C_S1));
@@ -97,14 +83,13 @@ internal static unsafe class H5TAdapter
         try
         {
             type.Size = storageLengthBytes;
+            return type;
         }
         catch
         {
             type.Dispose();
             throw;
         }
-
-        return type;
     }
 
     internal static H5StringType CreateVariableLengthStringType()
@@ -113,9 +98,9 @@ internal static unsafe class H5TAdapter
     }
 
     internal static void InsertEnumMember<T>(H5Type type, string name, T value)
-        //where T : Enum //unmanaged, 
+    //where T : Enum //unmanaged, 
     {
-        // TODO: assert is unmanaged
+        H5ThrowHelpers.ThrowIfNotEnum<T>();
 
 #pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 #if NET7_0_OR_GREATER
@@ -196,6 +181,8 @@ internal static unsafe class H5TAdapter
 
     internal static H5EnumType<T> CreateEnumType<T>() //where T : Enum // unmanaged, 
     {
+        H5ThrowHelpers.ThrowIfNotEnum<T>();
+
         var h5EnumType = ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
 
         try
@@ -260,7 +247,13 @@ internal static unsafe class H5TAdapter
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="H5Exception"></exception>
-    internal static H5Type ConvertDotNetPrimitiveToH5NativeType<T>() // where T : unmanaged /* primitive would be nice */
+    internal static H5PrimitiveType<T> ConvertDotNetPrimitiveToH5NativeType<T>() // where T : unmanaged /* primitive would be nice */
+    {
+        return ConvertDotNetPrimitiveToH5Type<T, H5PrimitiveType<T>>(h => new H5PrimitiveType<T>(h));
+    }
+
+    internal static TT ConvertDotNetPrimitiveToH5Type<T, TT>(Func<long, TT> typeCtor)
+        where TT : H5Type
     {
         if (!typeof(T).IsPrimitive)
         {
@@ -293,7 +286,7 @@ internal static unsafe class H5TAdapter
         };
 
         // Copy the static handle so we can track and close it
-        return new H5Type(copy(handle));
+        return typeCtor(copy(handle));
     }
 
     internal static H5Type GetEquivalentNativeType(H5Type type)

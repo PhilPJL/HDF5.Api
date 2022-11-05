@@ -29,7 +29,7 @@ public sealed class TestRecordAdapter : H5TypeAdapter<TestRecord, TestRecordAdap
     public override H5Type GetH5Type()
     {
         return H5Type
-            .CreateCompoundType<STestRecord>()
+            .CreateCompoundType<STestRecord, H5CompoundType<STestRecord>>(h => new H5CompoundType<STestRecord>(h))
             .Insert<STestRecord, int>(nameof(STestRecord.Id))
             .Insert<STestRecord, short>(nameof(STestRecord.ShortProperty))
             .Insert<STestRecord, int>(nameof(STestRecord.IntProperty))

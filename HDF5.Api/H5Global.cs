@@ -89,6 +89,8 @@ public static class H5Global
     /// this.
     /// </summary>
     public static int MaxVariableLengthStringBuffer { get; set; } = 0x100000;
+
+    public static AttributeWriteBehaviour DefaultAttributeWriteBehaviour { get; set; } = AttributeWriteBehaviour.Default;
 }
 
 [Flags]
@@ -228,4 +230,37 @@ public enum LibraryVersion
     /// Use the latest possible format for storing objects
     /// </summary>
     Latest = Version110
+}
+
+/// <summary>
+/// Specify behaviour when writing a value to an attribute which already exists
+/// </summary>
+public enum AttributeWriteBehaviour
+{
+    /// <summary>
+    /// Global default = CreateOrUpdate
+    /// </summary>
+    Default = CreateOrUpdate,
+
+    /// <summary>
+    /// If the attribute does not exist either then create.
+    /// If the attribute does exist, check it's the correct type and then update the value.
+    /// </summary>
+    CreateOrUpdate = 0,
+
+    /// <summary>
+    /// Delete the existing attribute, create new attribute and set value.
+    /// </summary>
+    OverwriteIfAlreadyExists = 1,
+
+    /// <summary>
+    /// Throw exception if already exists.
+    /// </summary>
+    ThrowIfAlreadyExists = 2
+}
+
+public enum DeleteAttributeStatus
+{
+    NotFound,
+    Deleted
 }

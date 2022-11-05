@@ -84,7 +84,7 @@ public class H5PropertyListTests : H5Test<H5PropertyListTests>
             Assert.IsTrue(dspa2.IsEqualTo(dspa3));
 
             // attribute
-            file.CreateAndWriteAttribute("IntAttribute", 1);
+            file.WriteAttribute("IntAttribute", 1);
             using var att = file.OpenPrimitiveAttribute<int>("IntAttribute");
             using var apc1 = att.GetCreationPropertyList();
             using var apc2 = H5Attribute.CreateCreationPropertyList();

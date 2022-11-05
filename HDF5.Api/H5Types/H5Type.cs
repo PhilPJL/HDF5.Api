@@ -60,7 +60,7 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="H5Exception"></exception>
-    public static H5Type GetEquivalentNativeType<T>() //where T : unmanaged
+    public static H5PrimitiveType<T> GetEquivalentNativeType<T>() //where T : unmanaged
     {
         return H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<T>();
     }
@@ -107,20 +107,20 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         return H5TAdapter.CreateDoubleArrayType(size);
     }
 
-    public static H5Type CreateCompoundType(int size)
+/*    public static H5Type CreateCompoundType(int size)
     {
         return H5TAdapter.CreateCompoundType(size);
     }
-
+*/
     /// <summary>
     ///     Create a Compound type in order to hold an <typeparamref name="T" />
     /// </summary>
-    public static H5Type CreateCompoundType<T>() where T : unmanaged
+    public static TT CreateCompoundType<T, TT>(Func<long, TT> typeCtor) where T : unmanaged
     {
-        return H5TAdapter.CreateCompoundType<T>();
+        return H5TAdapter.CreateCompoundType<T, TT>(typeCtor);
     }
 
-    /// <summary>
+/*    /// <summary>
     ///     Create a Compound type in order to hold an <typeparamref name="T" /> plus additional space as defined by
     ///     <paramref name="extraSpace" />
     /// </summary>
@@ -128,7 +128,7 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     {
         return H5TAdapter.CreateCompoundType<T>(extraSpace);
     }
-
+*/
     public static H5Type CreateByteArrayType(int size)
     {
         return H5TAdapter.CreateByteArrayType(size);
@@ -177,11 +177,4 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     }
 
     internal int NumberOfMembers => H5TAdapter.GetNumberOfMembers(this);
-}
-
-public abstract class H5Type<T> : H5Type
-{
-    internal H5Type(long handle) : base(handle)
-    {
-    }
 }

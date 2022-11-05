@@ -9,7 +9,7 @@ public class H5TimeSpanAttribute : H5Attribute<TimeSpan, H5TimeSpanAttribute, H5
     {
     }
 
-    public override H5TimeSpanType GetH5Type()
+    public override H5TimeSpanType GetAttributeType()
     {
         return H5AAdapter.GetType(this, h => new H5TimeSpanType(h));
     }
@@ -17,7 +17,7 @@ public class H5TimeSpanAttribute : H5Attribute<TimeSpan, H5TimeSpanAttribute, H5
     public override TimeSpan Read(bool verifyType = false)
     {
         // TODO: optionally write value.ToString("G", CultureInfo.InvariantCulture)
-        using var type = GetH5Type();
+        using var type = GetAttributeType();
 
         // TODO: sort out the type/expectedType/cls stuff
         long timeSpan = H5AAdapter.ReadImpl<long>(this, type, type);

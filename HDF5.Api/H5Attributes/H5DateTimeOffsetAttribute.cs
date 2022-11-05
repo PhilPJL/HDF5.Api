@@ -9,7 +9,7 @@ public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset, H5DateTimeO
     {
     }
 
-    public override H5DateTimeOffsetType GetH5Type()
+    public override H5DateTimeOffsetType GetAttributeType()
     {
         return H5AAdapter.GetType(this, h => new H5DateTimeOffsetType(h));
     }
@@ -17,8 +17,8 @@ public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset, H5DateTimeO
     public override DateTimeOffset Read(bool verifyType = false)
     {
         // TODO: optionally write value.ToString("O")
-        using var type = GetH5Type();
-        using var expectedType = H5TAdapter.CreateDateTimeOffsetType();
+        using var type = GetAttributeType();
+        using var expectedType = H5DateTimeOffsetType.CreateType();
 
         // TODO: sort out the type/expectedType/cls stuff
         var value = H5AAdapter.ReadImpl<DateTimeOffsetProxy>(this, type, expectedType);
@@ -35,7 +35,7 @@ public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset, H5DateTimeO
         };
 
         // TODO: optionally write value.ToString("O")
-        using var type = H5TAdapter.CreateDateTimeOffsetType();
+        using var type = H5DateTimeOffsetType.CreateType();
         H5AAdapter.Write(this, type, dt);
 
         return this;

@@ -9,22 +9,22 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
 {
     internal H5EnumAttribute(long handle) : base(handle)
     {
-        H5ThrowHelpers.ThrowIfManaged<T>();
+        H5ThrowHelpers.ThrowIfNotEnum<T>();
     }
 
-    public override H5EnumType<T> GetH5Type()
+    public override H5EnumType<T> GetAttributeType()
     {
-        H5ThrowHelpers.ThrowIfManaged<T>();
+        H5ThrowHelpers.ThrowIfNotEnum<T>();
 
         return H5AAdapter.GetType(this, h => new H5EnumType<T>(h));
     }
 
     public override T Read(bool verifyType = false)
     {
-        H5ThrowHelpers.ThrowIfManaged<T>();
+        H5ThrowHelpers.ThrowIfNotEnum<T>();
 
         using var nativeType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
-        using var type = GetH5Type();
+        using var type = GetAttributeType();
 
         if (verifyType)
         {
@@ -40,7 +40,7 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
 
     public override H5EnumAttribute<T> Write(T value)
     {
-        H5ThrowHelpers.ThrowIfManaged<T>();
+        H5ThrowHelpers.ThrowIfNotEnum<T>();
         Guard.IsNotNull(value);
 
         WriteEnum();
@@ -65,7 +65,7 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
 
         H5Attribute WritePrimitive<TP>(TP value) where TP : unmanaged
         {
-            using var enumType = GetH5Type();
+            using var enumType = GetAttributeType();
             H5AAdapter.Write(this, enumType, value);
 
             return this;

@@ -9,7 +9,7 @@ public class H5CompoundAttribute<T> : H5Attribute<T, H5CompoundAttribute<T>, H5C
     {
     }
 
-    public override H5CompoundType<T> GetH5Type()
+    public override H5CompoundType<T> GetAttributeType()
     {
         return H5AAdapter.GetType(this, h => new H5CompoundType<T>(h));
     }

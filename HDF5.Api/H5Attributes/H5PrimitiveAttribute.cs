@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5.Api.H5Types;
 using HDF5.Api.NativeMethodAdapters;
-using System;
 
 namespace HDF5.Api.H5Attributes;
 
@@ -12,7 +11,7 @@ public class H5PrimitiveAttribute<T> : H5Attribute<T, H5PrimitiveAttribute<T>, H
         H5ThrowHelpers.ThrowIfManaged<T>();
     }
 
-    public override H5PrimitiveType<T> GetH5Type()
+    public override H5PrimitiveType<T> GetAttributeType()
     {
         H5ThrowHelpers.ThrowIfManaged<T>();
 
@@ -23,7 +22,7 @@ public class H5PrimitiveAttribute<T> : H5Attribute<T, H5PrimitiveAttribute<T>, H
     {
         H5ThrowHelpers.ThrowIfManaged<T>();
 
-        using var type = GetH5Type();
+        using var type = GetAttributeType();
         using var nativeType = H5Type.GetEquivalentNativeType<T>();
         return H5AAdapter.ReadImpl<T>(this, type, nativeType);
     }
@@ -33,7 +32,7 @@ public class H5PrimitiveAttribute<T> : H5Attribute<T, H5PrimitiveAttribute<T>, H
         H5ThrowHelpers.ThrowIfManaged<T>();
         Guard.IsNotNull(value);
 
-        using var type = GetH5Type();
+        using var type = GetAttributeType();
         H5AAdapter.Write(this, type, value);
 
         return this;
