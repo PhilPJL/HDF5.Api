@@ -287,7 +287,7 @@ internal static unsafe class H5TAdapter
             double => NATIVE_DOUBLE,
 
             // .NET char is 16 bit (UTF-16-ish)
-            char => NATIVE_UCHAR,
+            char => NATIVE_UINT16,
 
             _ => throw new H5Exception($"No mapping defined from {typeof(T).Name} to native type.")
         };

@@ -41,7 +41,6 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
                 // NOTE: assuming that if no value is written ReadString will return string.Empty
                 Assert.AreEqual(value ?? string.Empty, r);
-
                 Assert.AreEqual(name, attribute.Name);
             }
         },
@@ -304,6 +303,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     internal static void CreateWriteReadDeleteAttributesSucceeds<T>(H5ObjectWithAttributes<T> location) where T : H5ObjectWithAttributes<T>
     {
         // Create attributes
+        CreateWriteReadUpdateDeleteAttribute('a', 'b');
+        CreateWriteReadUpdateDeleteAttribute('a', 'Â');
         CreateWriteReadUpdateDeleteAttribute((short)15, (short)99);
         CreateWriteReadUpdateDeleteAttribute((ushort)15, (ushort)77);
         CreateWriteReadUpdateDeleteAttribute((byte)15, (byte)0xff);
@@ -333,9 +334,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             location.CreateAndWriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
-            Assert.AreEqual(value, location.ReadDateTimeAttribute(name));
-
             using var a = location.OpenDateTimeAttribute(name);
+            Assert.AreEqual(value, location.ReadDateTimeAttribute(name));
             Assert.AreEqual(value, a.Read());
 
             a.Write(newValue);
@@ -354,9 +354,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             location.CreateAndWriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
-            Assert.AreEqual(value, location.ReadDateTimeOffsetAttribute(name));
-
             using var a = location.OpenDateTimeOffsetAttribute(name);
+            Assert.AreEqual(value, location.ReadDateTimeOffsetAttribute(name));
             Assert.AreEqual(value, a.Read());
 
             a.Write(newValue);
@@ -375,23 +374,15 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             location.CreateAndWriteAttribute(name, value, fixedStorageLength);
             Assert.IsTrue(location.AttributeExists(name));
 
-            string readValue = location.ReadStringAttribute(name);
-
-            Assert.AreEqual(value, readValue);
-
             using var a = location.OpenStringAttribute(name);
-            string readValue2 = location.ReadStringAttribute(name);
-            string readValue2a = a.Read();
 
-            Assert.AreEqual(value, readValue2);
-            Assert.AreEqual(value, readValue2a);
+            Assert.AreEqual(value, location.ReadStringAttribute(name));
+            Assert.AreEqual(value, a.Read());
 
             a.Write(newValue);
 
-            string readValue3 = location.ReadStringAttribute(name);
-            string readValue3a = a.Read();
-            Assert.AreEqual(newValue, readValue3);
-            Assert.AreEqual(newValue, readValue3a);
+            Assert.AreEqual(newValue, location.ReadStringAttribute(name));
+            Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
@@ -404,16 +395,13 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             location.CreateAndWriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
-            var readValue = location.ReadAttribute<TValue>(name);
-            Assert.AreEqual(value, readValue);
-
             using var a = location.OpenPrimitiveAttribute<TValue>(name);
-            var readValue2 = location.ReadAttribute<TValue>(name);
-            Assert.AreEqual(value, readValue2);
+            Assert.AreEqual(value, location.ReadAttribute<TValue>(name));
+            Assert.AreEqual(value, a.Read());
 
             a.Write(newValue);
-            var readValue3 = location.ReadAttribute<TValue>(name);
-            Assert.AreEqual(newValue, readValue3);
+            Assert.AreEqual(newValue, location.ReadAttribute<TValue>(name));
+            Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
@@ -426,16 +414,13 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             location.CreateAndWriteEnumAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
-            var readValue = location.ReadEnumAttribute<TValue>(name);
-            Assert.AreEqual(value, readValue);
-
             using var a = location.OpenEnumAttribute<TValue>(name);
-            var readValue2 = location.ReadEnumAttribute<TValue>(name);
-            Assert.AreEqual(value, readValue2);
+            Assert.AreEqual(value, location.ReadEnumAttribute<TValue>(name));
+            Assert.AreEqual(value, a.Read());
 
             a.Write(newValue);
-            var readValue3 = location.ReadEnumAttribute<TValue>(name);
-            Assert.AreEqual(newValue, readValue3);
+            Assert.AreEqual(newValue, location.ReadEnumAttribute<TValue>(name));
+            Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));
@@ -448,16 +433,13 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             location.CreateAndWriteAttribute(name, value);
             Assert.IsTrue(location.AttributeExists(name));
 
-            var readValue = location.ReadBoolAttribute(name);
-            Assert.AreEqual(value, readValue);
-
             using var a = location.OpenBooleanAttribute(name);
-            var readValue2 = location.ReadBoolAttribute(name);
-            Assert.AreEqual(value, readValue2);
+            Assert.AreEqual(value, location.ReadBoolAttribute(name));
+            Assert.AreEqual(value, a.Read());
 
             a.Write(newValue);
-            var readValue3 = location.ReadBoolAttribute(name);
-            Assert.AreEqual(newValue, readValue3);
+            Assert.AreEqual(newValue, location.ReadBoolAttribute(name));
+            Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);
             Assert.IsFalse(location.AttributeExists(name));

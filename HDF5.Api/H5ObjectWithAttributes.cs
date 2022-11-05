@@ -181,15 +181,15 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
     }
 
     // TODO
-    /*    public void Enumerate(Action<H5Attribute> action)
+/*    public void Enumerate(Action<H5Attribute> action)
+    {
+        foreach (var name in AttributeNames)
         {
-            foreach (var name in AttributeNames)
-            {
-                using var h5Object = OpenAttribute(name);
-                action(h5Object);
-            }
+            using var h5Object = H5AAdapter.Open()...;
+            action(h5Object);
         }
-    */
+    }*/
+
 
     public void CreateAndWriteAttribute<TA>([DisallowNull] string name, TA value)
         where TA : unmanaged, IEquatable<TA>
@@ -198,15 +198,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         using var type = H5Type.GetEquivalentNativeType<TA>();
 
-        if (typeof(TA) == typeof(bool))
-        {
-            var byteValue = (byte)(value.Equals(default) ? 0 : 0x01);
-            CreateAndWriteAttribute(type, name, byteValue);
-        }
-        else
-        {
-            CreateAndWriteAttribute(type, name, value);
-        }
+        CreateAndWriteAttribute(type, name, value);
     }
 
     public void CreateAndWriteEnumAttribute<TA>([DisallowNull] string name, TA value) where TA : unmanaged, Enum
