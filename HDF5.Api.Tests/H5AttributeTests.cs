@@ -38,7 +38,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                     attribute.Write(value);
                 }
 
-                var r = attribute.Read<string>();
+                var r = attribute.Read();
 
                 // NOTE: assuming that if no value is written ReadString will return string.Empty
                 Assert.AreEqual(value ?? string.Empty, r);
@@ -82,9 +82,9 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
                     }
                 }
 
-                using (var attribute = file.OpenAttribute(name))
+                using (var attribute = file.OpenStringAttribute(name))
                 {
-                    var r = attribute.Read<string>();
+                    var r = attribute.Read();
 
                     // NOTE: assuming that if no value is written ReadString will return string.Empty
                     Assert.AreEqual(value ?? string.Empty, r);
@@ -188,15 +188,15 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             file.CreateAndWriteEnumAttribute("test-ulong.min", TestULong.Min);
 
-            var valueTestUlongMin = file.ReadEnumAttribute<TestULong>("test-ulong.min", true);
+            var valueTestUlongMin = file.ReadEnumAttribute<TestULong>("test-ulong.min");
             Assert.AreEqual(valueTestUlongMin, TestULong.Min);
 
             // mismatched type but should work because the value is zero
-            TestLong valueTestLong = file.ReadEnumAttribute<TestLong>("test-ulong.min", false);
+            TestLong valueTestLong = file.ReadEnumAttribute<TestLong>("test-ulong.min");
             Assert.AreEqual(valueTestLong, TestLong.None);
 
             // should throw
-            Assert.ThrowsException<H5Exception>(() => file.ReadEnumAttribute<TestLong>("test-ulong.min", true));
+            Assert.ThrowsException<H5Exception>(() => file.ReadEnumAttribute<TestLong>("test-ulong.min"));
         });
     }
 
@@ -337,13 +337,13 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             var readValue = location.ReadDateTimeAttribute(name);
             Assert.AreEqual(value, readValue);
 
-            using var a = location.OpenAttribute(name);
+            using var a = location.OpenDateTimeAttribute(name);
             a.Write(newValue);
 
             var readValue2 = location.ReadDateTimeAttribute(name);
             Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
-            var readValue3 = a.Read<DateTime>();
+            var readValue3 = a.Read();
             Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
             location.DeleteAttribute(name);
@@ -360,13 +360,13 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             var readValue = location.ReadDateTimeOffsetAttribute(name);
             Assert.AreEqual(value, readValue);
 
-            using var a = location.OpenAttribute(name);
+            using var a = location.OpenDateTimeOffsetAttribute(name);
             a.Write(newValue);
 
             var readValue2 = location.ReadDateTimeOffsetAttribute(name);
             Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
-            var readValue3 = a.Read<DateTimeOffset>();
+            var readValue3 = a.Read();
             Assert.IsTrue(Math.Abs((newValue - readValue2).TotalMilliseconds) < 1);
 
             location.DeleteAttribute(name);
@@ -384,7 +384,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             Assert.AreEqual(value, readValue);
 
-            using var a = location.OpenAttribute(name);
+            using var a = location.OpenStringAttribute(name);
             string readValue2 = location.ReadStringAttribute(name);
 
             Assert.AreEqual(value, readValue2);
@@ -408,7 +408,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             var readValue = location.ReadAttribute<TValue>(name);
             Assert.AreEqual(value, readValue);
 
-            using var a = location.OpenAttribute(name);
+            using var a = location.OpenPrimitiveAttribute<TValue>(name);
             var readValue2 = location.ReadAttribute<TValue>(name);
             Assert.AreEqual(value, readValue2);
 
@@ -430,7 +430,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             var readValue = location.ReadEnumAttribute<TValue>(name);
             Assert.AreEqual(value, readValue);
 
-            using var a = location.OpenAttribute(name);
+            using var a = location.OpenEnumAttribute<TValue>(name);
             var readValue2 = location.ReadEnumAttribute<TValue>(name);
             Assert.AreEqual(value, readValue2);
 
@@ -452,7 +452,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             var readValue = location.ReadBoolAttribute(name);
             Assert.AreEqual(value, readValue);
 
-            using var a = location.OpenAttribute(name);
+            using var a = location.OpenBooleanAttribute(name);
             var readValue2 = location.ReadBoolAttribute(name);
             Assert.AreEqual(value, readValue2);
 
@@ -480,7 +480,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             using var attribute = file.CreateStringAttribute(attributeName, value.Length * 4, encoding);
 
             attribute.Write(value);
-            var read = attribute.Read<string>();
+            var read = attribute.Read();
             Assert.AreEqual(value, read);
 
             Assert.IsTrue(file.AttributeExists(attributeName));
@@ -523,7 +523,9 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         {
             using var file = CreateFile();
 
-            using var type = H5Type.GetEquivalentNativeType<bool>();
+            Assert.Fail("TODO");
+            // TODO:
+/*            using var type = H5Type.GetEquivalentNativeType<bool>();
             Debug.WriteLine(type.GetClass());
             using var size = H5Space.CreateScalar();
 
@@ -534,7 +536,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             using var attributeFalse = file.CreateAttribute("boolTestFalse", type, size);
             attributeFalse.Write(false);
             Assert.IsFalse(H5AAdapter.ReadBool(attributeFalse));
-        });
+*/        });
     }
 
     [TestMethod]
@@ -556,7 +558,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             void CreateValue<T>(T valueMin, T valueMax) where T : unmanaged, Enum
             {
-                using var type = H5Type.CreateEnumType<T>();
+                Assert.Fail("TODO"); 
+/*                using var type = H5Type.CreateEnumType<T>();
                 using var attMin = file.CreateAttribute($"{typeof(T).Name}:{valueMin}", type, size);
                 attMin.Write(valueMin);
 
@@ -568,7 +571,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
                 var max = attMax.Read<T>();
                 Assert.AreEqual(valueMax, max);
-            }
+*/            }
         });
     }
 

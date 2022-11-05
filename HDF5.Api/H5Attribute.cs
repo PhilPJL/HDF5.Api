@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5.Api.NativeMethodAdapters;
 using HDF5.Api.Utils;
+using System.Diagnostics;
 
 namespace HDF5.Api;
 
@@ -29,191 +30,353 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AAdapter.GetSpace(this);
     }
 
-    internal H5Type GetH5Type()
-    {
-        return H5AAdapter.GetType(this);
-    }
-
     public string Name => H5AAdapter.GetName(this);
 
     internal int StorageSize => H5AAdapter.GetStorageSize(this);
 
-    #region Read
+    /*    #region Read
 
-    public T Read<T>()
-    {
-        if(typeof(T) == typeof(string))
+        public T Read<T>()
         {
-            return (T)ReadString();
-        }
-
-        return default(T) switch
-        {
-            // primitive
-            bool => ReadPrimitive(),
-            char => ReadPrimitive(),
-            sbyte => ReadPrimitive(),
-            byte => ReadPrimitive(),
-            short => ReadPrimitive(),
-            ushort => ReadPrimitive(),
-            int => ReadPrimitive(),
-            uint => ReadPrimitive(),
-            long => ReadPrimitive(),
-            ulong => ReadPrimitive(),
-            float => ReadPrimitive(),
-            double => ReadPrimitive(),
-
-            // decimal
-            decimal => (T)ReadDecimal(),
-
-            // enum
-            Enum => ReadEnum(),
-
-            // date & time
-            DateTime => (T)ReadDateTime(),
-            DateTimeOffset => (T)ReadDateTimeOffset(),
-            TimeSpan => (T)ReadTimeSpan(),
-
-            // everything else
-            _ => ReadCompound()
-        };
-
-        T ReadPrimitive()
-        {
-            T value = H5AAdapter.Read<T>(this);
-            if (value == null)
+            if(typeof(T) == typeof(string))
             {
-                throw new ArgumentNullException("value");
+                return (T)ReadString();
             }
-            return value;
+
+            return default(T) switch
+            {
+                // primitive
+                bool => ReadPrimitive(),
+                char => ReadPrimitive(),
+                sbyte => ReadPrimitive(),
+                byte => ReadPrimitive(),
+                short => ReadPrimitive(),
+                ushort => ReadPrimitive(),
+                int => ReadPrimitive(),
+                uint => ReadPrimitive(),
+                long => ReadPrimitive(),
+                ulong => ReadPrimitive(),
+                float => ReadPrimitive(),
+                double => ReadPrimitive(),
+
+                // decimal
+                decimal => (T)ReadDecimal(),
+
+                // enum
+                Enum => ReadEnum(),
+
+                // date & time
+                DateTime => (T)ReadDateTime(),
+                DateTimeOffset => (T)ReadDateTimeOffset(),
+                TimeSpan => (T)ReadTimeSpan(),
+
+                // everything else
+                _ => ReadCompound()
+            };
+
+            T ReadPrimitive()
+            {
+                T value = H5AAdapter.Read<T>(this);
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                return value;
+            }
+
+            object ReadString()
+            {
+                return H5AAdapter.ReadString(this);
+            }
+
+            T ReadEnum(bool verifyType = false)
+            {
+                return H5AAdapter.ReadEnum<T>(this, verifyType);
+            }
+
+            object ReadDateTime()
+            {
+                return DateTime.FromBinary(H5AAdapter.Read<long>(this));
+            }
+
+            object ReadDateTimeOffset()
+            {
+                return H5AAdapter.ReadDateTimeOffset(this);
+            }
+
+            object ReadTimeSpan()
+            {
+                return new TimeSpan(H5AAdapter.Read<long>(this));
+            }
+
+            object ReadDecimal()
+            {
+                throw new NotImplementedException();
+            }
+
+            T ReadCompound()
+            {
+                if (typeof(T).IsUnmanaged())
+                {
+                    return ReadCompoundUnmanaged();
+                }
+
+                throw new NotImplementedException();
+
+                T ReadCompoundUnmanaged()
+                {
+                    // TODO: optimised struct based
+                    throw new NotImplementedException();
+                }
+            }
         }
 
-        object ReadString()
+        #endregion
+
+        #region Write
+
+        public H5Attribute Write<T>([DisallowNull] T value)
         {
-            return H5AAdapter.ReadString(this);
+            Guard.IsNotNull(value);
+
+            return value switch
+            {
+                // primitive
+                bool number => WritePrimitive(number),
+                char number => WritePrimitive(number),
+                sbyte number => WritePrimitive(number),
+                byte number => WritePrimitive(number),
+                short number => WritePrimitive(number),
+                ushort number => WritePrimitive(number),
+                int number => WritePrimitive(number),
+                uint number => WritePrimitive(number),
+                long number => WritePrimitive(number),
+                ulong number => WritePrimitive(number),
+                float number => WritePrimitive(number),
+                double number => WritePrimitive(number),
+
+                // enum
+                Enum @enum => WriteEnum(@enum),
+
+                // decimal
+                decimal number => WriteDecimal(number),
+
+                // string
+                string s => WriteString(s),
+
+                // date & time
+                TimeSpan timeSpan => WriteTimeSpan(timeSpan),
+                DateTime dateTime => WriteDateTime(dateTime),
+                DateTimeOffset dateTimeOffset => WriteDateTimeOffset(dateTimeOffset),
+
+                // everything else
+                _ => WriteCompound(value)
+            };
+
+            H5Attribute WriteDecimal(decimal value)
+            {
+                // TODO: decimal is not primitive and is 16 bytes
+                throw new NotImplementedException();
+            }
+
+            H5Attribute WriteTimeSpan(TimeSpan value)
+            {
+                // TODO: optionally write ticks or value.ToString("G", CultureInfo.InvariantCulture)
+                return WritePrimitive(value.Ticks);
+            }
+
+            H5Attribute WriteDateTime(DateTime value)
+            {
+                // TODO: optionally write binary (ticks + kind) or value.ToString("O")
+                return WritePrimitive(value.ToBinary());
+            }
+
+            H5Attribute WriteDateTimeOffset(DateTimeOffset value)
+            {
+                H5AAdapter.Write(this, value);
+                return this;
+            }
+
+            H5Attribute WritePrimitive<TP>(TP value) where TP : unmanaged
+            {
+                H5AAdapter.Write(this, value);
+                return this;
+            }
+
+            H5Attribute WriteEnum(Enum value)
+            {
+                return value.GetTypeCode() switch
+                {
+                    TypeCode.Byte => WritePrimitive(Convert.ToByte(value)),
+                    TypeCode.SByte => WritePrimitive(Convert.ToSByte(value)),
+                    TypeCode.Int16 => WritePrimitive(Convert.ToInt16(value)),
+                    TypeCode.UInt16 => WritePrimitive(Convert.ToUInt16(value)),
+                    TypeCode.Int32 => WritePrimitive(Convert.ToInt32(value)),
+                    TypeCode.UInt32 => WritePrimitive(Convert.ToUInt32(value)),
+                    TypeCode.Int64 => WritePrimitive(Convert.ToInt64(value)),
+                    TypeCode.UInt64 => WritePrimitive(Convert.ToUInt64(value)),
+                    _ => throw new NotImplementedException(),
+                };
+            }
         }
 
-        T ReadEnum(bool verifyType = false)
-        {
-            return H5AAdapter.ReadEnum<T>(this, verifyType);
-        }
-
-        object ReadDateTime()
-        {
-            return DateTime.FromBinary(H5AAdapter.Read<long>(this));
-        }
-
-        object ReadDateTimeOffset()
-        {
-            return H5AAdapter.ReadDateTimeOffset(this);
-        }
-
-        object ReadTimeSpan()
-        {
-            return new TimeSpan(H5AAdapter.Read<long>(this));
-        }
-
-        object ReadDecimal()
-        {
-            throw new NotImplementedException();
-        }
-
-        T ReadCompound()
+        private H5Attribute WriteCompound<T>(T value)
         {
             if (typeof(T).IsUnmanaged())
             {
-                return ReadCompoundUnmanaged();
+                return WriteCompoundUnmanaged(value);
             }
 
+            // TODO: class based
             throw new NotImplementedException();
 
-            T ReadCompoundUnmanaged()
+            H5Attribute WriteCompoundUnmanaged(T value)
             {
                 // TODO: optimised struct based
                 throw new NotImplementedException();
             }
         }
+
+        #endregion
+    */
+}
+
+public abstract class H5Attribute<T> : H5Attribute
+{
+    internal H5Attribute(long handle) : base(handle)
+    {
     }
 
-    #endregion
+    [Conditional("DEBUG")]
+    internal void AssertIsUnmanaged()
+    {
+        if (!typeof(T).IsUnmanaged())
+        {
+            // TODO: improve message
+            throw new InvalidOperationException($"{typeof(T).Name} is managed.");
+        }
+    }
 
-    #region Write
+    public abstract H5Attribute<T>
+        //#else
+        //    public abstract H5Attribute
+        //#endif
+        Write([DisallowNull] T value);
 
-    public H5Attribute Write<T>([DisallowNull] T value)
+    //#if NET7_0_OR_GREATER
+    public virtual H5Type<T>
+    //#else
+    //    public virtual H5Type
+    //#endif
+    GetH5Type()
+    {
+        return H5AAdapter.GetType(this, h => new H5Type<T>(h));
+    }
+
+    public abstract T Read();
+
+    [DisallowNull]
+    public T Value
+    {
+        get => Read();
+        set => Write(value);
+    }
+}
+
+public class H5BooleanAttribute : H5Attribute<bool>
+{
+    internal H5BooleanAttribute(long handle) : base(handle)
+    {
+    }
+
+#if NET7_0_OR_GREATER
+    public override H5BooleanType GetH5Type()
+#else
+    public override H5Type<bool> GetH5Type()
+#endif
+    {
+        return H5AAdapter.GetType(this, h => new H5BooleanType(h));
+    }
+
+    public override bool Read()
+    {
+        return H5AAdapter.ReadBool(this);
+    }
+#if NET7_0_OR_GREATER
+    public override H5BooleanAttribute Write([DisallowNull] bool value)
+#else
+    public override H5Attribute<bool> Write([DisallowNull] bool value)
+#endif
     {
         Guard.IsNotNull(value);
 
-        return value switch
-        {
-            // primitive
-            bool number => WritePrimitive(number),
-            char number => WritePrimitive(number),
-            sbyte number => WritePrimitive(number),
-            byte number => WritePrimitive(number),
-            short number => WritePrimitive(number),
-            ushort number => WritePrimitive(number),
-            int number => WritePrimitive(number),
-            uint number => WritePrimitive(number),
-            long number => WritePrimitive(number),
-            ulong number => WritePrimitive(number),
-            float number => WritePrimitive(number),
-            double number => WritePrimitive(number),
+        H5AAdapter.WriteBool(this, value);
 
-            // enum
-            Enum @enum => WriteEnum(@enum),
+        return this;
+    }
+}
 
-            // decimal
-            decimal number => WriteDecimal(number),
+public class H5PrimitiveAttribute<T> : H5Attribute<T> //where T : unmanaged
+{
+    internal H5PrimitiveAttribute(long handle) : base(handle)
+    {
+    }
 
-            // string
-            string s => WriteString(s),
+#if NET7_0_OR_GREATER
+    public override H5PrimitiveType<T> GetH5Type()
+#else
+    public override H5Type<T> GetH5Type()
+#endif
+    {
+        return H5AAdapter.GetType(this, h => new H5PrimitiveType<T>(h));
+    }
 
-            // date & time
-            TimeSpan timeSpan => WriteTimeSpan(timeSpan),
-            DateTime dateTime => WriteDateTime(dateTime),
-            DateTimeOffset dateTimeOffset => WriteDateTimeOffset(dateTimeOffset),
+    public override T Read()
+    {
+        return H5AAdapter.Read<T>(this);
+    }
 
-            // everything else
-            _ => WriteCompound(value)
-        };
+    public override H5Attribute<T> Write([DisallowNull] T value)
+    {
+        Guard.IsNotNull(value);
 
-        H5Attribute WriteDecimal(decimal value)
-        {
-            // TODO: decimal is not primitive and is 16 bytes
-            throw new NotImplementedException();
-        }
+        H5AAdapter.Write(this, value);
 
-        H5Attribute WriteTimeSpan(TimeSpan value)
-        {
-            // TODO: optionally write ticks or value.ToString("G", CultureInfo.InvariantCulture)
-            return WritePrimitive(value.Ticks);
-        }
+        return this;
+    }
+}
 
-        H5Attribute WriteDateTime(DateTime value)
-        {
-            // TODO: optionally write binary (ticks + kind) or value.ToString("O")
-            return WritePrimitive(value.ToBinary());
-        }
+public class H5EnumAttribute<T> : H5Attribute<T>
+    where T : Enum // unmanaged
+{
+    internal H5EnumAttribute(long handle) : base(handle)
+    {
+    }
 
-        H5Attribute WriteDateTimeOffset(DateTimeOffset value)
-        {
-            H5AAdapter.Write(this, value);
-            return this;
-        }
+#if NET7_0_OR_GREATER
+    public override H5EnumType<T>
+#else
+    public override H5Type<T>
+#endif
+    GetH5Type()
+    {
+        return H5AAdapter.GetType(this, h => new H5EnumType<T>(h));
+    }
 
-        H5Attribute WritePrimitive<TP>(TP value) where TP : unmanaged
-        {
-            H5AAdapter.Write(this, value);
-            return this;
-        }
+    public override T Read()
+    {
+        return H5AAdapter.ReadEnum<T>(this);
+    }
 
-        H5Attribute WriteString([DisallowNull] string value)
-        {
-            H5AAdapter.Write(this, value);
-            return this;
-        }
+    public override H5Attribute<T> Write(T value)
+    {
+        Guard.IsNotNull(value);
 
-        H5Attribute WriteEnum(Enum value)
+        WriteEnum();
+
+        return this;
+
+        H5Attribute WriteEnum()
         {
             return value.GetTypeCode() switch
             {
@@ -228,24 +391,142 @@ public class H5Attribute : H5Object<H5Attribute>
                 _ => throw new NotImplementedException(),
             };
         }
-    }
 
-    private H5Attribute WriteCompound<T>(T value)
+        H5Attribute WritePrimitive<TP>(TP value) where TP : unmanaged
+        {
+            H5AAdapter.WritePrimitive(this, value);
+            return this;
+        }
+    }
+}
+
+public class H5StringAttribute : H5Attribute<string>
+{
+    internal H5StringAttribute(long handle) : base(handle)
     {
-        if (typeof(T).IsUnmanaged())
-        {
-            return WriteCompoundUnmanaged(value);
-        }
+        /*        using var type = GetH5Type();
 
-        // TODO: class based
-        throw new NotImplementedException();
+                var typeClass = type.GetClass();
 
-        H5Attribute WriteCompoundUnmanaged(T value)
-        {
-            // TODO: optimised struct based
-            throw new NotImplementedException();
-        }
+                if(typeClass != DataTypeClass.String)
+                {
+                    throw new H5Exception($"The attribute should be of class {DataTypeClass.String} but is of class {typeClass}.");
+                }*/
     }
 
-    #endregion
+#if NET7_0_OR_GREATER
+    public override H5StringType GetH5Type()
+#else
+    public override H5Type<string> GetH5Type()
+#endif
+    {
+        return H5AAdapter.GetType(this, h => new H5StringType(h));
+    }
+
+    public override string Read()
+    {
+        return H5AAdapter.ReadString(this);
+    }
+
+#if NET7_0_OR_GREATER
+    public override H5StringAttribute Write([DisallowNull] string value)
+#else
+    public override H5Attribute<string> Write([DisallowNull] string value)
+#endif
+    {
+        Guard.IsNotNull(value);
+
+        H5AAdapter.Write(this, value);
+
+        return this;
+    }
+}
+
+public class H5DecimalAttribute : H5Attribute<decimal>
+{
+    internal H5DecimalAttribute(long handle) : base(handle)
+    {
+    }
+
+    public override decimal Read()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override H5Attribute<decimal> Write([DisallowNull] decimal value)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class H5TimeSpanAttribute : H5Attribute<TimeSpan>
+{
+    internal H5TimeSpanAttribute(long handle) : base(handle)
+    {
+    }
+
+    public override TimeSpan Read()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override H5Attribute<TimeSpan> Write([DisallowNull] TimeSpan value)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class H5DateTimeAttribute : H5Attribute<DateTime>
+{
+    internal H5DateTimeAttribute(long handle) : base(handle)
+    {
+    }
+
+    public override DateTime Read()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override H5Attribute<DateTime> Write([DisallowNull] DateTime value)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset>
+{
+    internal H5DateTimeOffsetAttribute(long handle) : base(handle)
+    {
+    }
+
+    public override DateTimeOffset Read()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override H5Attribute<DateTimeOffset> Write([DisallowNull] DateTimeOffset value)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class H5CompoundAttribute<T> : H5Attribute<T>
+{
+    internal H5CompoundAttribute(long handle) : base(handle)
+    {
+    }
+
+    public override T Read()
+    {
+        throw new NotImplementedException();
+    }
+
+#if NET7_0_OR_GREATER
+    public override H5CompoundAttribute<T> Write([DisallowNull] T value)
+#else
+    public override H5Attribute<T> Write([DisallowNull] T value)
+#endif
+    {
+        throw new NotImplementedException();
+    }
 }

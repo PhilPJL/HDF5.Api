@@ -174,17 +174,26 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         return H5TAdapter.IsVariableLengthString(this);
     }
 
-    internal CharacterSet CharacterSet
-    {
-        get => H5TAdapter.GetCharacterSet(this);
-        set => H5TAdapter.SetCharacterSet(this, value);
-    }
-
-    internal StringPadding StringPadding
-    {
-        get => H5TAdapter.GetPadding(this);
-        set => H5TAdapter.SetPadding(this, value);
-    }
-
     internal int NumberOfMembers => H5TAdapter.GetNumberOfMembers(this);
+}
+
+public class H5Type<T> : H5Type
+{
+    internal H5Type(long handle) : base(handle)
+    {
+    }
+}
+
+public class H5BooleanType : H5Type<bool>
+{
+    internal H5BooleanType(long handle) : base(handle)
+    {
+    }
+}
+
+public class H5PrimitiveType<T> : H5Type<T> //where T : unmanaged
+{
+    internal H5PrimitiveType(long handle) : base(handle)
+    {
+    }
 }

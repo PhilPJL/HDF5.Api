@@ -20,11 +20,14 @@ internal static unsafe class H5AAdapter
         close(attribute).ThrowIfError();
     }
 
-    internal static H5Attribute Create<T>(
+    internal static TA Create<T, TA>(
         H5Object<T> h5Object,
         string name,
         H5Type type,
-        H5Space space) where T : H5Object<T>
+        H5Space space,
+        Func<long, TA> attributeCtor)
+        where T : H5Object<T>
+        where TA : H5Attribute
     {
         h5Object.AssertHasWithAttributesHandleType();
 
@@ -41,7 +44,7 @@ internal static unsafe class H5AAdapter
         }
 #endif
 
-        return new H5Attribute(h);
+        return attributeCtor(h);
     }
 
     internal static void Delete<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
@@ -169,13 +172,14 @@ internal static unsafe class H5AAdapter
         return (int)get_storage_size(attribute);
     }
 
-    internal static H5Type GetType(H5Attribute attribute)
+    internal static TT GetType<TT>(H5Attribute attribute, Func<long, TT> typeCtor) where TT : H5Type
     {
-        return new H5Type(get_type(attribute));
+        return typeCtor(get_type(attribute));
     }
 
-    internal static H5Attribute Open<T>(H5Object<T> h5Object, string name)
+    internal static TA Open<T, TA>(H5Object<T> h5Object, string name, Func<long, TA> attributeCtor)
         where T : H5Object<T>
+        where TA : H5Attribute
     {
         h5Object.AssertHasWithAttributesHandleType();
 
@@ -190,12 +194,12 @@ internal static unsafe class H5AAdapter
         }
 #endif
 
-        return new H5Attribute(h);
+        return attributeCtor(h);
     }
 
     #region Read
 
-    internal static string ReadString(H5Attribute attribute)
+    internal static string ReadString(H5StringAttribute attribute)
     {
         using var type = attribute.GetH5Type();
         using var space = attribute.GetSpace();
@@ -317,13 +321,21 @@ internal static unsafe class H5AAdapter
         }
     }
 
-    internal static bool ReadBool(H5Attribute attribute)
+    internal static bool ReadBool(H5BooleanAttribute attribute)
     {
         using var type = attribute.GetH5Type();
-        return Read<byte>(attribute, type) != default;
+        throw new NotImplementedException();
+        //return ReadPrimitive<byte>(attribute, type) != default;
     }
 
-    internal static DateTimeOffset ReadDateTimeOffset(H5Attribute attribute)
+    internal static void WriteBool(H5BooleanAttribute attribute, bool value)
+    {
+        using var type = attribute.GetH5Type();
+        throw new NotImplementedException();
+        //return ReadPrimitive<byte>(attribute, type) != default;
+    }
+
+    internal static DateTimeOffset ReadDateTimeOffset(H5DateTimeOffsetAttribute attribute)
     {
         // TODO: optionally write ticks + offset or value.ToString("O")
         using var type = attribute.GetH5Type();
@@ -334,19 +346,19 @@ internal static unsafe class H5AAdapter
         return new DateTimeOffset(DateTime.FromBinary(value.DateTime), TimeSpan.FromMinutes(value.Offset));
     }
 
-    internal static T Read<T>(H5Attribute attribute) // where T : unmanaged
+    internal static T Read<T>(H5PrimitiveAttribute<T> attribute) // where T : unmanaged
     {
         using var type = attribute.GetH5Type();
         return Read<T>(attribute, type);
     }
 
-    internal static T Read<T>(H5Attribute attribute, H5Type type) // where T : unmanaged
+    internal static T Read<T>(H5PrimitiveAttribute<T> attribute, H5Type type) // where T : unmanaged
     {
         using var nativeType = H5Type.GetEquivalentNativeType<T>();
         return ReadImpl<T>(attribute, type, nativeType);
     }
 
-    internal static T ReadEnum<T>(H5Attribute attribute, bool verifyType = false) // where T : unmanaged, Enum
+    internal static T ReadEnum<T>(H5EnumAttribute<T> attribute, bool verifyType = false)  where T : Enum //unmanaged, 
     {
         using var nativeType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
         using var type = attribute.GetH5Type();
@@ -399,12 +411,19 @@ internal static unsafe class H5AAdapter
         }
 
         int attributeStorageSize = attribute.StorageSize;
+
+        // We are relying on code consistency to ensure T is unmanaged since generic constraints aren't flexible enough
+
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
         int marshalSize = sizeof(T);
+#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
 
         T value = default!;
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
         read(attribute, type, new IntPtr(&value)).ThrowIfError();
+#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
         return value!;
     }
 
@@ -412,7 +431,7 @@ internal static unsafe class H5AAdapter
 
     #region Write
     
-    internal static void Write<T>(H5Attribute attribute, T value) where T : unmanaged
+    internal static void Write<T>(H5PrimitiveAttribute<T> attribute, T value) //where T : unmanaged
     {
         using var type = attribute.GetH5Type();
 
@@ -425,26 +444,39 @@ internal static unsafe class H5AAdapter
             Write(attribute, type, value);
         }
     }
-
-    internal static void Write(H5Attribute attribute, DateTimeOffset value)
+    
+    internal static void WritePrimitive<T>(H5Attribute attribute, T value) where T : unmanaged
     {
-        // TODO: optionally write ticks + offset or value.ToString("O")
-        var _value = new _DateTimeOffset
-        {
-            DateTime = value.DateTime.ToBinary(),
-            Offset = (short)value.Offset.TotalMinutes
-        };
-
-        Write(attribute, _value);
+        using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<T>();
+        Write(attribute, type, value);
     }
 
-    internal static void Write<T>(H5Attribute attribute, H5Type type, T value) where T : unmanaged
+    internal static void WriteDateTimeOffset(H5DateTimeOffsetAttribute attribute, DateTimeOffset value)
     {
+        //WriteDateTimeOffset(attribute, value);
+        throw new NotImplementedException();
+    }
+
+    internal static void Write<T>(H5Attribute attribute, H5Type type, T value) //where T : unmanaged
+    {
+#if DEBUG
+        if (!typeof(T).IsUnmanaged())
+        {
+            throw new InvalidOperationException($"{typeof(T).Name} is a managed type.");
+        }
+#endif
+
+        // We are relying on code consistency to ensure T is unmanaged since generic constraints aren't flexible enough
+
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
         var size = sizeof(T);
+#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
         int attributeStorageSize = attribute.StorageSize;
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, size);
 
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
         Write(attribute, type, new IntPtr(&value));
+#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
     }
 
     internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
@@ -452,11 +484,11 @@ internal static unsafe class H5AAdapter
         write(attribute, type, buffer).ThrowIfError();
     }
 
-    internal static void Write(H5Attribute attribute, string value)
+    internal static void Write(H5StringAttribute attribute, string value)
     {
         // TODO: handle array of strings
 
-        using var type = attribute.GetH5Type();
+        using var type = (H5StringType)attribute.GetH5Type();
         using var space = attribute.GetSpace();
 
         var cls = type.GetClass();
@@ -517,7 +549,7 @@ internal static unsafe class H5AAdapter
     
     #endregion
 
-    internal static H5Attribute CreateStringAttribute<T>(
+    internal static H5StringAttribute CreateStringAttribute<T>(
         H5Object<T> h5Object, string name, int fixedStorageLength,
         CharacterSet cset, StringPadding padding) where T : H5Object<T>
     {
@@ -531,6 +563,6 @@ internal static unsafe class H5AAdapter
         type.StringPadding = padding;
 
         using var memorySpace = H5SAdapter.CreateScalar();
-        return Create(h5Object, name, type, memorySpace);
+        return Create(h5Object, name, type, memorySpace, h => new H5StringAttribute(h));
     }
 }
