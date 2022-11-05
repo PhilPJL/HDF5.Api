@@ -347,6 +347,15 @@ internal static unsafe class H5AAdapter
         return value != default;
     }
 
+    internal static TimeSpan ReadTimeSpan(H5TimeSpanAttribute attribute)
+    {
+        // TODO: optionally write value.ToString("G", CultureInfo.InvariantCulture)
+        using var type = attribute.GetH5Type();
+        // TODO: sort out the type/expectedType/cls stuff
+        long timeSpan = ReadImpl<long>(attribute, type, type);
+        return TimeSpan.FromMinutes(timeSpan);
+    }
+
     internal static DateTime ReadDateTime(H5DateTimeAttribute attribute)
     {
         // TODO: optionally write value.ToString("O")

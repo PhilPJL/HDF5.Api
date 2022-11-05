@@ -17,6 +17,8 @@ public class H5BooleanAttribute : H5Attribute<bool, H5BooleanAttribute, H5Boolea
 
     public override bool Read(bool verifyType = false)
     {
+        // TODO: allow bool as byte, long, bitfield
+
         // TODO: verify
         return H5AAdapter.ReadBool(this);
     }

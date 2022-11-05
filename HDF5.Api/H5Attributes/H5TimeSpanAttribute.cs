@@ -16,12 +16,13 @@ public class H5TimeSpanAttribute : H5Attribute<TimeSpan, H5TimeSpanAttribute, H5
 
     public override TimeSpan Read(bool verifyType = false)
     {
-        throw new NotImplementedException();
+        return H5AAdapter.ReadTimeSpan(this);
     }
 
     public override H5TimeSpanAttribute Write([DisallowNull] TimeSpan value)
     {
-        throw new NotImplementedException();
+        H5AAdapter.WriteTimeSpan(this, value);
+        return this;
     }
 }
 

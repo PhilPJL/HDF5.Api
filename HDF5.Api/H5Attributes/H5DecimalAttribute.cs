@@ -16,11 +16,13 @@ public class H5DecimalAttribute : H5Attribute<decimal, H5DecimalAttribute, H5Dec
 
     public override decimal Read(bool verifyType = false)
     {
+        // TODO: implement
         throw new NotImplementedException();
     }
 
     public override H5DecimalAttribute Write([DisallowNull] decimal value)
     {
+        // TODO: implement
         throw new NotImplementedException();
     }
 }

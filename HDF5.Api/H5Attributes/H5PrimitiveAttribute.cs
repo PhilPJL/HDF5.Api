@@ -26,6 +26,7 @@ public class H5PrimitiveAttribute<T> : H5Attribute<T, H5PrimitiveAttribute<T>, H
 
     public override H5PrimitiveAttribute<T> Write([DisallowNull] T value) //where T : unmanaged
     {
+        H5ThrowHelpers.ThrowIfManaged<T>();
         Guard.IsNotNull(value);
 
         H5AAdapter.Write(this, value);

@@ -13,16 +13,21 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
 
     public override H5EnumType<T> GetH5Type()
     {
+        H5ThrowHelpers.ThrowIfManaged<T>();
+
         return H5AAdapter.GetType(this, h => new H5EnumType<T>(h));
     }
 
     public override T Read(bool verifyType = false)
     {
+        H5ThrowHelpers.ThrowIfManaged<T>();
+        
         return H5AAdapter.ReadEnum<T>(this, verifyType);
     }
 
     public override H5EnumAttribute<T> Write(T value)
     {
+        H5ThrowHelpers.ThrowIfManaged<T>();
         Guard.IsNotNull(value);
 
         WriteEnum();

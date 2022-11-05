@@ -217,7 +217,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         using var space = H5Space.CreateScalar();
         using var attribute = H5AAdapter.Create(this, name, type, space, h => new H5EnumAttribute<TA>(h));
 
-        H5AAdapter.Write(attribute, type, value);
+        attribute.Write(value);
     }
 
     private void CreateAndWriteAttribute<TA>(H5Type type, [DisallowNull] string name, TA value) where TA : unmanaged
@@ -226,7 +226,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         using var space = H5Space.CreateScalar();
         using var attribute = H5AAdapter.Create(this, name, type, space, h => new H5PrimitiveAttribute<TA>(h));
-        H5AAdapter.Write(attribute, type, value);
+
+        attribute.Write(value);
     }
 
     public void CreateAndWriteAttribute([DisallowNull] string name, DateTimeOffset value)
@@ -237,7 +238,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         using var space = H5Space.CreateScalar();
         using var attribute = H5AAdapter.Create(this, name, type, space, h => new H5DateTimeOffsetAttribute(h));
 
-        H5AAdapter.WriteDateTimeOffset(attribute, value);
+        attribute.Write(value);
     }
 
     public void CreateAndWriteAttribute([DisallowNull] string name, DateTime value)

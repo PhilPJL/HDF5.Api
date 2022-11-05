@@ -141,6 +141,7 @@ internal static unsafe class H5DAdapter
 
     internal static H5Type GetType(H5DataSet dataSet)
     {
+        // TODO: convert to correct type class and make H5Type abstract
         return new H5Type(get_type(dataSet));
     }
  

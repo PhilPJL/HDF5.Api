@@ -11,6 +11,8 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 {
     internal H5Type(long handle) : base(handle, HandleType.Type, H5TAdapter.Close) { }
 
+    // TODO: bring these back?
+
     //private H5Type(long handle, Action<H5Type>? closer) : base(handle, HandleType.Type, closer) { }
 
     //internal static H5Type CreateNonTracked(long handle) => new(handle, null);
@@ -177,7 +179,7 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     internal int NumberOfMembers => H5TAdapter.GetNumberOfMembers(this);
 }
 
-public class H5Type<T> : H5Type
+public abstract class H5Type<T> : H5Type
 {
     internal H5Type(long handle) : base(handle)
     {
