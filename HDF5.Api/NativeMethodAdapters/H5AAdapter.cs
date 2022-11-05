@@ -375,6 +375,7 @@ internal static unsafe class H5AAdapter
         return ReadImpl<T>(attribute, type, nativeType);
     }
 
+    // TODO:should this be H5Attribute<T> attribute?
     private static T ReadImpl<T>(H5Attribute attribute, H5Type type, H5Type expectedType) //where T : unmanaged
     {
         if (!typeof(T).IsUnmanaged())

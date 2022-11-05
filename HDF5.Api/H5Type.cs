@@ -142,7 +142,7 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         return H5TAdapter.CreateVariableLengthByteArrayType();
     }
 
-    public static H5EnumType<T> CreateEnumType<T>() //where T : unmanaged, Enum
+    public static H5EnumType<T> CreateEnumType<T>() where T : Enum // unmanaged
     {
         return H5TAdapter.CreateEnumType<T>();
     }
@@ -191,9 +191,54 @@ public class H5BooleanType : H5Type<bool>
     }
 }
 
+public class H5TimeSpanType : H5Type<TimeSpan>
+{
+    internal H5TimeSpanType(long handle) : base(handle)
+    {
+    }
+}
+
+public class H5DecimalType : H5Type<decimal>
+{
+    internal H5DecimalType(long handle) : base(handle)
+    {
+    }
+}
+
+public class H5DateTimeType : H5Type<DateTime>
+{
+    internal H5DateTimeType(long handle) : base(handle)
+    {
+    }
+}
+
+public class H5DateTimeOffsetType : H5Type<DateTimeOffset>
+{
+    internal H5DateTimeOffsetType(long handle) : base(handle)
+    {
+    }
+}
+
+#if NET7_0_OR_GREATER
+public class H5TimeOnlyType : H5Type<TimeOnly>
+{
+    internal H5TimeOnlyType(long handle) : base(handle)
+    {
+    }
+}
+#endif
+
 public class H5PrimitiveType<T> : H5Type<T> //where T : unmanaged
 {
     internal H5PrimitiveType(long handle) : base(handle)
+    {
+        // TODO: assert is unmanaged
+    }
+}
+
+public class H5CompoundType<T> : H5Type<T> 
+{
+    internal H5CompoundType(long handle) : base(handle)
     {
     }
 }

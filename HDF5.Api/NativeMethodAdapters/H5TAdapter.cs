@@ -112,8 +112,11 @@ internal static unsafe class H5TAdapter
     }
 
     internal static void InsertEnumMember<T>(H5Type type, string name, T value)
-        //where T : unmanaged, Enum
+        where T : Enum //unmanaged, 
     {
+        // TODO: assert is unmanaged
+
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 #if NET7_0_OR_GREATER
         enum_insert(type, name, new IntPtr(&value)).ThrowIfError();
 #else
@@ -122,6 +125,7 @@ internal static unsafe class H5TAdapter
             enum_insert(type, nameBytesPtr, new IntPtr(&value)).ThrowIfError();
         }
 #endif
+#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
     }
 
     internal static string NameOfEnumMember<T>(H5Type type, T value)
@@ -189,7 +193,7 @@ internal static unsafe class H5TAdapter
         return is_variable_str(typeId).ThrowIfError() > 0;
     }
 
-    internal static H5EnumType<T> CreateEnumType<T>() // where T : unmanaged, Enum
+    internal static H5EnumType<T> CreateEnumType<T>() where T : Enum // unmanaged, 
     {
         var h5EnumType = ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
 

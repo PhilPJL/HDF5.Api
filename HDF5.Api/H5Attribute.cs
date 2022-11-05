@@ -9,7 +9,7 @@ namespace HDF5.Api;
 ///     <para>.NET wrapper for H5A (Attribute) API.</para>
 ///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
 /// </summary>
-public class H5Attribute : H5Object<H5Attribute>
+public abstract class H5Attribute : H5Object<H5Attribute>
 {
     internal H5Attribute(long handle) : base(handle, HandleType.Attribute, H5AAdapter.Close)
     {
@@ -25,12 +25,12 @@ public class H5Attribute : H5Object<H5Attribute>
         return H5AAdapter.CreateCreationPropertyList(encoding);
     }
 
+    public string Name => H5AAdapter.GetName(this);
+
     internal H5Space GetSpace()
     {
         return H5AAdapter.GetSpace(this);
     }
-
-    public string Name => H5AAdapter.GetName(this);
 
     internal int StorageSize => H5AAdapter.GetStorageSize(this);
 
@@ -264,14 +264,14 @@ public abstract class H5Attribute<T> : H5Attribute
         Write([DisallowNull] T value);
 
     //#if NET7_0_OR_GREATER
-    public virtual H5Type<T>
+    public abstract H5Type<T>
     //#else
     //    public virtual H5Type
     //#endif
-    GetH5Type()
-    {
-        return H5AAdapter.GetType(this, h => new H5Type<T>(h));
-    }
+    GetH5Type();
+    //{
+    //    return H5AAdapter.GetType(this, h => new H5Type<T>(h));
+    //}
 
     public abstract T Read();
 
@@ -448,6 +448,15 @@ public class H5DecimalAttribute : H5Attribute<decimal>
     {
     }
 
+#if NET7_0_OR_GREATER
+    public override H5DecimalType GetH5Type()
+#else
+    public override H5Type<decimal> GetH5Type()
+#endif
+    {
+        return H5AAdapter.GetType(this, h => new H5DecimalType(h));
+    }
+
     public override decimal Read()
     {
         throw new NotImplementedException();
@@ -464,6 +473,14 @@ public class H5TimeSpanAttribute : H5Attribute<TimeSpan>
     internal H5TimeSpanAttribute(long handle) : base(handle)
     {
     }
+#if NET7_0_OR_GREATER
+    public override H5TimeSpanType GetH5Type()
+#else
+    public override H5Type<TimeSpan> GetH5Type()
+#endif
+    {
+        return H5AAdapter.GetType(this, h => new H5TimeSpanType(h));
+    }
 
     public override TimeSpan Read()
     {
@@ -476,10 +493,43 @@ public class H5TimeSpanAttribute : H5Attribute<TimeSpan>
     }
 }
 
+#if NET7_0_OR_GREATER
+public class H5TimeOnlyAttribute : H5Attribute<TimeOnly>
+{
+    internal H5TimeOnlyAttribute(long handle) : base(handle)
+    {
+    }
+
+    public override H5TimeOnlyType GetH5Type()
+    {
+        return H5AAdapter.GetType(this, h => new H5TimeOnlyType(h));
+    }
+
+    public override TimeOnly Read()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override H5Attribute<TimeOnly> Write([DisallowNull] TimeOnly value)
+    {
+        throw new NotImplementedException();
+    }
+}
+#endif
+
 public class H5DateTimeAttribute : H5Attribute<DateTime>
 {
     internal H5DateTimeAttribute(long handle) : base(handle)
     {
+    }
+
+#if NET7_0_OR_GREATER
+    public override H5DateTimeType GetH5Type()
+#else
+    public override H5Type<DateTime> GetH5Type()
+#endif
+    {
+        return H5AAdapter.GetType(this, h => new H5DateTimeType(h));
     }
 
     public override DateTime Read()
@@ -499,6 +549,15 @@ public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset>
     {
     }
 
+#if NET7_0_OR_GREATER
+    public override H5DateTimeOffsetType GetH5Type()
+#else
+    public override H5Type<DateTimeOffset> GetH5Type()
+#endif
+    {
+        return H5AAdapter.GetType(this, h => new H5DateTimeOffsetType(h));
+    }
+
     public override DateTimeOffset Read()
     {
         throw new NotImplementedException();
@@ -514,6 +573,15 @@ public class H5CompoundAttribute<T> : H5Attribute<T>
 {
     internal H5CompoundAttribute(long handle) : base(handle)
     {
+    }
+
+#if NET7_0_OR_GREATER
+    public override H5CompoundType<T> GetH5Type()
+#else
+    public override H5Type<T> GetH5Type()
+#endif
+    {
+        return H5AAdapter.GetType(this, h => new H5CompoundType<T>(h));
     }
 
     public override T Read()
