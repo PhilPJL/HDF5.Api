@@ -4,6 +4,11 @@ public class H5PrimitiveType<T> : H5Type<T> //where T : unmanaged
 {
     internal H5PrimitiveType(long handle) : base(handle)
     {
-        // TODO: assert is unmanaged
+        H5ThrowHelpers.ThrowIfManaged<T>();
+    }
+
+    internal static H5PrimitiveType<T> Create()
+    {
+        return GetEquivalentNativeType<T>();
     }
 }

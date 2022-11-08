@@ -1575,6 +1575,24 @@ internal static unsafe partial class H5T
     public static extern herr_t set_tag(hid_t dtype_id, string tag);
 
     /// <summary>
+    /// Tags an opaque datatype.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-SetTag
+    /// </summary>
+    /// <param name="dtype_id">Datatype identifier for the opaque datatype
+    /// to be tagged.</param>
+    /// <param name="tag">Descriptive string with which the opaque
+    /// datatype is to be tagged.</param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    /// <remarks><paramref name="tag"/> is intended to provide a concise
+    /// description; the maximum size is hard-coded in the HDF5 Library as
+    /// 256 bytes </remarks>
+    [DllImport(Constants.DLLFileName, EntryPoint = "H5Tset_tag",
+        CallingConvention = CallingConvention.Cdecl),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    public static extern herr_t set_tag(hid_t dtype_id, byte* tag);
+
+    /// <summary>
     /// Removes a conversion function.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-Unregister
     /// </summary>

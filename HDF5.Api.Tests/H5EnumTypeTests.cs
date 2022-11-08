@@ -90,7 +90,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     {
         HandleCheck((file) =>
         {
-            using var enumType = H5Type.CreateEnumType<TestInt>();
+            using var enumType = H5EnumType<TestInt>.Create();
 
             Assert.AreEqual(nameof(TestInt.one), H5TAdapter.NameOfEnumMember(enumType, TestInt.one));
             Assert.AreEqual(nameof(TestInt.two), H5TAdapter.NameOfEnumMember(enumType, TestInt.two));
@@ -111,9 +111,9 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     {
         HandleCheck((file) =>
         {
-            using var enumType1 = H5Type.CreateEnumType<TestInt>();
-            using var enumType2 = H5Type.CreateEnumType<TestInt>();
-            using var enumType3 = H5Type.CreateEnumType<TestInt2>();
+            using var enumType1 = H5EnumType<TestInt>.Create();
+            using var enumType2 = H5EnumType<TestInt>.Create();
+            using var enumType3 = H5EnumType<TestInt2>.Create();
 
             Assert.IsTrue(enumType1.Equals(enumType2));
             Assert.IsTrue(enumType1.Equals(enumType3));

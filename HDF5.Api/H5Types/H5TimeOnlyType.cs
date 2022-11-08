@@ -10,7 +10,7 @@ public class H5TimeOnlyType : H5Type<TimeOnly>
     {
     }
 
-    internal static H5TimeOnlyType CreateType()
+    internal static H5TimeOnlyType Create()
     {
         return H5TAdapter.ConvertDotNetPrimitiveToH5Type<long, H5TimeOnlyType>(h => new H5TimeOnlyType(h));
     }

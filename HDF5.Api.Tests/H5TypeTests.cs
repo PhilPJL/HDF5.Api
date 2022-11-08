@@ -13,7 +13,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
         {
             const string bigString = "bigstring";
 
-            using var bigStringType = H5StringType.CreateFixedLengthStringType(1000);
+            using var bigStringType = H5StringType.Create(1000);
             file.Commit(bigString, bigStringType);
 
             Assert.IsTrue(file.DataTypeNames.Contains(bigString));
@@ -21,7 +21,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
             const string smallString = "smallstring";
 
             using var group = file.CreateGroup("group");
-            using var smallStringType = H5StringType.CreateFixedLengthStringType(10);
+            using var smallStringType = H5StringType.Create(10);
             group.Commit(smallString, smallStringType);
 
             Assert.IsTrue(group.DataTypeNames.Contains(smallString));
@@ -35,7 +35,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
         {
             const string bigString = "Χαρακτηριστικό";
 
-            using var bigStringType = H5StringType.CreateFixedLengthStringType(1000);
+            using var bigStringType = H5StringType.Create(1000);
             file.Commit(bigString, bigStringType);
 
             Assert.IsTrue(file.DataTypeNames.Contains(bigString));
@@ -43,7 +43,7 @@ public class H5TypeTests : H5Test<H5TypeTests>
             const string smallString = "ᚠᛇᚻ᛫ᛒᛦᚦ᛫ᚠᚱᚩᚠᚢᚱ᛫ᚠᛁᚱᚪ᛫ᚷᛖᚻᚹᛦᛚᚳᚢᛗᛋᚳᛖᚪᛚ᛫ᚦᛖᚪᚻ᛫ᛗᚪᚾᚾᚪ᛫ᚷᛖᚻᚹᛦᛚᚳ᛫ᛗᛁᚳᛚᚢᚾ᛫ᚻᛦᛏ᛫ᛞᚫᛚᚪᚾᚷᛁᚠ᛫ᚻᛖ᛫ᚹᛁᛚᛖ᛫ᚠᚩᚱ᛫ᛞᚱᛁᚻᛏᚾᛖ᛫ᛞᚩᛗᛖᛋ᛫ᚻᛚᛇᛏᚪᚾ";
 
             using var group = file.CreateGroup("group");
-            using var smallStringType = H5StringType.CreateFixedLengthStringType(10);
+            using var smallStringType = H5StringType.Create(10);
             group.Commit(smallString, smallStringType);
 
             Assert.IsTrue(group.DataTypeNames.Contains(smallString));

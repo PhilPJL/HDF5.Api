@@ -24,12 +24,15 @@ public class H5DateTimeAttribute : H5Attribute<DateTime, H5DateTimeAttribute, H5
         return DateTime.FromBinary(dateTime);
     }
 
-    public override H5DateTimeAttribute Write([DisallowNull] DateTime value)
+    public override void Write([DisallowNull] DateTime value)
     {
         // TODO: optionally write value.ToString("O")
         using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
         H5AAdapter.Write(this, type, value.ToBinary());
+    }
 
-        return this;
+    public static H5DateTimeAttribute Create(long handle)
+    {
+        return new H5DateTimeAttribute(handle);
     }
 }

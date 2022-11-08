@@ -24,7 +24,7 @@ public class H5TimeSpanAttribute : H5Attribute<TimeSpan, H5TimeSpanAttribute, H5
         return TimeSpan.FromTicks(timeSpan);
     }
 
-    public override H5TimeSpanAttribute Write([DisallowNull] TimeSpan value)
+    public override void Write([DisallowNull] TimeSpan value)
     {
         // TODO: optionally write value.ToString("G", CultureInfo.InvariantCulture)
         /*        if (...)
@@ -35,8 +35,11 @@ public class H5TimeSpanAttribute : H5Attribute<TimeSpan, H5TimeSpanAttribute, H5
 
         using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
         H5AAdapter.Write(this, type, value.Ticks);
+    }
 
-        return this;
+    public static H5TimeSpanAttribute Create(long handle)
+    {
+        return new H5TimeSpanAttribute(handle);
     }
 }
 

@@ -7,7 +7,6 @@ using HDF5.Api.NativeMethods;
 using System.Linq;
 using System.Reflection;
 using static HDF5.Api.NativeMethods.H5T;
-using HDF5.Api.H5Attributes;
 
 namespace HDF5.Api.NativeMethodAdapters;
 
@@ -55,7 +54,6 @@ internal static unsafe class H5TAdapter
         return typeCtor(create((class_t)DataTypeClass.Compound, new ssize_t(size)));
     }
 
-    // TODO: create type from struct and/or class
     internal static H5Type CreateByteArrayType(params long[] dims)
     {
         return new H5Type(array_create(NATIVE_B8, (uint)dims.Length, dims.Select(d => (ulong)d).ToArray()));
@@ -90,6 +88,23 @@ internal static unsafe class H5TAdapter
             type.Dispose();
             throw;
         }
+    }
+
+    internal static TT CreateOpaqueType<TT>(int size, string tag, Func<long, TT> typeCtor)
+        where TT : H5Type
+    {
+        var type = typeCtor(create(class_t.OPAQUE, new IntPtr(size)));
+
+#if NET7_0_OR_GREATER
+        set_tag(type, tag).ThrowIfError();
+#else
+        fixed (byte* tagBytesPtr = Encoding.UTF8.GetBytes(tag))
+        {
+            set_tag(type, tagBytesPtr).ThrowIfError();
+        }
+#endif
+
+        return type;
     }
 
     internal static H5StringType CreateVariableLengthStringType()
@@ -262,7 +277,7 @@ internal static unsafe class H5TAdapter
 
         var handle = default(T) switch
         {
-            bool => NATIVE_HBOOL, // hmm bool has marshalable size of 4, but storage size of 1.
+            bool => NATIVE_HBOOL,
 
             byte => NATIVE_UINT8,
             sbyte => NATIVE_INT8,

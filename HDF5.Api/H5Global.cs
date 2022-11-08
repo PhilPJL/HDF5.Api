@@ -262,5 +262,6 @@ public enum AttributeWriteBehaviour
 public enum DeleteAttributeStatus
 {
     NotFound,
-    Deleted
+    Deleted,
+    NotCommittedType
 }

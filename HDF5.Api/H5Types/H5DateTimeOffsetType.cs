@@ -2,13 +2,13 @@
 
 namespace HDF5.Api.H5Types;
 
-public class H5DateTimeOffsetType : H5Type<DateTimeOffset>
+public class H5DateTimeOffsetType : H5CompoundType<DateTimeOffset>
 {
     internal H5DateTimeOffsetType(long handle) : base(handle)
     {
     }
 
-    internal static H5DateTimeOffsetType CreateType()
+    internal static H5DateTimeOffsetType Create()
     {
         var type = H5TAdapter.CreateCompoundType<DateTimeOffsetProxy, H5DateTimeOffsetType>(h => new H5DateTimeOffsetType(h));
 

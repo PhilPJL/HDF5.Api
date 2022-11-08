@@ -25,13 +25,16 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
         return Read(this);
     }
 
-    public override H5StringAttribute Write([DisallowNull] string value)
+    public override void Write([DisallowNull] string value)
     {
         Guard.IsNotNull(value);
 
         Write(this, value);
+    }
 
-        return this;
+    public static H5StringAttribute Create(long handle)
+    {
+        return new H5StringAttribute(handle);
     }
 
     private static unsafe void Write(H5StringAttribute attribute, string value)
@@ -41,7 +44,7 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
         using var type = attribute.GetAttributeType();
         using var space = attribute.GetSpace();
 
-        var cls = type.GetClass();
+        var cls = type.Class;
         if (cls != DataTypeClass.String)
         {
             throw new H5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
@@ -68,7 +71,7 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
             _ => throw new InvalidEnumArgumentException($"Unknown CharacterSet:{characterSet}.")
         };
 
-        if (type.IsVariableLengthString())
+        if (type.IsVariableLength)
         {
             fixed (void* fixedBytes = bytes)
             {
@@ -116,13 +119,13 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
             throw new H5Exception("Attribute is not scalar.");
         }
 
-        var cls = type.GetClass();
+        var cls = type.Class;
         if (cls != DataTypeClass.String)
         {
             throw new H5Exception($"Attribute is of class '{cls}' when expecting '{DataTypeClass.String}'.");
         }
 
-        if (type.IsVariableLengthString())
+        if (type.IsVariableLength)
         {
             if (count < 256 / sizeof(nint))
             {

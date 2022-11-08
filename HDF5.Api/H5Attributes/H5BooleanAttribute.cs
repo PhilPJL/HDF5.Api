@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.HighPerformance;
-using HDF5.Api.H5Types;
+﻿using HDF5.Api.H5Types;
 using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.H5Attributes;
@@ -17,20 +16,20 @@ public class H5BooleanAttribute : H5Attribute<bool, H5BooleanAttribute, H5Boolea
 
     public override bool Read(bool verifyType = false)
     {
-        // TODO: save as byte Enum?
         using var type = GetAttributeType();
         using var expectedType = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<byte>();
 
-        var value = H5AAdapter.ReadImpl<byte>(this, type, expectedType);
-        return value != default;
+        return H5AAdapter.ReadImpl<bool>(this, type, expectedType);
     }
 
-    public override H5BooleanAttribute Write([DisallowNull] bool value)
+    public override void Write([DisallowNull] bool value)
     {
-        // TODO: save as byte Enum?
         using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<byte>();
-        H5AAdapter.Write(this, type, value.ToByte());
+        H5AAdapter.Write(this, type, value); 
+    }
 
-        return this;
+    public static H5BooleanAttribute Create(long handle)
+    {
+        return new H5BooleanAttribute(handle);
     }
 }

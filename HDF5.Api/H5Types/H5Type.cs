@@ -1,5 +1,5 @@
-﻿using CommunityToolkit.Diagnostics;
-using HDF5.Api.NativeMethodAdapters;
+﻿using HDF5.Api.NativeMethodAdapters;
+using System.Collections.Generic;
 
 namespace HDF5.Api.H5Types;
 
@@ -60,7 +60,7 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="H5Exception"></exception>
-    public static H5PrimitiveType<T> GetEquivalentNativeType<T>() //where T : unmanaged
+    internal static H5PrimitiveType<T> GetEquivalentNativeType<T>() //where T : unmanaged
     {
         return H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<T>();
     }
@@ -69,53 +69,25 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
     /// Gets the equivalent native type for an H5 type
     /// </summary>
     /// <exception cref="H5Exception"></exception>
-    public static H5Type GetEquivalentNativeType(H5Type type)
+    internal static H5Type GetEquivalentNativeType(H5Type type)
     {
         return H5TAdapter.GetEquivalentNativeType(type);
     }
 
-    public H5Type Insert([DisallowNull] string name, int offset, [DisallowNull] H5Type dataType)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-        Guard.IsNotNull(dataType);
-
-        H5TAdapter.Insert(this, name, new ssize_t(offset), dataType);
-        return this;
-    }
-
-    public H5Type Insert([DisallowNull] string name, ssize_t offset, [DisallowNull] H5Type dataType)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-        Guard.IsNotNull(dataType);
-
-        H5TAdapter.Insert(this, name, offset, dataType);
-        return this;
-    }
-
-    public H5Type Insert<TS, TP>([DisallowNull] string name) where TS : struct where TP : unmanaged
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-
-        var offset = Marshal.OffsetOf<TS>(name);
-        using var type = GetEquivalentNativeType<TP>();
-        H5TAdapter.Insert(this, name, offset, type);
-        return this;
-    }
-
-    public static H5Type CreateDoubleArrayType(int size)
+    internal static H5Type CreateDoubleArrayType(int size)
     {
         return H5TAdapter.CreateDoubleArrayType(size);
     }
 
-/*    public static H5Type CreateCompoundType(int size)
-    {
-        return H5TAdapter.CreateCompoundType(size);
-    }
-*/
+    /*    public static H5Type CreateCompoundType(int size)
+        {
+            return H5TAdapter.CreateCompoundType(size);
+        }
+    */
     /// <summary>
     ///     Create a Compound type in order to hold an <typeparamref name="T" />
     /// </summary>
-    public static TT CreateCompoundType<T, TT>(Func<long, TT> typeCtor) where T : unmanaged
+    internal static TT CreateCompoundType<T, TT>(Func<long, TT> typeCtor) where T : unmanaged
     {
         return H5TAdapter.CreateCompoundType<T, TT>(typeCtor);
     }
@@ -129,24 +101,19 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         return H5TAdapter.CreateCompoundType<T>(extraSpace);
     }
 */
-    public static H5Type CreateByteArrayType(int size)
+    internal static H5Type CreateByteArrayType(int size)
     {
         return H5TAdapter.CreateByteArrayType(size);
     }
 
-    public static H5Type CreateFloatArrayType(int size)
+    internal static H5Type CreateFloatArrayType(int size)
     {
         return H5TAdapter.CreateFloatArrayType(size);
     }
 
-    public static H5Type CreateVariableLengthByteArrayType()
+    internal static H5Type CreateVariableLengthByteArrayType()
     {
         return H5TAdapter.CreateVariableLengthByteArrayType();
-    }
-
-    public static H5EnumType<T> CreateEnumType<T>() //where T : Enum // unmanaged
-    {
-        return H5TAdapter.CreateEnumType<T>();
     }
 
     public int Size
@@ -157,7 +124,7 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 
     public bool Committed => H5TAdapter.GetCommitted(this);
 
-    public DataTypeClass GetClass() => H5TAdapter.GetClass(this);
+    public DataTypeClass Class => H5TAdapter.GetClass(this);
 
     internal static H5DataTypeCreationPropertyList CreateCreationPropertyList()
     {
@@ -169,12 +136,19 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         return H5TAdapter.CreateAccessPropertyList();
     }
 
-    public string Name => H5IAdapter.GetName(this);
+    public string Name => Committed ? H5IAdapter.GetName(this) : string.Empty;
 
-    public bool IsVariableLengthString()
+    public override IEnumerable<string> AttributeNames => Committed ? base.AttributeNames : Array.Empty<string>();
+
+    public override int NumberOfAttributes => Committed ? base.NumberOfAttributes : 0;
+
+    public override DeleteAttributeStatus DeleteAttribute([DisallowNull] string name)
     {
-        return H5TAdapter.IsVariableLengthString(this);
-    }
+        if (Committed)
+        {
+            return base.DeleteAttribute(name);
+        }
 
-    internal int NumberOfMembers => H5TAdapter.GetNumberOfMembers(this);
+        return DeleteAttributeStatus.NotCommittedType;
+    }
 }

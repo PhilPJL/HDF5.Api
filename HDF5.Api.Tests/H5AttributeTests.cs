@@ -207,6 +207,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 #if NET7_0_OR_GREATER
         location.WriteAttribute("timeOnly-min", TimeOnly.MinValue);
         location.WriteAttribute("timeOnly-max", TimeOnly.MaxValue);
+        location.WriteAttribute("dateOnly-min", DateOnly.MinValue);
+        location.WriteAttribute("dateOnly-max", DateOnly.MaxValue);
 #endif
 
         location.WriteAttribute("bool-true", true);
@@ -248,9 +250,9 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         location.WriteAttribute("double", 12.0d);
         location.WriteAttribute("double-max", double.MaxValue);
 
-        //location.CreateAndWriteAttribute("decimal-min", decimal.MinValue);
-        //location.CreateAndWriteAttribute("decimal", 12.0m);
-        //location.CreateAndWriteAttribute("decimal-max", decimal.MaxValue);
+        location.WriteAttribute("decimal-min", decimal.MinValue);
+        location.WriteAttribute("decimal", 12.0m);
+        location.WriteAttribute("decimal-max", decimal.MaxValue);
 
         location.WriteAttribute("enumlong-min", TestLong.Min);
         location.WriteAttribute("enumlong", TestLong.None);
@@ -270,6 +272,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 #if NET7_0_OR_GREATER
             "timeOnly-min",
             "timeOnly-max",
+            "dateOnly-min",
+            "dateOnly-max",
 #endif
             "bool-true",
             "bool-false",
@@ -301,6 +305,9 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             "double-min",
             "double",
             "double-max",
+            "decimal-min",
+            "decimal",
+            "decimal-max",
             "enumlong-min",
             "enumlong",
             "enumlong-max"
@@ -328,6 +335,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteAttribute(15uL, ulong.MaxValue);
         CreateWriteReadUpdateDeleteAttribute(1.5f, 123.456);
         CreateWriteReadUpdateDeleteAttribute(1.5123d, double.MaxValue);
+        CreateWriteReadUpdateDeleteDecimalAttribute(12345678.123m, -9999999.1234m);
         CreateWriteReadUpdateDeleteStringAttribute("1234567890", "ABCDEFGH", 11);
         CreateWriteReadUpdateDeleteStringAttribute("", "ABCDEFGH", 10);
         CreateWriteReadUpdateDeleteStringAttribute("abcdefghijklmnopqrstuvwzyz", "", 27);
@@ -461,6 +469,25 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
             a.Write(newValue);
             Assert.AreEqual(newValue, location.ReadAttribute<TValue>(name));
+            Assert.AreEqual(newValue, a.Read());
+
+            location.DeleteAttribute(name);
+            Assert.IsFalse(location.AttributeExists(name));
+        }
+
+        void CreateWriteReadUpdateDeleteDecimalAttribute(decimal value, decimal newValue)
+        {
+            string name = $"dt{typeof(decimal).Name}";
+
+            location.WriteAttribute(name, value);
+            Assert.IsTrue(location.AttributeExists(name));
+
+            using var a = location.OpenDecimalAttribute(name);
+            Assert.AreEqual(value, location.ReadAttribute<decimal>(name));
+            Assert.AreEqual(value, a.Read());
+
+            a.Write(newValue);
+            Assert.AreEqual(newValue, location.ReadAttribute<decimal>(name));
             Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);

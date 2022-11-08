@@ -14,8 +14,7 @@ public abstract class H5Attribute<T, TA, TT> : H5Attribute
 
     public abstract T Read(bool verifyType = false);
 
-    // TODO: is there any point in returning TA?
-    public abstract TA Write([DisallowNull] T value);
+    public abstract void Write([DisallowNull] T value);
 
     [DisallowNull]
     public T Value

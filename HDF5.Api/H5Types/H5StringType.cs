@@ -6,17 +6,20 @@ public class H5StringType : H5Type<string>
 {
     internal H5StringType(long handle) : base(handle)
     {
-        // TODO: verify type
     }
 
-    internal static H5StringType CreateFixedLengthStringType(int length)
+    internal static H5StringType Create(int fixedStorageLength,
+        CharacterSet characterSet = CharacterSet.Utf8,
+        StringPadding padding = StringPadding.NullPad)
     {
-        return H5TAdapter.CreateFixedLengthStringType(length);
-    }
+        var type = fixedStorageLength != 0
+            ? H5TAdapter.CreateFixedLengthStringType(fixedStorageLength)
+            : H5TAdapter.CreateVariableLengthStringType();
 
-    internal static H5StringType CreateVariableLengthStringType()
-    {
-        return H5TAdapter.CreateVariableLengthStringType();
+        type.CharacterSet = characterSet;
+        type.StringPadding = padding;
+
+        return type;
     }
 
     public CharacterSet CharacterSet

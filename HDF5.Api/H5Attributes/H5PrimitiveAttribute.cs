@@ -27,14 +27,17 @@ public class H5PrimitiveAttribute<T> : H5Attribute<T, H5PrimitiveAttribute<T>, H
         return H5AAdapter.ReadImpl<T>(this, type, nativeType);
     }
 
-    public override H5PrimitiveAttribute<T> Write([DisallowNull] T value) //where T : unmanaged
+    public override void Write([DisallowNull] T value) //where T : unmanaged
     {
         H5ThrowHelpers.ThrowIfManaged<T>();
         Guard.IsNotNull(value);
 
         using var type = GetAttributeType();
         H5AAdapter.Write(this, type, value);
+    }
 
-        return this;
+    public static H5PrimitiveAttribute<T> Create(long handle)
+    {
+        return new H5PrimitiveAttribute<T>(handle);
     }
 }

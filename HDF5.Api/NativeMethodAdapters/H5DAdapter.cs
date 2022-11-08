@@ -55,7 +55,7 @@ internal static unsafe class H5DAdapter
         using var type = dataSet.GetH5Type();
         long count = space.GetSimpleExtentNPoints();
 
-        var cls = type.GetClass();
+        var cls = type.Class;
 
         if (cls != DataTypeClass.Compound)
         {

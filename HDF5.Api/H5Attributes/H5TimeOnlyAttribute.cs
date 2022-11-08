@@ -28,14 +28,17 @@ public class H5TimeOnlyAttribute : H5Attribute<TimeOnly, H5TimeOnlyAttribute, H5
         return new TimeOnly(ticks);
     }
 
-    public override H5TimeOnlyAttribute Write([DisallowNull] TimeOnly value)
+    public override void Write([DisallowNull] TimeOnly value)
     {
         // TODO: optionally write value.ToString("O", CultureInfo.InvariantCulture)
 
         using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
         H5AAdapter.Write(this, type, value.Ticks);
+    }
 
-        return this;
+    public static H5TimeOnlyAttribute Create(long handle)
+    {
+        return new H5TimeOnlyAttribute(handle);
     }
 }
 

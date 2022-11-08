@@ -14,9 +14,9 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
     {
     }
 
-    public int NumberOfAttributes => (int)H5OAdapter.GetInfo(this).num_attrs;
+    public virtual int NumberOfAttributes => (int)H5OAdapter.GetInfo(this).num_attrs;
 
-    public IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
+    public virtual IEnumerable<string> AttributeNames => H5AAdapter.GetAttributeNames(this);
 
     public bool AttributeExists([DisallowNull] string name)
     {
@@ -25,7 +25,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         return H5AAdapter.Exists(this, name);
     }
 
-    public DeleteAttributeStatus DeleteAttribute([DisallowNull] string name)
+    public virtual DeleteAttributeStatus DeleteAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
@@ -50,7 +50,12 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         return H5AAdapter.Open(this, name, h => new H5BooleanAttribute(h));
     }
 
-    public H5StringAttribute OpenStringAttribute(string name)
+    internal H5DecimalAttribute OpenDecimalAttribute(string name)
+    {
+        return H5AAdapter.Open(this, name, h => new H5DecimalAttribute(h));
+    }
+
+    internal H5StringAttribute OpenStringAttribute(string name)
     {
         return H5AAdapter.Open(this, name, h => new H5StringAttribute(h));
     }
@@ -79,7 +84,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         return H5AAdapter.Open(this, name, h => new H5DateTimeOffsetAttribute(h));
     }
 
-    public H5EnumAttribute<TA> OpenEnumAttribute<TA>([DisallowNull] string name) where TA : Enum
+    internal H5EnumAttribute<TA> OpenEnumAttribute<TA>([DisallowNull] string name) where TA : Enum
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
@@ -172,8 +177,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         object ReadDecimalAttribute()
         {
-            // TODO
-            throw new NotImplementedException($"{typeof(TA).Name}");
+            using var attribute = H5AAdapter.Open(this, name, h => new H5DecimalAttribute(h));
+            return attribute.Read();
         }
 
         object ReadCompoundAttribute()
@@ -229,70 +234,77 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         Guard.IsNotNull(value);
 
         var exists = CheckExists(name, writeBehaviour);
-
         var shapeCtor = H5Space.CreateScalar; // TODO: arrays?
 
         if (typeof(TA).IsEnum)
         {
-            using var attribute = exists
-                ? H5AAdapter.Open(this, name, h => new H5EnumAttribute<TA>(h))
-                : H5AAdapter.Create(this, name, H5Type.CreateEnumType<TA>, shapeCtor, h => new H5EnumAttribute<TA>(h));
-            
+            using var attribute = 
+                H5AAdapter.CreateOrOpen(this, name, H5EnumType<TA>.Create, shapeCtor, h => new H5EnumAttribute<TA>(h));
+
             attribute.Write(value);
+        }
+        else if (value is bool boolValue)
+        {
+            using var attribute = 
+                H5AAdapter.CreateOrOpen(this, name, H5BooleanType.Create, shapeCtor, H5BooleanAttribute.Create);
+
+            attribute.Write(boolValue);
         }
         else if (value is decimal decimalValue)
         {
-            using var attribute = exists
-                ? H5AAdapter.Open(this, name, h => new H5DecimalAttribute(h))
-                : H5AAdapter.Create(this, name, H5DecimalType.CreateType, shapeCtor, h => new H5DecimalAttribute(h));
+            using var attribute = 
+                H5AAdapter.CreateOrOpen(this, name, H5DecimalType.Create, shapeCtor, H5DecimalAttribute.Create);
 
             attribute.Write(decimalValue);
         }
         else if (value is DateTimeOffset dateTimeOffsetValue)
         {
-            using var attribute = exists
-                ? H5AAdapter.Open(this, name, h => new H5DateTimeOffsetAttribute(h))
-                : H5AAdapter.Create(this, name, H5DateTimeOffsetType.CreateType, shapeCtor, h => new H5DateTimeOffsetAttribute(h));
+            using var attribute = 
+                H5AAdapter.CreateOrOpen(this, name, H5DateTimeOffsetType.Create, shapeCtor, H5DateTimeOffsetAttribute.Create);
 
             attribute.Write(dateTimeOffsetValue);
         }
         else if (value is DateTime dateTimeValue)
         {
-            using var attribute = exists
-                ? H5AAdapter.Open(this, name, h => new H5DateTimeAttribute(h))
-                : H5AAdapter.Create(this, name, H5DateTimeType.CreateType, shapeCtor, h => new H5DateTimeAttribute(h));
+            using var attribute = 
+                H5AAdapter.CreateOrOpen(this, name, H5DateTimeType.Create, shapeCtor, H5DateTimeAttribute.Create);
 
             attribute.Write(dateTimeValue);
         }
         else if (value is TimeSpan timeSpanValue)
         {
-            using var attribute = exists
-                ? H5AAdapter.Open(this, name, h => new H5TimeSpanAttribute(h))
-                : H5AAdapter.Create(this, name, H5TimeSpanType.CreateType, shapeCtor, h => new H5TimeSpanAttribute(h));
+            using var attribute = 
+                H5AAdapter.CreateOrOpen(this, name, H5TimeSpanType.Create, shapeCtor, H5TimeSpanAttribute.Create);
 
             attribute.Write(timeSpanValue);
         }
 #if NET7_0_OR_GREATER
         else if (value is TimeOnly timeOnlyValue)
         {
-            using var attribute = exists
-                ? H5AAdapter.Open(this, name, h => new H5TimeOnlyAttribute(h))
-                : H5AAdapter.Create(this, name, H5TimeOnlyType.CreateType, shapeCtor, h => new H5TimeOnlyAttribute(h));
+            using var attribute = 
+                H5AAdapter.CreateOrOpen(this, name, H5TimeOnlyType.Create, shapeCtor, H5TimeOnlyAttribute.Create);
 
             attribute.Write(timeOnlyValue);
+        }
+        else if (value is DateOnly dateOnlyValue)
+        {
+            using var attribute = 
+                H5AAdapter.CreateOrOpen(this, name, H5DateOnlyType.Create, shapeCtor, H5DateOnlyAttribute.Create);
+
+            attribute.Write(dateOnlyValue);
         }
 #endif
         else if (typeof(TA).IsPrimitive)
         {
-            using var attribute = exists
-                ? H5AAdapter.Open(this, name, h => new H5PrimitiveAttribute<TA>(h))
-                : H5AAdapter.Create(this, name, H5Type.GetEquivalentNativeType<TA>, shapeCtor, h => new H5PrimitiveAttribute<TA>(h));
+            using var attribute = 
+                H5AAdapter.CreateOrOpen(this, name, H5PrimitiveType<TA>.Create, shapeCtor, H5PrimitiveAttribute<TA>.Create);
 
             attribute.Write(value);
         }
         else
         {
-            // TODO: Compound
+            // TODO: Compound, arrays, collections etc
+            throw new NotImplementedException($"Support for {typeof(TA).FullName} is not implemented.");
         }
     }
 
@@ -319,16 +331,15 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         var exists = CheckExists(name, writeBehaviour);
 
-        if (exists)
-        {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5StringAttribute(h));
-            attribute.Write(value);
-        }
-        else
-        {
-            using var attribute = H5AAdapter.CreateStringAttribute(this, name, fixedStorageLength, characterSet, padding);
-            attribute.Write(value);
-        }
+        var shapeCtor = H5Space.CreateScalar; // TODO: arrays?
+
+        using H5StringAttribute attribute = exists
+            ? H5AAdapter.Open(this, name, H5StringAttribute.Create)
+            : H5AAdapter.Create(this, name, 
+                () => H5StringType.Create(fixedStorageLength, characterSet, padding), 
+                shapeCtor, H5StringAttribute.Create);
+
+        attribute.Write(value);
     }
 
     #endregion

@@ -18,11 +18,7 @@ internal static unsafe class H5AAdapter
     }
 
     internal static TA Create<T, TA, TT>(
-        H5Object<T> h5Object,
-        string name,
-        Func<TT> typeCtor,
-        Func<H5Space> spaceCtor,
-        Func<long, TA> attributeCtor)
+        H5Object<T> h5Object, string name, Func<TT> typeCtor, Func<H5Space> spaceCtor, Func<long, TA> attributeCtor)
         where T : H5Object<T>
         where TA : H5Attribute
         where TT : H5Type
@@ -46,6 +42,31 @@ internal static unsafe class H5AAdapter
 #endif
 
         return attributeCtor(h);
+    }
+
+    internal static TA CreateOrOpen<T, TA, TT>(
+        H5Object<T> h5Object, bool exists, string name, Func<TT> typeCtor, Func<H5Space> spaceCtor, Func<long, TA> attributeCtor)
+        where T : H5Object<T>
+        where TA : H5Attribute
+        where TT : H5Type
+    {
+        if (exists)
+        {
+            return Open(h5Object, name, attributeCtor);
+        }
+        else
+        {
+            return Create(h5Object, name, typeCtor, spaceCtor, attributeCtor);
+        }
+    }
+
+    internal static TA CreateOrOpen<T, TA, TT>(
+        H5Object<T> h5Object, string name, Func<TT> typeCtor, Func<H5Space> spaceCtor, Func<long, TA> attributeCtor)
+        where T : H5Object<T>
+        where TA : H5Attribute
+        where TT : H5Type
+    {
+        return CreateOrOpen(h5Object, Exists(h5Object, name), name, typeCtor, spaceCtor, attributeCtor);
     }
 
     internal static H5StringAttribute CreateStringAttribute<T>(
@@ -88,22 +109,6 @@ internal static unsafe class H5AAdapter
 
         return attributeCtor(h);
     }
-
-/*    internal static TA CreateOrOpen<T, TA, TT>(
-        H5Object<T> h5Object, string name, Func<TT> typeCtor, Func<H5Space> spaceCtor, Func<long, TA> attributeCtor)
-        where T : H5Object<T>
-        where TA : H5Attribute
-        where TT : H5Type
-    {
-        if (Exists(h5Object, name))
-        {
-            return Open(h5Object, name, attributeCtor);
-        }
-        else
-        {
-            return Create(h5Object, name, typeCtor, spaceCtor, attributeCtor);
-        }
-    }*/
 
     internal static void Delete<T>(H5Object<T> h5Object, string name) where T : H5Object<T>
     {
@@ -266,7 +271,7 @@ internal static unsafe class H5AAdapter
         //    throw new H5Exception($"Attribute is not of expected type.");
         //}
 
-        var cls = type.GetClass();
+        var cls = type.Class;
 
         var expectedCls = H5TAdapter.GetClass(expectedType);
 

@@ -28,7 +28,8 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
 
         if (verifyType)
         {
-            using var enumType = H5Type.CreateEnumType<T>();
+            using var enumType = H5EnumType<T>.Create();
+
             if (!enumType.IsEqualTo(type))
             {
                 throw new H5Exception($"{Name} does not have an equivalent HDF5 enumeration of {typeof(T)}.");
@@ -38,14 +39,12 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
         return H5AAdapter.ReadImpl<T>(this, type, nativeType);
     }
 
-    public override H5EnumAttribute<T> Write(T value)
+    public override void Write(T value)
     {
         H5ThrowHelpers.ThrowIfNotEnum<T>();
         Guard.IsNotNull(value);
 
         WriteEnum();
-
-        return this;
 
         H5Attribute WriteEnum()
         {
@@ -70,5 +69,10 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
 
             return this;
         }
+    }
+
+    public static H5EnumAttribute<T> Create(long handle)
+    {
+        return new H5EnumAttribute<T>(handle);
     }
 }

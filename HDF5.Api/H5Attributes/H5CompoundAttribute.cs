@@ -19,8 +19,13 @@ public class H5CompoundAttribute<T> : H5Attribute<T, H5CompoundAttribute<T>, H5C
         throw new NotImplementedException();
     }
 
-    public override H5CompoundAttribute<T> Write([DisallowNull] T value)
+    public override void Write([DisallowNull] T value)
     {
         throw new NotImplementedException();
+    }
+
+    public static H5CompoundAttribute<T> Create(long handle)
+    {
+        return new H5CompoundAttribute<T>(handle);
     }
 }

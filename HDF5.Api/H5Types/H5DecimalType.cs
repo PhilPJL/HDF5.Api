@@ -8,9 +8,11 @@ public class H5DecimalType : H5Type<decimal>
     {
     }
 
-    internal static H5DecimalType CreateType()
+    internal static H5DecimalType Create()
     {
-        // TODO: 4 x long opaque type
-        throw new NotImplementedException("decimal type: TODO.");
+        return H5TAdapter.CreateOpaqueType(sizeof(decimal), typeof(decimal).FullName!, h => new H5DecimalType(h));
     }
+
+    // TODO?
+    //internal string Tag => H5TAdapter.GetOpaqueTypeTag(this);
 }

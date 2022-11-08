@@ -73,7 +73,7 @@ internal static class H5ThrowHelpers
     {
         if (!typeof(T).IsEnum)
         {
-            throw new InvalidOperationException($"{typeof(T).Name} must be an Enum.");
+            throw new InvalidOperationException($"The generic typep parameter 'T' is of type {typeof(T).Name}.  An enum type was expected.");
         }
     }
 

@@ -18,7 +18,7 @@ public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset, H5DateTimeO
     {
         // TODO: optionally write value.ToString("O")
         using var type = GetAttributeType();
-        using var expectedType = H5DateTimeOffsetType.CreateType();
+        using var expectedType = H5DateTimeOffsetType.Create();
 
         // TODO: sort out the type/expectedType/cls stuff
         var value = H5AAdapter.ReadImpl<DateTimeOffsetProxy>(this, type, expectedType);
@@ -26,7 +26,7 @@ public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset, H5DateTimeO
         return new DateTimeOffset(DateTime.FromBinary(value.DateTime), TimeSpan.FromMinutes(value.Offset));
     }
 
-    public override H5DateTimeOffsetAttribute Write([DisallowNull] DateTimeOffset value)
+    public override void Write([DisallowNull] DateTimeOffset value)
     {
         var dt = new DateTimeOffsetProxy
         {
@@ -35,9 +35,12 @@ public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset, H5DateTimeO
         };
 
         // TODO: optionally write value.ToString("O")
-        using var type = H5DateTimeOffsetType.CreateType();
+        using var type = H5DateTimeOffsetType.Create();
         H5AAdapter.Write(this, type, dt);
+    }
 
-        return this;
+    public static H5DateTimeOffsetAttribute Create(long handle)
+    {
+        return new H5DateTimeOffsetAttribute(handle);
     }
 }

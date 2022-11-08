@@ -16,14 +16,20 @@ public class H5DecimalAttribute : H5Attribute<decimal, H5DecimalAttribute, H5Dec
 
     public override decimal Read(bool verifyType = false)
     {
-        // TODO: implement
-        throw new NotImplementedException();
+        using var type = GetAttributeType();
+        using var expectedType = H5DecimalType.Create();
+        return H5AAdapter.ReadImpl<decimal>(this, type, expectedType);
     }
 
-    public override H5DecimalAttribute Write([DisallowNull] decimal value)
+    public override void Write([DisallowNull] decimal value)
     {
-        // TODO: implement
-        throw new NotImplementedException();
+        using var type = GetAttributeType();
+        H5AAdapter.Write(this, type, value);
+    }
+
+    public static H5DecimalAttribute Create(long handle)
+    {
+        return new H5DecimalAttribute(handle);
     }
 }
 

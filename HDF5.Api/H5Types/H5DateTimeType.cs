@@ -8,7 +8,7 @@ public class H5DateTimeType : H5Type<DateTime>
     {
     }
 
-    internal static H5DateTimeType CreateType()
+    internal static H5DateTimeType Create()
     {
         return H5TAdapter.ConvertDotNetPrimitiveToH5Type<long, H5DateTimeType>(h => new H5DateTimeType(h));
     }
