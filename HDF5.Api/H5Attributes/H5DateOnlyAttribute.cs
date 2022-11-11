@@ -19,12 +19,11 @@ public class H5DateOnlyAttribute : H5Attribute<DateOnly, H5DateOnlyAttribute, H5
     public override DateOnly Read(bool verifyType = false)
     {
         using var type = GetAttributeType();
-        using var expectedType = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
+        using var expectedType = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<int>();
 
         // TODO: sort out the type/expectedType/cls stuff
 
         int dayNumber = H5AAdapter.ReadImpl<int>(this, type, expectedType);
-
         return DateOnly.FromDayNumber(dayNumber);
     }
 
@@ -32,7 +31,7 @@ public class H5DateOnlyAttribute : H5Attribute<DateOnly, H5DateOnlyAttribute, H5
     {
         // TODO: optionally write value.ToString("O", CultureInfo.InvariantCulture)
 
-        using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<long>();
+        using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<int>();
         H5AAdapter.Write(this, type, value.DayNumber);
     }
 

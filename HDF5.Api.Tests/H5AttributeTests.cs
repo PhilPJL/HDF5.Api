@@ -70,15 +70,13 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             {
                 file.WriteAttribute(name, value, fixedStorageLength, characterSet, padding);
 
-                using (var attribute = file.OpenStringAttribute(name))
-                {
-                    var r = attribute.Read();
+                using var attribute = file.OpenStringAttribute(name);
+                var r = attribute.Read();
 
-                    // NOTE: assuming that if no value is written ReadString will return string.Empty
-                    Assert.AreEqual(value ?? string.Empty, r);
+                // NOTE: assuming that if no value is written ReadString will return string.Empty
+                Assert.AreEqual(value ?? string.Empty, r);
 
-                    Assert.AreEqual(name, attribute.Name);
-                }
+                Assert.AreEqual(name, attribute.Name);
             }
         },
         fileNameSuffix);
@@ -343,6 +341,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         CreateWriteReadUpdateDeleteTimeSpanAttribute(TimeSpan.FromDays(5.61), TimeSpan.FromMilliseconds(16.345));
 #if NET7_0_OR_GREATER
         CreateWriteReadUpdateDeleteTimeOnlyAttribute(TimeOnly.MinValue, TimeOnly.MaxValue);
+        CreateWriteReadUpdateDeleteDateOnlyAttribute(DateOnly.MinValue, DateOnly.MaxValue);
 #endif
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddMinutes(5));
         CreateWriteReadUpdateDeleteDateTimeAttribute(DateTime.UtcNow, DateTime.UtcNow.AddYears(5));
@@ -368,6 +367,26 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             a.Write(newValue);
 
             Assert.AreEqual(newValue, location.ReadAttribute<TimeOnly>(name));
+            Assert.AreEqual(newValue, a.Read());
+
+            location.DeleteAttribute(name);
+            Assert.IsFalse(location.AttributeExists(name));
+        }
+
+        void CreateWriteReadUpdateDeleteDateOnlyAttribute(DateOnly value, DateOnly newValue)
+        {
+            const string name = "dtDateOnly";
+
+            location.WriteAttribute(name, value);
+            Assert.IsTrue(location.AttributeExists(name));
+
+            using var a = location.OpenDateOnlyAttribute(name);
+            Assert.AreEqual(value, location.ReadAttribute<DateOnly>(name));
+            Assert.AreEqual(value, a.Read());
+
+            a.Write(newValue);
+
+            Assert.AreEqual(newValue, location.ReadAttribute<DateOnly>(name));
             Assert.AreEqual(newValue, a.Read());
 
             location.DeleteAttribute(name);

@@ -72,6 +72,13 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         return H5AAdapter.Open(this, name, h => new H5TimeOnlyAttribute(h));
     }
+
+    internal H5DateOnlyAttribute OpenDateOnlyAttribute([DisallowNull] string name)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+
+        return H5AAdapter.Open(this, name, h => new H5DateOnlyAttribute(h));
+    }
 #endif
 
     internal H5DateTimeAttribute OpenDateTimeAttribute(string name)
@@ -121,6 +128,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
             TimeSpan => (TA)ReadTimeSpanAttribute(),
 #if NET7_0_OR_GREATER
             TimeOnly => (TA)ReadTimeOnlyAttribute(),
+            DateOnly => (TA)ReadDateOnlyAttribute(),
 #endif
             _ => (TA)ReadCompoundAttribute()
         };
@@ -159,6 +167,12 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         object ReadTimeOnlyAttribute()
         {
             using var attribute = H5AAdapter.Open(this, name, h => new H5TimeOnlyAttribute(h));
+            return attribute.Read();
+        }
+
+        object ReadDateOnlyAttribute()
+        {
+            using var attribute = H5AAdapter.Open(this, name, h => new H5DateOnlyAttribute(h));
             return attribute.Read();
         }
 #endif
@@ -226,6 +240,11 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         }
 
         return false;
+    }
+
+    public void WriteAttribute<TA>([DisallowNull] string name, [DisallowNull] TA[] value, AttributeWriteBehaviour? writeBehaviour = null) //where TA : unmanaged
+    {
+
     }
 
     public void WriteAttribute<TA>([DisallowNull] string name, [DisallowNull] TA value, AttributeWriteBehaviour? writeBehaviour = null) //where TA : unmanaged
