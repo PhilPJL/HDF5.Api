@@ -18,13 +18,13 @@ public class H5PrimitiveAttribute<T> : H5Attribute<T, H5PrimitiveAttribute<T>, H
         return H5AAdapter.GetType(this, h => new H5PrimitiveType<T>(h));
     }
 
-    public override T Read(bool verifyType = false)
+    public override T Read()
     {
         H5ThrowHelpers.ThrowIfManaged<T>();
 
         using var type = GetAttributeType();
-        using var nativeType = H5Type.GetEquivalentNativeType<T>();
-        return H5AAdapter.ReadImpl<T>(this, type, nativeType);
+        using var expectedType = H5PrimitiveType<T>.Create();
+        return H5AAdapter.ReadImpl<T>(this, type, expectedType);
     }
 
     public override void Write([DisallowNull] T value) //where T : unmanaged

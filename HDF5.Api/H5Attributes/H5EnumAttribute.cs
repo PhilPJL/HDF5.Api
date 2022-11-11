@@ -19,24 +19,14 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
         return H5AAdapter.GetType(this, h => new H5EnumType<T>(h));
     }
 
-    public override T Read(bool verifyType = false)
+    public override T Read()
     {
         H5ThrowHelpers.ThrowIfNotEnum<T>();
 
-        using var nativeType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
         using var type = GetAttributeType();
+        using var expectedType = H5EnumType<T>.Create();
 
-        if (verifyType)
-        {
-            using var enumType = H5EnumType<T>.Create();
-
-            if (!enumType.IsEqualTo(type))
-            {
-                throw new H5Exception($"{Name} does not have an equivalent HDF5 enumeration of {typeof(T)}.");
-            }
-        }
-
-        return H5AAdapter.ReadImpl<T>(this, type, nativeType);
+        return H5AAdapter.ReadImpl<T>(this, type, expectedType);
     }
 
     public override void Write(T value)

@@ -50,6 +50,11 @@ public class H5Space : H5Object<H5Space>
         return Create(Dimension.Create(dimensions));
     }
 
+    public static H5Space Create(params ulong[] dimensions)
+    {
+        return Create(Dimension.Create(dimensions));
+    }
+
     public static H5Space Create(params (long initialSize, long upperLimit)[] dimensions)
     {
         return Create(Dimension.Create(dimensions));

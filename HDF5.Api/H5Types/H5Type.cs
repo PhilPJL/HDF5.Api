@@ -92,15 +92,15 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
         return H5TAdapter.CreateCompoundType<T, TT>(typeCtor);
     }
 
-/*    /// <summary>
-    ///     Create a Compound type in order to hold an <typeparamref name="T" /> plus additional space as defined by
-    ///     <paramref name="extraSpace" />
-    /// </summary>
-    public static H5Type CreateCompoundType<T>(int extraSpace) where T : unmanaged
-    {
-        return H5TAdapter.CreateCompoundType<T>(extraSpace);
-    }
-*/
+    /*    /// <summary>
+        ///     Create a Compound type in order to hold an <typeparamref name="T" /> plus additional space as defined by
+        ///     <paramref name="extraSpace" />
+        /// </summary>
+        public static H5Type CreateCompoundType<T>(int extraSpace) where T : unmanaged
+        {
+            return H5TAdapter.CreateCompoundType<T>(extraSpace);
+        }
+    */
     internal static H5Type CreateByteArrayType(int size)
     {
         return H5TAdapter.CreateByteArrayType(size);

@@ -16,12 +16,10 @@ public class H5DateOnlyAttribute : H5Attribute<DateOnly, H5DateOnlyAttribute, H5
         return H5AAdapter.GetType(this, h => new H5DateOnlyType(h));
     }
 
-    public override DateOnly Read(bool verifyType = false)
+    public override DateOnly Read()
     {
         using var type = GetAttributeType();
-        using var expectedType = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<int>();
-
-        // TODO: sort out the type/expectedType/cls stuff
+        using var expectedType = H5DateOnlyType.Create();
 
         int dayNumber = H5AAdapter.ReadImpl<int>(this, type, expectedType);
         return DateOnly.FromDayNumber(dayNumber);

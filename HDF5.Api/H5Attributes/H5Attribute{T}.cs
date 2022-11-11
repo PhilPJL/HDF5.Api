@@ -1,4 +1,5 @@
 ﻿using HDF5.Api.H5Types;
+using System.Collections.Generic;
 
 namespace HDF5.Api.H5Attributes;
 
@@ -12,9 +13,14 @@ public abstract class H5Attribute<T, TA, TT> : H5Attribute
 
     public abstract TT GetAttributeType();
 
-    public abstract T Read(bool verifyType = false);
+    public abstract T Read();
 
     public abstract void Write([DisallowNull] T value);
+
+    public virtual void Write([DisallowNull] IEnumerable<T> value)
+    {
+        throw new NotImplementedException($"{typeof(IEnumerable<T>)}");
+    }
 
     [DisallowNull]
     public T Value

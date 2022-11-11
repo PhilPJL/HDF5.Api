@@ -168,7 +168,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
     }
 
     [TestMethod]
-    public void ReadingVerifiedMismatchedEnumTypeThrows()
+    public void ReadingMismatchedEnumTypeThrows()
     {
         HandleCheck((file) =>
         {
@@ -177,12 +177,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             var valueTestUlongMin = file.ReadAttribute<TestULong>("test-ulong.min");
             Assert.AreEqual(valueTestUlongMin, TestULong.Min);
 
-            // mismatched type but should work because the value is zero
-            TestLong valueTestLong = file.ReadAttribute<TestLong>("test-ulong.min");
-            Assert.AreEqual(valueTestLong, TestLong.None);
-
-            // should throw
-            Assert.ThrowsException<H5Exception>(() => file.ReadAttribute<TestLong>("test-ulong.min", true));
+            // mismatched type should throw
+            Assert.ThrowsException<H5Exception>(() => file.ReadAttribute<TestLong>("test-ulong.min"));
         });
     }
 
@@ -198,7 +194,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         location.WriteAttribute("dateTimeOffset-min", DateTimeOffset.MinValue);
         location.WriteAttribute("dateTimeOffset", DateTimeOffset.Now);
         location.WriteAttribute("dateTimeOffset-max", DateTimeOffset.MaxValue);
-        
+
         location.WriteAttribute("timeSpan-min", TimeSpan.MinValue);
         location.WriteAttribute("timeSpan-max", TimeSpan.MaxValue);
 
@@ -211,6 +207,9 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
 
         location.WriteAttribute("bool-true", true);
         location.WriteAttribute("bool-false", false);
+
+        location.WriteAttribute("char-min", char.MinValue);
+        location.WriteAttribute("char-max", char.MaxValue);
 
         location.WriteAttribute("byte-min", byte.MinValue);
         location.WriteAttribute("byte", (byte)5);
@@ -259,6 +258,8 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
         // TODO: decimal
 
         var names = new List<string> {
+            "char-min",
+            "char-max",
             "dateTime-min",
             "dateTime-max",
             "dateTime",
@@ -641,6 +642,7 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             CreateValue(TestUShort.Min, TestUShort.Max);
             CreateValue(TestByte.Min, TestByte.Max);
             CreateValue(TestSByte.Min, TestSByte.Max);
+            CreateValue(Boolean.False, Boolean.True);
 
             void CreateValue<T>(T valueMin, T valueMax) where T : unmanaged, Enum
             {
@@ -720,6 +722,50 @@ public class H5AttributeTests : H5Test<H5AttributeTests>
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => file.WriteAttribute("too_long2", "012345678901234567890", 21)); // does throw
         });
     }
+
+    [TestMethod]
+    public void VariableLengthStringArray()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+            file.WriteAttribute("strings",
+                (IEnumerable<string>)new string[] 
+                {
+                    "the",
+                    "quick",
+                    "brown",
+                    "fox",
+                    "jumped",
+                    "over",
+                    "the",
+                    "lazy",
+                    "dog"
+                }, 0);
+        });
+    }
+
+    [TestMethod]
+    public void FixedLengthStringArray()
+    {
+        HandleCheck(() =>
+        {
+            using var file = CreateFile();
+            file.WriteAttribute("strings",
+                (IEnumerable<string>)new string[] 
+                {
+                    "the",
+                    "quick",
+                    "brown",
+                    "fox",
+                    "jumped",
+                    "over",
+                    "the",
+                    "lazy",
+                    "dog"
+                }, 10);
+        });
+    }
 }
 
 enum TestInt
@@ -765,6 +811,12 @@ enum TestByte : byte
 {
     Min = byte.MinValue,
     Max = byte.MaxValue
+}
+
+enum Boolean : byte
+{
+    False = 0,
+    True = 1
 }
 
 enum TestSByte : sbyte

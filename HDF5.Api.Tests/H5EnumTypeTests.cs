@@ -63,7 +63,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     {
         HandleCheck((file) =>
         {
-            using var enumType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<TestInt>();
+            using var enumType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<TestInt>();
 
             H5TAdapter.InsertEnumMember(enumType, nameof(TestInt.one), TestInt.one);
             H5TAdapter.InsertEnumMember(enumType, nameof(TestInt.two), TestInt.two);
@@ -125,7 +125,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     {
         HandleCheck((file) =>
         {
-            using var enumType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<TestShort>();
+            using var enumType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<TestShort>();
 
             H5TAdapter.InsertEnumMember(enumType, nameof(TestShort.one), TestShort.one);
             H5TAdapter.InsertEnumMember(enumType, nameof(TestShort.two), TestShort.two);
@@ -152,13 +152,13 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     {
         HandleCheck((file) =>
         {
-            using var e1 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<TestByte>();
-            using var e2 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<TestShort>();
-            using var e3 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<TestUShort>();
-            using var e4 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<TestInt>();
-            using var e5 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<TestUInt>();
-            using var e6 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<TestLong>();
-            using var e7 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<TestULong>();
+            using var e1 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<TestByte>();
+            using var e2 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<TestShort>();
+            using var e3 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<TestUShort>();
+            using var e4 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<TestInt>();
+            using var e5 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<TestUInt>();
+            using var e6 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<TestLong>();
+            using var e7 = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<TestULong>();
         });
     }
 
@@ -167,7 +167,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     {
         HandleCheck((file) =>
         {
-            using var enumType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<TestShort>();
+            using var enumType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<TestShort>();
 
             H5TAdapter.InsertEnumMember(enumType, nameof(TestShort.one), TestShort.one);
             Assert.ThrowsException<H5Exception>(() =>
@@ -180,7 +180,7 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
     {
         HandleCheck((file) =>
         {
-            using var enumType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5NativeType<TestShort>();
+            using var enumType = H5TAdapter.ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<TestShort>();
 
             H5TAdapter.InsertEnumMember(enumType, nameof(TestShort.one), TestShort.one);
             Assert.ThrowsException<H5Exception>(() =>

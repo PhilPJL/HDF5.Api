@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using static HDF5.Api.NativeMethods.H5A;
 using HDF5.Api.H5Attributes;
 using HDF5.Api.H5Types;
+using CommunityToolkit.HighPerformance;
 
 namespace HDF5.Api.NativeMethodAdapters;
 
@@ -265,11 +266,10 @@ internal static unsafe class H5AAdapter
             throw new H5Exception("Attribute is not scalar.");
         }
 
-        // TODO: fix for enums
-        //if (!type.IsEqualTo(expectedType))
-        //{
-        //    throw new H5Exception($"Attribute is not of expected type.");
-        //}
+        if (!type.IsEqualTo(expectedType))
+        {
+            throw new H5Exception($"Attribute type does not match the expected type.");
+        }
 
         var cls = type.Class;
 
@@ -324,5 +324,17 @@ internal static unsafe class H5AAdapter
         write(attribute, type, buffer).ThrowIfError();
     }
 
-    #endregion
+    internal static void Write(H5Attribute attribute, H5Type type, ReadOnlySpan<byte> buffer)
+    {
+#if NET7_0_OR_GREATER
+        write(attribute, type, buffer).ThrowIfError();
+#else
+        fixed (byte* ptr = &buffer.DangerousGetReference())
+        {
+            H5AAdapter.Write(attribute, type, new IntPtr(ptr));
+        }
+#endif
+    }
+
+#endregion
 }

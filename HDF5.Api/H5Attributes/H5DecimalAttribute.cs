@@ -14,10 +14,11 @@ public class H5DecimalAttribute : H5Attribute<decimal, H5DecimalAttribute, H5Dec
         return H5AAdapter.GetType(this, h => new H5DecimalType(h));
     }
 
-    public override decimal Read(bool verifyType = false)
+    public override decimal Read()
     {
         using var type = GetAttributeType();
         using var expectedType = H5DecimalType.Create();
+
         return H5AAdapter.ReadImpl<decimal>(this, type, expectedType);
     }
 

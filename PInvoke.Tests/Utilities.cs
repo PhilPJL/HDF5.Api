@@ -14,6 +14,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 using HDF5.Api;
+using System.Diagnostics;
 
 namespace UnitTests;
 
@@ -24,6 +25,8 @@ internal static class Utilities
         _ = H5E.set_auto(H5E.DEFAULT, null, IntPtr.Zero);
     }
 
+    private readonly static object _lock = new object();
+
     /// <summary>
     /// Create a temporary HDF5 file IN MEMORY and return its name and
     /// a file handle.
@@ -32,32 +35,57 @@ internal static class Utilities
         H5F.libver_t version = H5F.libver_t.LATEST,
         bool backing_store = false)
     {
-        hid_t fapl = H5P.create(H5P.FILE_ACCESS);
-        if (fapl < 0)
+        // TODO: this intermittently fails with 'can't truncate file, already open'.
+        int attempts = 0;
+        while (true)
         {
-            throw new H5Exception("H5P.create failed.");
+            lock (_lock)
+            {
+                try
+                {
+
+                    hid_t fapl = H5P.create(H5P.FILE_ACCESS);
+                    if (fapl < 0)
+                    {
+                        throw new H5Exception("H5P.create failed.");
+                    }
+                    if (H5P.set_libver_bounds(fapl, version) < 0)
+                    {
+                        throw new H5Exception("H5P.set_libver_bounds failed.");
+                    }
+                    // use the core VFD, 64K increments, no backing store
+                    if (H5P.set_fapl_core(fapl, new IntPtr(65536),
+                        (uint)(backing_store ? 1 : 0)) < 0)
+                    {
+                        throw new H5Exception("H5P.set_fapl_core failed.");
+                    }
+                    fileName = Path.GetTempFileName();
+                    hid_t file = H5F.create(fileName, H5F.ACC_TRUNC, H5P.DEFAULT, fapl);
+                    if (file < 0)
+                    {
+                        throw new H5Exception("H5F.create failed.");
+                    }
+                    if (H5P.close(fapl) < 0)
+                    {
+                        throw new H5Exception("H5P.close failed.");
+                    }
+                    return file;
+                }
+                catch(Exception ex)
+                {
+                    attempts++;
+
+                    Debug.WriteLine(ex.Message);
+
+                    Thread.Sleep(100);
+
+                    if(attempts >= 3)
+                    {
+                        throw;
+                    }
+                }
+            }
         }
-        if (H5P.set_libver_bounds(fapl, version) < 0)
-        {
-            throw new H5Exception("H5P.set_libver_bounds failed.");
-        }
-        // use the core VFD, 64K increments, no backing store
-        if (H5P.set_fapl_core(fapl, new IntPtr(65536),
-            (uint)(backing_store ? 1 : 0)) < 0)
-        {
-            throw new H5Exception("H5P.set_fapl_core failed.");
-        }
-        fileName = Path.GetTempFileName();
-        hid_t file = H5F.create(fileName, H5F.ACC_TRUNC, H5P.DEFAULT, fapl);
-        if (file < 0)
-        {
-            throw new H5Exception("H5F.create failed.");
-        }
-        if (H5P.close(fapl) < 0)
-        {
-            throw new H5Exception("H5P.close failed.");
-        }
-        return file;
     }
 
     /// <summary>

@@ -4,6 +4,7 @@ using HDF5.Api.H5Types;
 using HDF5.Api.NativeMethodAdapters;
 using HDF5.Api.Utils;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HDF5.Api;
 
@@ -154,7 +155,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         object ReadEnumAttribute()
         {
             using var attribute = H5AAdapter.Open(this, name, h => new H5EnumAttribute<TA>(h));
-            return attribute.Read(verifyType)!;
+            return attribute.Read()!;
         }
 
         object ReadDateTimeAttribute()
@@ -242,20 +243,22 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         return false;
     }
 
-    public void WriteAttribute<TA>([DisallowNull] string name, [DisallowNull] TA[] value, AttributeWriteBehaviour? writeBehaviour = null) //where TA : unmanaged
-    {
-
-    }
-
     public void WriteAttribute<TA>([DisallowNull] string name, [DisallowNull] TA value, AttributeWriteBehaviour? writeBehaviour = null) //where TA : unmanaged
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(value);
 
         var exists = CheckExists(name, writeBehaviour);
-        var shapeCtor = H5Space.CreateScalar; // TODO: arrays?
+        var shapeCtor = H5Space.CreateScalar; 
 
-        if (typeof(TA).IsEnum)
+        var type = typeof(TA);
+
+        if(value is string stringValue)
+        {
+            // Write a variable length string with default encoding and padding
+            WriteAttribute(name, stringValue, 0);
+        }
+        else if (type.IsEnum)
         {
             using var attribute = 
                 H5AAdapter.CreateOrOpen(this, name, H5EnumType<TA>.Create, shapeCtor, h => new H5EnumAttribute<TA>(h));
@@ -313,7 +316,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
             attribute.Write(dateOnlyValue);
         }
 #endif
-        else if (typeof(TA).IsPrimitive)
+        else if (type.IsPrimitive)
         {
             using var attribute = 
                 H5AAdapter.CreateOrOpen(this, name, H5PrimitiveType<TA>.Create, shapeCtor, H5PrimitiveAttribute<TA>.Create);
@@ -340,7 +343,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
     public void WriteAttribute(
         [DisallowNull] string name,
         [DisallowNull] string value,
-        int fixedStorageLength = 0,
+        int fixedStorageLength,
         CharacterSet characterSet = CharacterSet.Utf8,
         StringPadding padding = StringPadding.NullPad,
         AttributeWriteBehaviour? writeBehaviour = null)
@@ -359,6 +362,40 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
                 shapeCtor, H5StringAttribute.Create);
 
         attribute.Write(value);
+    }
+
+    /// <summary>
+    /// Write string attribute.
+    /// </summary>
+    /// <param name="name">Attribute name. This can be unicode and isn't impacted by the <paramref name="fixedStorageLength"/> value.</param>
+    /// <param name="fixedStorageLength">The total number of bytes allocated to store the string including the null terminator.  Set to 0 for a variable length string.
+    /// <para>ASCII strings require 1 byte per character, plus 1 for the null terminator.</para>
+    /// <para>UTF8 strings require 1-4 bytes per character, plus 1 for the null terminator.</para></param>
+    /// <param name="characterSet">Defaults to <see cref="CharacterSet.Utf8"/>.</param>
+    /// <param name="padding"></param>
+    /// <returns></returns>
+    public void WriteAttribute(
+        [DisallowNull] string name,
+        [DisallowNull] IEnumerable<string> values,
+        int fixedStorageLength,
+        CharacterSet characterSet = CharacterSet.Utf8,
+        StringPadding padding = StringPadding.NullPad,
+        AttributeWriteBehaviour? writeBehaviour = null)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(values);
+        // TODO: check no elements of values is null
+
+        var exists = CheckExists(name, writeBehaviour);
+        var shapeCtor = () => H5Space.Create(new Dimension(values.Count()));
+
+        using H5StringAttribute attribute = exists
+            ? H5AAdapter.Open(this, name, H5StringAttribute.Create)
+            : H5AAdapter.Create(this, name, 
+                () => H5StringType.Create(fixedStorageLength, characterSet, padding), 
+                shapeCtor, H5StringAttribute.Create);
+
+        attribute.Write(values);
     }
 
     #endregion

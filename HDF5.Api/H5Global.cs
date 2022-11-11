@@ -154,11 +154,19 @@ public readonly struct Dimension
 
     public static Dimension[] Create(params long[] dimensions)
     {
+        // TODO: max rank 4
+        return dimensions.Select(d => new Dimension(d)).ToArray();
+    }
+
+    public static Dimension[] Create(params ulong[] dimensions)
+    {
+        // TODO: max rank 4
         return dimensions.Select(d => new Dimension(d)).ToArray();
     }
 
     public static Dimension[] Create(params (long initialSize, long upperLimit)[] dimensions)
     {
+        // TODO: max rank 4
         return dimensions.Select(d => new Dimension(d.initialSize, d.upperLimit)).ToArray();
     }
 }

@@ -267,5 +267,35 @@ internal static unsafe partial class H5A
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     public static partial herr_t write
         (hid_t attr_id, hid_t mem_type_id, IntPtr buf);
+
+    /// <summary>
+    /// Writes data to an attribute.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Write
+    /// </summary>
+    /// <param name="attr_id">Identifier of an attribute to write.</param>
+    /// <param name="mem_type_id">Identifier of the attribute datatype
+    /// (in memory).</param>
+    /// <param name="buf">Data to be written.</param>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Awrite"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t write
+        (hid_t attr_id, hid_t mem_type_id, ReadOnlySpan<byte> buf);
+
+
+    /// <summary>
+    /// Writes data to an attribute.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5A.html#Annot-Write
+    /// </summary>
+    /// <param name="attr_id">Identifier of an attribute to write.</param>
+    /// <param name="mem_type_id">Identifier of the attribute datatype
+    /// (in memory).</param>
+    /// <param name="buf">Data to be written.</param>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Awrite"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t write
+        (hid_t attr_id, hid_t mem_type_id, byte[][] buf);
+
 #endif
 }

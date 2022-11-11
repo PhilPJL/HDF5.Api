@@ -14,13 +14,13 @@ public class H5DateTimeAttribute : H5Attribute<DateTime, H5DateTimeAttribute, H5
         return H5AAdapter.GetType(this, h => new H5DateTimeType(h));
     }
 
-    public override DateTime Read(bool verifyType = false)
+    public override DateTime Read()
     {
         // TODO: optionally write value.ToString("O")
         using var type = GetAttributeType();
+        using var expectedType = H5DateTimeType.Create();
 
-        // TODO: sort out the type/expectedType/cls stuff
-        long dateTime = H5AAdapter.ReadImpl<long>(this, type, type);
+        long dateTime = H5AAdapter.ReadImpl<long>(this, type, expectedType);
         return DateTime.FromBinary(dateTime);
     }
 

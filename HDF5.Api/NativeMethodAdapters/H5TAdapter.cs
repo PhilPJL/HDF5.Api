@@ -54,6 +54,50 @@ internal static unsafe class H5TAdapter
         return typeCtor(create((class_t)DataTypeClass.Compound, new ssize_t(size)));
     }
 
+    internal static TT CreatePrimitiveArrayType<T, TT>(Func<long, TT> typeCtor, params long[] dims)
+        where TT : H5Type
+    {
+        var handle = GetNativeTypeHandleForPrimitiveDotNetType<T>();
+
+        return typeCtor(array_create(handle, (uint)dims.Length, dims.Select(d => (ulong)d).ToArray()));
+    }
+
+    private static long GetNativeTypeHandleForPrimitiveDotNetType<T>()
+    {
+        var type = typeof(T);
+
+        if (!type.IsPrimitive)
+        {
+            throw new H5Exception($"{typeof(T).Name} is not primitive");
+        }
+
+        var handle = Type.GetTypeCode(type) switch
+        {
+            TypeCode.Boolean => NATIVE_HBOOL,
+
+            TypeCode.Byte => NATIVE_UINT8,
+            TypeCode.SByte => NATIVE_INT8,
+
+            TypeCode.Int16 => NATIVE_INT16,
+            TypeCode.UInt16 => NATIVE_UINT16,
+
+            TypeCode.Int32 => NATIVE_INT32,
+            TypeCode.UInt32 => NATIVE_UINT32,
+
+            TypeCode.Int64 => NATIVE_INT64,
+            TypeCode.UInt64 => NATIVE_UINT64,
+
+            TypeCode.Single => NATIVE_FLOAT,
+            TypeCode.Double => NATIVE_DOUBLE,
+
+            // .NET char is 16 bit (UTF-16-ish)
+            TypeCode.Char => NATIVE_UINT16,
+
+            _ => throw new H5Exception($"No mapping defined from {typeof(T).Name} to native type.")
+        };
+        return handle;
+    }
+
     internal static H5Type CreateByteArrayType(params long[] dims)
     {
         return new H5Type(array_create(NATIVE_B8, (uint)dims.Length, dims.Select(d => (ulong)d).ToArray()));
@@ -90,6 +134,11 @@ internal static unsafe class H5TAdapter
         }
     }
 
+    internal static H5StringType CreateVariableLengthStringType()
+    {
+        return new H5StringType(create(class_t.STRING, VARIABLE));
+    }
+
     internal static TT CreateOpaqueType<TT>(int size, string tag, Func<long, TT> typeCtor)
         where TT : H5Type
     {
@@ -105,11 +154,6 @@ internal static unsafe class H5TAdapter
 #endif
 
         return type;
-    }
-
-    internal static H5StringType CreateVariableLengthStringType()
-    {
-        return new H5StringType(create(class_t.STRING, VARIABLE));
     }
 
     internal static void InsertEnumMember<T>(H5Type type, string name, T value)
@@ -194,11 +238,12 @@ internal static unsafe class H5TAdapter
         return is_variable_str(typeId).ThrowIfError() > 0;
     }
 
-    internal static H5EnumType<T> CreateEnumType<T>() //where T : Enum // unmanaged, 
+    internal static TT CreateEnumType<T, TT>(Func<long, TT> typeCtor) //where T : Enum // unmanaged, 
+        where TT : H5Type
     {
         H5ThrowHelpers.ThrowIfNotEnum<T>();
 
-        var h5EnumType = ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>();
+        var h5EnumType = ConvertDotNetEnumUnderlyingTypeToH5NativeType<T, TT>(typeCtor);
 
         try
         {
@@ -207,12 +252,7 @@ internal static unsafe class H5TAdapter
                 .Select(m => new
                 {
                     m.Name,
-#if NET7_0_OR_GREATER
-                    //Value = Enum.Parse<T>(m.Name)
                     Value = (T)Enum.Parse(typeof(T), m.Name)
-#else
-                    Value = (T)Enum.Parse(typeof(T), m.Name)
-#endif
                 }))
             {
                 InsertEnumMember(h5EnumType, enumInfo.Name, enumInfo.Value);
@@ -227,29 +267,35 @@ internal static unsafe class H5TAdapter
         return h5EnumType;
     }
 
-    internal static H5EnumType<T> ConvertDotNetEnumUnderlyingTypeToH5NativeType<T>() // where T : unmanaged, Enum
+    internal static H5PrimitiveType<T> ConvertDotNetEnumUnderlyingTypeToH5PrimitiveType<T>() // where T : unmanaged, Enum
+    {
+        return ConvertDotNetEnumUnderlyingTypeToH5NativeType<T, H5PrimitiveType<T>>(h => new H5PrimitiveType<T>(h));
+    }
+
+    internal static TT ConvertDotNetEnumUnderlyingTypeToH5NativeType<T, TT>(Func<long, TT> typeCtor) // where T : unmanaged, Enum
+        where TT : H5Type
     {
         var baseType = GetNativeType();
 
-        return new H5EnumType<T>(enum_create(baseType));
+        return typeCtor(enum_create(baseType));
 
         static long GetNativeType()
         {
-            var underlyingType = Enum.GetUnderlyingType(typeof(T)).Name;
+            var underlyingType = Type.GetTypeCode(Enum.GetUnderlyingType(typeof(T)));
 
             return underlyingType switch
             {
-                "Byte" => NATIVE_UINT8,
-                "SByte" => NATIVE_INT8,
+                TypeCode.Byte => NATIVE_UINT8,
+                TypeCode.SByte => NATIVE_INT8,
 
-                "Int16" => NATIVE_INT16,
-                "UInt16" => NATIVE_UINT16,
+                TypeCode.Int16 => NATIVE_INT16,
+                TypeCode.UInt16 => NATIVE_UINT16,
 
-                "Int32" => NATIVE_INT32,
-                "UInt32" => NATIVE_UINT32,
+                TypeCode.Int32 => NATIVE_INT32,
+                TypeCode.UInt32 => NATIVE_UINT32,
 
-                "Int64" => NATIVE_INT64,
-                "UInt64" => NATIVE_UINT64,
+                TypeCode.Int64 => NATIVE_INT64,
+                TypeCode.UInt64 => NATIVE_UINT64,
 
                 _ => throw new ArgumentException($"Unable to create Enum for underlying type '{underlyingType}'.")
             };
@@ -270,35 +316,7 @@ internal static unsafe class H5TAdapter
     internal static TT ConvertDotNetPrimitiveToH5Type<T, TT>(Func<long, TT> typeCtor)
         where TT : H5Type
     {
-        if (!typeof(T).IsPrimitive)
-        {
-            throw new H5Exception($"{typeof(T).Name} is not primitive");
-        }
-
-        var handle = default(T) switch
-        {
-            bool => NATIVE_HBOOL,
-
-            byte => NATIVE_UINT8,
-            sbyte => NATIVE_INT8,
-
-            short => NATIVE_INT16,
-            ushort => NATIVE_UINT16,
-
-            int => NATIVE_INT32,
-            uint => NATIVE_UINT32,
-
-            long => NATIVE_INT64,
-            ulong => NATIVE_UINT64,
-
-            float => NATIVE_FLOAT,
-            double => NATIVE_DOUBLE,
-
-            // .NET char is 16 bit (UTF-16-ish)
-            char => NATIVE_UINT16,
-
-            _ => throw new H5Exception($"No mapping defined from {typeof(T).Name} to native type.")
-        };
+        var handle = GetNativeTypeHandleForPrimitiveDotNetType<T>();
 
         // Copy the static handle so we can track and close it
         return typeCtor(copy(handle));

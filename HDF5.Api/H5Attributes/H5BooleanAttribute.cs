@@ -14,17 +14,17 @@ public class H5BooleanAttribute : H5Attribute<bool, H5BooleanAttribute, H5Boolea
         return H5AAdapter.GetType(this, h => new H5BooleanType(h));
     }
 
-    public override bool Read(bool verifyType = false)
+    public override bool Read()
     {
         using var type = GetAttributeType();
-        using var expectedType = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<byte>();
+        using var expectedType = H5BooleanType.Create(); 
 
-        return H5AAdapter.ReadImpl<bool>(this, type, expectedType);
+        return H5AAdapter.ReadImpl<H5BooleanType.Boolean>(this, type, expectedType) == H5BooleanType.Boolean.TRUE;
     }
 
     public override void Write([DisallowNull] bool value)
     {
-        using var type = H5TAdapter.ConvertDotNetPrimitiveToH5NativeType<byte>();
+        using var type = H5BooleanType.Create(); 
         H5AAdapter.Write(this, type, value); 
     }
 

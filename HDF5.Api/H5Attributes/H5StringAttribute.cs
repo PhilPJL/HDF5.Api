@@ -1,10 +1,12 @@
 ﻿using CommunityToolkit.Diagnostics;
-#if NET7_0_OR_GREATER
+using CommunityToolkit.HighPerformance;
 using CommunityToolkit.HighPerformance.Buffers;
-#endif
+using HDF5.Api.Disposables;
 using HDF5.Api.H5Types;
 using HDF5.Api.NativeMethodAdapters;
 using HDF5.Api.NativeMethods;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HDF5.Api.H5Attributes;
@@ -20,7 +22,7 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
         return H5AAdapter.GetType(this, h => new H5StringType(h));
     }
 
-    public override string Read(bool verifyType = false)
+    public override string Read()
     {
         return Read(this);
     }
@@ -29,7 +31,14 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
     {
         Guard.IsNotNull(value);
 
-        Write(this, value);
+        WriteImpl(this, value);
+    }
+
+    public override void Write([DisallowNull] IEnumerable<string> value)
+    {
+        Guard.IsNotNull(value);
+
+        WriteImpl(this, value);
     }
 
     public static H5StringAttribute Create(long handle)
@@ -37,10 +46,14 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
         return new H5StringAttribute(handle);
     }
 
-    private static unsafe void Write(H5StringAttribute attribute, string value)
+    private static unsafe void WriteImpl(H5StringAttribute attribute, string value)
     {
-        // TODO: handle array of strings
+        WriteImpl(attribute, Enumerable.Repeat(value, 1));
+        return;
+    }
 
+    private static unsafe void WriteImpl(H5StringAttribute attribute, IEnumerable<string> values)
+    {
         using var type = attribute.GetAttributeType();
         using var space = attribute.GetSpace();
 
@@ -53,50 +66,72 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
         var count = space.GetSimpleExtentNPoints();
         var dims = space.GetSimpleExtentDims();
 
-        if (count != 1 || dims.Count != 0)
+        if (dims.Count > 1)
         {
-            throw new H5Exception("Attribute is not scalar.");
+            throw new H5Exception("2D, 3D, 4D arrays not supported yet.");
         }
 
         var characterSet = type.CharacterSet;
 
-        // TODO: optionally throw if writing a string containing non-ASCII characters when characterSet = Ascii
-        // TODO: optionally silently truncate to nearest character (not byte)
-
         var bytes = characterSet switch
         {
-            // we absolutely need to add '\0' :)
-            CharacterSet.Ascii => Encoding.ASCII.GetBytes(value + '\0'),
-            CharacterSet.Utf8 => Encoding.UTF8.GetBytes(value + '\0'),
+            CharacterSet.Ascii => ToAscii(values),
+            CharacterSet.Utf8 => ToUtf8(values),
             _ => throw new InvalidEnumArgumentException($"Unknown CharacterSet:{characterSet}.")
         };
 
         if (type.IsVariableLength)
         {
-            fixed (void* fixedBytes = bytes)
-            {
-                var stringArray = new IntPtr[] { new(fixedBytes) };
+#if NET7_0_OR_GREATER
+            H5A.write(attribute, type, bytes).ThrowIfError();
+#else
+            var pinned = bytes.Select(b => new PinnedObject(b));
 
-                fixed (void* stringArrayPtr = stringArray)
-                {
-                    H5AAdapter.Write(attribute, type, new IntPtr(stringArrayPtr));
-                }
+            try
+            {
+                using var pinnedArray = new PinnedObject(pinned.Select(p => (IntPtr)p).ToArray());
+
+                H5A.write(attribute, type, new IntPtr(pinnedArray)).ThrowIfError();
             }
+            finally
+            {
+                foreach (var p in pinned) { p.Dispose(); }
+            }
+#endif
         }
         else
         {
-            int storageSize = attribute.StorageSize;
+            int storageSize = attribute.StorageSize; // = type.Size * count
 
-            if (bytes.Length > storageSize)
+            // TODO: optionally truncate to nearest character (not byte) to fit fixed length buffer
+            var tooLong = (bytes.FirstOrDefault(b => b.Length > type.Size));
+
+            if (tooLong != null)
             {
                 throw new ArgumentOutOfRangeException(
-                    $"The string requires {bytes.Length} storage which is greater than the allocated fixed storage size of {storageSize} bytes.");
+                    $"A string requires {tooLong.Length} storage which is greater than the allocated fixed storage size of {storageSize} bytes.");
             }
 
-            fixed (void* fixedBytes = bytes)
+            using var spanOwner = SpanOwner<byte>.Allocate(storageSize);
+
+            for (int i = 0; i < bytes.Length; i++)
             {
-                H5AAdapter.Write(attribute, type, new IntPtr(fixedBytes));
+                var span = new Span<byte>(bytes[i]);
+                span.CopyTo(spanOwner.Span.Slice(i * type.Size, type.Size));
             }
+
+            H5AAdapter.Write(attribute, type, spanOwner.Span);
+        }
+
+        // TODO: optionally throw if writing a string containing non-ASCII characters when characterSet = Ascii
+        static unsafe byte[][] ToAscii(IEnumerable<string> values)
+        {
+            return values.Select(v => Encoding.ASCII.GetBytes(v + '\0')).ToArray();
+        }
+
+        static unsafe byte[][] ToUtf8(IEnumerable<string> values)
+        {
+            return values.Select(v => Encoding.UTF8.GetBytes(v + '\0')).ToArray();
         }
     }
 
