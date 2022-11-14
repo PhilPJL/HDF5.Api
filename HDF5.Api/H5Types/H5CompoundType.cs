@@ -9,8 +9,6 @@ public class H5CompoundType<T> : H5Type<T>
     {
     }
 
-    internal int NumberOfMembers => H5TAdapter.GetNumberOfMembers(this);
-
     internal H5CompoundType<T> Insert([DisallowNull] string name, int offset, [DisallowNull] H5Type dataType)
     {
         Guard.IsNotNullOrWhiteSpace(name);

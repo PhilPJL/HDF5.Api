@@ -4,6 +4,7 @@ using HDF5.Api.H5Types;
 using HDF5.Api.NativeMethodAdapters;
 using HDF5.Api.Utils;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace HDF5.Api;
@@ -101,7 +102,9 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
     #endregion
 
-    public TA ReadAttribute<TA>([DisallowNull] string name, bool verifyType = false)
+    #region Read attribute
+    
+    public TA ReadAttribute<TA>([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
@@ -213,6 +216,25 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         }
     }
 
+    public IEnumerable<TA> ReadAttribute<TA>([DisallowNull] string name, long dimension1, params long[] dimensions)
+    {
+        return default(TA) switch
+        {
+            char or byte or sbyte or short or ushort or int or uint or long or ulong or float or double
+                => ReadPrimitiveAttribute(),
+        };
+
+        return Array.Empty<TA>();
+
+        IEnumerable<TA> ReadPrimitiveAttribute()
+        {
+            using var attribute = H5AAdapter.Open(this, name, h => new H5PrimitiveAttribute<TA>(h));
+            return attribute.ReadCollection()!;
+        }
+    }
+
+    #endregion
+
     #region Write attribute
 
     private bool CheckExists(string name, AttributeWriteBehaviour? writeBehaviour)
@@ -253,10 +275,18 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         var type = typeof(TA);
 
-        if(value is string stringValue)
+        if(value is IEnumerable<string> values)
+        {
+            WriteAttribute(name, values, 0, writeBehaviour: writeBehaviour);
+        }
+        else if(value is string stringValue)
         {
             // Write a variable length string with default encoding and padding
-            WriteAttribute(name, stringValue, 0);
+            WriteAttribute(name, stringValue, 0, writeBehaviour: writeBehaviour);
+        }
+        else if(value is Array array)
+        {
+            WriteAttribute(name, array, 0, writeBehaviour: writeBehaviour);
         }
         else if (type.IsEnum)
         {
@@ -330,6 +360,128 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         }
     }
 
+    public void WriteAttribute<TA>(
+        [DisallowNull] string name,
+        [DisallowNull] IEnumerable<TA> values,
+        long[]? dimensions = null,
+        AttributeWriteBehaviour? writeBehaviour = null)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(values);
+        // TODO: check no elements of values is null
+
+        var exists = CheckExists(name, writeBehaviour);
+
+        Func<H5Space> shapeCtor = dimensions == null 
+            ? (() => H5Space.Create(new Dimension(values.Count()))) 
+            : (() => H5Space.Create(dimensions));
+
+        // TODO: check values.Count = dimensions
+
+        var type = typeof(TA);
+
+        if (values is IEnumerable<string> stringValues)
+        {
+            WriteAttribute(name, stringValues, 0, writeBehaviour: writeBehaviour);
+        }
+        //else if (type.IsEnum)
+        //{
+        //    using var attribute =
+        //        H5AAdapter.CreateOrOpen(this, name, H5EnumType<TA>.Create, shapeCtor, h => new H5EnumAttribute<TA>(h));
+
+        //    attribute.Write(value);
+        //}
+        else if (values is IEnumerable<bool> boolValues)
+        {
+            using var attribute =
+                H5AAdapter.CreateOrOpen(this, name, H5BooleanType.Create, shapeCtor, H5BooleanAttribute.Create);
+
+            attribute.Write(boolValues);
+        }
+        else if (values is IEnumerable<decimal> decimalValues)
+        {
+            using var attribute =
+                H5AAdapter.CreateOrOpen(this, name, H5DecimalType.Create, shapeCtor, H5DecimalAttribute.Create);
+
+            attribute.Write(decimalValues);
+        }
+        else if (values is IEnumerable<DateTimeOffset> dateTimeOffsetValues)
+        {
+            using var attribute =
+                H5AAdapter.CreateOrOpen(this, name, H5DateTimeOffsetType.Create, shapeCtor, H5DateTimeOffsetAttribute.Create);
+
+            attribute.Write(dateTimeOffsetValues);
+        }
+        else if (values is IEnumerable<DateTime> dateTimeValues)
+        {
+            using var attribute =
+                H5AAdapter.CreateOrOpen(this, name, H5DateTimeType.Create, shapeCtor, H5DateTimeAttribute.Create);
+
+            attribute.Write(dateTimeValues);
+        }
+        else if (values is IEnumerable<TimeSpan> timeSpanValues)
+        {
+            using var attribute =
+                H5AAdapter.CreateOrOpen(this, name, H5TimeSpanType.Create, shapeCtor, H5TimeSpanAttribute.Create);
+
+            attribute.Write(timeSpanValues);
+        }
+#if NET7_0_OR_GREATER
+        else if (values is IEnumerable<TimeOnly> timeOnlyValues)
+        {
+            using var attribute = 
+                H5AAdapter.CreateOrOpen(this, name, H5TimeOnlyType.Create, shapeCtor, H5TimeOnlyAttribute.Create);
+
+            attribute.Write(timeOnlyValues);
+        }
+        else if (values is IEnumerable<DateOnly> dateOnlyValues)
+        {
+            using var attribute = 
+                H5AAdapter.CreateOrOpen(this, name, H5DateOnlyType.Create, shapeCtor, H5DateOnlyAttribute.Create);
+
+            attribute.Write(dateOnlyValues);
+        }
+#endif
+        else if (type.GetElementType()?.IsPrimitive ?? true)
+        {
+            using var attribute =
+                H5AAdapter.CreateOrOpen(this, name, H5PrimitiveType<TA>.Create, shapeCtor, H5PrimitiveAttribute<TA>.Create);
+
+            attribute.Write(values);
+        }
+        else
+        {
+            // TODO: Compound, arrays, collections etc
+            throw new NotImplementedException($"Support for {typeof(TA).FullName} is not implemented.");
+        }
+    }
+
+    public void WriteUnmanagedAttribute<TA>(
+        [DisallowNull] string name,
+        [DisallowNull] IEnumerable<TA> values,
+        long[]? dimensions = null,
+        AttributeWriteBehaviour? writeBehaviour = null) where TA : unmanaged
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(values);
+        // TODO: check no elements of values is null
+
+        var exists = CheckExists(name, writeBehaviour);
+
+        Func<H5Space> shapeCtor = dimensions == null 
+            ? (() => H5Space.Create(new Dimension(values.Count()))) 
+            : (() => H5Space.Create(dimensions));
+
+        // TODO: check values.Count = dimensions
+
+        var type = typeof(TA);
+
+        using var attribute =
+            H5AAdapter.CreateOrOpen(this, name, H5PrimitiveType<TA>.Create, shapeCtor, H5UnmanagedPrimitiveAttribute<TA>.Create);
+
+        attribute.Write(values);
+    }
+
     /// <summary>
     /// Write string attribute.
     /// </summary>
@@ -364,16 +516,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         attribute.Write(value);
     }
 
-    /// <summary>
-    /// Write string attribute.
-    /// </summary>
-    /// <param name="name">Attribute name. This can be unicode and isn't impacted by the <paramref name="fixedStorageLength"/> value.</param>
-    /// <param name="fixedStorageLength">The total number of bytes allocated to store the string including the null terminator.  Set to 0 for a variable length string.
-    /// <para>ASCII strings require 1 byte per character, plus 1 for the null terminator.</para>
-    /// <para>UTF8 strings require 1-4 bytes per character, plus 1 for the null terminator.</para></param>
-    /// <param name="characterSet">Defaults to <see cref="CharacterSet.Utf8"/>.</param>
-    /// <param name="padding"></param>
-    /// <returns></returns>
     public void WriteAttribute(
         [DisallowNull] string name,
         [DisallowNull] IEnumerable<string> values,
@@ -396,6 +538,55 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
                 shapeCtor, H5StringAttribute.Create);
 
         attribute.Write(values);
+    }
+
+    public void WriteAttribute(
+        [DisallowNull] string name,
+        [DisallowNull] IEnumerable<string> values,
+        long[] dimensions,
+        int fixedStorageLength,
+        CharacterSet characterSet = CharacterSet.Utf8,
+        StringPadding padding = StringPadding.NullPad,
+        AttributeWriteBehaviour? writeBehaviour = null)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(values);
+        // TODO: check no elements of values is null
+
+        var exists = CheckExists(name, writeBehaviour);
+        var shapeCtor = () => H5Space.Create(dimensions);
+        using var shape = shapeCtor();
+        Debug.WriteLine($"{shape.GetSimpleExtentNPoints()}, {values.Count()}");
+        if(shape.GetSimpleExtentNPoints() != values.Count())
+        {
+            // throw
+            throw new H5Exception($"The dimensions specify a size of {shape.GetSimpleExtentNPoints()}, but there are {values.Count()} values.");
+        }
+
+        using H5StringAttribute attribute = exists
+            ? H5AAdapter.Open(this, name, H5StringAttribute.Create)
+            : H5AAdapter.Create(this, name, 
+                () => H5StringType.Create(fixedStorageLength, characterSet, padding), 
+                shapeCtor, H5StringAttribute.Create);
+
+        attribute.Write(values);
+    }
+
+    public void WriteAttribute(
+        [DisallowNull] string name,
+        [DisallowNull] Array values,
+        int fixedStorageLength,
+        CharacterSet characterSet = CharacterSet.Utf8,
+        StringPadding padding = StringPadding.NullPad,
+        AttributeWriteBehaviour? writeBehaviour = null)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(values);
+        // TODO: check no elements of values is null
+
+        var dimensions = Enumerable.Range(0, values.Rank).Select(r => (long)values.GetUpperBound(r) + 1).ToArray();
+        Debug.WriteLine(string.Join(",", dimensions));
+        WriteAttribute(name, values.OfType<string>(), dimensions, fixedStorageLength, characterSet, padding, writeBehaviour);
     }
 
     #endregion

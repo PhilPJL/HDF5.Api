@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using static HDF5.Api.NativeMethods.H5L;
-#if NETSTANDARD
 using HDF5.Api.Utils;
-#endif
 
 namespace HDF5.Api.NativeMethodAdapters;
 
@@ -60,11 +58,7 @@ internal static unsafe class H5LAdapter
             {
                 var name = info.cset switch
                 {
-#if NET7_0_OR_GREATER
-                    H5T.cset_t.ASCII or H5T.cset_t.UTF8 => Marshal.PtrToStringUTF8(intPtrName),
-#else
                     H5T.cset_t.ASCII or H5T.cset_t.UTF8 => MarshalHelpers.PtrToStringUTF8(intPtrName),
-#endif
                     // Don't throw inside callback - see HDF docs
                     _ => string.Empty
                 };

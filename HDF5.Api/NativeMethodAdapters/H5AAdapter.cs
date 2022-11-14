@@ -5,6 +5,9 @@ using static HDF5.Api.NativeMethods.H5A;
 using HDF5.Api.H5Attributes;
 using HDF5.Api.H5Types;
 using CommunityToolkit.HighPerformance;
+using System.Linq;
+using CommunityToolkit.HighPerformance.Buffers;
+using System;
 
 namespace HDF5.Api.NativeMethodAdapters;
 
@@ -165,11 +168,7 @@ internal static unsafe class H5AAdapter
             {
                 var name = info.cset switch
                 {
-#if NET7_0_OR_GREATER
-                    H5T.cset_t.ASCII or H5T.cset_t.UTF8 => Marshal.PtrToStringUTF8(intPtrName),
-#else
                     H5T.cset_t.ASCII or H5T.cset_t.UTF8 => MarshalHelpers.PtrToStringUTF8(intPtrName),
-#endif
                     // Don't throw inside callback - see HDF docs
                     _ => string.Empty
                 };
@@ -251,6 +250,12 @@ internal static unsafe class H5AAdapter
 
     internal static T ReadImpl<T>(H5Attribute attribute, H5Type type, H5Type expectedType) //where T : unmanaged
     {
+        return ReadCollectionImpl<T>(attribute, type, expectedType).Single();
+    }
+
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
+    internal static IEnumerable<T> ReadCollectionImpl<T>(H5Attribute attribute, H5Type type, H5Type expectedType) //where T : unmanaged
+    {
         H5ThrowHelpers.ThrowIfManaged<T>();
 
         using var space = attribute.GetSpace();
@@ -258,13 +263,7 @@ internal static unsafe class H5AAdapter
         long count = space.GetSimpleExtentNPoints();
         var dims = space.GetSimpleExtentDims();
 
-        // TODO: handle dims.Count > 0 where NPoints=1
-        // TODO: generalise to NPoints >= 0
-
-        if (count != 1 || dims.Count != 0)
-        {
-            throw new H5Exception("Attribute is not scalar.");
-        }
+        // TODO: check space matches 'expectedSpace'
 
         if (!type.IsEqualTo(expectedType))
         {
@@ -284,18 +283,24 @@ internal static unsafe class H5AAdapter
 
         // We are relying on code consistency to ensure T is unmanaged since generic constraints aren't flexible enough
 
-#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
         int marshalSize = sizeof(T);
-#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 
-        H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, marshalSize);
+        H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, (int)(count * marshalSize));
 
-        T value = default!;
-#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
-        read(attribute, type, new IntPtr(&value)).ThrowIfError();
-#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
-        return value!;
+        var buffer = new T[(int)count];
+
+        // This is all pretty dodgy
+        fixed (T* ptr = &buffer[0])
+        {
+            byte* ptr1 = (byte*)ptr;
+
+            read(attribute, type, ptr1).ThrowIfError();
+        }
+
+        return buffer;
     }
+
+#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 
     #endregion
 
@@ -336,5 +341,5 @@ internal static unsafe class H5AAdapter
 #endif
     }
 
-#endregion
+    #endregion
 }

@@ -10,9 +10,11 @@ namespace HDF5.Api.Utils
 {
     internal static unsafe class MarshalHelpers
     {
-#if NETSTANDARD
         public static string PtrToStringUTF8(IntPtr native)
         {
+#if NET7_0_OR_GREATER
+            return Marshal.PtrToStringUTF8(native) ?? string.Empty;
+#else           
             int size = GetNativeDataSize(native);
 
             byte[] array = new byte[size];
@@ -22,7 +24,7 @@ namespace HDF5.Api.Utils
             static int GetNativeDataSize(IntPtr ptr)
             {
                 int size;
-                
+
                 for (size = 0; Marshal.ReadByte(ptr, size) > 0; size++)
                 {
                     // empty
@@ -30,15 +32,16 @@ namespace HDF5.Api.Utils
 
                 return size;
             }
-        }
 #endif
+        }
+
 
         public static string GetName<T>(H5Object<T> h5Object, get_name_del getNameFunc) where T : H5Object<T>
         {
             // get length of buffer required
             int length = ((int)getNameFunc(h5Object, null, IntPtr.Zero)).ThrowIfError();
 
-            if(length == 0)
+            if (length == 0)
             {
                 return string.Empty;
             }

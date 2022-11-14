@@ -216,6 +216,23 @@ internal static partial class H5T
     public static partial cset_t get_cset(hid_t dtype_id);
 
     /// <summary>
+    /// Retrieves the name of a compound or enumeration datatype member.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-GetMemberName
+    /// </summary>
+    /// <param name="dtype_id">Identifier of datatype to query.</param>
+    /// <param name="field_idx">Zero-based index of the field or element
+    /// whose name is to be retrieved.</param>
+    /// <returns>Returns a pointer to a string allocated in unmanaged
+    /// memory if successful; otherwise returns <code>NULL</code>.</returns>
+    /// <remarks>The caller is responsible for freeing the allocated
+    /// memory.</remarks>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Tget_member_name"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial IntPtr get_member_name
+        (hid_t dtype_id, uint field_idx);
+
+    /// <summary>
     /// Returns the native datatype of a specified datatype.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5T.html#Datatype-GetNativeType
     /// </summary>

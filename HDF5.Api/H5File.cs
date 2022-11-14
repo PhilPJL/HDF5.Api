@@ -87,7 +87,7 @@ public class H5File : H5Location<H5File>
     /// <param name="path">Path to the file.</param>
     /// <param name="readOnly">Open the file in read-only mode.  Defaults to read-write.</param>
     public static H5File Open(
-        [DisallowNull] string path, 
+        [DisallowNull] string path,
         bool readOnly = false)
     {
         return Open(path, readOnly, null);
@@ -100,8 +100,8 @@ public class H5File : H5Location<H5File>
     /// <param name="readOnly">Open the file in read-only mode.  Defaults to read-write.</param>
     /// <param name="fileAccessPropertyList"></param>
     internal static H5File Open(
-        [DisallowNull] string path, 
-        bool readOnly, 
+        [DisallowNull] string path,
+        bool readOnly,
         [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList)
     {
         Guard.IsNotNullOrWhiteSpace(path);
@@ -115,10 +115,16 @@ public class H5File : H5Location<H5File>
     /// <param name="path">Path to the file.</param>
     /// <param name="readOnly">Open the file in read-only mode.  Defaults to read-write.</param>
     public static H5File CreateOrOpen(
-        [DisallowNull] string path, 
-        bool readOnly = false)
+        [DisallowNull] string path,
+        bool readOnly = false, LibraryVersionBounds? versionBounds = null)
     {
-        return CreateOrOpen(path, readOnly, null, null);
+        using var fcpl = CreateCreationPropertyList();
+        fcpl.SetPhaseChange(0, 0);
+
+        using var fapl = CreateAccessPropertyList();
+        fapl.SetLibraryVersionBounds(versionBounds);
+
+        return CreateOrOpen(path, readOnly, fcpl, fapl);
     }
 
     /// <summary>
@@ -129,7 +135,7 @@ public class H5File : H5Location<H5File>
     /// <param name="fileCreationPropertyList"></param>
     /// <param name="fileAccessPropertyList"></param>
     internal static H5File CreateOrOpen(
-        [DisallowNull] string path, 
+        [DisallowNull] string path,
         bool readOnly,
         [AllowNull] H5FileCreationPropertyList? fileCreationPropertyList,
         [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList)
@@ -148,10 +154,16 @@ public class H5File : H5Location<H5File>
     /// <param name="path">Path tp the file</param>
     /// <param name="failIfExists">Fail if the file being created already exists.</param>
     public static H5File Create(
-        [DisallowNull] string path, 
-        bool failIfExists = false)
+        [DisallowNull] string path,
+        bool failIfExists = false, LibraryVersionBounds? versionBounds = null)
     {
-        return Create(path, failIfExists, null, null);
+        using var fcpl = CreateCreationPropertyList();
+        fcpl.SetPhaseChange(0, 0);
+
+        using var fapl = CreateAccessPropertyList();
+        fapl.SetLibraryVersionBounds(versionBounds);
+
+        return Create(path, failIfExists, fcpl, fapl);
     }
 
     /// <summary>
@@ -163,9 +175,9 @@ public class H5File : H5Location<H5File>
     /// <param name="fileCreationPropertyList"></param>
     /// <param name="fileAccessPropertyList"></param>
     internal static H5File Create(
-        [DisallowNull] string path, 
-        bool failIfExists, 
-        [AllowNull] H5FileCreationPropertyList? fileCreationPropertyList, 
+        [DisallowNull] string path,
+        bool failIfExists,
+        [AllowNull] H5FileCreationPropertyList? fileCreationPropertyList,
         [AllowNull] H5FileAccessPropertyList? fileAccessPropertyList)
     {
         Guard.IsNotNullOrWhiteSpace(path);
@@ -173,9 +185,9 @@ public class H5File : H5Location<H5File>
         return H5FAdapter.Create(path, failIfExists, fileCreationPropertyList, fileAccessPropertyList);
     }
 
-    public H5File SetLibraryVersionBounds(LibraryVersion low = LibraryVersion.Earliest, LibraryVersion high = LibraryVersion.Latest)
+    internal H5File SetLibraryVersionBounds(LibraryVersionBounds versionBounds)
     {
-        H5FAdapter.SetLibraryVersionBounds(this, low, high);
+        H5FAdapter.SetLibraryVersionBounds(this, versionBounds.Low, versionBounds.High);
         return this;
     }
 
@@ -190,5 +202,17 @@ public class H5File : H5Location<H5File>
         // TODO: optionally automatically dispose and close all handles tracked by this file
 
         base.Dispose(disposing);
+    }
+}
+
+public class LibraryVersionBounds
+{
+    public LibraryVersion Low { get; }
+    public LibraryVersion High { get; }
+
+    public LibraryVersionBounds(LibraryVersion low = LibraryVersion.Earliest, LibraryVersion high = LibraryVersion.Latest)
+    {
+        Low = low;
+        High = high;
     }
 }

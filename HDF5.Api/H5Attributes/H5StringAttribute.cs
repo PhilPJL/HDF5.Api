@@ -66,11 +66,6 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
         var count = space.GetSimpleExtentNPoints();
         var dims = space.GetSimpleExtentDims();
 
-        if (dims.Count > 1)
-        {
-            throw new H5Exception("2D, 3D, 4D arrays not supported yet.");
-        }
-
         var characterSet = type.CharacterSet;
 
         var bytes = characterSet switch
@@ -109,7 +104,7 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
             if (tooLong != null)
             {
                 throw new ArgumentOutOfRangeException(
-                    $"A string requires {tooLong.Length} storage which is greater than the allocated fixed storage size of {storageSize} bytes.");
+                    $"At least one string requires {tooLong.Length} bytes of storage which is greater than the allocated fixed storage size of {type.Size} bytes.");
             }
 
             using var spanOwner = SpanOwner<byte>.Allocate(storageSize);
@@ -168,13 +163,7 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
                 return ReadVariableStrings(buffer);
             }
 
-            // TODO: performance check
-            //#if NET7_0_OR_GREATER
-            //            using var spanOwner = SpanOwner<nint>.Allocate((int)count);
-            //            return ReadVariableStrings(spanOwner.Span);
-            //#else
             return ReadVariableStrings(new Span<nint>(new nint[count]));
-            //#endif
 
             string ReadVariableStrings(Span<nint> buffer)
             {

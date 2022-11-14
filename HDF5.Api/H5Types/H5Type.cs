@@ -138,8 +138,8 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 
     public string Name => Committed ? H5IAdapter.GetName(this) : string.Empty;
 
+    // To support committed types
     public override IEnumerable<string> AttributeNames => Committed ? base.AttributeNames : Array.Empty<string>();
-
     public override int NumberOfAttributes => Committed ? base.NumberOfAttributes : 0;
 
     public override DeleteAttributeStatus DeleteAttribute([DisallowNull] string name)
@@ -151,4 +151,9 @@ public class H5Type : H5ObjectWithAttributes<H5Type>, IEquatable<H5Type>
 
         return DeleteAttributeStatus.NotCommittedType;
     }
+
+
+    // To support Enum and Compound types
+    internal IEnumerable<string> MemberNames => H5TAdapter.GetMemberNames(this);
+    internal int NumberOfMembers => H5TAdapter.GetNumberOfMembers(this);
 }

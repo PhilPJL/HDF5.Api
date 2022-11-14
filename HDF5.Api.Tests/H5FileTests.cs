@@ -90,7 +90,7 @@ public class H5FileTests : H5LocationTests<H5FileTests>
     public void SetLibraryVersionEarliestSucceeds(string name, LibraryVersion low, LibraryVersion high)
     {
         using var acpl = H5File.CreateAccessPropertyList();
-        acpl.SetLibraryVersionBounds(low, high);
+        acpl.SetLibraryVersionBounds(new LibraryVersionBounds(low, high));
 
         HandleCheck2((file) =>
         {
@@ -100,7 +100,7 @@ public class H5FileTests : H5LocationTests<H5FileTests>
             Assert.AreEqual(low, low2);
             Assert.AreEqual(high, high2);
 
-            file.SetLibraryVersionBounds(LibraryVersion.Version110, LibraryVersion.Version110);
+            file.SetLibraryVersionBounds(new (LibraryVersion.Version110, LibraryVersion.Version110));
             
             var (low3, high3) = file.GetLibraryVersionBounds();
             Assert.AreEqual(LibraryVersion.Version110, low3);

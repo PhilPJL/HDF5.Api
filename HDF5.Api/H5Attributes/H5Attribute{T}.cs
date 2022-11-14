@@ -15,6 +15,11 @@ public abstract class H5Attribute<T, TA, TT> : H5Attribute
 
     public abstract T Read();
 
+    public virtual IEnumerable<T> ReadCollection()
+    {
+        return Array.Empty<T>();
+    }
+
     public abstract void Write([DisallowNull] T value);
 
     public virtual void Write([DisallowNull] IEnumerable<T> value)

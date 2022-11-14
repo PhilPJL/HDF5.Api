@@ -4,9 +4,11 @@ using HDF5.Api.H5Types;
 using CommunityToolkit.HighPerformance.Buffers;
 #endif
 using HDF5.Api.NativeMethods;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using static HDF5.Api.NativeMethods.H5T;
+using HDF5.Api.Utils;
 
 namespace HDF5.Api.NativeMethodAdapters;
 
@@ -228,14 +230,49 @@ internal static unsafe class H5TAdapter
 #endif
     }
 
-    internal static void Insert(H5Type typeId, string name, ssize_t offset, H5Type dataTypeId)
+    internal static void Insert(H5Type type, string name, ssize_t offset, H5Type dataTypeId)
     {
-        Insert(typeId, name, offset, (long)dataTypeId);
+        Insert(type, name, offset, (long)dataTypeId);
     }
 
     internal static bool IsVariableLengthString(H5Type typeId)
     {
         return is_variable_str(typeId).ThrowIfError() > 0;
+    }
+
+    internal static string GetMemberName(H5Type type, int index)
+    {
+        var name = get_member_name(type, (uint)index);
+
+        if (name == IntPtr.Zero)
+        {
+            throw new H5Exception("Unable to retrieve member name.");
+        }
+
+        try
+        {
+            return MarshalHelpers.PtrToStringUTF8(name);
+        }
+        finally
+        {
+            H5.free_memory(name);
+        }
+    }
+
+    internal static int GetNumberOfMembers(H5Type type)
+    {
+        return get_nmembers(type).ThrowIfError();
+    }
+
+    internal static IEnumerable<string> GetMemberNames(H5Type type)
+    {
+        int count = GetNumberOfMembers(type);
+        int index = 0;
+        while (index < count)
+        {
+            yield return GetMemberName(type, index);
+            index++;
+        }
     }
 
     internal static TT CreateEnumType<T, TT>(Func<long, TT> typeCtor) //where T : Enum // unmanaged, 
@@ -418,11 +455,6 @@ internal static unsafe class H5TAdapter
 #endif
 
         return new H5Type(h);
-    }
-
-    internal static int GetNumberOfMembers(H5Type type)
-    {
-        return get_nmembers(type).ThrowIfError();
     }
 }
 

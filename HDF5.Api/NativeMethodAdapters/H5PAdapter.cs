@@ -75,6 +75,11 @@ internal static class H5PAdapter
         set_create_intermediate_group(propertyList, value ? 1 : (uint)0).ThrowIfError();
     }
 
+    internal static void SetAttributePhaseChange(H5PropertyList propertyList, int maxCompact, int minDense)
+    {
+        H5P.set_attr_phase_change(propertyList, (uint)maxCompact, (uint)minDense).ThrowIfError();
+    }
+
     internal static bool GetCreateIntermediateGroups(H5PropertyList propertyList)
     {
         uint value = 0;

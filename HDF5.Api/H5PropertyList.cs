@@ -122,6 +122,7 @@ internal class H5LinkCreationPropertyList : H5AttributeCreationPropertyList
     }
 }
 
+// TODO: make internal
 public class H5DataSetCreationPropertyList : H5PropertyList
 {
     internal H5DataSetCreationPropertyList(long handle) : base(handle)
@@ -130,6 +131,11 @@ public class H5DataSetCreationPropertyList : H5PropertyList
 
     internal H5DataSetCreationPropertyList() : base(H5PAdapter.Create(H5P.DATASET_CREATE))
     {
+    }
+
+    public void SetPhaseChange(int maxcompact, int minDense)
+    {
+        H5PAdapter.SetAttributePhaseChange(this, maxcompact, minDense);
     }
 
     public void SetChunk([DisallowNull] params long[] dims)
@@ -180,9 +186,11 @@ internal class H5FileAccessPropertyList : H5PropertyList
     {
     }
 
-    internal void SetLibraryVersionBounds(LibraryVersion low, LibraryVersion high)
+    internal void SetLibraryVersionBounds(LibraryVersionBounds? bounds)
     {
-        H5PAdapter.SetLibraryVersionBounds(this, low, high);
+        bounds ??= new();
+
+        H5PAdapter.SetLibraryVersionBounds(this, bounds.Low, bounds.High);
     }
 
     internal (LibraryVersion low, LibraryVersion high) GetLibraryVersionBounds()
@@ -203,7 +211,11 @@ internal class H5FileCreationPropertyList : H5PropertyList
     {
     }
 
-    // TODO: add properties and then make public
+
+    public void SetPhaseChange(int maxcompact, int minDense)
+    {
+        H5PAdapter.SetAttributePhaseChange(this, maxcompact, minDense);
+    }
 }
 
 internal class H5GroupCreationPropertyList : H5PropertyList
@@ -216,7 +228,11 @@ internal class H5GroupCreationPropertyList : H5PropertyList
     {
     }
 
-    // TODO: add properties and then make public
+
+    public void SetPhaseChange(int maxcompact, int minDense)
+    {
+        H5PAdapter.SetAttributePhaseChange(this, maxcompact, minDense);
+    }
 }
 
 internal class H5DataTypeCreationPropertyList : H5PropertyList

@@ -82,6 +82,18 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
             Assert.AreEqual(TestInt.min, H5TAdapter.ValueOfEnumMember<TestInt>(enumType, nameof(TestInt.min)));
             Assert.AreEqual(TestInt.max, H5TAdapter.ValueOfEnumMember<TestInt>(enumType, nameof(TestInt.max)));
             Assert.AreEqual(TestInt.ᚢᛗᛋᚳᛖᚪᛚᚦᛖᚪᚻ, H5TAdapter.ValueOfEnumMember<TestInt>(enumType, nameof(TestInt.ᚢᛗᛋᚳᛖᚪᛚᚦᛖᚪᚻ)));
+
+            var names = H5TAdapter.GetMemberNames(enumType).OrderBy(x => x).ToList();
+            var expectedNames = new List<string>
+            {
+                nameof(TestInt.one),
+                nameof(TestInt.two),
+                nameof(TestInt.min),
+                nameof(TestInt.max),
+                nameof(TestInt.ᚢᛗᛋᚳᛖᚪᛚᚦᛖᚪᚻ)
+            }.OrderBy(x => x).ToList();
+
+            Assert.IsTrue(names.SequenceEqual(expectedNames));
         });
     }
 
@@ -103,6 +115,18 @@ public class H5EnumTypeTests : H5Test<H5EnumTypeTests>
             Assert.AreEqual(TestInt.min, H5TAdapter.ValueOfEnumMember<TestInt>(enumType, nameof(TestInt.min)));
             Assert.AreEqual(TestInt.max, H5TAdapter.ValueOfEnumMember<TestInt>(enumType, nameof(TestInt.max)));
             Assert.AreEqual(TestInt.ᚢᛗᛋᚳᛖᚪᛚᚦᛖᚪᚻ, H5TAdapter.ValueOfEnumMember<TestInt>(enumType, nameof(TestInt.ᚢᛗᛋᚳᛖᚪᛚᚦᛖᚪᚻ)));
+
+            var names = H5TAdapter.GetMemberNames(enumType).OrderBy(x => x).ToList();
+            var expectedNames = new List<string>
+            {
+                nameof(TestInt.one),
+                nameof(TestInt.two),
+                nameof(TestInt.min),
+                nameof(TestInt.max),
+                nameof(TestInt.ᚢᛗᛋᚳᛖᚪᛚᚦᛖᚪᚻ)
+            }.OrderBy(x => x).ToList();
+
+            Assert.IsTrue(names.SequenceEqual(expectedNames));
         });
     }
     

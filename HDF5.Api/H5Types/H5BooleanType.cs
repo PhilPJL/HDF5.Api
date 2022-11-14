@@ -13,8 +13,8 @@ public class H5BooleanType : H5Type<bool>
         return H5TAdapter.CreateEnumType<Boolean, H5BooleanType>(h => new H5BooleanType(h));
     }
 
-    // NOTE: this is compatible with h5py - there are other ways to encode boolean
-    public enum Boolean : byte
+    // NOTE: this is for compatibility with h5py - there are other ways to encode boolean
+    public enum Boolean : sbyte
     {
         FALSE = 0,
         TRUE = 1

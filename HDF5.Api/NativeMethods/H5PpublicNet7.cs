@@ -143,6 +143,23 @@ internal static partial class H5P
         ref H5F.libver_t libver_high);
 
     /// <summary>
+    /// Sets attribute storage phase change thresholds.
+    /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetAttrPhaseChange
+    /// </summary>
+    /// <param name="ocpl_id">Object creation property list identifier</param>
+    /// <param name="max_compact">Maximum number of attributes to be stored
+    /// in compact storage</param>
+    /// <param name="min_dense">Minimum number of attributes to be stored
+    /// in dense storage </param>
+    /// <returns>Returns a non-negative value if successful; otherwise
+    /// returns a negative value.</returns>
+    [LibraryImport(Constants.DLLFileName, EntryPoint = "H5Pset_attr_phase_change"),
+    SuppressUnmanagedCodeSecurity, SecuritySafeCritical]
+    [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+    public static partial herr_t set_attr_phase_change
+        (hid_t ocpl_id, uint max_compact = 8, uint min_dense = 6);
+
+    /// <summary>
     /// Sets the character encoding used to encode link and attribute names.
     /// See https://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetCharEncoding
     /// </summary>
