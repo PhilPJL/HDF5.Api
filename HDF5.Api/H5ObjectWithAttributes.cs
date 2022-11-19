@@ -44,27 +44,27 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
     internal H5PrimitiveAttribute<TA> OpenPrimitiveAttribute<TA>(string name) //where TA : unmanaged
     {
-        return H5AAdapter.Open(this, name, h => new H5PrimitiveAttribute<TA>(h));
+        return H5AAdapter.Open(this, name, static h => new H5PrimitiveAttribute<TA>(h));
     }
 
     internal H5BooleanAttribute OpenBooleanAttribute(string name)
     {
-        return H5AAdapter.Open(this, name, h => new H5BooleanAttribute(h));
+        return H5AAdapter.Open(this, name, static h => new H5BooleanAttribute(h));
     }
 
     internal H5DecimalAttribute OpenDecimalAttribute(string name)
     {
-        return H5AAdapter.Open(this, name, h => new H5DecimalAttribute(h));
+        return H5AAdapter.Open(this, name, static h => new H5DecimalAttribute(h));
     }
 
     internal H5StringAttribute OpenStringAttribute(string name)
     {
-        return H5AAdapter.Open(this, name, h => new H5StringAttribute(h));
+        return H5AAdapter.Open(this, name, static h => new H5StringAttribute(h));
     }
 
     internal H5TimeSpanAttribute OpenTimeSpanAttribute(string name)
     {
-        return H5AAdapter.Open(this, name, h => new H5TimeSpanAttribute(h));
+        return H5AAdapter.Open(this, name, static h => new H5TimeSpanAttribute(h));
     }
 
 #if NET7_0_OR_GREATER
@@ -72,38 +72,38 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5AAdapter.Open(this, name, h => new H5TimeOnlyAttribute(h));
+        return H5AAdapter.Open(this, name, static h => new H5TimeOnlyAttribute(h));
     }
 
     internal H5DateOnlyAttribute OpenDateOnlyAttribute([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5AAdapter.Open(this, name, h => new H5DateOnlyAttribute(h));
+        return H5AAdapter.Open(this, name, static h => new H5DateOnlyAttribute(h));
     }
 #endif
 
     internal H5DateTimeAttribute OpenDateTimeAttribute(string name)
     {
-        return H5AAdapter.Open(this, name, h => new H5DateTimeAttribute(h));
+        return H5AAdapter.Open(this, name, static h => new H5DateTimeAttribute(h));
     }
 
     internal H5DateTimeOffsetAttribute OpenDateTimeOffsetAttribute(string name)
     {
-        return H5AAdapter.Open(this, name, h => new H5DateTimeOffsetAttribute(h));
+        return H5AAdapter.Open(this, name, static h => new H5DateTimeOffsetAttribute(h));
     }
 
     internal H5EnumAttribute<TA> OpenEnumAttribute<TA>([DisallowNull] string name) where TA : Enum
     {
         Guard.IsNotNullOrWhiteSpace(name);
 
-        return H5AAdapter.Open(this, name, h => new H5EnumAttribute<TA>(h));
+        return H5AAdapter.Open(this, name, static h => new H5EnumAttribute<TA>(h));
     }
 
     #endregion
 
     #region Read attribute
-    
+
     public TA ReadAttribute<TA>([DisallowNull] string name)
     {
         Guard.IsNotNullOrWhiteSpace(name);
@@ -139,63 +139,63 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         object ReadPrimitiveAttribute()
         {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5PrimitiveAttribute<TA>(h));
+            using var attribute = H5AAdapter.Open(this, name, static h => new H5PrimitiveAttribute<TA>(h));
             return attribute.Read()!;
         }
 
         object ReadBoolAttribute()
         {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5BooleanAttribute(h));
+            using var attribute = H5AAdapter.Open(this, name, static h => new H5BooleanAttribute(h));
             return attribute.Read();
         }
 
         object ReadStringAttribute()
         {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5StringAttribute(h));
+            using var attribute = H5AAdapter.Open(this, name, static h => new H5StringAttribute(h));
             return attribute.Read();
         }
 
         object ReadEnumAttribute()
         {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5EnumAttribute<TA>(h));
+            using var attribute = H5AAdapter.Open(this, name, static h => new H5EnumAttribute<TA>(h));
             return attribute.Read()!;
         }
 
         object ReadDateTimeAttribute()
         {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5DateTimeAttribute(h));
+            using var attribute = H5AAdapter.Open(this, name, static h => new H5DateTimeAttribute(h));
             return attribute.Read();
         }
 
 #if NET7_0_OR_GREATER
         object ReadTimeOnlyAttribute()
         {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5TimeOnlyAttribute(h));
+            using var attribute = H5AAdapter.Open(this, name, static h => new H5TimeOnlyAttribute(h));
             return attribute.Read();
         }
 
         object ReadDateOnlyAttribute()
         {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5DateOnlyAttribute(h));
+            using var attribute = H5AAdapter.Open(this, name, static h => new H5DateOnlyAttribute(h));
             return attribute.Read();
         }
 #endif
 
         object ReadDateTimeOffsetAttribute()
         {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5DateTimeOffsetAttribute(h));
+            using var attribute = H5AAdapter.Open(this, name, static h => new H5DateTimeOffsetAttribute(h));
             return attribute.Read();
         }
 
         object ReadTimeSpanAttribute()
         {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5TimeSpanAttribute(h));
+            using var attribute = H5AAdapter.Open(this, name, static h => new H5TimeSpanAttribute(h));
             return attribute.Read();
         }
 
         object ReadDecimalAttribute()
         {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5DecimalAttribute(h));
+            using var attribute = H5AAdapter.Open(this, name, static h => new H5DecimalAttribute(h));
             return attribute.Read();
         }
 
@@ -222,13 +222,12 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         {
             char or byte or sbyte or short or ushort or int or uint or long or ulong or float or double
                 => ReadPrimitiveAttribute(),
+            _ => Array.Empty<TA>()
         };
-
-        return Array.Empty<TA>();
 
         IEnumerable<TA> ReadPrimitiveAttribute()
         {
-            using var attribute = H5AAdapter.Open(this, name, h => new H5PrimitiveAttribute<TA>(h));
+            using var attribute = H5AAdapter.Open(this, name, static h => new H5PrimitiveAttribute<TA>(h));
             return attribute.ReadCollection()!;
         }
     }
@@ -271,61 +270,61 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         Guard.IsNotNull(value);
 
         var exists = CheckExists(name, writeBehaviour);
-        var shapeCtor = H5Space.CreateScalar; 
+        var shapeCtor = H5Space.CreateScalar;
 
         var type = typeof(TA);
 
-        if(value is IEnumerable<string> values)
+        if (value is IEnumerable<string> values)
         {
             WriteAttribute(name, values, 0, writeBehaviour: writeBehaviour);
         }
-        else if(value is string stringValue)
+        else if (value is string stringValue)
         {
             // Write a variable length string with default encoding and padding
             WriteAttribute(name, stringValue, 0, writeBehaviour: writeBehaviour);
         }
-        else if(value is Array array)
+        else if (value is Array array)
         {
             WriteAttribute(name, array, 0, writeBehaviour: writeBehaviour);
         }
         else if (type.IsEnum)
         {
-            using var attribute = 
-                H5AAdapter.CreateOrOpen(this, name, H5EnumType<TA>.Create, shapeCtor, h => new H5EnumAttribute<TA>(h));
+            using var attribute =
+                H5AAdapter.CreateOrOpen(this, name, H5EnumType<TA>.Create, shapeCtor, static h => new H5EnumAttribute<TA>(h));
 
             attribute.Write(value);
         }
         else if (value is bool boolValue)
         {
-            using var attribute = 
+            using var attribute =
                 H5AAdapter.CreateOrOpen(this, name, H5BooleanType.Create, shapeCtor, H5BooleanAttribute.Create);
 
             attribute.Write(boolValue);
         }
         else if (value is decimal decimalValue)
         {
-            using var attribute = 
+            using var attribute =
                 H5AAdapter.CreateOrOpen(this, name, H5DecimalType.Create, shapeCtor, H5DecimalAttribute.Create);
 
             attribute.Write(decimalValue);
         }
         else if (value is DateTimeOffset dateTimeOffsetValue)
         {
-            using var attribute = 
+            using var attribute =
                 H5AAdapter.CreateOrOpen(this, name, H5DateTimeOffsetType.Create, shapeCtor, H5DateTimeOffsetAttribute.Create);
 
             attribute.Write(dateTimeOffsetValue);
         }
         else if (value is DateTime dateTimeValue)
         {
-            using var attribute = 
+            using var attribute =
                 H5AAdapter.CreateOrOpen(this, name, H5DateTimeType.Create, shapeCtor, H5DateTimeAttribute.Create);
 
             attribute.Write(dateTimeValue);
         }
         else if (value is TimeSpan timeSpanValue)
         {
-            using var attribute = 
+            using var attribute =
                 H5AAdapter.CreateOrOpen(this, name, H5TimeSpanType.Create, shapeCtor, H5TimeSpanAttribute.Create);
 
             attribute.Write(timeSpanValue);
@@ -333,14 +332,14 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 #if NET7_0_OR_GREATER
         else if (value is TimeOnly timeOnlyValue)
         {
-            using var attribute = 
+            using var attribute =
                 H5AAdapter.CreateOrOpen(this, name, H5TimeOnlyType.Create, shapeCtor, H5TimeOnlyAttribute.Create);
 
             attribute.Write(timeOnlyValue);
         }
         else if (value is DateOnly dateOnlyValue)
         {
-            using var attribute = 
+            using var attribute =
                 H5AAdapter.CreateOrOpen(this, name, H5DateOnlyType.Create, shapeCtor, H5DateOnlyAttribute.Create);
 
             attribute.Write(dateOnlyValue);
@@ -348,7 +347,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 #endif
         else if (type.IsPrimitive)
         {
-            using var attribute = 
+            using var attribute =
                 H5AAdapter.CreateOrOpen(this, name, H5PrimitiveType<TA>.Create, shapeCtor, H5PrimitiveAttribute<TA>.Create);
 
             attribute.Write(value);
@@ -372,8 +371,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         var exists = CheckExists(name, writeBehaviour);
 
-        Func<H5Space> shapeCtor = dimensions == null 
-            ? (() => H5Space.Create(new Dimension(values.Count()))) 
+        Func<H5Space> shapeCtor = dimensions == null
+            ? (() => H5Space.Create(new Dimension(values.Count())))
             : (() => H5Space.Create(dimensions));
 
         // TODO: check values.Count = dimensions
@@ -429,14 +428,14 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 #if NET7_0_OR_GREATER
         else if (values is IEnumerable<TimeOnly> timeOnlyValues)
         {
-            using var attribute = 
+            using var attribute =
                 H5AAdapter.CreateOrOpen(this, name, H5TimeOnlyType.Create, shapeCtor, H5TimeOnlyAttribute.Create);
 
             attribute.Write(timeOnlyValues);
         }
         else if (values is IEnumerable<DateOnly> dateOnlyValues)
         {
-            using var attribute = 
+            using var attribute =
                 H5AAdapter.CreateOrOpen(this, name, H5DateOnlyType.Create, shapeCtor, H5DateOnlyAttribute.Create);
 
             attribute.Write(dateOnlyValues);
@@ -468,8 +467,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         var exists = CheckExists(name, writeBehaviour);
 
-        Func<H5Space> shapeCtor = dimensions == null 
-            ? (() => H5Space.Create(new Dimension(values.Count()))) 
+        Func<H5Space> shapeCtor = dimensions == null
+            ? (() => H5Space.Create(new Dimension(values.Count())))
             : (() => H5Space.Create(dimensions));
 
         // TODO: check values.Count = dimensions
@@ -509,8 +508,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         using H5StringAttribute attribute = exists
             ? H5AAdapter.Open(this, name, H5StringAttribute.Create)
-            : H5AAdapter.Create(this, name, 
-                () => H5StringType.Create(fixedStorageLength, characterSet, padding), 
+            : H5AAdapter.Create(this, name,
+                () => H5StringType.Create(fixedStorageLength, characterSet, padding),
                 shapeCtor, H5StringAttribute.Create);
 
         attribute.Write(value);
@@ -533,8 +532,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         using H5StringAttribute attribute = exists
             ? H5AAdapter.Open(this, name, H5StringAttribute.Create)
-            : H5AAdapter.Create(this, name, 
-                () => H5StringType.Create(fixedStorageLength, characterSet, padding), 
+            : H5AAdapter.Create(this, name,
+                () => H5StringType.Create(fixedStorageLength, characterSet, padding),
                 shapeCtor, H5StringAttribute.Create);
 
         attribute.Write(values);
@@ -557,7 +556,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         var shapeCtor = () => H5Space.Create(dimensions);
         using var shape = shapeCtor();
         Debug.WriteLine($"{shape.GetSimpleExtentNPoints()}, {values.Count()}");
-        if(shape.GetSimpleExtentNPoints() != values.Count())
+        if (shape.GetSimpleExtentNPoints() != values.Count())
         {
             // throw
             throw new H5Exception($"The dimensions specify a size of {shape.GetSimpleExtentNPoints()}, but there are {values.Count()} values.");
@@ -565,8 +564,8 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
 
         using H5StringAttribute attribute = exists
             ? H5AAdapter.Open(this, name, H5StringAttribute.Create)
-            : H5AAdapter.Create(this, name, 
-                () => H5StringType.Create(fixedStorageLength, characterSet, padding), 
+            : H5AAdapter.Create(this, name,
+                () => H5StringType.Create(fixedStorageLength, characterSet, padding),
                 shapeCtor, H5StringAttribute.Create);
 
         attribute.Write(values);

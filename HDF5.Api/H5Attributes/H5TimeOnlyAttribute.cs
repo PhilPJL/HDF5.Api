@@ -13,7 +13,7 @@ public class H5TimeOnlyAttribute : H5Attribute<TimeOnly, H5TimeOnlyAttribute, H5
 
     public override H5TimeOnlyType GetAttributeType()
     {
-        return H5AAdapter.GetType(this, h => new H5TimeOnlyType(h));
+        return H5AAdapter.GetType(this, static h => new H5TimeOnlyType(h));
     }
 
     public override TimeOnly Read()

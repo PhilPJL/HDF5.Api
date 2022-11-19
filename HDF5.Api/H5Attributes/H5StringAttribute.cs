@@ -19,7 +19,7 @@ public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5String
 
     public override H5StringType GetAttributeType()
     {
-        return H5AAdapter.GetType(this, h => new H5StringType(h));
+        return H5AAdapter.GetType(this, static h => new H5StringType(h));
     }
 
     public override string Read()

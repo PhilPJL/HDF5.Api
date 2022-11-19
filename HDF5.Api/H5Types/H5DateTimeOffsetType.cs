@@ -10,7 +10,7 @@ public class H5DateTimeOffsetType : H5CompoundType<DateTimeOffset>
 
     internal static H5DateTimeOffsetType Create()
     {
-        var type = H5TAdapter.CreateCompoundType<DateTimeOffsetProxy, H5DateTimeOffsetType>(h => new H5DateTimeOffsetType(h));
+        var type = H5TAdapter.CreateCompoundType<DateTimeOffsetProxy, H5DateTimeOffsetType>(static h => new H5DateTimeOffsetType(h));
 
         try
         {

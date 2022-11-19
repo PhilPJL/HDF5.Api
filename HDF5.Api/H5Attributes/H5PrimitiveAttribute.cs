@@ -19,7 +19,7 @@ public class H5PrimitiveAttribute<T> : H5Attribute<T, H5PrimitiveAttribute<T>, H
     {
         H5ThrowHelpers.ThrowIfManaged<T>();
 
-        return H5AAdapter.GetType(this, h => new H5PrimitiveType<T>(h));
+        return H5AAdapter.GetType(this, static h => new H5PrimitiveType<T>(h));
     }
 
     public override T Read()

@@ -13,7 +13,7 @@ public class H5DateOnlyAttribute : H5Attribute<DateOnly, H5DateOnlyAttribute, H5
 
     public override H5DateOnlyType GetAttributeType()
     {
-        return H5AAdapter.GetType(this, h => new H5DateOnlyType(h));
+        return H5AAdapter.GetType(this, static h => new H5DateOnlyType(h));
     }
 
     public override DateOnly Read()

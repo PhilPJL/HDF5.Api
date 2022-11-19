@@ -10,7 +10,7 @@ public class H5DecimalType : H5Type<decimal>
 
     internal static H5DecimalType Create()
     {
-        return H5TAdapter.CreateOpaqueType(sizeof(decimal), typeof(decimal).FullName!, h => new H5DecimalType(h));
+        return H5TAdapter.CreateOpaqueType(sizeof(decimal), typeof(decimal).FullName!, static h => new H5DecimalType(h));
     }
 
     // TODO?

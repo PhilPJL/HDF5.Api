@@ -134,15 +134,33 @@ public abstract class H5Test<T> where T : H5Test<T>
         var typeName = typeof(T).Name;
         var fullpath = Path.Combine(TestFolder, Path.ChangeExtension($"{typeName}-{path}", "h5"));
 
-        var file = H5File.Create(
-            fullpath,
-            failIfExists,
-            fileCreationPropertyList,
-            fileAccessPropertyList);
+/*        bool faplIsNull = fileAccessPropertyList is null;
 
-        Assert.IsTrue(File.Exists(fullpath));
+        try
+        {
+            if (faplIsNull)
+            {
+                fileAccessPropertyList = H5File.CreateAccessPropertyList();
+                fileAccessPropertyList.SetLibraryVersionBounds(LibraryVersion.Version110);
+            }
+*/
+            var file = H5File.Create(
+                fullpath,
+                failIfExists,
+                fileCreationPropertyList,
+                fileAccessPropertyList);
 
-        return file;
+            Assert.IsTrue(File.Exists(fullpath));
+
+            return file;
+/*        }
+        finally
+        {
+            if (faplIsNull)
+            {
+                fileAccessPropertyList?.Dispose();
+            }
+        }*/
     }
 
     internal static H5File CreateOrOpenFile(

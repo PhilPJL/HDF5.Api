@@ -306,23 +306,21 @@ internal static unsafe class H5AAdapter
 
     #region Write
 
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
     internal static void Write<T>(H5Attribute attribute, H5Type type, T value) //where T : unmanaged
     {
         H5ThrowHelpers.ThrowIfManaged<T>();
 
         // We are relying on code consistency to ensure T is unmanaged since generic constraints aren't flexible enough
 
-#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
         var size = sizeof(T);
-#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 
         int attributeStorageSize = attribute.StorageSize;
         H5ThrowHelpers.ThrowOnAttributeStorageMismatch<T>(attributeStorageSize, size);
 
-#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
         Write(attribute, type, new IntPtr(&value));
-#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
     }
+#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 
     internal static void Write(H5Attribute attribute, H5Type type, IntPtr buffer)
     {

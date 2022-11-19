@@ -11,7 +11,7 @@ public class H5DateTimeAttribute : H5Attribute<DateTime, H5DateTimeAttribute, H5
 
     public override H5DateTimeType GetAttributeType()
     {
-        return H5AAdapter.GetType(this, h => new H5DateTimeType(h));
+        return H5AAdapter.GetType(this, static h => new H5DateTimeType(h));
     }
 
     public override DateTime Read()

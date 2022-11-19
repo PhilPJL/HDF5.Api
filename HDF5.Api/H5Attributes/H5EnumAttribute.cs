@@ -16,7 +16,7 @@ public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<
     {
         H5ThrowHelpers.ThrowIfNotEnum<T>();
 
-        return H5AAdapter.GetType(this, h => new H5EnumType<T>(h));
+        return H5AAdapter.GetType(this, static h => new H5EnumType<T>(h));
     }
 
     public override T Read()

@@ -12,6 +12,6 @@ public class H5EnumType<T> : H5Type<T> // where T : unmanaged, Enum
 
     internal static H5EnumType<T> Create()
     {
-        return H5TAdapter.CreateEnumType<T, H5EnumType<T>>(h => new H5EnumType<T>(h));
+        return H5TAdapter.CreateEnumType<T, H5EnumType<T>>(static h => new H5EnumType<T>(h));
     }
 }

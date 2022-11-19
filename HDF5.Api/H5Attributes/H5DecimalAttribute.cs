@@ -11,7 +11,7 @@ public class H5DecimalAttribute : H5Attribute<decimal, H5DecimalAttribute, H5Dec
 
     public override H5DecimalType GetAttributeType()
     {
-        return H5AAdapter.GetType(this, h => new H5DecimalType(h));
+        return H5AAdapter.GetType(this, static h => new H5DecimalType(h));
     }
 
     public override decimal Read()

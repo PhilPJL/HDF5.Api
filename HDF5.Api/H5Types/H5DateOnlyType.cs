@@ -12,7 +12,7 @@ public class H5DateOnlyType : H5Type<DateOnly>
 
     internal static H5DateOnlyType Create()
     {
-        return H5TAdapter.ConvertDotNetPrimitiveToH5Type<int, H5DateOnlyType>(h => new H5DateOnlyType(h));
+        return H5TAdapter.ConvertDotNetPrimitiveToH5Type<int, H5DateOnlyType>(static h => new H5DateOnlyType(h));
     }
 }
 

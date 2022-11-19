@@ -11,7 +11,7 @@ public class H5BooleanAttribute : H5Attribute<bool, H5BooleanAttribute, H5Boolea
 
     public override H5BooleanType GetAttributeType()
     {
-        return H5AAdapter.GetType(this, h => new H5BooleanType(h));
+        return H5AAdapter.GetType(this, static h => new H5BooleanType(h));
     }
 
     public override bool Read()

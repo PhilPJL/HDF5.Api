@@ -10,6 +10,6 @@ public class H5TimeSpanType : H5Type<TimeSpan>
 
     internal static H5TimeSpanType Create()
     {
-        return H5TAdapter.ConvertDotNetPrimitiveToH5Type<long, H5TimeSpanType>(h => new H5TimeSpanType(h));
+        return H5TAdapter.ConvertDotNetPrimitiveToH5Type<long, H5TimeSpanType>(static h => new H5TimeSpanType(h));
     }
 }

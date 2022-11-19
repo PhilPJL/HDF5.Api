@@ -11,7 +11,7 @@ public class H5TimeSpanAttribute : H5Attribute<TimeSpan, H5TimeSpanAttribute, H5
 
     public override H5TimeSpanType GetAttributeType()
     {
-        return H5AAdapter.GetType(this, h => new H5TimeSpanType(h));
+        return H5AAdapter.GetType(this, static h => new H5TimeSpanType(h));
     }
 
     public override TimeSpan Read()
