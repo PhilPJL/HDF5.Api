@@ -4,7 +4,7 @@ namespace HDF5.Api.H5Types;
 
 #if NET7_0_OR_GREATER
 
-public class H5DateOnlyType : H5Type<DateOnly>
+internal class H5DateOnlyType : H5Type<DateOnly>
 {
     internal H5DateOnlyType(long handle) : base(handle)
     {

@@ -10,7 +10,7 @@ namespace HDF5.Api;
 ///     for use in an HDF5 dataset
 /// </summary>
 /// <typeparam name="TInput"></typeparam>
-public abstract class H5TypeAdapter<TInput> : IH5TypeAdapter<TInput>
+internal abstract class H5TypeAdapter<TInput> : IH5TypeAdapter<TInput>
 {
     public abstract H5Type GetH5Type();
 
@@ -26,7 +26,7 @@ public abstract class H5TypeAdapter<TInput> : IH5TypeAdapter<TInput>
 ///     <typeparamref name="TOutput" />, and
 ///     to implement the <see cref="H5TypeAdapter{TInput}.GetH5Type" /> method to provide a matching H5 type definition.
 /// </remarks>
-public abstract class H5TypeAdapter<TInput, TOutput> : H5TypeAdapter<TInput>
+internal abstract class H5TypeAdapter<TInput, TOutput> : H5TypeAdapter<TInput>
 {
     protected abstract TOutput Convert(TInput source);
 

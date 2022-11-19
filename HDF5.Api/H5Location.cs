@@ -39,7 +39,7 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T> where T : H5Loca
 
     internal IEnumerable<string> DataTypeNames => H5LAdapter.GetNamedDataTypeNames(this);
 
-    public void Enumerate(Action<H5Type> action)
+    internal void Enumerate(Action<H5Type> action)
     {
         foreach (var name in DataTypeNames)
         {
@@ -119,17 +119,16 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T> where T : H5Loca
     /// <summary>
     ///     Create a DataSet in this location
     /// </summary>
-    public H5DataSet CreateDataSet(
+    internal H5DataSet CreateDataSet(
         [DisallowNull] string name,
         [DisallowNull] H5Type type,
-        [DisallowNull] H5Space space,
-        [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList = null)
+        [DisallowNull] H5Space space)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);
         Guard.IsNotNull(space);
 
-        return CreateDataSet(name, type, space, dataSetCreationPropertyList, null);
+        return H5DAdapter.Create(this, name, type, space, null, null);
     }
 
     /// <summary>
@@ -140,7 +139,7 @@ public abstract class H5Location<T> : H5ObjectWithAttributes<T> where T : H5Loca
         [DisallowNull] H5Type type,
         [DisallowNull] H5Space space,
         [AllowNull] H5DataSetCreationPropertyList? dataSetCreationPropertyList,
-        [AllowNull] H5DataSetAccessPropertyList? dataSetAccessPropertyList)
+        [AllowNull] H5DataSetAccessPropertyList? dataSetAccessPropertyList = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(type);

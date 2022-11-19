@@ -3,7 +3,7 @@ using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.H5Attributes;
 
-public class H5DateTimeAttribute : H5Attribute<DateTime, H5DateTimeAttribute, H5DateTimeType>
+internal class H5DateTimeAttribute : H5Attribute<DateTime, H5DateTimeAttribute, H5DateTimeType>
 {
     internal H5DateTimeAttribute(long handle) : base(handle)
     {

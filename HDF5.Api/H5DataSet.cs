@@ -36,14 +36,14 @@ public class H5DataSet : H5ObjectWithAttributes<H5DataSet>
         return H5DAdapter.GetAccessPropertyList(this);
     }
 
-    public H5Type GetH5Type()
+    internal H5Type GetH5Type()
     {
         return H5DAdapter.GetType(this);
     }
 
     public string Name => H5IAdapter.GetName(this);
 
-    public H5Space GetSpace()
+    internal H5Space GetSpace()
     {
         return H5DAdapter.GetSpace(this);
     }
@@ -62,7 +62,7 @@ public class H5DataSet : H5ObjectWithAttributes<H5DataSet>
     }
 
     // TODO: get rid of IntPtr
-    public H5DataSet Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] IntPtr buffer)
+    internal H5DataSet Write([DisallowNull] H5Type type, [DisallowNull] H5Space memorySpace, [DisallowNull] H5Space fileSpace, [DisallowNull] IntPtr buffer)
     {
         Guard.IsNotNull(type);
         Guard.IsNotNull(memorySpace);

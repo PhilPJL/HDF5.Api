@@ -3,7 +3,7 @@ using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.H5Attributes;
 
-public class H5BooleanAttribute : H5Attribute<bool, H5BooleanAttribute, H5BooleanType>
+internal class H5BooleanAttribute : H5Attribute<bool, H5BooleanAttribute, H5BooleanType>
 {
     internal H5BooleanAttribute(long handle) : base(handle)
     {

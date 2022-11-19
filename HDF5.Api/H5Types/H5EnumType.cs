@@ -2,7 +2,7 @@
 
 namespace HDF5.Api.H5Types;
 
-public class H5EnumType<T> : H5Type<T> // where T : unmanaged, Enum
+internal class H5EnumType<T> : H5Type<T> // where T : unmanaged, Enum
 {
     internal H5EnumType(long handle) : base(handle)
     {

@@ -13,7 +13,7 @@ namespace HDF5.Api;
 ///     to a suitable form.
 /// </remarks>
 /// <typeparam name="TInput"></typeparam>
-public class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
+internal class H5DataSetWriter1D<TInput> : Disposable, IH5DataSetWriter<TInput>
 {
     internal H5DataSetWriter1D(H5DataSet h5DataSet, H5Type h5Type, IH5TypeAdapter<TInput> converter, bool ownsDataSet = false)
     {

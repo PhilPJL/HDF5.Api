@@ -457,10 +457,3 @@ internal static unsafe class H5TAdapter
         return new H5Type(h);
     }
 }
-
-// TODO: move this to suitable place
-struct DateTimeOffsetProxy
-{
-    public long DateTime;
-    public short Offset;
-}

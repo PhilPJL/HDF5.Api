@@ -4,7 +4,7 @@ using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.H5Attributes;
 
-public class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<T>>
+internal class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumType<T>>
     //where T : Enum // unmanaged
 {
     internal H5EnumAttribute(long handle) : base(handle)

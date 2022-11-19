@@ -5,7 +5,7 @@
 /// </summary>
 public static class H5DataSetWriter
 {
-    public static IH5DataSetWriter<TInput> CreateOneDimensionalDataSetWriter<TInput, TLocation>
+    internal static IH5DataSetWriter<TInput> CreateOneDimensionalDataSetWriter<TInput, TLocation>
         (H5Location<TLocation> location, string dataSetName, IH5TypeAdapter<TInput> converter, int chunkSize, int compressionLevel = 0)
         where TLocation : H5Location<TLocation>
     {

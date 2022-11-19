@@ -1,8 +1,7 @@
 ﻿using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.H5Types;
-
-public class H5StringType : H5Type<string>
+internal class H5StringType : H5Type<string>
 {
     internal H5StringType(long handle) : base(handle)
     {

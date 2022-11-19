@@ -283,10 +283,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
             // Write a variable length string with default encoding and padding
             WriteAttribute(name, stringValue, 0, writeBehaviour: writeBehaviour);
         }
-        else if (value is Array array)
-        {
-            WriteAttribute(name, array, 0, writeBehaviour: writeBehaviour);
-        }
         else if (type.IsEnum)
         {
             using var attribute =
@@ -355,15 +351,15 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         else
         {
             // TODO: Compound, arrays, collections etc
-            throw new NotImplementedException($"Support for {typeof(TA).FullName} is not implemented.");
+            throw new NotImplementedException($"Support for {typeof(TA).FullName} is not implemented for this override of {nameof(WriteAttribute)}.");
         }
     }
 
     public void WriteAttribute<TA>(
         [DisallowNull] string name,
         [DisallowNull] IEnumerable<TA> values,
-        long[]? dimensions = null,
-        AttributeWriteBehaviour? writeBehaviour = null)
+        [AllowNull] long[]? dimensions = null,
+        [AllowNull] AttributeWriteBehaviour? writeBehaviour = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(values);
@@ -455,32 +451,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         }
     }
 
-    public void WriteUnmanagedAttribute<TA>(
-        [DisallowNull] string name,
-        [DisallowNull] IEnumerable<TA> values,
-        long[]? dimensions = null,
-        AttributeWriteBehaviour? writeBehaviour = null) where TA : unmanaged
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-        Guard.IsNotNull(values);
-        // TODO: check no elements of values is null
-
-        var exists = CheckExists(name, writeBehaviour);
-
-        Func<H5Space> shapeCtor = dimensions == null
-            ? (() => H5Space.Create(new Dimension(values.Count())))
-            : (() => H5Space.Create(dimensions));
-
-        // TODO: check values.Count = dimensions
-
-        var type = typeof(TA);
-
-        using var attribute =
-            H5AAdapter.CreateOrOpen(this, name, H5PrimitiveType<TA>.Create, shapeCtor, H5UnmanagedPrimitiveAttribute<TA>.Create);
-
-        attribute.Write(values);
-    }
-
     /// <summary>
     /// Write string attribute.
     /// </summary>
@@ -497,7 +467,7 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         int fixedStorageLength,
         CharacterSet characterSet = CharacterSet.Utf8,
         StringPadding padding = StringPadding.NullPad,
-        AttributeWriteBehaviour? writeBehaviour = null)
+        [AllowNull] AttributeWriteBehaviour? writeBehaviour = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(value);
@@ -519,43 +489,22 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         [DisallowNull] string name,
         [DisallowNull] IEnumerable<string> values,
         int fixedStorageLength,
+        [AllowNull] long[]? dimensions = null,
         CharacterSet characterSet = CharacterSet.Utf8,
         StringPadding padding = StringPadding.NullPad,
-        AttributeWriteBehaviour? writeBehaviour = null)
+        [AllowNull] AttributeWriteBehaviour? writeBehaviour = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(values);
         // TODO: check no elements of values is null
 
         var exists = CheckExists(name, writeBehaviour);
-        var shapeCtor = () => H5Space.Create(new Dimension(values.Count()));
 
-        using H5StringAttribute attribute = exists
-            ? H5AAdapter.Open(this, name, H5StringAttribute.Create)
-            : H5AAdapter.Create(this, name,
-                () => H5StringType.Create(fixedStorageLength, characterSet, padding),
-                shapeCtor, H5StringAttribute.Create);
+        dimensions ??= new long[] { values.Count() };
 
-        attribute.Write(values);
-    }
-
-    public void WriteAttribute(
-        [DisallowNull] string name,
-        [DisallowNull] IEnumerable<string> values,
-        long[] dimensions,
-        int fixedStorageLength,
-        CharacterSet characterSet = CharacterSet.Utf8,
-        StringPadding padding = StringPadding.NullPad,
-        AttributeWriteBehaviour? writeBehaviour = null)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-        Guard.IsNotNull(values);
-        // TODO: check no elements of values is null
-
-        var exists = CheckExists(name, writeBehaviour);
         var shapeCtor = () => H5Space.Create(dimensions);
         using var shape = shapeCtor();
-        Debug.WriteLine($"{shape.GetSimpleExtentNPoints()}, {values.Count()}");
+
         if (shape.GetSimpleExtentNPoints() != values.Count())
         {
             // throw
@@ -571,21 +520,20 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         attribute.Write(values);
     }
 
-    public void WriteAttribute(
+    public void WriteAttribute<TA>(
         [DisallowNull] string name,
         [DisallowNull] Array values,
-        int fixedStorageLength,
-        CharacterSet characterSet = CharacterSet.Utf8,
-        StringPadding padding = StringPadding.NullPad,
-        AttributeWriteBehaviour? writeBehaviour = null)
+        [AllowNull] long[]? dimensions = null,
+        [AllowNull] AttributeWriteBehaviour? writeBehaviour = null)
     {
         Guard.IsNotNullOrWhiteSpace(name);
         Guard.IsNotNull(values);
         // TODO: check no elements of values is null
 
-        var dimensions = Enumerable.Range(0, values.Rank).Select(r => (long)values.GetUpperBound(r) + 1).ToArray();
+        dimensions ??= Enumerable.Range(0, values.Rank).Select(r => (long)values.GetUpperBound(r) + 1).ToArray();
+
         Debug.WriteLine(string.Join(",", dimensions));
-        WriteAttribute(name, values.OfType<string>(), dimensions, fixedStorageLength, characterSet, padding, writeBehaviour);
+        WriteAttribute(name, values.OfType<TA>(), dimensions, writeBehaviour: writeBehaviour);
     }
 
     #endregion

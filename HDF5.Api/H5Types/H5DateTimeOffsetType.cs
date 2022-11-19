@@ -2,7 +2,7 @@
 
 namespace HDF5.Api.H5Types;
 
-public class H5DateTimeOffsetType : H5CompoundType<DateTimeOffset>
+internal class H5DateTimeOffsetType : H5CompoundType<DateTimeOffset>
 {
     internal H5DateTimeOffsetType(long handle) : base(handle)
     {
@@ -10,12 +10,12 @@ public class H5DateTimeOffsetType : H5CompoundType<DateTimeOffset>
 
     internal static H5DateTimeOffsetType Create()
     {
-        var type = H5TAdapter.CreateCompoundType<DateTimeOffsetProxy, H5DateTimeOffsetType>(static h => new H5DateTimeOffsetType(h));
+        var type = H5TAdapter.CreateCompoundType<Proxy, H5DateTimeOffsetType>(static h => new H5DateTimeOffsetType(h));
 
         try
         {
-            type.Insert<DateTimeOffsetProxy, long>(nameof(DateTimeOffsetProxy.DateTime));
-            type.Insert<DateTimeOffsetProxy, int>(nameof(DateTimeOffsetProxy.Offset));
+            type.Insert<Proxy, long>(nameof(Proxy.DateTime));
+            type.Insert<Proxy, int>(nameof(Proxy.Offset));
             return type;
         }
         catch
@@ -23,5 +23,27 @@ public class H5DateTimeOffsetType : H5CompoundType<DateTimeOffset>
             type.Dispose();
             throw;
         }
+    }
+
+    internal struct Proxy
+    {
+        public long DateTime;
+        public short Offset;
+    }
+
+    internal static DateTimeOffset FromProxy(Proxy proxy)
+    {
+        return new DateTimeOffset(
+            DateTime.FromBinary(proxy.DateTime), 
+            TimeSpan.FromMinutes(proxy.Offset));
+    }
+
+    internal static Proxy ToProxy(DateTimeOffset value)
+    {
+        return new H5DateTimeOffsetType.Proxy
+        {
+            DateTime = value.DateTime.ToBinary(),
+            Offset = (short)value.Offset.TotalMinutes
+        };
     }
 }

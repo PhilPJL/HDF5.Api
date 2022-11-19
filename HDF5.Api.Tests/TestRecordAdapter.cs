@@ -6,7 +6,7 @@ namespace HDF5.Api.Tests;
 /// <summary>
 ///     A type converter for <see cref="TestRecord" />.
 /// </summary>
-public sealed class TestRecordAdapter : H5TypeAdapter<TestRecord, TestRecordAdapter.STestRecord>
+internal sealed class TestRecordAdapter : H5TypeAdapter<TestRecord, TestRecordAdapter.STestRecord>
 {
     private TestRecordAdapter() { }
 

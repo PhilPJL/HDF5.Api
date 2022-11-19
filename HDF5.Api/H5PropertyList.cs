@@ -9,7 +9,7 @@ namespace HDF5.Api;
 ///     <para>.NET wrapper for H5P (Property list) API.</para>
 ///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_p.html"/>
 /// </summary>
-public abstract class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5PropertyList>
+internal abstract class H5PropertyList : H5Object<H5PropertyList>, IEquatable<H5PropertyList>
 {
     protected internal H5PropertyList(long handle) : base(handle, HandleType.PropertyList, H5PAdapter.Close)
     {
@@ -122,8 +122,7 @@ internal class H5LinkCreationPropertyList : H5AttributeCreationPropertyList
     }
 }
 
-// TODO: make internal
-public class H5DataSetCreationPropertyList : H5PropertyList
+internal class H5DataSetCreationPropertyList : H5PropertyList
 {
     internal H5DataSetCreationPropertyList(long handle) : base(handle)
     {
@@ -173,7 +172,7 @@ internal class H5DataSetAccessPropertyList : H5PropertyList
     {
     }
 
-    // TODO: add properties and then make public
+    // TODO: add properties
 }
 
 internal class H5FileAccessPropertyList : H5PropertyList
@@ -203,7 +202,7 @@ internal class H5FileAccessPropertyList : H5PropertyList
         return H5PAdapter.GetLibraryVersionBounds(this);
     }
 
-    // TODO: add properties and then make public
+    // TODO: add properties
 }
 
 internal class H5FileCreationPropertyList : H5PropertyList
@@ -250,7 +249,7 @@ internal class H5DataTypeCreationPropertyList : H5PropertyList
     {
     }
 
-    // TODO: add properties and then make public
+    // TODO: add properties
 }
 
 internal class H5DataTypeAccessPropertyList : H5PropertyList
@@ -263,8 +262,8 @@ internal class H5DataTypeAccessPropertyList : H5PropertyList
     {
     }
 
-    // TODO: add properties and then make public
+    // TODO: add properties
 
 }
 
-// TODO: other property lists
+// TODO: other property lists?

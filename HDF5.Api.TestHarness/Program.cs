@@ -37,7 +37,7 @@ namespace HDF5.Api.TestHarness
             sw.Start();
             for (int i = 0; i < 1; i++)
             {
-                file.WriteUnmanagedAttribute($"c#1-{d}x{d}-{i}", list, new long[] { d, d });
+                file.WriteAttribute($"c#1-{d}x{d}-{i}", (IEnumerable<double>)list, new long[] { d, d });
             }
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds);
@@ -149,6 +149,8 @@ namespace HDF5.Api.TestHarness
             //Console.WriteLine(H5Global.GetLibraryVersion());
             //DumpLocation(file, 1);
             //Console.WriteLine(H5Global.GetLibraryVersion());
+
+            Console.ReadLine();
         }
 
         private static void DumpLocation<T>(H5Location<T> location, int indent) where T : H5Location<T>

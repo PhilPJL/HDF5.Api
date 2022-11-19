@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace HDF5.Api.H5Attributes;
 
-public class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5StringType>
+internal class H5StringAttribute : H5Attribute<string, H5StringAttribute, H5StringType>
 {
     internal H5StringAttribute(long handle) : base(handle)
     {

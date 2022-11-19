@@ -5,7 +5,7 @@ namespace HDF5.Api.H5Attributes;
 
 #if NET7_0_OR_GREATER
 
-public class H5TimeOnlyAttribute : H5Attribute<TimeOnly, H5TimeOnlyAttribute, H5TimeOnlyType>
+internal class H5TimeOnlyAttribute : H5Attribute<TimeOnly, H5TimeOnlyAttribute, H5TimeOnlyType>
 {
     internal H5TimeOnlyAttribute(long handle) : base(handle)
     {

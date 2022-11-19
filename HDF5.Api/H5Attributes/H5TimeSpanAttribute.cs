@@ -3,7 +3,7 @@ using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.H5Attributes;
 
-public class H5TimeSpanAttribute : H5Attribute<TimeSpan, H5TimeSpanAttribute, H5TimeSpanType>
+internal class H5TimeSpanAttribute : H5Attribute<TimeSpan, H5TimeSpanAttribute, H5TimeSpanType>
 {
     internal H5TimeSpanAttribute(long handle) : base(handle)
     {

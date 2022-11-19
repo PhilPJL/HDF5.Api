@@ -3,7 +3,7 @@ using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.H5Attributes;
 
-public class H5DecimalAttribute : H5Attribute<decimal, H5DecimalAttribute, H5DecimalType>
+internal class H5DecimalAttribute : H5Attribute<decimal, H5DecimalAttribute, H5DecimalType>
 {
     internal H5DecimalAttribute(long handle) : base(handle)
     {

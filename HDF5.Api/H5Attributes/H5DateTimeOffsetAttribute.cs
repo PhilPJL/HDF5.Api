@@ -3,7 +3,7 @@ using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.H5Attributes;
 
-public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset, H5DateTimeOffsetAttribute, H5DateTimeOffsetType>
+internal class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset, H5DateTimeOffsetAttribute, H5DateTimeOffsetType>
 {
     internal H5DateTimeOffsetAttribute(long handle) : base(handle)
     {
@@ -17,25 +17,21 @@ public class H5DateTimeOffsetAttribute : H5Attribute<DateTimeOffset, H5DateTimeO
     public override DateTimeOffset Read()
     {
         // TODO: optionally write value.ToString("O")
+        
         using var type = GetAttributeType();
         using var expectedType = H5DateTimeOffsetType.Create();
 
-        var value = H5AAdapter.ReadImpl<DateTimeOffsetProxy>(this, type, expectedType);
+        var value = H5AAdapter.ReadImpl<H5DateTimeOffsetType.Proxy>(this, type, expectedType);
 
-        return new DateTimeOffset(DateTime.FromBinary(value.DateTime), TimeSpan.FromMinutes(value.Offset));
+        return H5DateTimeOffsetType.FromProxy(value);
     }
 
     public override void Write([DisallowNull] DateTimeOffset value)
     {
-        var dt = new DateTimeOffsetProxy
-        {
-            DateTime = value.DateTime.ToBinary(),
-            Offset = (short)value.Offset.TotalMinutes
-        };
-
         // TODO: optionally write value.ToString("O")
+
         using var type = H5DateTimeOffsetType.Create();
-        H5AAdapter.Write(this, type, dt);
+        H5AAdapter.Write(this, type, H5DateTimeOffsetType.ToProxy(value));
     }
 
     public static H5DateTimeOffsetAttribute Create(long handle)

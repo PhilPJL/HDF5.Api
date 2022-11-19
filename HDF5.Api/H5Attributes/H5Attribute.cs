@@ -6,7 +6,7 @@ namespace HDF5.Api.H5Attributes;
 ///     <para>.NET wrapper for H5A (Attribute) API.</para>
 ///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_a.html"/>
 /// </summary>
-public abstract class H5Attribute : H5Object<H5Attribute>
+internal abstract class H5Attribute : H5Object<H5Attribute>
 {
     internal H5Attribute(long handle) : base(handle, HandleType.Attribute, H5AAdapter.Close)
     {

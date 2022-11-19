@@ -8,7 +8,7 @@ namespace HDF5.Api;
 ///     <para>.NET wrapper for H5S (Space) API.</para>
 ///     Native methods are described here: <see href="https://docs.hdfgroup.org/hdf5/v1_10/group___h5_s.html"/>
 /// </summary>
-public class H5Space : H5Object<H5Space>
+internal class H5Space : H5Object<H5Space>
 {
     internal H5Space(long handle) : base(handle, HandleType.Space, H5SAdapter.Close) { }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace HDF5.Api.H5Attributes;
 
-public abstract class H5Attribute<T, TA, TT> : H5Attribute
+internal abstract class H5Attribute<T, TA, TT> : H5Attribute
     where TA : H5Attribute<T, TA, TT>
     where TT : H5Type<T>
 {

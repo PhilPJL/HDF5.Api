@@ -3,7 +3,7 @@ using HDF5.Api.NativeMethodAdapters;
 
 namespace HDF5.Api.H5Attributes;
 
-public class H5CompoundAttribute<T> : H5Attribute<T, H5CompoundAttribute<T>, H5CompoundType<T>>
+internal class H5CompoundAttribute<T> : H5Attribute<T, H5CompoundAttribute<T>, H5CompoundType<T>>
 {
     internal H5CompoundAttribute(long handle) : base(handle)
     {

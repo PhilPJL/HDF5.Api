@@ -7,7 +7,7 @@ namespace HDF5.Api;
 ///     Interface that needs to be implemented by the H5TypeAdapter used by the IH5DataWriter.
 /// </summary>
 /// <typeparam name="TInput"></typeparam>
-public interface IH5TypeAdapter<in TInput>
+internal interface IH5TypeAdapter<in TInput>
 {
     H5Type GetH5Type();
     void Write(Action<IntPtr> write, IEnumerable<TInput> inputRecords);
