@@ -37,24 +37,26 @@ namespace HDF5.Api.TestHarness
             sw.Start();
             for (int i = 0; i < 1; i++)
             {
-                file.WriteAttribute($"c#1-{d}x{d}-{i}", (IEnumerable<double>)list, new long[] { d, d });
+                file.WriteAttribute($"c#-array-2000x2000", (IEnumerable<double>)list, new long[] { d, d });
             }
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds);
             sw.Restart();
 
-            var list2 = file.ReadAttribute<double>($"c#1-{d}x{d}-{0}", d, d);
-
+            for (int i = 0; i < 1; i++)
+            {
+                var list2 = file.ReadAttribute<double>($"c#-array-2000x2000", d, d);
+            }
             Console.WriteLine(sw.ElapsedMilliseconds);
 
-            if(list.Zip(list2, (l, m) => new {l, m}).Any(x => x.l != x.m))
-            {
-                Console.WriteLine("Fail");
-            }
-            else
-            {
-                Console.WriteLine("Succeed");
-            }
+            //if(list.Zip(list2, (l, m) => new {l, m}).Any(x => x.l != x.m))
+            //{
+            //    Console.WriteLine("Fail");
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Succeed");
+            //}
 
             //for (int i = 0; i < 1000; i++)
             //{

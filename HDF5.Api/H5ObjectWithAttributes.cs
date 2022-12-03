@@ -355,6 +355,77 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         }
     }
 
+    /// <summary>
+    /// Write string attribute.
+    /// </summary>
+    /// <param name="name">Attribute name. This can be unicode and isn't impacted by the <paramref name="fixedStorageLength"/> value.</param>
+    /// <param name="fixedStorageLength">The total number of bytes allocated to store the string including the null terminator.  Set to 0 for a variable length string.
+    /// <para>ASCII strings require 1 byte per character, plus 1 for the null terminator.</para>
+    /// <para>UTF8 strings require 1-4 bytes per character, plus 1 for the null terminator.</para></param>
+    /// <param name="characterSet">Defaults to <see cref="CharacterSet.Utf8"/>.</param>
+    /// <param name="padding"></param>
+    /// <returns></returns>
+    public void WriteAttribute(
+        [DisallowNull] string name,
+        [DisallowNull] string value,
+        int fixedStorageLength,
+        CharacterSet characterSet = CharacterSet.Utf8,
+        StringPadding padding = StringPadding.NullPad,
+        [AllowNull] AttributeWriteBehaviour? writeBehaviour = null)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(value);
+
+        var exists = CheckExists(name, writeBehaviour);
+
+        var shapeCtor = H5Space.CreateScalar; // TODO: arrays?
+
+        using H5StringAttribute attribute = exists
+            ? H5AAdapter.Open(this, name, H5StringAttribute.Create)
+            : H5AAdapter.Create(this, name,
+                () => H5StringType.Create(fixedStorageLength, characterSet, padding),
+                shapeCtor, H5StringAttribute.Create);
+
+        attribute.Write(value);
+    }
+
+    public void WriteAttribute<TA>(
+        [DisallowNull] string name,
+        [DisallowNull] Array values,
+        [AllowNull] long[]? dimensions = null,
+        [AllowNull] AttributeWriteBehaviour? writeBehaviour = null)
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(values);
+        // TODO: check no elements of values is null
+
+        dimensions ??= Enumerable.Range(0, values.Rank).Select(r => (long)values.GetUpperBound(r) + 1).ToArray();
+
+        Debug.WriteLine(string.Join(",", dimensions));
+        WriteAttribute(name, values.OfType<TA>(), dimensions, writeBehaviour: writeBehaviour);
+    }
+
+    public void WriteEnumAttribute<TE>(
+    [DisallowNull] string name,
+    [DisallowNull] IEnumerable<TE> values,
+    [AllowNull] long[]? dimensions = null,
+    [AllowNull] AttributeWriteBehaviour? writeBehaviour = null) where TE : Enum
+    {
+        Guard.IsNotNullOrWhiteSpace(name);
+        Guard.IsNotNull(values);
+
+        var exists = CheckExists(name, writeBehaviour);
+
+        Func<H5Space> shapeCtor = dimensions == null
+            ? (() => H5Space.Create(new Dimension(values.Count())))
+            : (() => H5Space.Create(dimensions));
+
+        using var attribute =
+            H5AAdapter.CreateOrOpen(this, name, H5EnumType<TE>.Create, shapeCtor, static h => new H5EnumAttribute<TE>(h));
+
+        attribute.Write(values);
+    }
+
     public void WriteAttribute<TA>(
         [DisallowNull] string name,
         [DisallowNull] IEnumerable<TA> values,
@@ -379,13 +450,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         {
             WriteAttribute(name, stringValues, 0, writeBehaviour: writeBehaviour);
         }
-        //else if (type.IsEnum)
-        //{
-        //    using var attribute =
-        //        H5AAdapter.CreateOrOpen(this, name, H5EnumType<TA>.Create, shapeCtor, h => new H5EnumAttribute<TA>(h));
-
-        //    attribute.Write(value);
-        //}
         else if (values is IEnumerable<bool> boolValues)
         {
             using var attribute =
@@ -451,40 +515,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
         }
     }
 
-    /// <summary>
-    /// Write string attribute.
-    /// </summary>
-    /// <param name="name">Attribute name. This can be unicode and isn't impacted by the <paramref name="fixedStorageLength"/> value.</param>
-    /// <param name="fixedStorageLength">The total number of bytes allocated to store the string including the null terminator.  Set to 0 for a variable length string.
-    /// <para>ASCII strings require 1 byte per character, plus 1 for the null terminator.</para>
-    /// <para>UTF8 strings require 1-4 bytes per character, plus 1 for the null terminator.</para></param>
-    /// <param name="characterSet">Defaults to <see cref="CharacterSet.Utf8"/>.</param>
-    /// <param name="padding"></param>
-    /// <returns></returns>
-    public void WriteAttribute(
-        [DisallowNull] string name,
-        [DisallowNull] string value,
-        int fixedStorageLength,
-        CharacterSet characterSet = CharacterSet.Utf8,
-        StringPadding padding = StringPadding.NullPad,
-        [AllowNull] AttributeWriteBehaviour? writeBehaviour = null)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-        Guard.IsNotNull(value);
-
-        var exists = CheckExists(name, writeBehaviour);
-
-        var shapeCtor = H5Space.CreateScalar; // TODO: arrays?
-
-        using H5StringAttribute attribute = exists
-            ? H5AAdapter.Open(this, name, H5StringAttribute.Create)
-            : H5AAdapter.Create(this, name,
-                () => H5StringType.Create(fixedStorageLength, characterSet, padding),
-                shapeCtor, H5StringAttribute.Create);
-
-        attribute.Write(value);
-    }
-
     public void WriteAttribute(
         [DisallowNull] string name,
         [DisallowNull] IEnumerable<string> values,
@@ -518,22 +548,6 @@ public abstract class H5ObjectWithAttributes<T> : H5Object<T> where T : H5Object
                 shapeCtor, H5StringAttribute.Create);
 
         attribute.Write(values);
-    }
-
-    public void WriteAttribute<TA>(
-        [DisallowNull] string name,
-        [DisallowNull] Array values,
-        [AllowNull] long[]? dimensions = null,
-        [AllowNull] AttributeWriteBehaviour? writeBehaviour = null)
-    {
-        Guard.IsNotNullOrWhiteSpace(name);
-        Guard.IsNotNull(values);
-        // TODO: check no elements of values is null
-
-        dimensions ??= Enumerable.Range(0, values.Rank).Select(r => (long)values.GetUpperBound(r) + 1).ToArray();
-
-        Debug.WriteLine(string.Join(",", dimensions));
-        WriteAttribute(name, values.OfType<TA>(), dimensions, writeBehaviour: writeBehaviour);
     }
 
     #endregion

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Diagnostics;
 using HDF5.Api.H5Types;
 using HDF5.Api.NativeMethodAdapters;
+using System.Collections.Generic;
 
 namespace HDF5.Api.H5Attributes;
 
@@ -59,6 +60,12 @@ internal class H5EnumAttribute<T> : H5Attribute<T, H5EnumAttribute<T>, H5EnumTyp
 
             return this;
         }
+    }
+
+    public override void Write([DisallowNull] IEnumerable<T> value)
+    {
+        // TODO: 
+        base.Write(value);
     }
 
     public static H5EnumAttribute<T> Create(long handle)
