@@ -48,7 +48,7 @@ internal static unsafe class H5DAdapter
         return new H5DataSet(h);
     }
 
-    public static IEnumerable<T> Read<T>(H5DataSet dataSet) 
+    public static T[] Read<T>(H5DataSet dataSet) 
         where T : unmanaged 
     {
         using var space = dataSet.GetSpace();
@@ -57,18 +57,18 @@ internal static unsafe class H5DAdapter
 
         var cls = type.Class;
 
-        if (cls != DataTypeClass.Compound)
-        {
-            throw new H5Exception($"DataSet is of class {cls} when expecting {DataTypeClass.Compound}.");
-        }
+        //if (cls != DataTypeClass.Compound)
+        //{
+        //    throw new H5Exception($"DataSet is of class {cls} when expecting {DataTypeClass.Compound}.");
+        //}
 
         long size = (long)GetStorageSize(dataSet);
 
-        if (size != count * sizeof(T))
-        {
-            throw new H5Exception(
-                $"Attribute storage size is {size}, which does not match the expected size for {count} items of type {typeof(T).Name} of {count * sizeof(T)}.");
-        }
+        //if (size != count * sizeof(T))
+        //{
+        //    throw new H5Exception(
+        //        $"Attribute storage size is {size}, which does not match the expected size for {count} items of type {typeof(T).Name} of {count * sizeof(T)}.");
+        //}
 
 #if NET7_0_OR_GREATER
         if (size < 256)

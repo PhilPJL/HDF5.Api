@@ -1,12 +1,91 @@
-﻿using HDF5.Api.Attributes;
+﻿using CommunityToolkit.HighPerformance;
+using CommunityToolkit.HighPerformance.Buffers;
+using HDF5.Api.Attributes;
 using HDF5.Api.H5Types;
+using System.Collections.Immutable;
 using System.Diagnostics;
 
 namespace HDF5.Api.TestHarness
 {
+    public sealed class ImageWaveformData<T>
+    {
+        public IImmutableList<T> AxisPositions { get; set; }
+        public IImmutableList<T> Waveform { get; set; }
+    };
+
     internal static class Program
     {
         private static void Main()
+        {
+            const string fileName = @"D:\TeraViewTestFiles\cathode2.h5";
+            using var file = H5File.Open(fileName, readOnly: true);
+
+            var sw = Stopwatch.StartNew();
+
+            using var grp = file.OpenGroup(@"/TerapulseDocument/Measurements/Image Data/IMG-2147483643/sample");
+
+            using var dsLine = grp.OpenDataSet("line");
+            var line = dsLine.Read<int>();
+
+            using var dsData = grp.OpenDataSet("data");
+            var data = dsData.Read<float>();
+
+#if NET7_0_OR_GREATER
+
+            Test1(data, sw);
+            Test2(data, sw);
+
+            static void Test1(Span<float> data, Stopwatch sw)
+            {
+                var data2D = data.AsSpan2D(2050, 40788);
+                var waveforms = new List<ImageWaveformData<float>>(40788);
+
+                Console.WriteLine($"{sw.ElapsedMilliseconds}");
+
+                using var rowOwner = SpanOwner<float>.Allocate(2050);
+                var row = rowOwner.Span;
+
+                for (int i = 0; i < data2D.Width; i++)
+                {
+                    data2D.GetColumn(i).CopyTo(row);
+
+                    waveforms.Add(new ImageWaveformData<float>
+                    {
+                        AxisPositions = row[0..2].ToImmutableArray(),//.Select(s => (double)s).ToImmutableArray(),
+                        Waveform = row[2..].ToImmutableArray()//.Select(s => (double)s).ToImmutableArray()
+                    });
+                };
+
+                Console.WriteLine($"Test1: {sw.ElapsedMilliseconds}");
+            }
+
+            static void Test2(Span<float> data, Stopwatch sw)
+            {
+                var data2D = data.AsSpan2D(40788, 2050);
+                var waveforms = new List<ImageWaveformData<float>>(40788);
+
+                Console.WriteLine($"{sw.ElapsedMilliseconds}");
+
+                using var rowOwner = SpanOwner<float>.Allocate(2050);
+                var row = rowOwner.Span;
+
+                for (int i = 0; i < data2D.Height; i++)
+                {
+                    data2D.GetRowSpan(i).CopyTo(row);
+
+                    waveforms.Add(new ImageWaveformData<float>
+                    {
+                        AxisPositions = row[0..2].ToImmutableArray(), //.Select(s => (double)s).ToImmutableArray(),
+                        Waveform = row[2..].ToImmutableArray()//.Select(s => (double)s).ToImmutableArray()
+                    });
+                };
+
+                Console.WriteLine($"Test2: {sw.ElapsedMilliseconds}");
+            }
+#endif
+        }
+
+        private static void Main1()
         {
             //H5Global.TryLoadLibraries(@"C:\Program Files\HDF_Group\HDF5\1.10.9_intel\bin");
             //H5Global.TryLoadLibraries();

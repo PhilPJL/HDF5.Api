@@ -48,7 +48,7 @@ public class H5DataSet : H5ObjectWithAttributes<H5DataSet>
         return H5DAdapter.GetSpace(this);
     }
 
-    public IEnumerable<T> Read<T>() where T : unmanaged
+    public Span<T> Read<T>() where T : unmanaged
     {
         return H5DAdapter.Read<T>(this);
     }
